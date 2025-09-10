@@ -1,0 +1,234 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User profiles extending Supabase auth.users
+model Profile {
+  id                 String   @id @db.Uuid
+  email              String   @unique
+  full_name          String?
+  timezone           String   @default("America/New_York")
+  date_of_birth      DateTime?
+  onboarding_completed Boolean @default(false)
+  notification_preferences Json? // Store as JSON for flexibility
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  // Relations
+  log_entries        LogEntry[]
+  medications        UserMedication[]
+  action_plan        ActionPlan?
+
+  @@map("profiles")
+}
+
+// Main logging table - central to the app
+model LogEntry {
+  id          String   @id @default(cuid())
+  user_id     String   @db.Uuid
+  logged_at   DateTime @default(now())
+  notes       String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  profile           Profile          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  peak_flow         PeakFlowReading?
+  symptoms          LogSymptom[]
+  medications       LogMedication[]
+  triggers          LogTrigger[]
+
+  @@map("log_entries")
+  @@index([user_id])
+  @@index([logged_at])
+}
+
+// Peak flow readings linked to log entries
+model PeakFlowReading {
+  id           String   @id @default(cuid())
+  log_entry_id String   @unique
+  value        Int // Peak flow value in L/min
+  personal_best Int? // User's personal best for reference
+  zone         PeakFlowZone? // Green, Yellow, Red
+  created_at   DateTime @default(now())
+
+  // Relations
+  log_entry    LogEntry @relation(fields: [log_entry_id], references: [id], onDelete: Cascade)
+
+  @@map("peak_flow_readings")
+}
+
+// Symptom severity tracking
+model LogSymptom {
+  id           String   @id @default(cuid())
+  log_entry_id String
+  symptom_id   String
+  severity     Int      @default(0) // 0-10 scale
+  created_at   DateTime @default(now())
+
+  // Relations
+  log_entry    LogEntry @relation(fields: [log_entry_id], references: [id], onDelete: Cascade)
+  symptom      Symptom  @relation(fields: [symptom_id], references: [id])
+
+  @@map("log_symptoms")
+  @@unique([log_entry_id, symptom_id])
+}
+
+// Medication taken tracking
+model LogMedication {
+  id             String   @id @default(cuid())
+  log_entry_id   String
+  medication_id  String
+  taken          Boolean  @default(false)
+  dosage         String?
+  time_taken     DateTime?
+  notes          String?
+  created_at     DateTime @default(now())
+
+  // Relations
+  log_entry      LogEntry       @relation(fields: [log_entry_id], references: [id], onDelete: Cascade)
+  medication     UserMedication @relation(fields: [medication_id], references: [id])
+
+  @@map("log_medications")
+  @@unique([log_entry_id, medication_id])
+}
+
+// Trigger exposure tracking
+model LogTrigger {
+  id           String        @id @default(cuid())
+  log_entry_id String
+  trigger_id   String
+  exposed      Boolean       @default(false)
+  intensity    TriggerIntensity? // Mild, Moderate, Severe
+  notes        String?
+  created_at   DateTime      @default(now())
+
+  // Relations
+  log_entry    LogEntry      @relation(fields: [log_entry_id], references: [id], onDelete: Cascade)
+  trigger      Trigger       @relation(fields: [trigger_id], references: [id])
+
+  @@map("log_triggers")
+  @@unique([log_entry_id, trigger_id])
+}
+
+// Reference table for symptoms (seeded data)
+model Symptom {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String? // Icon name for UI
+  sort_order  Int      @default(0)
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  // Relations
+  log_symptoms LogSymptom[]
+
+  @@map("symptoms")
+}
+
+// User-specific medications
+model UserMedication {
+  id                String   @id @default(cuid())
+  user_id           String   @db.Uuid
+  name              String
+  dosage            String?
+  frequency         String? // e.g., "2x daily", "as needed"
+  medication_type   MedicationType
+  color             String?  // For UI identification
+  active            Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relations
+  profile           Profile        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  log_medications   LogMedication[]
+
+  @@map("user_medications")
+  @@index([user_id])
+}
+
+// Reference table for triggers (seeded data)
+model Trigger {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  category    TriggerCategory
+  icon        String? // Icon name for UI
+  sort_order  Int      @default(0)
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  // Relations
+  log_triggers LogTrigger[]
+
+  @@map("triggers")
+}
+
+// User's asthma action plan
+model ActionPlan {
+  id          String   @id @default(cuid())
+  user_id     String   @unique @db.Uuid
+  title       String   @default("My Asthma Action Plan")
+  content     Json     // Rich text content stored as JSON
+  green_zone  Json?    // Instructions for good control
+  yellow_zone Json?    // Instructions for caution
+  red_zone    Json?    // Instructions for emergency
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  profile     Profile  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("action_plans")
+}
+
+// Enums
+enum PeakFlowZone {
+  GREEN  // 80-100% of personal best
+  YELLOW // 50-79% of personal best
+  RED    // Below 50% of personal best
+
+  @@map("peak_flow_zone")
+}
+
+enum TriggerIntensity {
+  MILD
+  MODERATE
+  SEVERE
+
+  @@map("trigger_intensity")
+}
+
+enum TriggerCategory {
+  ENVIRONMENTAL // pollen, dust, pollution
+  LIFESTYLE     // exercise, stress
+  WEATHER       // cold air, humidity
+  CHEMICAL      // smoke, perfumes
+  MEDICAL       // infections, medications
+  FOOD          // food allergies
+  OTHER
+
+  @@map("trigger_category")
+}
+
+enum MedicationType {
+  CONTROLLER    // Daily maintenance
+  RESCUE        // Quick relief
+  PREVENTIVE    // Before triggers
+  SUPPLEMENT    // Vitamins, etc.
+
+  @@map("medication_type")
+}
+
+// Row Level Security policies will be implemented at the Supabase level
+// All tables with user_id will have RLS enabled
