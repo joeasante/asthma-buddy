@@ -1,0 +1,45 @@
+require "test_helper"
+
+class SessionsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:verified_user)
+  end
+
+  test "GET /session/new returns 200 with login form" do
+    get new_session_path
+    assert_response :success
+    assert_select "form"
+    assert_select "input[type=email]"
+    assert_select "input[type=password]"
+  end
+
+  test "POST /session with valid credentials creates session and redirects" do
+    assert_difference "Session.count", 1 do
+      post session_path, params: { email_address: @user.email_address, password: "password123" }
+    end
+    assert_redirected_to root_path
+  end
+
+  test "POST /session with wrong password does not create session" do
+    assert_no_difference "Session.count" do
+      post session_path, params: { email_address: @user.email_address, password: "wrongpassword" }
+    end
+    assert_redirected_to new_session_path
+  end
+
+  test "POST /session with non-existent email does not create session" do
+    assert_no_difference "Session.count" do
+      post session_path, params: { email_address: "nobody@example.com", password: "password123" }
+    end
+    assert_redirected_to new_session_path
+  end
+
+  test "DELETE /session destroys session and redirects" do
+    sign_in_as(@user)
+
+    assert_difference "Session.count", -1 do
+      delete session_path
+    end
+    assert_redirected_to new_session_path
+  end
+end
