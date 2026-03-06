@@ -2,6 +2,7 @@
 Rails.application.routes.draw do
   resource :session
   resource :registration, only: %i[ new create ]
+  get "email_verification/:token", to: "email_verifications#show", as: :email_verification
   resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
