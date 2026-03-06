@@ -37,14 +37,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. The test suite runs with `bin/rails test` and produces zero failures on an empty test baseline.
   3. SQLite is running in WAL mode and the database schema can be created with `bin/rails db:schema:load`.
   4. A Kamal deploy configuration exists and a staging deploy succeeds without errors.
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Configure Rails 8 app — WAL-mode SQLite, Solid Queue, Solid Cache, Solid Cable
-- [ ] 01-02: Establish test suite baseline — Minitest, fixtures, system test setup
-- [ ] 01-03: Configure Kamal deployment — staging environment, secrets management
-- [ ] 01-04: Set up CI pipeline — automated test run on push
-- [ ] 01-05: Create root route, application layout, and navigation shell
+- [ ] 01-01-PLAN.md — Enable WAL mode SQLite via database.yml or initializer
+- [ ] 01-02-PLAN.md — Root route, HomeController, and application layout with nav shell
+- [ ] 01-03-PLAN.md — Minitest baseline: HomeController integration test and system test setup
+- [ ] 01-04-PLAN.md — Kamal staging deployment config and CI verification (has checkpoint)
 
 ---
 
@@ -59,15 +58,12 @@ Plans:
   3. A logged-in user remains authenticated after closing and reopening the browser (persistent session).
   4. A user can click "Sign out" from any page and is immediately logged out.
   5. A user who has forgotten their password can request a reset link, receive it by email, and set a new password.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Generate Rails 8 authentication scaffold — User model, has_secure_password, sessions
-- [ ] 02-02: Add email verification — token generation, mailer, verification gate
-- [ ] 02-03: Implement persistent sessions — remember me cookie, session expiry
-- [ ] 02-04: Build password reset flow — token mailer, reset form, token expiry
-- [ ] 02-05: Add sign-out link to navigation and protect all routes with authentication
-- [ ] 02-06: Write Minitest coverage for all auth flows (register, verify, login, logout, reset)
+- [ ] 02-01-PLAN.md — Auth scaffold + RegistrationsController + User model with signup and login
+- [ ] 02-02-PLAN.md — Email verification mailer, token flow, and login gate on verified email
+- [ ] 02-03-PLAN.md — Persistent sessions, password reset, nav auth links, route protection, system test
 
 ---
 
@@ -140,7 +136,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. A logged-in user can enter a peak flow reading (numeric value in L/min) and a timestamp and save it successfully.
   2. A user can set their personal best peak flow value in their profile or settings; this value persists across sessions.
-  3. When a reading is saved, the system automatically computes the zone: Green (>= 80% of personal best), Yellow (50–79%), Red (< 50%) — and stores it against the reading.
+  3. When a reading is saved, the system automatically computes the zone: Green (>= 80% of personal best), Yellow (50-79%), Red (< 50%) — and stores it against the reading.
   4. A user cannot record or view another user's peak flow data (isolation enforced).
 **Plans**: TBD
 
@@ -220,12 +216,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/5 | Not started | - |
-| 2. Authentication | 0/6 | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
+| 2. Authentication | 0/3 | Not started | - |
 | 3. Symptom Recording | 0/5 | Not started | - |
 | 4. Symptom Management | 0/4 | Not started | - |
 | 5. Symptom Timeline | 0/5 | Not started | - |
