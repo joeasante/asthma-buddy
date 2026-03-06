@@ -10,4 +10,7 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 8 }, if: -> { password.present? || new_record? }
 
   generates_token_for :email_verification, expires_in: 24.hours
+  generates_token_for :password_reset, expires_in: 1.hour do
+    password_salt.last(10)
+  end
 end

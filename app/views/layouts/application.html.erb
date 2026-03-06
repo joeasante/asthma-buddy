@@ -3,16 +3,10 @@
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Asthma Buddy" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Asthma Buddy">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
-
-    <%# PWA manifest — enable in Phase 9 when manifest route is configured %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -23,14 +17,22 @@
   </head>
 
   <body>
-    <header role="banner">
-      <nav role="navigation" aria-label="Main navigation">
+    <header>
+      <nav aria-label="Main navigation">
         <%= link_to "Asthma Buddy", root_path, class: "nav-brand" %>
-        <%# Authentication links added in Phase 2 %>
+        <div class="nav-auth">
+          <% if authenticated? %>
+            <span class="nav-user-email"><%= Current.user&.email_address %></span>
+            <%= button_to "Sign out", session_path, method: :delete, class: "btn-sign-out" %>
+          <% else %>
+            <%= link_to "Sign in", new_session_path %>
+            <%= link_to "Sign up", new_registration_path %>
+          <% end %>
+        </div>
       </nav>
     </header>
 
-    <main role="main" id="main-content">
+    <main id="main-content">
       <% if notice.present? %>
         <p role="status" class="flash flash--notice"><%= notice %></p>
       <% end %>
@@ -41,7 +43,7 @@
       <%= yield %>
     </main>
 
-    <footer role="contentinfo">
+    <footer>
       <p>Asthma Buddy</p>
     </footer>
   </body>
