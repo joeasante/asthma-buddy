@@ -63,5 +63,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 01-01 — SQLite WAL mode configured (database.yml + initializer), db:schema:load verified
+Stopped at: Completed 01-02-PLAN.md — root route, HomeController, and application layout shell
 Resume file: None
