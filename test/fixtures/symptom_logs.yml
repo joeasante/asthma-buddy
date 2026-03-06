@@ -1,0 +1,11 @@
+alice_wheezing:
+  user: verified_user
+  symptom_type: 0
+  severity: 1
+  recorded_at: <%= 1.hour.ago %>
+
+bob_coughing:
+  user: unverified_user
+  symptom_type: 1
+  severity: 0
+  recorded_at: <%= 2.hours.ago %>
