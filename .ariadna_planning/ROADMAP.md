@@ -16,7 +16,7 @@ Milestone 1 establishes the complete foundation of Asthma Buddy: a secure, multi
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation** - Rails app infrastructure, database configuration, and CI baseline
-- [ ] **Phase 2: Authentication** - User accounts, sessions, email verification, and password reset
+- [x] **Phase 2: Authentication** - User accounts, sessions, email verification, and password reset — completed 2026-03-06
 - [ ] **Phase 3: Symptom Recording** - Create symptom entries with type, severity, timestamp, and notes
 - [ ] **Phase 4: Symptom Management** - Edit and delete symptom entries
 - [ ] **Phase 5: Symptom Timeline** - Chronological view, date filtering, and severity trends
@@ -221,7 +221,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/4 | Not started | - |
-| 2. Authentication | 0/3 | Not started | - |
+| 2. Authentication | 3/3 | Complete | 2026-03-06 |
 | 3. Symptom Recording | 0/5 | Not started | - |
 | 4. Symptom Management | 0/4 | Not started | - |
 | 5. Symptom Timeline | 0/5 | Not started | - |
