@@ -5,33 +5,34 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Authentication
 
 ## Current Position
 
-Phase: 1 of 9 (Foundation)
-Plan: 2 of 5 in current phase
-Status: In progress
-Last activity: 2026-03-06 — Completed 01-02: root route, HomeController, and application layout shell
+Phase: 2 of 9 (Authentication)
+Plan: 1 of 3 in current phase (02-01 complete)
+Status: In Progress
+Last activity: 2026-03-06 — Completed 02-01: Rails 8 auth scaffold, signup/login/logout, 28 passing tests
 
-Progress: [██░░░░░░░░] 4%
+Progress: [████░░░░░░] 12%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 5 min
-- Total execution time: 5 min
+- Total plans completed: 5
+- Average duration: ~6 min
+- Total execution time: ~31 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1 | 5 min | 5 min |
+| 01-foundation | 4 | ~28 min | ~7 min |
+| 02-authentication | 1 | ~3 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5 min)
-- Trend: —
+- Last 5 plans: 01-02 (5 min), 01-03 (10 min), 01-04 (5 min), 02-01 (3 min)
+- Trend: steady, auth plan fast due to generator
 
 *Updated after each plan completion*
 
@@ -51,6 +52,14 @@ Recent decisions affecting current work:
 - ARIA landmark roles (banner, navigation, main, contentinfo) established in base layout (01-02)
 - Flash messages use role=status (notice) and role=alert (alert) for screen reader semantics (01-02)
 - id="main-content" on <main> for skip-link target — Phase 9 adds skip link (01-02)
+- application_system_test_case.rb lives in test/ (not test/system/) — Rails load path convention (01-03)
+- System tests use headless Chrome at 1400×1400 screen size (01-03)
+- actions/checkout@v4 — v6 does not exist, CI would have failed on push (01-04)
+- Staging deploy deferred — config/deploy.yml retains placeholders until VPS provisioned (01-04)
+- Rails 8 auth generator uses email_address column (not email) — kept convention rather than renaming (02-01)
+- email_verified_at column added to users now but not enforced until 02-02 (deferred gate) (02-01)
+- HomeController gets allow_unauthenticated_access to keep home page public until 02-03 sets up route guards (02-01)
+- PasswordsControllerTest assert_notice uses p selector to match application layout flash tags (02-01)
 
 ### Pending Todos
 
@@ -63,5 +72,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 01-02-PLAN.md — root route, HomeController, and application layout shell
+Stopped at: Completed 02-01-PLAN.md — auth scaffold, signup/login/logout complete, 28 tests passing
 Resume file: None
