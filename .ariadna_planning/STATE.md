@@ -10,29 +10,29 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 2 of 9 (Authentication)
-Plan: 1 of 3 in current phase (02-01 complete)
+Plan: 2 of 3 in current phase (02-02 complete)
 Status: In Progress
-Last activity: 2026-03-06 — Completed 02-01: Rails 8 auth scaffold, signup/login/logout, 28 passing tests
+Last activity: 2026-03-06 — Completed 02-02: Email verification gate, UserMailer, 37 passing tests
 
-Progress: [████░░░░░░] 12%
+Progress: [████░░░░░░] 13%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: ~6 min
-- Total execution time: ~31 min
+- Total execution time: ~34 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4 | ~28 min | ~7 min |
-| 02-authentication | 1 | ~3 min | ~3 min |
+| 02-authentication | 2 | ~6 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (5 min), 01-03 (10 min), 01-04 (5 min), 02-01 (3 min)
-- Trend: steady, auth plan fast due to generator
+- Last 5 plans: 01-03 (10 min), 01-04 (5 min), 02-01 (3 min), 02-02 (3 min)
+- Trend: steady, auth plans fast
 
 *Updated after each plan completion*
 
@@ -60,6 +60,9 @@ Recent decisions affecting current work:
 - email_verified_at column added to users now but not enforced until 02-02 (deferred gate) (02-01)
 - HomeController gets allow_unauthenticated_access to keep home page public until 02-03 sets up route guards (02-01)
 - PasswordsControllerTest assert_notice uses p selector to match application layout flash tags (02-01)
+- Custom GET route /email_verification/:token used — singular resource show has no ID segment so param: :token has no path effect (02-02)
+- generates_token_for :email_verification chosen over DB token column — stateless signed tokens, no migration needed (02-02)
+- deliver_later used for non-blocking signup flow via Solid Queue (02-02)
 
 ### Pending Todos
 
@@ -72,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 02-01-PLAN.md — auth scaffold, signup/login/logout complete, 28 tests passing
+Stopped at: Completed 02-02-PLAN.md — email verification gate complete, 37 tests passing
 Resume file: None
