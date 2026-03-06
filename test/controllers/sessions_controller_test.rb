@@ -42,4 +42,15 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to new_session_path
   end
+
+  test "POST /session with unverified user does not create session and shows verification warning" do
+    unverified = users(:unverified_user)
+
+    assert_no_difference "Session.count" do
+      post session_path, params: { email_address: unverified.email_address, password: "password123" }
+    end
+
+    assert_redirected_to new_session_path
+    assert_equal "Please verify your email address before signing in. Check your inbox for a verification link.", flash[:alert]
+  end
 end
