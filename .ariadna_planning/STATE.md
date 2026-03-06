@@ -9,19 +9,19 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 ## Current Position
 
-Phase: 2 of 9 (Authentication) — COMPLETE
-Plan: 3 of 3 in phase 02 (02-03 complete — phase complete)
-Status: Phase 2 Complete, Phase 3 Next
-Last activity: 2026-03-06 — Completed 02-03: Persistent sessions, password reset, nav auth links, 39 tests + 4 system tests
+Phase: 3 of 9 (Symptom Recording) — IN PROGRESS
+Plan: 1 of 5 in phase 03 (03-01 complete)
+Status: Phase 3 Plan 1 Complete, Plan 2 Next
+Last activity: 2026-03-06 — Completed 03-01: SymptomLog model, ActionText install, 9 model tests, all migrations applied
 
-Progress: [█████░░░░░] 17%
+Progress: [█████░░░░░] 19%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: ~7 min
-- Total execution time: ~49 min
+- Total execution time: ~57 min
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [█████░░░░░] 17%
 |-------|-------|-------|----------|
 | 01-foundation | 4 | ~28 min | ~7 min |
 | 02-authentication | 3 | ~21 min | ~7 min |
+| 03-symptom-recording | 1 | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-04 (5 min), 02-01 (3 min), 02-02 (3 min), 02-03 (15 min)
-- Trend: system test plan took longer due to debugging 3 Capybara/ActiveJob issues
+- Last 5 plans: 02-01 (3 min), 02-02 (3 min), 02-03 (15 min), 03-01 (8 min)
+- Trend: steady execution, model-only plan fastest so far
 
 *Updated after each plan completion*
 
@@ -67,6 +68,10 @@ Recent decisions affecting current work:
 - generates_token_for :password_reset with 1-hour expiry overrides has_secure_password 15-min default (02-03)
 - System tests use ActiveJob inline adapter to make deliver_later synchronous in Puma server thread (02-03)
 - click_button used over click_on in system tests to avoid ambiguous matches between nav links and form submits (02-03)
+- enum :field, hash, validate: true (Rails 7+ syntax) — validate: true raises validation error on invalid values rather than ArgumentError, critical for safe form handling (03-01)
+- Composite index [user_id, recorded_at] added in 03-01 to avoid follow-up migration when Phase 5 timeline queries are built (03-01)
+- ActionText (not an external gem) used for rich text notes — Rails built-in Trix implementation (03-01)
+- dependent: :destroy on has_many :symptom_logs ensures GDPR data ownership — logs deleted with user (03-01)
 
 ### Pending Todos
 
@@ -79,5 +84,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 02-03-PLAN.md — full auth system complete, AUTH-01 through AUTH-05 done, 39 tests + 4 system tests passing
+Stopped at: Completed 03-01-PLAN.md — SymptomLog model, ActionText, 9 model tests, 48 total tests passing
 Resume file: None
