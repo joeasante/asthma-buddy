@@ -5,34 +5,34 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 2 — Authentication
+**Current focus:** Phase 3 — Symptom Logging
 
 ## Current Position
 
-Phase: 2 of 9 (Authentication)
-Plan: 2 of 3 in current phase (02-02 complete)
-Status: In Progress
-Last activity: 2026-03-06 — Completed 02-02: Email verification gate, UserMailer, 37 passing tests
+Phase: 2 of 9 (Authentication) — COMPLETE
+Plan: 3 of 3 in phase 02 (02-03 complete — phase complete)
+Status: Phase 2 Complete, Phase 3 Next
+Last activity: 2026-03-06 — Completed 02-03: Persistent sessions, password reset, nav auth links, 39 tests + 4 system tests
 
-Progress: [████░░░░░░] 13%
+Progress: [█████░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: ~6 min
-- Total execution time: ~34 min
+- Total plans completed: 7
+- Average duration: ~7 min
+- Total execution time: ~49 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4 | ~28 min | ~7 min |
-| 02-authentication | 2 | ~6 min | ~3 min |
+| 02-authentication | 3 | ~21 min | ~7 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (10 min), 01-04 (5 min), 02-01 (3 min), 02-02 (3 min)
-- Trend: steady, auth plans fast
+- Last 5 plans: 01-04 (5 min), 02-01 (3 min), 02-02 (3 min), 02-03 (15 min)
+- Trend: system test plan took longer due to debugging 3 Capybara/ActiveJob issues
 
 *Updated after each plan completion*
 
@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - Custom GET route /email_verification/:token used — singular resource show has no ID segment so param: :token has no path effect (02-02)
 - generates_token_for :email_verification chosen over DB token column — stateless signed tokens, no migration needed (02-02)
 - deliver_later used for non-blocking signup flow via Solid Queue (02-02)
+- 2-week cookie expiry chosen over permanent (20-year) for security (02-03)
+- generates_token_for :password_reset with 1-hour expiry overrides has_secure_password 15-min default (02-03)
+- System tests use ActiveJob inline adapter to make deliver_later synchronous in Puma server thread (02-03)
+- click_button used over click_on in system tests to avoid ambiguous matches between nav links and form submits (02-03)
 
 ### Pending Todos
 
@@ -75,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 02-02-PLAN.md — email verification gate complete, 37 tests passing
+Stopped at: Completed 02-03-PLAN.md — full auth system complete, AUTH-01 through AUTH-05 done, 39 tests + 4 system tests passing
 Resume file: None
