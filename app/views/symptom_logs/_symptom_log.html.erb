@@ -1,0 +1,19 @@
+<article id="<%= dom_id(symptom_log) %>" class="symptom-log-entry">
+  <dl>
+    <dt>Symptom</dt>
+    <dd><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></dd>
+
+    <dt>Severity</dt>
+    <dd><%= symptom_log.severity.capitalize %></dd>
+
+    <dt>When</dt>
+    <dd><time datetime="<%= symptom_log.recorded_at.iso8601 %>">
+      <%= symptom_log.recorded_at.strftime("%e %b %Y at %H:%M") %>
+    </time></dd>
+
+    <% if symptom_log.notes.present? %>
+      <dt>Notes</dt>
+      <dd><%= symptom_log.notes %></dd>
+    <% end %>
+  </dl>
+</article>

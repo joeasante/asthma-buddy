@@ -1,0 +1,22 @@
+<% content_for :title, "Log Symptom" %>
+
+<h1>Log a Symptom</h1>
+
+<section aria-label="Log symptom form">
+  <%= turbo_frame_tag "symptom_log_form" do %>
+    <%= render "form", symptom_log: @symptom_log %>
+  <% end %>
+</section>
+
+<section aria-label="Recent symptom logs">
+  <h2>Recent Entries</h2>
+  <%= turbo_frame_tag "symptom_logs_list" do %>
+    <% if @symptom_logs.empty? %>
+      <p>No symptoms logged yet. Use the form above to add your first entry.</p>
+    <% else %>
+      <% @symptom_logs.each do |symptom_log| %>
+        <%= render "symptom_log", symptom_log: symptom_log %>
+      <% end %>
+    <% end %>
+  <% end %>
+</section>

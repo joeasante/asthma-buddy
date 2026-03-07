@@ -1,0 +1,40 @@
+<%= form_with model: symptom_log, url: symptom_logs_path, data: { turbo: true } do |form| %>
+  <% if symptom_log.errors.any? %>
+    <div role="alert" aria-live="assertive">
+      <p><%= pluralize(symptom_log.errors.count, "error") %> prevented this entry from being saved:</p>
+      <ul>
+        <% symptom_log.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :symptom_type, "Symptom type" %>
+    <%= form.select :symptom_type,
+          SymptomLog.symptom_types.keys.map { |k| [k.humanize.gsub("_", " "), k] },
+          { include_blank: "Select a symptom type", selected: symptom_log.symptom_type },
+          { required: true } %>
+  </div>
+
+  <div>
+    <%= form.label :severity, "Severity" %>
+    <%= form.select :severity,
+          SymptomLog.severities.keys.map { |k| [k.capitalize, k] },
+          { include_blank: "Select severity", selected: symptom_log.severity },
+          { required: true } %>
+  </div>
+
+  <div>
+    <%= form.label :recorded_at, "When did this happen?" %>
+    <%= form.datetime_local_field :recorded_at, required: true %>
+  </div>
+
+  <div>
+    <%= form.label :notes, "Notes (optional)" %>
+    <%= form.rich_text_area :notes, aria: { label: "Notes" } %>
+  </div>
+
+  <%= form.submit "Log symptom" %>
+<% end %>
