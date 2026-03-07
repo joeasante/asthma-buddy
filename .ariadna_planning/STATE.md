@@ -10,18 +10,18 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 5 of 9 (Symptom Timeline) — IN PROGRESS
-Plan: 1 of N in phase 05 (05-01 complete)
-Status: Phase 5 Plan 1 Complete
-Last activity: 2026-03-07 — Completed 05-01: Filtered, paginated symptom timeline with Turbo Frame partial refresh, severity trend bar, CSS custom property color palette; 88 total tests passing
+Plan: 2 of N in phase 05 (05-02 complete)
+Status: Phase 5 Plan 2 Complete
+Last activity: 2026-03-07 — Completed 05-02: Full test coverage for timeline feature — model scope unit tests, controller filter/isolation tests, system tests for Turbo Frame chip interaction; 100 total tests passing
 
 Progress: [██████░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: ~6 min
-- Total execution time: ~67 min
+- Total execution time: ~73 min
 
 **By Phase:**
 
@@ -31,12 +31,12 @@ Progress: [██████░░░░] 27%
 | 02-authentication | 3 | ~21 min | ~7 min |
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
-| 05-symptom-timeline | 1 | ~3 min | ~3 min |
+| 05-symptom-timeline | 2 | ~9 min | ~4.5 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (4 min), 04-01 (3 min), 04-02 (8 min), 05-01 (3 min)
-- Trend: stable — recent UI plans averaging ~3-5 min
+- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (6 min)
+- Trend: stable — recent plans averaging ~3-6 min
 
 *Updated after each plan completion*
 
@@ -88,6 +88,8 @@ Recent decisions affecting current work:
 - Filter bar sits OUTSIDE turbo_frame_tag 'timeline_content' — chip links and date form target the frame without being nested inside it (05-01)
 - dom_id on _timeline_row article preserves Turbo Stream destroy targeting and existing controller test assertions (05-01)
 - CSS custom properties (--severity-mild/moderate/severe) in symptom_timeline.css establish severity/zone color palette reused by Phase 6+ peak flow (05-01)
+- turbo_frame_tag wraps _timeline_row so Edit/Delete buttons are present and inline edit targets the frame — id=timeline_list on <ol> enables Turbo Stream prepend on create (05-02)
+- create.turbo_stream.erb targets timeline_list using timeline_row partial; update.turbo_stream.erb uses timeline_row partial — consistent with Phase 5 view architecture (05-02)
 
 ### Pending Todos
 
@@ -100,5 +102,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 05-01-PLAN.md — Filtered paginated symptom timeline with Turbo Frame refresh, severity trend bar, CSS color palette; 88 total tests passing
+Stopped at: Completed 05-02-PLAN.md — Full test coverage for timeline feature; 100 tests, 304 assertions, 0 failures
 Resume file: None
