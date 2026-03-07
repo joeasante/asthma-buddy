@@ -14,21 +14,19 @@
     <%= form.label :symptom_type, "Symptom type" %>
     <%= form.select :symptom_type,
           SymptomLog.symptom_types.keys.map { |k| [k.humanize.gsub("_", " "), k] },
-          { include_blank: "Select a symptom type", selected: symptom_log.symptom_type },
-          { required: true } %>
+          { include_blank: "Select a symptom type", selected: symptom_log.symptom_type } %>
   </div>
 
   <div>
     <%= form.label :severity, "Severity" %>
     <%= form.select :severity,
           SymptomLog.severities.keys.map { |k| [k.capitalize, k] },
-          { include_blank: "Select severity", selected: symptom_log.severity },
-          { required: true } %>
+          { include_blank: "Select severity", selected: symptom_log.severity } %>
   </div>
 
   <div>
     <%= form.label :recorded_at, "When did this happen?" %>
-    <%= form.datetime_local_field :recorded_at, required: true %>
+    <%= form.datetime_local_field :recorded_at %>
   </div>
 
   <div>
