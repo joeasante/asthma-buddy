@@ -1,0 +1,200 @@
+/* ==========================================================================
+   Severity color palette — shared with peak flow zone colors (Phase 6+)
+   green = mild/controlled, yellow = moderate/caution, red = severe/danger
+   ========================================================================== */
+
+:root {
+  --severity-mild:     #2d8a4e;   /* green */
+  --severity-moderate: #c57a00;   /* amber/yellow */
+  --severity-severe:   #c0392b;   /* red */
+  --severity-mild-bg:     #e8f5ee;
+  --severity-moderate-bg: #fff8e6;
+  --severity-severe-bg:   #fdecea;
+}
+
+/* Severity indicator bar (left edge of timeline row) */
+.severity-indicator {
+  width: 4px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  align-self: stretch;
+  min-height: 2.5rem;
+}
+.severity-indicator--mild     { background-color: var(--severity-mild); }
+.severity-indicator--moderate { background-color: var(--severity-moderate); }
+.severity-indicator--severe   { background-color: var(--severity-severe); }
+
+/* Severity labels */
+.severity-label--mild     { color: var(--severity-mild); }
+.severity-label--moderate { color: var(--severity-moderate); }
+.severity-label--severe   { color: var(--severity-severe); }
+
+/* Timeline list */
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Timeline row */
+.timeline-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.timeline-row-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-type {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.timeline-severity {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.timeline-timestamp {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.timeline-notes-preview {
+  width: 100%;
+  font-size: 0.8rem;
+  color: #888;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Filter bar */
+.filter-bar {
+  margin-bottom: 1rem;
+}
+
+.filter-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-chip {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: #333;
+  background: #f5f5f5;
+}
+
+.filter-chip--active {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+.filter-custom-dates .filter-date-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.date-input {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.btn-apply-dates {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Trend bar */
+.trend-bar {
+  display: flex;
+  height: 1.75rem;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.trend-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.trend-segment--mild     { background-color: var(--severity-mild); }
+.trend-segment--moderate { background-color: var(--severity-moderate); }
+.trend-segment--severe   { background-color: var(--severity-severe); }
+
+.trend-segment-label {
+  font-size: 0.75rem;
+  color: #fff;
+  white-space: nowrap;
+  padding: 0 0.35rem;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+}
+
+/* Empty state */
+.timeline-empty-state {
+  padding: 2rem 0;
+  color: #666;
+  text-align: center;
+}
+
+/* Mobile: stack row body vertically on small screens */
+@media (max-width: 480px) {
+  .timeline-row-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+  .filter-custom-dates .filter-date-inputs {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

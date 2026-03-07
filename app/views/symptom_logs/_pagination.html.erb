@@ -1,0 +1,19 @@
+<% if total_pages > 1 %>
+  <nav class="pagination" aria-label="Timeline pages">
+    <span class="pagination-position">Page <%= current_page %> of <%= total_pages %></span>
+    <div class="pagination-controls">
+      <% if current_page > 1 %>
+        <%= link_to "← Prev",
+              symptom_logs_path(page: current_page - 1, preset: active_preset, start_date: start_date, end_date: end_date),
+              class: "pagination-btn",
+              data: { turbo_frame: "timeline_content" } %>
+      <% end %>
+      <% if current_page < total_pages %>
+        <%= link_to "Next →",
+              symptom_logs_path(page: current_page + 1, preset: active_preset, start_date: start_date, end_date: end_date),
+              class: "pagination-btn",
+              data: { turbo_frame: "timeline_content" } %>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

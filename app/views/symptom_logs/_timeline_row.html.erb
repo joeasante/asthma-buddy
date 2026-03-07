@@ -1,0 +1,13 @@
+<article id="<%= dom_id(symptom_log) %>" class="timeline-row" aria-label="<%= symptom_log.symptom_type.humanize %> on <%= symptom_log.recorded_at.strftime('%e %b %Y') %>">
+  <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
+  <div class="timeline-row-body">
+    <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
+    <span class="timeline-severity severity-label--<%= symptom_log.severity %>"><%= symptom_log.severity.capitalize %></span>
+    <time class="timeline-timestamp" datetime="<%= symptom_log.recorded_at.iso8601 %>">
+      <%= symptom_log.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+    </time>
+    <% if symptom_log.notes.present? %>
+      <span class="timeline-notes-preview"><%= truncate(symptom_log.notes.to_plain_text, length: 60) %></span>
+    <% end %>
+  </div>
+</article>
