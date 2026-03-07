@@ -1,0 +1,32 @@
+<%= form_with model: personal_best_record,
+              url: settings_personal_best_path,
+              method: :post do |form| %>
+
+  <% if personal_best_record.errors.any? %>
+    <div role="alert" aria-live="assertive">
+      <p><%= pluralize(personal_best_record.errors.count, "error") %> prevented this from being saved:</p>
+      <ul>
+        <% personal_best_record.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :value, "Personal best value" %>
+    <div class="input-with-unit">
+      <%= form.number_field :value,
+            min: 100, max: 900,
+            placeholder: "e.g. 520",
+            aria: { label: "Personal best peak flow in litres per minute" } %>
+      <span class="input-unit" aria-hidden="true">L/min</span>
+    </div>
+    <p class="field-hint">
+      Your highest reading when your asthma is well controlled, as measured by your doctor or from your own history.
+    </p>
+  </div>
+
+  <%= form.submit @current_personal_best ? "Update personal best" : "Set personal best" %>
+
+<% end %>

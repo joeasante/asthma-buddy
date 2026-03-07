@@ -1,0 +1,19 @@
+<% content_for :title, "Settings" %>
+
+<h1>Settings</h1>
+
+<section aria-label="Personal best peak flow">
+  <h2>Personal Best Peak Flow</h2>
+
+  <% if @current_personal_best %>
+    <p>
+      Current personal best:
+      <strong><%= @current_personal_best.value %> L/min</strong>
+      <span class="settings-pb-date">(set <%= @current_personal_best.recorded_at.strftime("%-d %b %Y") %>)</span>
+    </p>
+  <% else %>
+    <p class="settings-pb-unset">No personal best set yet.</p>
+  <% end %>
+
+  <%= render "personal_best_form", personal_best_record: @personal_best_record %>
+</section>
