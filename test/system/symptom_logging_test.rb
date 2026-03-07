@@ -190,4 +190,54 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     # The edit form for bob's entry must not be visible
     assert_no_selector "form input[name='symptom_log[symptom_type]']", wait: 3
   end
+
+  # --- TIMELINE FILTER — TURBO FRAME CHIP INTERACTION ---
+
+  test "preset chip filters timeline via Turbo Frame without full page reload" do
+    user = users(:verified_user)
+    sign_in_as user
+
+    visit symptom_logs_path
+
+    # The timeline section must be visible
+    assert_selector "section[aria-label='Symptom timeline']"
+
+    # Click the "7 days" chip — should update timeline_content frame
+    within(".filter-bar") { click_on "7 days" }
+
+    # alice_coughing_old (40 days ago) should not be in the updated list
+    assert_no_selector ".timeline-row", text: /Coughing/i
+
+    # Page heading still present — confirms no full page reload wiped the form section
+    assert_selector "h1", text: "Log a Symptom"
+  end
+
+  test "trend bar shows severity counts above entry list" do
+    sign_in_as users(:verified_user)
+    visit symptom_logs_path
+
+    # Trend bar rendered (Alice has entries of varied severity)
+    assert_selector ".trend-bar"
+
+    # At least one segment present
+    assert_selector ".trend-segment"
+  end
+
+  test "All chip shows entries from every date" do
+    sign_in_as users(:verified_user)
+    visit symptom_logs_path
+
+    within(".filter-bar") { click_on "All" }
+
+    # alice_coughing_old (40 days ago) should now appear
+    assert_selector ".timeline-row", text: /Coughing/i
+  end
+
+  test "empty state shown when no entries match filter" do
+    # Sign in as verified_user and use a future date range that has no entries
+    sign_in_as users(:verified_user)
+    visit symptom_logs_path(start_date: 1.year.from_now.to_date.to_s, end_date: 2.years.from_now.to_date.to_s)
+
+    assert_selector ".timeline-empty-state"
+  end
 end

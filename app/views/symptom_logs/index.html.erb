@@ -22,7 +22,7 @@
     <% if @symptom_logs.empty? %>
       <p class="timeline-empty-state">No symptoms recorded for this period. Try a wider date range or log your first entry above.</p>
     <% else %>
-      <ol class="timeline-list" aria-label="Symptom entries">
+      <ol id="timeline_list" class="timeline-list" aria-label="Symptom entries">
         <% @symptom_logs.each do |log| %>
           <li><%= render "timeline_row", symptom_log: log %></li>
         <% end %>

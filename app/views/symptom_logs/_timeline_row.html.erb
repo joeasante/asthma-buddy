@@ -1,13 +1,21 @@
-<article id="<%= dom_id(symptom_log) %>" class="timeline-row" aria-label="<%= symptom_log.symptom_type.humanize %> on <%= symptom_log.recorded_at.strftime('%e %b %Y') %>">
-  <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
-  <div class="timeline-row-body">
-    <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
-    <span class="timeline-severity severity-label--<%= symptom_log.severity %>"><%= symptom_log.severity.capitalize %></span>
-    <time class="timeline-timestamp" datetime="<%= symptom_log.recorded_at.iso8601 %>">
-      <%= symptom_log.recorded_at.strftime("%-d %b %Y, %H:%M") %>
-    </time>
-    <% if symptom_log.notes.present? %>
-      <span class="timeline-notes-preview"><%= truncate(symptom_log.notes.to_plain_text, length: 60) %></span>
-    <% end %>
-  </div>
-</article>
+<%= turbo_frame_tag dom_id(symptom_log) do %>
+  <article class="timeline-row" aria-label="<%= symptom_log.symptom_type.humanize %> on <%= symptom_log.recorded_at.strftime('%e %b %Y') %>">
+    <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
+    <div class="timeline-row-body">
+      <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
+      <span class="timeline-severity severity-label--<%= symptom_log.severity %>"><%= symptom_log.severity.capitalize %></span>
+      <time class="timeline-timestamp" datetime="<%= symptom_log.recorded_at.iso8601 %>">
+        <%= symptom_log.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+      </time>
+      <% if symptom_log.notes.present? %>
+        <span class="timeline-notes-preview"><%= truncate(symptom_log.notes.to_plain_text, length: 60) %></span>
+      <% end %>
+    </div>
+    <div class="timeline-row-actions">
+      <%= link_to "Edit", edit_symptom_log_path(symptom_log), class: "btn-edit" %>
+      <%= button_to "Delete", symptom_log_path(symptom_log), method: :delete,
+            class: "btn-delete",
+            form: { data: { turbo: true, turbo_confirm: "Delete this entry?" } } %>
+    </div>
+  </article>
+<% end %>
