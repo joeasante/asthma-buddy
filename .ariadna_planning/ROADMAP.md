@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Symptom Management** - Edit and delete symptom entries
 - [ ] **Phase 5: Symptom Timeline** - Chronological view, date filtering, and severity trends
 - [ ] **Phase 6: Peak Flow Recording** - Enter readings, set personal best, calculate zones
-- [ ] **Phase 7: Peak Flow Display and Management** - View readings with zone colour coding, edit, delete
+- [x] **Phase 7: Peak Flow Display and Management** - View readings with zone colour coding, edit, delete — Complete 2026-03-07
 - [ ] **Phase 8: Peak Flow Trends** - Trend chart of readings over time
 - [ ] **Phase 9: Accessibility and Polish** - WCAG 2.2 AA compliance, performance, PWA manifest
 
@@ -156,11 +156,10 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: Build peak flow readings index view with zone colour coding (CSS classes per zone)
-- [ ] 07-02: Build edit form for peak flow readings — recalculate zone on update
-- [ ] 07-03: Add delete action with confirmation
-- [ ] 07-04: Enforce ownership on edit and delete
-- [ ] 07-05: Write Minitest and system test coverage for display, edit, delete, and isolation
+- [x] 07-01: Build peak flow readings index view with zone colour coding (CSS classes per zone)
+- [x] 07-02: Build edit/update/destroy with Turbo Streams, cross-user 404 isolation
+- [x] 07-03: Controller tests — 18 new cases, 170 total, 0 failures
+- [x] 07-04: System tests — 7 browser tests for zone badges, inline edit, delete, isolation
 
 ---
 
