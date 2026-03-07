@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 6 — Peak Flow Recording
+**Current focus:** Phase 7 — Peak Flow Display
 
 ## Current Position
 
-Phase: 6 of 9 (Peak Flow Recording) — IN PROGRESS
-Plan: 5 of 5 in phase 06 (06-01, 06-02, 06-03, 06-04, 06-05 complete)
-Status: Phase 6 Plan 5 Complete — Phase 6 all UAT gaps closed, fully ship-ready
-Last activity: 2026-03-07 — Completed 06-05: blank validation (required attr), flash replace (id=flash-messages), coloured zone names (html_safe span + CSS); 152 tests, 430 assertions, 0 failures
+Phase: 7 of 9 (Peak Flow Display) — IN PROGRESS
+Plan: 1 of 3 in phase 07 (07-01 complete)
+Status: Phase 7 Plan 1 Complete — filterable paginated index with zone badges and nav link
+Last activity: 2026-03-07 — Completed 07-01: zone badge CSS (WCAG AA), filter chips, pagination, _reading_row/_filter_bar/_pagination partials, Peak Flow nav link; 13 controller tests, 0 failures
 
-Progress: [███████░░░] 30%
+Progress: [███████░░░] 33%
 
 ## Performance Metrics
 
@@ -33,11 +33,12 @@ Progress: [███████░░░] 30%
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
 | 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
+| 07-peak-flow-display | 1 | ~2 min | ~2 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (8 min), 06-02 (5 min), 06-03 (1 min), 06-04 (3 min), 06-05 (5 min)
-- Trend: stable — recent plans averaging ~1-8 min
+- Last 5 plans: 06-02 (5 min), 06-03 (1 min), 06-04 (3 min), 06-05 (5 min), 07-01 (2 min)
+- Trend: stable — recent plans averaging ~1-5 min
 
 *Updated after each plan completion*
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - turbo_stream.replace "flash-messages" supersedes turbo_stream.prepend "main-content" from 06-03 — replace is correct primitive for non-accumulating flash (06-05)
 - turbo_frame_tag wrapper supplied in create.turbo_stream.erb not in _form partial — frame lifecycle managed at stream layer, partial renders inner content only (06-05)
 - html_safe + raw() for controller-generated HTML in Turbo Stream templates — marked at source in controller, rendered unescaped in template (06-05)
+- filter_bar rendered INSIDE turbo_frame_tag readings_content — matches 05-03 precedent; active chip state re-renders correctly on filter click (07-01)
+- zone-badge background-fill pill approach (not text-colour only) — visually distinguishable at a glance without reading zone label; WCAG AA contrast on all three zones (07-01)
+- edit/delete stubs intentionally omitted from _reading_row — routes do not exist yet; 07-02 adds them when routes are in place to avoid routing errors at render time (07-01)
 
 ### Pending Todos
 
@@ -120,5 +124,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 06-05-PLAN.md — UAT gap closure: required attr on value field, flash replace via id=flash-messages, coloured zone names via html_safe span + CSS; 152 tests, 430 assertions, 0 failures; Phase 6 fully ship-ready
+Stopped at: Completed 07-01-PLAN.md — filterable paginated peak flow index: zone badge CSS (WCAG AA), filter chips, pagination, _reading_row/_filter_bar/_pagination partials, Peak Flow nav link; 13 controller tests, 0 failures
 Resume file: None
