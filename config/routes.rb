@@ -2,9 +2,14 @@
 Rails.application.routes.draw do
   resource :session
   resource :registration, only: %i[ new create ]
+  get "email_verification/new", to: "email_verifications#new", as: :new_email_verification
+  post "email_verification", to: "email_verifications#create", as: :email_verification_resend
   get "email_verification/:token", to: "email_verifications#show", as: :email_verification
-  resources :passwords, param: :token
+  resources :passwords, param: :token, only: %i[ new create edit update ]
   resources :symptom_logs, only: %i[ index create edit update destroy ]
+
+  get  "settings",               to: "settings#show",                as: :settings
+  post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
