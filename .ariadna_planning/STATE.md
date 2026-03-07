@@ -10,16 +10,16 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 6 of 9 (Peak Flow Recording) — IN PROGRESS
-Plan: 4 of 4 in phase 06 (06-01, 06-02, 06-03, 06-04 complete)
-Status: Phase 6 Plan 4 Complete — Phase 6 ship-ready
-Last activity: 2026-03-07 — Completed 06-04: 19 controller integration tests + 5 system tests; PEAK-01/02/03 requirements covered; full suite 142 tests, 409 assertions, 0 failures
+Plan: 5 of 5 in phase 06 (06-01, 06-02, 06-03, 06-04, 06-05 complete)
+Status: Phase 6 Plan 5 Complete — Phase 6 all UAT gaps closed, fully ship-ready
+Last activity: 2026-03-07 — Completed 06-05: blank validation (required attr), flash replace (id=flash-messages), coloured zone names (html_safe span + CSS); 152 tests, 430 assertions, 0 failures
 
 Progress: [███████░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: ~5.1 min
 - Total execution time: ~82 min
 
@@ -32,11 +32,11 @@ Progress: [███████░░░] 30%
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
-| 06-peak-flow-recording | 4 | ~17 min | ~4.25 min |
+| 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 05-03 (3 min), 06-01 (8 min), 06-02 (5 min), 06-03 (1 min), 06-04 (3 min)
+- Last 5 plans: 06-01 (8 min), 06-02 (5 min), 06-03 (1 min), 06-04 (3 min), 06-05 (5 min)
 - Trend: stable — recent plans averaging ~1-8 min
 
 *Updated after each plan completion*
@@ -104,6 +104,10 @@ Recent decisions affecting current work:
 - zone_flash_message reads personal_best_at_reading_time after before_save :assign_zone runs — zone and percentage always consistent (06-03)
 - System test sign_in_as defined as local helper using form-based login — SessionTestHelper only loads for ActionDispatch::IntegrationTest, not ApplicationSystemTestCase (06-04)
 - execute_script to strip HTML5 required attribute before blank-submit system test — prevents browser-native validation blocking server-side validation path (06-04)
+- id="flash-messages" div always rendered unconditionally in layout — empty div cheaper than missing Turbo Stream replace target (06-05)
+- turbo_stream.replace "flash-messages" supersedes turbo_stream.prepend "main-content" from 06-03 — replace is correct primitive for non-accumulating flash (06-05)
+- turbo_frame_tag wrapper supplied in create.turbo_stream.erb not in _form partial — frame lifecycle managed at stream layer, partial renders inner content only (06-05)
+- html_safe + raw() for controller-generated HTML in Turbo Stream templates — marked at source in controller, rendered unescaped in template (06-05)
 
 ### Pending Todos
 
@@ -116,5 +120,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 06-04-PLAN.md — Controller integration tests (19) + system tests (5) for peak flow recording; 142 tests, 409 assertions, 0 failures; Phase 6 ship-ready
+Stopped at: Completed 06-05-PLAN.md — UAT gap closure: required attr on value field, flash replace via id=flash-messages, coloured zone names via html_safe span + CSS; 152 tests, 430 assertions, 0 failures; Phase 6 fully ship-ready
 Resume file: None
