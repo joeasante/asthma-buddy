@@ -10,16 +10,16 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 4 of 9 (Symptom Management) — IN PROGRESS
-Plan: 1 of N in phase 04 (04-01 complete)
-Status: Phase 4 Plan 1 Complete, Plan 2 Next
-Last activity: 2026-03-07 — Completed 04-01: Inline edit/delete for symptom log entries via Turbo Frame/Stream, 16 controller tests, 64 total tests passing
+Plan: 2 of N in phase 04 (04-01 and 04-02 complete)
+Status: Phase 4 Plan 2 Complete
+Last activity: 2026-03-07 — Completed 04-02: System tests for inline edit flow, delete flow, cross-user URL isolation; 77 total tests passing
 
 Progress: [█████░░░░░] 23%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: ~7 min
 - Total execution time: ~64 min
 
@@ -30,12 +30,12 @@ Progress: [█████░░░░░] 23%
 | 01-foundation | 4 | ~28 min | ~7 min |
 | 02-authentication | 3 | ~21 min | ~7 min |
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
-| 04-symptom-management | 1 | ~3 min | ~3 min |
+| 04-symptom-management | 2 | ~11 min | ~5.5 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (15 min), 03-01 (8 min), 03-02 (4 min), 04-01 (3 min)
-- Trend: accelerating — edit/delete + Turbo Frame/Stream plan completed in 3 min
+- Last 5 plans: 03-01 (8 min), 03-02 (4 min), 04-01 (3 min), 04-02 (8 min)
+- Trend: stable — test-focused plans averaging ~5-8 min
 
 *Updated after each plan completion*
 
@@ -81,6 +81,8 @@ Recent decisions affecting current work:
 - Flash not streamed on update — layout flash has no DOM id to target; entry replacement sufficient for MVP (04-01)
 - Cancel on edit form uses full page reload (data-turbo: false) to avoid needing a show action — simplest correct MVP approach (04-01)
 - edit.html.erb wraps form in turbo_frame_tag matching entry frame id so inline edit works without data-turbo-frame on the Edit link (04-01)
+- button_to renders as <form> — use specific input name selectors not bare "form" to assert edit form absence in system tests (04-02)
+- Cross-user 404 in system test: assert edit form inputs absent rather than assert URL change — Rails error page stays at same URL (04-02)
 
 ### Pending Todos
 
@@ -93,5 +95,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 04-01-PLAN.md — Inline edit/delete for symptom log entries via Turbo Frame/Stream, 16 controller tests, 64 total tests passing
+Stopped at: Completed 04-02-PLAN.md — System tests for inline edit flow, delete flow, cross-user URL isolation; 77 total tests passing
 Resume file: None
