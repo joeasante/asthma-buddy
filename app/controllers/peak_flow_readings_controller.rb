@@ -1,36 +1,59 @@
 # frozen_string_literal: true
 
 class PeakFlowReadingsController < ApplicationController
-  rate_limit to: 60, within: 1.minute, only: :create
+  rate_limit to: 10, within: 1.minute, only: :create, with: -> {
+    respond_to do |format|
+      format.html { redirect_to new_peak_flow_reading_path, alert: "Too many submissions. Try again in a moment." }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("flash-messages") {
+          tag.div(id: "flash-messages") {
+            tag.p("Too many submissions. Try again in a moment.",
+                  role: "alert", class: "flash flash--alert")
+          }
+        }, status: :too_many_requests
+      end
+      format.json { render json: { error: "Rate limit exceeded. Try again later." }, status: :too_many_requests }
+    end
+  }
+
+  before_action :set_has_personal_best, only: %i[new create]
 
   def new
     @peak_flow_reading = Current.user.peak_flow_readings.new(
       recorded_at: Time.current.change(sec: 0)
     )
-    @has_personal_best = PersonalBestRecord.current_for(Current.user).present?
+  end
+
+  def index
+    start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 30.days.ago.to_date
+    end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.current
+
+    @peak_flow_readings = Current.user.peak_flow_readings
+      .chronological
+      .where(recorded_at: start_date.beginning_of_day..end_date.end_of_day)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @peak_flow_readings.map { |r| peak_flow_reading_json(r) } }
+    end
   end
 
   def create
     @peak_flow_reading = Current.user.peak_flow_readings.new(peak_flow_reading_params)
 
     if @peak_flow_reading.save
-      @flash_message = zone_flash_message(@peak_flow_reading)
-      @has_personal_best = PersonalBestRecord.current_for(Current.user).present?
+      @flash_message = helpers.zone_flash_message(@peak_flow_reading)
+      @new_peak_flow_reading = Current.user.peak_flow_readings.new(
+        recorded_at: Time.current.change(sec: 0)
+      )
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to new_peak_flow_reading_path, notice: @flash_message }
+        format.html { redirect_to new_peak_flow_reading_path, notice: helpers.zone_flash_message_text(@peak_flow_reading) }
         format.json { render json: peak_flow_reading_json(@peak_flow_reading), status: :created }
       end
     else
-      @has_personal_best = PersonalBestRecord.current_for(Current.user).present?
       respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "peak_flow_reading_form",
-            partial: "form",
-            locals: { peak_flow_reading: @peak_flow_reading, has_personal_best: @has_personal_best }
-          ), status: :unprocessable_entity
-        end
+        format.turbo_stream { render :form_error, status: :unprocessable_entity }
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: { errors: @peak_flow_reading.errors.full_messages }, status: :unprocessable_entity }
       end
@@ -39,19 +62,12 @@ class PeakFlowReadingsController < ApplicationController
 
   private
 
-  def peak_flow_reading_params
-    params.require(:peak_flow_reading).permit(:value, :recorded_at)
+  def set_has_personal_best
+    @has_personal_best = PersonalBestRecord.exists_for?(Current.user)
   end
 
-  def zone_flash_message(reading)
-    if reading.zone.nil?
-      "Reading saved \u2014 set your personal best to see your zone."
-    else
-      zone_name = reading.zone.capitalize
-      pct       = reading.zone_percentage
-      coloured  = "<span class=\"zone-label zone-label--#{reading.zone}\">#{zone_name} Zone (#{pct}% of personal best)</span>"
-      "Reading saved \u2014 #{coloured}.".html_safe
-    end
+  def peak_flow_reading_params
+    params.require(:peak_flow_reading).permit(:value, :recorded_at)
   end
 
   def peak_flow_reading_json(reading)
@@ -61,7 +77,6 @@ class PeakFlowReadingsController < ApplicationController
       recorded_at: reading.recorded_at,
       zone: reading.zone,
       zone_percentage: reading.zone_percentage,
-      personal_best_at_reading_time: reading.personal_best_at_reading_time,
       created_at: reading.created_at
     }
   end

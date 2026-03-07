@@ -2,9 +2,7 @@
 <%= turbo_stream.replace "peak_flow_reading_form" do %>
   <%= turbo_frame_tag "peak_flow_reading_form" do %>
     <%= render "form",
-          peak_flow_reading: Current.user.peak_flow_readings.new(
-            recorded_at: Time.current.change(sec: 0)
-          ),
+          peak_flow_reading: @new_peak_flow_reading,
           has_personal_best: @has_personal_best %>
   <% end %>
 <% end %>
@@ -12,6 +10,6 @@
 <%# Replace flash container — not prepend — so messages don't stack %>
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages">
-    <p role="status" class="flash flash--notice"><%= raw @flash_message %></p>
+    <p role="status" class="flash flash--notice"><%= @flash_message %></p>
   </div>
 <% end %>

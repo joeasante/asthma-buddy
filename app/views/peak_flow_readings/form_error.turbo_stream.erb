@@ -1,0 +1,8 @@
+<%# Validation error — wrap partial in turbo_frame_tag so the frame element persists in DOM %>
+<%= turbo_stream.replace "peak_flow_reading_form" do %>
+  <%= turbo_frame_tag "peak_flow_reading_form" do %>
+    <%= render "form",
+          peak_flow_reading: @peak_flow_reading,
+          has_personal_best: @has_personal_best %>
+  <% end %>
+<% end %>

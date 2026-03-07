@@ -18,10 +18,8 @@
   margin-bottom: 1rem;
 }
 
+/* .input-with-unit layout defined in settings.css — shared pattern */
 .peak-flow-value-input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-top: 0.25rem;
 }
 
@@ -40,12 +38,6 @@
 .peak-flow-value-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-.peak-flow-unit {
-  font-size: 1.1rem;
-  color: #555;
-  font-weight: 500;
 }
 
 /* Zone label colours in flash message — reuse severity custom properties */
