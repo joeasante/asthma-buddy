@@ -14,4 +14,13 @@ class ApplicationController < ActionController::Base
   # JSON response convention: controllers use respond_to blocks with jbuilder views
   # for JSON alongside ERB views for HTML. Every resource action that creates/modifies
   # data must support `format.json` so agents can call endpoints programmatically.
+
+  # PHI / HIPAA: prevent health data from being retained in browser or proxy caches.
+  before_action :set_no_store_cache_for_authenticated_users
+
+  private
+
+  def set_no_store_cache_for_authenticated_users
+    response.headers["Cache-Control"] = "no-store" if authenticated?
+  end
 end
