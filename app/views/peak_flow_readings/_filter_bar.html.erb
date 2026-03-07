@@ -1,0 +1,26 @@
+<div class="filter-bar" role="search" aria-label="Filter peak flow history">
+  <div class="filter-presets">
+    <% [["7", "7 days"], ["30", "30 days"], ["90", "90 days"], ["all", "All"]].each do |value, label| %>
+      <%= link_to label,
+            peak_flow_readings_path(preset: value),
+            class: "filter-chip #{"filter-chip--active" if active_preset == value}",
+            aria: { pressed: (active_preset == value).to_s },
+            data: { turbo_frame: "readings_content" } %>
+    <% end %>
+  </div>
+
+  <%= form_with url: peak_flow_readings_path, method: :get,
+        data: { turbo_frame: "readings_content" },
+        class: "filter-custom-dates" do |f| %>
+    <input type="hidden" name="preset" value="custom">
+    <div class="filter-date-inputs">
+      <%= f.label :start_date, "From" %>
+      <%= f.date_field :start_date, value: start_date, class: "date-input",
+            aria: { label: "Filter start date" } %>
+      <%= f.label :end_date, "To" %>
+      <%= f.date_field :end_date, value: end_date, class: "date-input",
+            aria: { label: "Filter end date" } %>
+      <%= f.submit "Apply", class: "btn-apply-dates" %>
+    </div>
+  <% end %>
+</div>

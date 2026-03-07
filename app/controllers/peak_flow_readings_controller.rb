@@ -25,12 +25,31 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def index
-    start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : 30.days.ago.to_date
-    end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : Date.current
+    @active_preset = params[:preset].presence || "30"
 
-    @peak_flow_readings = Current.user.peak_flow_readings
+    if params[:start_date].present? || params[:end_date].present?
+      @start_date = params[:start_date].present? ? (Date.parse(params[:start_date]) rescue nil) : nil
+      @end_date   = params[:end_date].present?   ? (Date.parse(params[:end_date])   rescue nil) : nil
+    else
+      @end_date = nil
+      @start_date = case @active_preset
+      when "7"  then Date.current - 7.days
+      when "30" then Date.current - 30.days
+      when "90" then Date.current - 90.days
+      else nil
+      end
+    end
+
+    base_relation = Current.user.peak_flow_readings
       .chronological
-      .where(recorded_at: start_date.beginning_of_day..end_date.end_of_day)
+      .where(recorded_at: (@start_date&.beginning_of_day || Time.at(0))..(@end_date&.end_of_day || Time.current.end_of_day))
+
+    # When preset is "all", remove the date filter
+    base_relation = Current.user.peak_flow_readings.chronological if @active_preset == "all"
+
+    @total_pages  = [ (base_relation.count.to_f / 25).ceil, 1 ].max
+    @current_page = [ [ params[:page].to_i, 1 ].max, @total_pages ].min
+    @peak_flow_readings = base_relation.offset((@current_page - 1) * 25).limit(25)
 
     respond_to do |format|
       format.html

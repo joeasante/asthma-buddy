@@ -2,5 +2,29 @@
 
 <h1>Peak Flow History</h1>
 
-<p>JSON API endpoint: <code>GET /peak-flow-readings.json</code></p>
-<p>Parameters: <code>start_date</code> (default: 30 days ago), <code>end_date</code> (default: today)</p>
+<%= link_to "Log a reading", new_peak_flow_reading_path, class: "btn-primary" %>
+
+<section aria-label="Peak flow reading history">
+  <%= turbo_frame_tag "readings_content" do %>
+    <%= render "filter_bar",
+          active_preset: @active_preset,
+          start_date: @start_date,
+          end_date: @end_date %>
+
+    <% if @peak_flow_readings.empty? %>
+      <p class="timeline-empty-state">No readings recorded for this period. Try a wider date range or log your first reading above.</p>
+    <% else %>
+      <ol id="readings_list" class="peak-flow-list" aria-label="Peak flow readings">
+        <% @peak_flow_readings.each do |reading| %>
+          <li><%= render "reading_row", reading: reading %></li>
+        <% end %>
+      </ol>
+      <%= render "pagination",
+            current_page: @current_page,
+            total_pages: @total_pages,
+            active_preset: @active_preset,
+            start_date: @start_date,
+            end_date: @end_date %>
+    <% end %>
+  <% end %>
+</section>

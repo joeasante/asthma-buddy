@@ -1,0 +1,23 @@
+<%= turbo_frame_tag dom_id(reading) do %>
+  <article class="peak-flow-row"
+           aria-label="Peak flow reading <%= reading.value %> L/min on <%= reading.recorded_at.strftime('%-d %b %Y') %>">
+    <span class="peak-flow-row-value">
+      <%= reading.value %><span class="peak-flow-row-unit" aria-hidden="true"> L/min</span>
+    </span>
+
+    <% zone_label = reading.zone&.capitalize || "No zone" %>
+    <% badge_modifier = reading.zone.present? ? reading.zone : "none" %>
+    <span class="zone-badge zone-badge--<%= badge_modifier %>"
+          aria-label="Zone: <%= zone_label %>">
+      <%= zone_label %>
+    </span>
+
+    <time class="peak-flow-row-timestamp" datetime="<%= reading.recorded_at.iso8601 %>">
+      <%= reading.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+    </time>
+
+    <div class="peak-flow-row-actions">
+      <%# Edit and Delete links are added in 07-02 when routes exist %>
+    </div>
+  </article>
+<% end %>
