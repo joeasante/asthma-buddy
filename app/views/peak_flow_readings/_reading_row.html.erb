@@ -17,7 +17,16 @@
     </time>
 
     <div class="peak-flow-row-actions">
-      <%# Edit and Delete links are added in 07-02 when routes exist %>
+      <%= link_to "Edit",
+            edit_peak_flow_reading_path(reading),
+            class: "btn-edit",
+            aria: { label: "Edit reading of #{reading.value} L/min" } %>
+      <%= button_to "Delete",
+            peak_flow_reading_path(reading),
+            method: :delete,
+            class: "btn-delete",
+            aria: { label: "Delete reading of #{reading.value} L/min" },
+            form: { data: { turbo: true, turbo_confirm: "Delete this reading?" } } %>
     </div>
   </article>
 <% end %>

@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@peak_flow_reading),
+      partial: "peak_flow_readings/reading_row",
+      locals: { reading: @peak_flow_reading } %>
