@@ -30,6 +30,8 @@ Progress: [█████░░░░░] 21%
 | 01-foundation | 4 | ~28 min | ~7 min |
 | 02-authentication | 3 | ~21 min | ~7 min |
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
+| Phase 03 P03 | 15 | 1 tasks | 3 files |
+
 
 **Recent Trend:**
 - Last 5 plans: 02-02 (3 min), 02-03 (15 min), 03-01 (8 min), 03-02 (4 min)

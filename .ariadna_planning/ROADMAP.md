@@ -77,14 +77,12 @@ Plans:
   2. Optional notes can be added to a symptom entry and are saved and displayed as entered.
   3. A submitted entry appears immediately in the user's data without requiring a page refresh.
   4. A user cannot see or interact with another user's symptom entries (multi-user isolation enforced).
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: Create SymptomLog model — type enum, severity enum, timestamp, notes, user association
-- [ ] 03-02: Build symptom log creation form with Turbo submission
-- [ ] 03-03: Integrate Lexxy (or ActionText) for notes field
-- [ ] 03-04: Enforce user-scoped data access in controller
-- [ ] 03-05: Write Minitest coverage for symptom log creation and isolation
+- [ ] 03-01-PLAN.md — SymptomLog model, ActionText install, enums (4 types, 3 severities), user association, model tests
+- [ ] 03-02-PLAN.md — SymptomLogs controller (index + create), views, Turbo Stream create response, controller tests
+- [ ] 03-03-PLAN.md — System tests: complete logging flow, form clear, notes, multi-user isolation
 
 ---
 
@@ -222,7 +220,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/4 | Not started | - |
 | 2. Authentication | 3/3 | Complete | 2026-03-06 |
-| 3. Symptom Recording | 0/5 | Not started | - |
+| 3. Symptom Recording | 0/3 | Not started | - |
 | 4. Symptom Management | 0/4 | Not started | - |
 | 5. Symptom Timeline | 0/5 | Not started | - |
 | 6. Peak Flow Recording | 0/6 | Not started | - |
