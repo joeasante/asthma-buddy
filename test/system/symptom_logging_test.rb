@@ -120,4 +120,74 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     visit symptom_logs_url
     assert_current_path new_session_url
   end
+
+  # --- EDIT FLOW ---
+
+  test "user can edit an existing symptom entry inline" do
+    # Use the alice_wheezing fixture — it already exists in the list
+    entry = symptom_logs(:alice_wheezing)
+
+    sign_in_as @alice
+    visit symptom_logs_url
+
+    # The entry should be visible
+    assert_selector "##{dom_id(entry)}"
+
+    # Click the Edit button within this entry's turbo frame
+    within("##{dom_id(entry)}") do
+      click_link "Edit"
+    end
+
+    # The edit form should now appear inline inside the same frame
+    within("##{dom_id(entry)}") do
+      assert_selector "form"
+      select "Chest tightness", from: "Symptom type"
+      select "Severe", from: "Severity"
+      click_button "Update symptom"
+    end
+
+    # After save, the entry in the list shows updated values
+    within("##{dom_id(entry)}") do
+      assert_text "Chest tightness"
+      assert_text "Severe"
+      # The edit form is gone — only the entry display (no form inputs visible)
+      assert_no_selector "input, select[name='symptom_log[symptom_type]']"
+    end
+  end
+
+  # --- DELETE FLOW ---
+
+  test "user can delete a symptom entry and it disappears from the list" do
+    entry = symptom_logs(:alice_wheezing)
+
+    sign_in_as @alice
+    visit symptom_logs_url
+
+    assert_selector "##{dom_id(entry)}"
+
+    # Dismiss the browser confirm dialog (accept it)
+    # Capybara handles data-turbo-confirm via the browser's native dialog.
+    # accept_confirm wraps the action that triggers the dialog.
+    accept_confirm "Delete this entry?" do
+      within("##{dom_id(entry)}") do
+        click_button "Delete"
+      end
+    end
+
+    # Entry no longer in the DOM
+    assert_no_selector "##{dom_id(entry)}"
+  end
+
+  # --- CROSS-USER URL ISOLATION ---
+
+  test "user cannot edit another user's entry via direct URL" do
+    bob_entry = symptom_logs(:bob_coughing)
+
+    sign_in_as @alice
+    visit edit_symptom_log_url(bob_entry)
+
+    # Rails raises RecordNotFound -> 404/error page is shown, not the edit form
+    # The edit form for bob's entry must not be visible
+    assert_no_selector "form input[name='symptom_log[symptom_type]']", wait: 3
+  end
 end
