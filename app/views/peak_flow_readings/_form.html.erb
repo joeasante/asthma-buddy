@@ -26,6 +26,7 @@
     <div class="peak-flow-value-input-row">
       <%= form.number_field :value,
             min: 1, max: 900,
+            required: true,
             placeholder: "e.g. 430",
             class: "peak-flow-value-input",
             aria: { label: "Peak flow reading in litres per minute" } %>

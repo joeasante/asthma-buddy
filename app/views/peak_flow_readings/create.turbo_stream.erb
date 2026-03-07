@@ -1,14 +1,17 @@
-<%# Reset the form with a fresh record and updated personal-best state %>
+<%# Reset the form — wrap partial in turbo_frame_tag so the frame element persists in DOM %>
 <%= turbo_stream.replace "peak_flow_reading_form" do %>
-  <%= render "form",
-        peak_flow_reading: Current.user.peak_flow_readings.new(
-          recorded_at: Time.current.change(sec: 0)
-        ),
-        has_personal_best: @has_personal_best %>
+  <%= turbo_frame_tag "peak_flow_reading_form" do %>
+    <%= render "form",
+          peak_flow_reading: Current.user.peak_flow_readings.new(
+            recorded_at: Time.current.change(sec: 0)
+          ),
+          has_personal_best: @has_personal_best %>
+  <% end %>
 <% end %>
 
-<%# Show zone flash message in the layout flash area %>
-<%# The layout <main id="main-content"> is the skip-link target — prepend flash notice there %>
-<%= turbo_stream.prepend "main-content" do %>
-  <p role="status" class="flash flash--notice"><%= @flash_message %></p>
+<%# Replace flash container — not prepend — so messages don't stack %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages">
+    <p role="status" class="flash flash--notice"><%= raw @flash_message %></p>
+  </div>
 <% end %>
