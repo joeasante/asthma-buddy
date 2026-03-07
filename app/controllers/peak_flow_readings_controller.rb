@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PeakFlowReadingsController < ApplicationController
+  include ActionView::RecordIdentifier
+
   rate_limit to: 10, within: 1.minute, only: :create, with: -> {
     respond_to do |format|
       format.html { redirect_to new_peak_flow_reading_path, alert: "Too many submissions. Try again in a moment." }
@@ -17,6 +19,7 @@ class PeakFlowReadingsController < ApplicationController
   }
 
   before_action :set_has_personal_best, only: %i[new create]
+  before_action :set_peak_flow_reading, only: %i[edit update destroy]
 
   def new
     @peak_flow_reading = Current.user.peak_flow_readings.new(
@@ -79,10 +82,41 @@ class PeakFlowReadingsController < ApplicationController
     end
   end
 
+  def edit
+    # @peak_flow_reading set by before_action
+    # Turbo Frame inline editing: renders edit.html.erb into the frame matching dom_id(@peak_flow_reading)
+  end
+
+  def update
+    if @peak_flow_reading.update(peak_flow_reading_params)
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to peak_flow_readings_path, notice: "Reading updated." }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream { render :update_error, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    @peak_flow_reading.destroy
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to peak_flow_readings_path, notice: "Reading deleted." }
+    end
+  end
+
   private
 
   def set_has_personal_best
     @has_personal_best = PersonalBestRecord.exists_for?(Current.user)
+  end
+
+  def set_peak_flow_reading
+    @peak_flow_reading = Current.user.peak_flow_readings.find(params[:id])
   end
 
   def peak_flow_reading_params
