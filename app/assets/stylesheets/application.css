@@ -8,10 +8,3 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
-
-/* Settings page */
-.settings-pb-unset { color: #888; font-style: italic; }
-.settings-pb-date  { color: #888; font-size: 0.85rem; margin-left: 0.25rem; }
-.input-with-unit   { display: flex; align-items: center; gap: 0.5rem; }
-.input-unit        { font-size: 0.9rem; color: #666; white-space: nowrap; }
-.field-hint        { font-size: 0.8rem; color: #888; margin-top: 0.25rem; }

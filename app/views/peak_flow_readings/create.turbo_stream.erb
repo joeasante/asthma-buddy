@@ -4,7 +4,7 @@
         peak_flow_reading: Current.user.peak_flow_readings.new(
           recorded_at: Time.current.change(sec: 0)
         ),
-        has_personal_best: PersonalBestRecord.current_for(Current.user).present? %>
+        has_personal_best: @has_personal_best %>
 <% end %>
 
 <%# Show zone flash message in the layout flash area %>

@@ -71,6 +71,51 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  # JSON API
+  test "show returns JSON with current personal best" do
+    pb = personal_best_records(:alice_updated_personal_best)
+    get settings_path, as: :json
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal pb.value, body["current_personal_best"]["value"]
+    assert_equal 100, body["valid_range"]["min"]
+    assert_equal 900, body["valid_range"]["max"]
+  end
+
+  test "show returns JSON with null personal best when none exists" do
+    PersonalBestRecord.where(user: @user).delete_all
+    get settings_path, as: :json
+
+    assert_response :success
+    assert_nil JSON.parse(response.body)["current_personal_best"]
+  end
+
+  test "update_personal_best returns 201 JSON on success" do
+    post settings_personal_best_path,
+         params: { personal_best_record: { value: 550 } },
+         as: :json
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal 550, body["value"]
+  end
+
+  test "update_personal_best returns 422 JSON on failure" do
+    post settings_personal_best_path,
+         params: { personal_best_record: { value: 50 } },
+         as: :json
+
+    assert_response :unprocessable_entity
+    assert JSON.parse(response.body)["errors"].any?
+  end
+
+  test "unauthenticated JSON show returns 401" do
+    delete session_path
+    get settings_path, as: :json
+    assert_response :unauthorized
+  end
+
   test "unauthenticated user is redirected from settings" do
     delete session_path
     get settings_path

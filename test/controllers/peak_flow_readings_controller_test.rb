@@ -95,6 +95,40 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user, PeakFlowReading.last.user
   end
 
+  # JSON API
+  test "create returns 201 JSON with zone on success" do
+    pb = personal_best_records(:alice_updated_personal_best)
+    reading_value = (pb.value * 0.85).to_i
+
+    post peak_flow_readings_path,
+         params: { peak_flow_reading: { value: reading_value, recorded_at: Time.current.iso8601 } },
+         as: :json
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal reading_value, body["value"]
+    assert_equal "green", body["zone"]
+    assert body["zone_percentage"].present?
+  end
+
+  test "create returns 422 JSON with errors on failure" do
+    post peak_flow_readings_path,
+         params: { peak_flow_reading: { value: "", recorded_at: Time.current.iso8601 } },
+         as: :json
+
+    assert_response :unprocessable_entity
+    assert JSON.parse(response.body)["errors"].any?
+  end
+
+  test "unauthenticated JSON create returns 401" do
+    delete session_path
+    post peak_flow_readings_path,
+         params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+         as: :json
+
+    assert_response :unauthorized
+  end
+
   test "unauthenticated user is redirected from new" do
     delete session_path  # sign out
     get new_peak_flow_reading_path

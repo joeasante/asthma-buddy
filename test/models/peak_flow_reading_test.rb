@@ -89,6 +89,17 @@ class PeakFlowReadingTest < ActiveSupport::TestCase
     assert reading.errors[:value].any?
   end
 
+  test "invalid when value exceeds 900" do
+    reading = PeakFlowReading.new(valid_attributes.merge(value: 901))
+    assert_not reading.valid?
+    assert reading.errors[:value].any?
+  end
+
+  test "valid when value is exactly 900" do
+    reading = PeakFlowReading.new(valid_attributes.merge(value: 900, recorded_at: 1.day.ago))
+    assert reading.valid?, reading.errors.full_messages.inspect
+  end
+
   test "invalid without user" do
     reading = PeakFlowReading.new(valid_attributes.except(:user))
     assert_not reading.valid?

@@ -15,5 +15,6 @@
     <p class="settings-pb-unset">No personal best set yet.</p>
   <% end %>
 
-  <%= render "personal_best_form", personal_best_record: @personal_best_record %>
+  <%= render "personal_best_form", personal_best_record: @personal_best_record,
+                                   current_personal_best: @current_personal_best %>
 </section>

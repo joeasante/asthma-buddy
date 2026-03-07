@@ -5,23 +5,22 @@ class PeakFlowReading < ApplicationRecord
   enum :zone, { green: 0, yellow: 1, red: 2 }, validate: { allow_nil: true }
 
   validates :value, presence: true,
-                    numericality: { only_integer: true, greater_than: 0 }
+                    numericality: { only_integer: true, greater_than: 0,
+                                    less_than_or_equal_to: 900,
+                                    message: "must be between 1 and 900 L/min" }
   validates :recorded_at, presence: true
+
+  before_save { self.zone = compute_zone }
 
   scope :chronological, -> { order(recorded_at: :desc) }
 
-  # Returns the personal best value for this user at the time of this reading.
-  # Looks for the most recent PersonalBestRecord with recorded_at <= self.recorded_at.
-  # Returns nil if no personal best exists before this reading.
   def personal_best_at_reading_time
-    user.personal_best_records
+    @personal_best_at_reading_time ||= user.personal_best_records
         .where("recorded_at <= ?", recorded_at)
         .order(recorded_at: :desc)
         .pick(:value)
   end
 
-  # Compute zone from value vs personal best at reading time.
-  # Returns :green, :yellow, :red, or nil (no personal best).
   def compute_zone
     pb = personal_best_at_reading_time
     return nil if pb.nil? || pb.zero?
@@ -36,13 +35,9 @@ class PeakFlowReading < ApplicationRecord
     end
   end
 
-  # Assign zone before save based on current personal best history.
-  # Sets zone to nil if no personal best record exists.
-  before_save :assign_zone
-
-  private
-
-  def assign_zone
-    self.zone = compute_zone
+  def zone_percentage
+    pb = personal_best_at_reading_time
+    return nil if pb.nil? || pb.zero?
+    ((value.to_f / pb) * 100).round
   end
 end

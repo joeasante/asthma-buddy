@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class User < ApplicationRecord
   has_secure_password
+  # :delete_all skips callbacks — sessions have none, and bulk DELETE is more efficient than per-record :destroy
   has_many :sessions, dependent: :delete_all
   has_many :symptom_logs, dependent: :destroy
   has_many :peak_flow_readings, dependent: :destroy
