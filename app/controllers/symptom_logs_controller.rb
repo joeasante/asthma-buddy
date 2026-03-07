@@ -9,8 +9,8 @@ class SymptomLogsController < ApplicationController
     @active_preset = params[:preset].presence || "all"
 
     if params[:start_date].present? || params[:end_date].present?
-      @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : nil
-      @end_date   = params[:end_date].present?   ? Date.parse(params[:end_date])   : nil
+      @start_date = params[:start_date].present? ? (Date.parse(params[:start_date]) rescue nil) : nil
+      @end_date   = params[:end_date].present?   ? (Date.parse(params[:end_date])   rescue nil) : nil
     else
       @end_date = nil
       @start_date = case @active_preset
@@ -39,6 +39,9 @@ class SymptomLogsController < ApplicationController
     @symptom_log = Current.user.symptom_logs.new(symptom_log_params)
 
     if @symptom_log.save
+      @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
+        Current.user.symptom_logs.severity_counts
+      )
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to symptom_logs_path, notice: "Symptom logged." }

@@ -17,7 +17,9 @@
         end_date: @end_date %>
 
   <%= turbo_frame_tag "timeline_content" do %>
-    <%= render "trend_bar", severity_counts: @severity_counts %>
+    <div id="trend_bar">
+      <%= render "trend_bar", severity_counts: @severity_counts %>
+    </div>
 
     <% if @symptom_logs.empty? %>
       <p class="timeline-empty-state">No symptoms recorded for this period. Try a wider date range or log your first entry above.</p>
