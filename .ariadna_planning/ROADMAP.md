@@ -132,13 +132,14 @@ Plans:
   2. A user can set their personal best peak flow value in their profile or settings; this value persists across sessions.
   3. When a reading is saved, the system automatically computes the zone: Green (>= 80% of personal best), Yellow (50-79%), Red (< 50%) — and stores it against the reading.
   4. A user cannot record or view another user's peak flow data (isolation enforced).
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [ ] 06-01-PLAN.md — PeakFlowReading + PersonalBestRecord models, migrations, zone calculation, fixtures, model tests
 - [ ] 06-02-PLAN.md — Settings routes, SettingsController, personal best form with 100-900 validation
 - [ ] 06-03-PLAN.md — PeakFlowReadingsController (new + create), entry form, Turbo Stream response, zone flash
 - [ ] 06-04-PLAN.md — Controller tests (recording + settings) and system tests for full recording flow
+- [ ] 06-05-PLAN.md — Gap closure: required field, form reset, flash replace, zone colour in flash
 
 ---
 
@@ -217,7 +218,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 3. Symptom Recording | 0/3 | Not started | - |
 | 4. Symptom Management | 0/2 | Not started | - |
 | 5. Symptom Timeline | 0/3 | Not started | - |
-| 6. Peak Flow Recording | 0/4 | Not started | - |
+| 6. Peak Flow Recording | 0/5 | Not started | - |
 | 7. Peak Flow Display and Management | 0/5 | Not started | - |
 | 8. Peak Flow Trends | 0/5 | Not started | - |
 | 9. Accessibility and Polish | 0/6 | Not started | - |
