@@ -45,9 +45,12 @@ class PeakFlowReadingsController < ApplicationController
 
   def zone_flash_message(reading)
     if reading.zone.nil?
-      "Reading saved — set your personal best to see your zone."
+      "Reading saved \u2014 set your personal best to see your zone."
     else
-      "Reading saved — #{reading.zone.capitalize} Zone (#{reading.zone_percentage}% of personal best)."
+      zone_name = reading.zone.capitalize
+      pct       = reading.zone_percentage
+      coloured  = "<span class=\"zone-label zone-label--#{reading.zone}\">#{zone_name} Zone (#{pct}% of personal best)</span>"
+      "Reading saved \u2014 #{coloured}.".html_safe
     end
   end
 

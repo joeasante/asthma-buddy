@@ -47,3 +47,12 @@
   color: #555;
   font-weight: 500;
 }
+
+/* Zone label colours in flash message — reuse severity custom properties */
+.zone-label {
+  font-weight: 600;
+}
+
+.zone-label--green  { color: var(--severity-mild); }
+.zone-label--yellow { color: var(--severity-moderate); }
+.zone-label--red    { color: var(--severity-severe); }
