@@ -1,0 +1,25 @@
+# Note: zone values stored as integers — 0=green, 1=yellow, 2=red
+# These are pre-set for fixture use; zone is normally assigned via before_save callback.
+alice_green_reading:
+  user: verified_user
+  value: 430
+  zone: 0
+  recorded_at: <%= 2.days.ago %>
+
+alice_yellow_reading:
+  user: verified_user
+  value: 260
+  zone: 1
+  recorded_at: <%= 1.day.ago %>
+
+alice_no_pb_reading:
+  user: verified_user
+  value: 400
+  zone:
+  recorded_at: <%= 60.days.ago %>
+
+bob_reading:
+  user: unverified_user
+  value: 380
+  zone: 0
+  recorded_at: <%= 3.days.ago %>

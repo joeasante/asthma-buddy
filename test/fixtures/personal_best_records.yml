@@ -1,0 +1,14 @@
+alice_personal_best:
+  user: verified_user
+  value: 500
+  recorded_at: <%= 30.days.ago %>
+
+alice_updated_personal_best:
+  user: verified_user
+  value: 520
+  recorded_at: <%= 7.days.ago %>
+
+bob_personal_best:
+  user: unverified_user
+  value: 450
+  recorded_at: <%= 10.days.ago %>

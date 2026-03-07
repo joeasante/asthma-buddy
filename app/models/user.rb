@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 class User < ApplicationRecord
   has_secure_password
-  has_many :sessions, dependent: :destroy
+  has_many :sessions, dependent: :delete_all
   has_many :symptom_logs, dependent: :destroy
+  has_many :peak_flow_readings, dependent: :destroy
+  has_many :personal_best_records, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
