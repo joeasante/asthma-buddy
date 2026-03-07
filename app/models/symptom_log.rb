@@ -17,8 +17,6 @@ class SymptomLog < ApplicationRecord
     severe: 2
   }, validate: true
 
-  validates :symptom_type, presence: true
-  validates :severity, presence: true
   validates :recorded_at, presence: true
 
   scope :chronological, -> { order(recorded_at: :desc) }

@@ -19,13 +19,13 @@ class SymptomLogTest < ActiveSupport::TestCase
   test "invalid without symptom_type" do
     log = SymptomLog.new(valid_attributes.except(:symptom_type))
     assert_not log.valid?
-    assert_includes log.errors[:symptom_type], "can't be blank"
+    assert log.errors[:symptom_type].any?
   end
 
   test "invalid without severity" do
     log = SymptomLog.new(valid_attributes.except(:severity))
     assert_not log.valid?
-    assert_includes log.errors[:severity], "can't be blank"
+    assert log.errors[:severity].any?
   end
 
   test "invalid without recorded_at" do
