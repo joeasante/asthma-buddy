@@ -10,16 +10,16 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 7 of 9 (Peak Flow Display) — IN PROGRESS
-Plan: 2 of 3 in phase 07 (07-02 complete)
-Status: Phase 7 Plan 2 Complete — edit/update/destroy for peak flow readings with inline Turbo Frame edit and Turbo Stream responses
-Last activity: 2026-03-07 — Completed 07-02: routes edit/update/destroy, controller set_peak_flow_reading (Current.user scoped), edit.html.erb, update/update_error/destroy turbo stream views, _reading_row Edit/Delete buttons; 13 controller tests, 0 failures
+Plan: 3 of 3 in phase 07 (07-03 complete — phase 07 DONE)
+Status: Phase 7 Complete — Peak Flow Display: index with zone badges, date filter, edit/update/destroy with Turbo Stream, comprehensive controller test suite
+Last activity: 2026-03-07 — Completed 07-03: 18 new controller tests for index/edit/update/destroy; zone badge CSS class assertions, cross-user 404 isolation, Turbo Stream replace/remove contracts, zone recalculation regression, unauthenticated redirects; 31 total tests, 0 failures
 
-Progress: [████████░░] 44%
+Progress: [████████░░] 49%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: ~4.9 min
 - Total execution time: ~84 min
 
@@ -33,11 +33,11 @@ Progress: [████████░░] 44%
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
 | 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
-| 07-peak-flow-display | 2 | ~4 min | ~2 min |
+| 07-peak-flow-display | 3 | ~7 min | ~2.3 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (1 min), 06-04 (3 min), 06-05 (5 min), 07-01 (2 min), 07-02 (2 min)
+- Last 5 plans: 06-04 (3 min), 06-05 (5 min), 07-01 (2 min), 07-02 (2 min), 07-03 (3 min)
 - Trend: stable — recent plans averaging ~1-5 min
 
 *Updated after each plan completion*
@@ -115,6 +115,8 @@ Recent decisions affecting current work:
 - ActionView::RecordIdentifier included in PeakFlowReadingsController matching Phase 4 symptom_logs pattern — dom_id available in controller for Turbo Stream responses (07-02)
 - update_error.turbo_stream.erb wraps form in both turbo_stream.replace and turbo_frame_tag — outer replace targets DOM, inner frame keeps subsequent edits functional (07-02)
 - has_personal_best: false passed to _form partial in edit context — suppresses personal best banner for existing users (07-02)
+- ActionView::RecordIdentifier included at class level in controller test — dom_id available for cross-user isolation assertion (07-03)
+- delete session_path for sign-out in unauthenticated tests — consistent with existing peak flow controller tests, not sign_out helper (07-03)
 
 ### Pending Todos
 
@@ -127,5 +129,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 07-02-PLAN.md — edit/update/destroy for peak flow readings: inline Turbo Frame edit, Turbo Stream replace/remove, Current.user-scoped set_peak_flow_reading, Edit/Delete buttons in _reading_row; 13 controller tests, 0 failures
+Stopped at: Completed 07-03-PLAN.md — controller tests for index/edit/update/destroy: zone badge CSS assertions, cross-user 404 isolation, Turbo Stream replace/remove contracts, zone recalculation, unauthenticated redirects; 31 total tests, 0 failures; Phase 7 complete
 Resume file: None
