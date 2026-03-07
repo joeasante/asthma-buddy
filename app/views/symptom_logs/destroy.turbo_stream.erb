@@ -3,4 +3,4 @@
     <%= render "trend_bar", severity_counts: @severity_counts %>
   </div>
 <% end %>
-<%= turbo_stream.replace dom_id(@symptom_log), partial: "timeline_row", locals: { symptom_log: @symptom_log } %>
+<%= turbo_stream.remove dom_id(@symptom_log) %>

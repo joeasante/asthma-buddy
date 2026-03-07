@@ -66,6 +66,9 @@ class SymptomLogsController < ApplicationController
 
   def update
     if @symptom_log.update(symptom_log_params)
+      @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
+        Current.user.symptom_logs.severity_counts
+      )
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to symptom_logs_path, notice: "Symptom updated." }
@@ -82,8 +85,11 @@ class SymptomLogsController < ApplicationController
 
   def destroy
     @symptom_log.destroy
+    @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
+      Current.user.symptom_logs.severity_counts
+    )
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(dom_id(@symptom_log)) }
+      format.turbo_stream
       format.html { redirect_to symptom_logs_path, notice: "Symptom deleted." }
       format.json { head :no_content }
     end
