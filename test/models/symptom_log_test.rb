@@ -67,4 +67,63 @@ class SymptomLogTest < ActiveSupport::TestCase
     results = SymptomLog.where(id: [older.id, newer.id]).chronological
     assert_equal newer.id, results.first.id
   end
+
+  # in_date_range scope
+
+  test "in_date_range returns entries within start and end bounds" do
+    alice = users(:verified_user)
+    result = alice.symptom_logs.in_date_range(7.days.ago, Date.current)
+    assert_includes result, symptom_logs(:alice_severe_recent)
+    assert_includes result, symptom_logs(:alice_mild_week)
+    assert_not_includes result, symptom_logs(:alice_coughing_old)
+  end
+
+  test "in_date_range with nil start returns from beginning of time" do
+    alice = users(:verified_user)
+    result = alice.symptom_logs.in_date_range(nil, Date.current)
+    assert_includes result, symptom_logs(:alice_coughing_old)
+  end
+
+  test "in_date_range with nil end returns through present" do
+    alice = users(:verified_user)
+    result = alice.symptom_logs.in_date_range(7.days.ago, nil)
+    assert_includes result, symptom_logs(:alice_severe_recent)
+  end
+
+  # severity_counts
+
+  test "severity_counts returns hash with counts per severity" do
+    alice = users(:verified_user)
+    counts = alice.symptom_logs.severity_counts
+    # Alice has: 1 moderate (alice_wheezing) + 2 mild (alice_coughing_old, alice_mild_week) + 1 severe (alice_severe_recent)
+    assert_equal 2, counts[:mild]
+    assert_equal 1, counts[:moderate]
+    assert_equal 1, counts[:severe]
+  end
+
+  test "severity_counts with filtered relation returns counts for that range only" do
+    alice = users(:verified_user)
+    counts = alice.symptom_logs.in_date_range(7.days.ago, nil).severity_counts
+    # Within 7 days: alice_wheezing (moderate), alice_severe_recent (severe), alice_mild_week (mild)
+    assert_equal 1, counts[:mild]
+    assert_equal 1, counts[:moderate]
+    assert_equal 1, counts[:severe]
+  end
+
+  # paginate
+
+  test "paginate returns first items on page 1" do
+    alice = users(:verified_user)
+    records, total_pages, current_page = alice.symptom_logs.chronological.paginate(page: 1, per_page: 2)
+    assert_equal 1, current_page
+    assert_equal 2, total_pages    # 4 fixtures / 2 per_page = 2 pages
+    assert_equal 2, records.count
+  end
+
+  test "paginate clamps page to valid range" do
+    alice = users(:verified_user)
+    _, total_pages, current_page = alice.symptom_logs.paginate(page: 999, per_page: 25)
+    assert_equal 1, current_page   # only 4 fixtures, all fit on 1 page at 25/page
+    assert_equal 1, total_pages
+  end
 end

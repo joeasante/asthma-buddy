@@ -1,11 +1,29 @@
 alice_wheezing:
   user: verified_user
-  symptom_type: 0
-  severity: 1
+  symptom_type: 0      # wheezing
+  severity: 1          # moderate
   recorded_at: <%= 1.hour.ago %>
+
+alice_coughing_old:
+  user: verified_user
+  symptom_type: 1      # coughing
+  severity: 0          # mild
+  recorded_at: <%= 40.days.ago %>
+
+alice_severe_recent:
+  user: verified_user
+  symptom_type: 2      # shortness_of_breath
+  severity: 2          # severe
+  recorded_at: <%= 3.days.ago %>
+
+alice_mild_week:
+  user: verified_user
+  symptom_type: 3      # chest_tightness
+  severity: 0          # mild
+  recorded_at: <%= 5.days.ago %>
 
 bob_coughing:
   user: unverified_user
-  symptom_type: 1
-  severity: 0
+  symptom_type: 1      # coughing
+  severity: 0          # mild
   recorded_at: <%= 2.hours.ago %>
