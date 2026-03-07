@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get "email_verification/:token", to: "email_verifications#show", as: :email_verification
   resources :passwords, param: :token, only: %i[ new create edit update ]
   resources :symptom_logs, only: %i[ index create edit update destroy ]
+  resources :peak_flow_readings, only: %i[ new create ]
 
   get  "settings",               to: "settings#show",                as: :settings
   post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
