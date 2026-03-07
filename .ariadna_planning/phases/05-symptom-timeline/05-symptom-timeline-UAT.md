@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 05-symptom-timeline
 source: 05-01-SUMMARY.md, 05-02-SUMMARY.md
 started: 2026-03-07T14:00:00Z
@@ -66,19 +66,33 @@ skipped: 1
   reason: "User reported: when I added an entry for severe it didn't appear in the bar immediately I had to refresh the page"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "create.turbo_stream.erb only prepends the new row — it never recomputes @severity_counts nor emits a Turbo Stream replace for the trend bar, so the bar's DOM stays frozen at its pre-submission state"
+  artifacts:
+    - path: "app/controllers/symptom_logs_controller.rb"
+      issue: "create action never computes @severity_counts — that assignment lives only in index"
+    - path: "app/views/symptom_logs/create.turbo_stream.erb"
+      issue: "no turbo_stream.replace operation for the trend bar"
+    - path: "app/views/symptom_logs/index.html.erb"
+      issue: "trend bar has no stable DOM id for turbo_stream.replace to target"
+  missing:
+    - "Add id='trend_bar' wrapper around the _trend_bar render in index.html.erb"
+    - "Compute @severity_counts in the create action after successful save"
+    - "Add turbo_stream.replace 'trend_bar' to create.turbo_stream.erb"
   debug_session: ""
 
-- truth: "Clicking the 30d chip filters the timeline to entries from the last 30 days"
+- truth: "Clicking the 30d chip filters the timeline to entries from the last 30 days and the chip appears visually active"
   status: failed
   reason: "User reported: the 30d button doesn't appear to work"
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "The filter bar is rendered outside turbo_frame_tag 'timeline_content', so frame responses never re-render the bar — the active-chip CSS class never updates, giving no visual confirmation the filter applied, making it appear broken even though the list does filter"
+  artifacts:
+    - path: "app/views/symptom_logs/index.html.erb"
+      issue: "filter_bar is rendered outside the timeline_content Turbo Frame — frame responses do not re-render it, so active chip state is never reflected"
+    - path: "app/views/symptom_logs/_filter_bar.html.erb"
+      issue: "chip links target the frame but the bar itself is never updated by frame responses"
+  missing:
+    - "Move the filter_bar render inside turbo_frame_tag 'timeline_content' so the active chip state and list update together on each frame request"
   debug_session: ""
 
 - truth: "The recorded_at datetime input does not show seconds and accepts clean minute-boundary values without browser validation errors"
@@ -86,7 +100,13 @@ skipped: 1
   reason: "User reported: seconds are shown in the input, and entering 09:30:00 triggers a browser error — nearest valid values shown as 09:29:39 and 09:30:39"
   severity: major
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "The controller initialises recorded_at with raw Time.current (including seconds e.g. 09:15:39) and the form renders datetime_local_field with no step attribute, so the browser's default step=60 aligns valid values to :39-second marks, rejecting clean minute-boundary entries"
+  artifacts:
+    - path: "app/controllers/symptom_logs_controller.rb"
+      issue: "recorded_at default is Time.current — includes seconds, misaligning the step-60 anchor"
+    - path: "app/views/symptom_logs/_form.html.erb"
+      issue: "datetime_local_field :recorded_at has no step: 60 attribute"
+  missing:
+    - "Change Time.current to Time.current.change(sec: 0) in the controller to align the anchor to a whole minute"
+    - "Add step: 60 to the datetime_local_field in _form.html.erb"
   debug_session: ""
