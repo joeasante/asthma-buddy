@@ -5,23 +5,23 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 5 — Symptom Timeline
+**Current focus:** Phase 6 — Peak Flow Recording
 
 ## Current Position
 
-Phase: 5 of 9 (Symptom Timeline) — IN PROGRESS
-Plan: 3 of N in phase 05 (05-03 complete)
-Status: Phase 5 Plan 3 Complete
-Last activity: 2026-03-07 — Completed 05-03: Three UAT gaps closed — live trend bar Turbo Stream update, filter chip active state fix, datetime step:60; 101 total tests passing
+Phase: 6 of 9 (Peak Flow Recording) — IN PROGRESS
+Plan: 1 of N in phase 06 (06-01 complete)
+Status: Phase 6 Plan 1 Complete
+Last activity: 2026-03-07 — Completed 06-01: PeakFlowReading and PersonalBestRecord models, zone calculation, 22 model tests; 123 total tests passing
 
-Progress: [██████░░░░] 27%
+Progress: [███████░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: ~6 min
-- Total execution time: ~73 min
+- Total execution time: ~81 min
 
 **By Phase:**
 
@@ -32,11 +32,12 @@ Progress: [██████░░░░] 27%
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
+| 06-peak-flow-recording | 1 | ~8 min | ~8 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (6 min), 05-03 (3 min)
-- Trend: stable — recent plans averaging ~3-6 min
+- Last 5 plans: 04-02 (8 min), 05-01 (3 min), 05-02 (6 min), 05-03 (3 min), 06-01 (8 min)
+- Trend: stable — recent plans averaging ~3-8 min
 
 *Updated after each plan completion*
 
@@ -93,6 +94,10 @@ Recent decisions affecting current work:
 - filter_bar moved INSIDE turbo_frame_tag 'timeline_content' — supersedes 05-01 outside-frame decision; root cause of broken active-chip state was bar never re-rendered on chip click (05-03)
 - @severity_counts in create uses full user history (no date filter) — trend bar matches fresh page load behavior (05-03)
 - trend_bar wrapped in div#trend_bar for stable turbo_stream.replace target — live update on create now works (05-03)
+- Zone calculation uses personal best at reading time (recorded_at <= self.recorded_at), not current personal best — ensures historical accuracy (06-01)
+- zone column is nullable; enum uses validate: { allow_nil: true } — nil zone when no personal best exists is a valid state (06-01)
+- PersonalBestRecord validation range 100-900 L/min — covers physiologically plausible peak flow values (06-01)
+- before_save :assign_zone on PeakFlowReading — zone is always derived, never manually set by callers (06-01)
 
 ### Pending Todos
 
@@ -105,5 +110,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 05-03-PLAN.md — Three UAT gap fixes; 101 tests, 307 assertions, 0 failures
+Stopped at: Completed 06-01-PLAN.md — PeakFlowReading + PersonalBestRecord models; 123 tests, 343 assertions, 0 failures
 Resume file: None
