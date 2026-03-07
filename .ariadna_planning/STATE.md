@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 5 of 9 (Symptom Timeline) — IN PROGRESS
-Plan: 2 of N in phase 05 (05-02 complete)
-Status: Phase 5 Plan 2 Complete
-Last activity: 2026-03-07 — Completed 05-02: Full test coverage for timeline feature — model scope unit tests, controller filter/isolation tests, system tests for Turbo Frame chip interaction; 100 total tests passing
+Plan: 3 of N in phase 05 (05-03 complete)
+Status: Phase 5 Plan 3 Complete
+Last activity: 2026-03-07 — Completed 05-03: Three UAT gaps closed — live trend bar Turbo Stream update, filter chip active state fix, datetime step:60; 101 total tests passing
 
 Progress: [██████░░░░] 27%
 
@@ -31,11 +31,11 @@ Progress: [██████░░░░] 27%
 | 02-authentication | 3 | ~21 min | ~7 min |
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
-| 05-symptom-timeline | 2 | ~9 min | ~4.5 min |
+| 05-symptom-timeline | 3 | ~12 min | ~4 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (6 min)
+- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (6 min), 05-03 (3 min)
 - Trend: stable — recent plans averaging ~3-6 min
 
 *Updated after each plan completion*
@@ -90,6 +90,9 @@ Recent decisions affecting current work:
 - CSS custom properties (--severity-mild/moderate/severe) in symptom_timeline.css establish severity/zone color palette reused by Phase 6+ peak flow (05-01)
 - turbo_frame_tag wraps _timeline_row so Edit/Delete buttons are present and inline edit targets the frame — id=timeline_list on <ol> enables Turbo Stream prepend on create (05-02)
 - create.turbo_stream.erb targets timeline_list using timeline_row partial; update.turbo_stream.erb uses timeline_row partial — consistent with Phase 5 view architecture (05-02)
+- filter_bar moved INSIDE turbo_frame_tag 'timeline_content' — supersedes 05-01 outside-frame decision; root cause of broken active-chip state was bar never re-rendered on chip click (05-03)
+- @severity_counts in create uses full user history (no date filter) — trend bar matches fresh page load behavior (05-03)
+- trend_bar wrapped in div#trend_bar for stable turbo_stream.replace target — live update on create now works (05-03)
 
 ### Pending Todos
 
@@ -102,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 05-02-PLAN.md — Full test coverage for timeline feature; 100 tests, 304 assertions, 0 failures
+Stopped at: Completed 05-03-PLAN.md — Three UAT gap fixes; 101 tests, 307 assertions, 0 failures
 Resume file: None
