@@ -95,13 +95,11 @@ Plans:
   1. A user can open an existing symptom entry, change any field (type, severity, timestamp, notes), save the change, and see the updated values immediately.
   2. A user can delete a symptom entry and it is removed from their record permanently.
   3. A user cannot edit or delete another user's symptom entries — attempting to do so returns a 404 or redirect.
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Build symptom log edit form and update action
-- [ ] 04-02: Add delete action with confirmation prompt (Turbo confirm)
-- [ ] 04-03: Enforce ownership checks on edit and delete
-- [ ] 04-04: Write Minitest coverage for edit, delete, and cross-user protection
+- [ ] 04-01-PLAN.md — Routes, controller (edit/update/destroy), views (inline Turbo Frame edit, delete button, Turbo Stream responses)
+- [ ] 04-02-PLAN.md — Controller tests (edit/update/destroy own + cross-user) and system tests (inline edit flow, delete flow)
 
 ---
 
@@ -221,7 +219,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 1. Foundation | 0/4 | Not started | - |
 | 2. Authentication | 3/3 | Complete | 2026-03-06 |
 | 3. Symptom Recording | 0/3 | Not started | - |
-| 4. Symptom Management | 0/4 | Not started | - |
+| 4. Symptom Management | 0/2 | Not started | - |
 | 5. Symptom Timeline | 0/5 | Not started | - |
 | 6. Peak Flow Recording | 0/6 | Not started | - |
 | 7. Peak Flow Display and Management | 0/5 | Not started | - |
