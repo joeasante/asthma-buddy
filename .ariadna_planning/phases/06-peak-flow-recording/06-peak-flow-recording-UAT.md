@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 06-peak-flow-recording
 source: [06-01-SUMMARY.md, 06-02-SUMMARY.md, 06-03-SUMMARY.md, 06-04-SUMMARY.md]
 started: 2026-03-07T00:00:00Z
@@ -65,21 +65,46 @@ skipped: 0
   reason: "User reported: If I try submitting nothing, there is no warning. Over 900, then there is a warning"
   severity: major
   test: 7
-  artifacts: []
-  missing: []
+  root_cause: "number_field :value in _form.html.erb is missing required: true. Without it, an empty number input passes browser constraint validation (min/max only apply to non-empty values). Turbo's XHR path bypasses browser tooltips, so the blank value reaches the server where Rails casts it to nil and presence: true fires — but the errors ARE returned in the turbo stream replace. The visual failure is that the errors block may not be rendering visibly, or more likely the server round-trip is not completing because the turbo frame structure breaks after first replace (see gap 3)."
+  artifacts:
+    - path: "app/views/peak_flow_readings/_form.html.erb"
+      issue: "number_field :value has min: 1, max: 900 but no required: true"
+  missing:
+    - "Add required: true to number_field :value in _form.html.erb"
+  debug_session: ".ariadna_planning/debug/peak-flow-blank-silent-fail.md"
 
 - truth: "Zone flash message shows the zone colour visually (green/yellow/red) alongside the zone name when a reading is saved with a personal best set"
   status: failed
   reason: "User reported: Pass, but it didn't show the actual colour when there was a personal best set. It just mentioned the name of the colour (Yellow)"
   severity: minor
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "Three gaps combine: (1) zone_flash_message returns plain text with no HTML span; (2) <%= %> in create.turbo_stream.erb and application.html.erb HTML-escape any HTML returned; (3) no CSS classes for zone colours exist in peak_flow.css. All three must be fixed together."
+  artifacts:
+    - path: "app/controllers/peak_flow_readings_controller.rb"
+      issue: "zone_flash_message returns plain text — no <span> with colour class"
+    - path: "app/views/peak_flow_readings/create.turbo_stream.erb"
+      issue: "<%= @flash_message %> escapes HTML"
+    - path: "app/assets/stylesheets/peak_flow.css"
+      issue: "No .zone-label--green/yellow/red CSS classes exist"
+  missing:
+    - "Wrap zone name in <span class='zone-label zone-label--ZONE'> in zone_flash_message, mark html_safe"
+    - "Use raw() or html_safe in create.turbo_stream.erb flash render"
+    - "Add zone colour CSS classes to peak_flow.css (can reuse --severity-* custom props)"
+  debug_session: ".ariadna_planning/debug/peak-flow-flash-zone-colour.md"
 
 - truth: "After a successful recording the form resets (value clears, datetime resets) and old flash messages are replaced not accumulated"
   status: failed
   reason: "User reported: No, the form didn't clear and the previous message about reading saved remained and another appeared below it"
   severity: major
   test: 8
-  artifacts: []
-  missing: []
+  root_cause: "Two independent bugs: (1) Form not clearing — create.turbo_stream.erb replace block renders the form partial without wrapping in turbo_frame_tag, so after the first replace the <turbo-frame id='peak_flow_reading_form'> element is gone from the DOM; browser form state restoration then repopulates the re-inserted inputs. (2) Flash stacking — turbo_stream.prepend is additive and the layout has no dedicated flash container with a stable DOM id to replace."
+  artifacts:
+    - path: "app/views/peak_flow_readings/create.turbo_stream.erb"
+      issue: "replace block renders form partial without turbo_frame_tag wrapper; uses prepend for flash instead of replace"
+    - path: "app/views/layouts/application.html.erb"
+      issue: "No dedicated <div id='flash-messages'> wrapper — flash <p> tags are direct children of <main>"
+  missing:
+    - "Wrap rendered form in turbo_frame_tag 'peak_flow_reading_form' inside the replace block in create.turbo_stream.erb"
+    - "Add <div id='flash-messages'> wrapper in application.html.erb around flash notices"
+    - "Change turbo_stream.prepend 'main-content' to turbo_stream.replace 'flash-messages' in create.turbo_stream.erb"
+  debug_session: ".ariadna_planning/debug/peak-flow-form-flash-bugs.md"
