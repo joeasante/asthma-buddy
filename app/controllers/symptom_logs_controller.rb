@@ -30,7 +30,7 @@ class SymptomLogsController < ApplicationController
     @symptom_logs, @total_pages, @current_page = base_relation.paginate(page: params[:page])
 
     respond_to do |format|
-      format.html { @symptom_log = Current.user.symptom_logs.new(recorded_at: Time.current) }
+      format.html { @symptom_log = Current.user.symptom_logs.new(recorded_at: Time.current.change(sec: 0)) }
       format.json { render json: symptom_logs_json(base_relation) }
     end
   end

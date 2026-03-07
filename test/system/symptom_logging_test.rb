@@ -204,6 +204,8 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
     # Click the "7 days" chip — should update timeline_content frame
     within(".filter-bar") { click_on "7 days" }
+    # Active chip state must update (filter_bar now inside the frame)
+    assert_selector ".filter-chip--active", text: "7 days"
 
     # alice_coughing_old (40 days ago) should not be in the updated list
     assert_no_selector ".timeline-row", text: /Coughing/i

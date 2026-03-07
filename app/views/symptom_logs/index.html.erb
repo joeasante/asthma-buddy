@@ -11,12 +11,12 @@
 <section aria-label="Symptom timeline">
   <h2>Your Symptom History</h2>
 
-  <%= render "filter_bar",
-        active_preset: @active_preset,
-        start_date: @start_date,
-        end_date: @end_date %>
-
   <%= turbo_frame_tag "timeline_content" do %>
+    <%= render "filter_bar",
+          active_preset: @active_preset,
+          start_date: @start_date,
+          end_date: @end_date %>
+
     <div id="trend_bar">
       <%= render "trend_bar", severity_counts: @severity_counts %>
     </div>

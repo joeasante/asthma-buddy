@@ -26,7 +26,7 @@
 
   <div>
     <%= form.label :recorded_at, "When did this happen?" %>
-    <%= form.datetime_local_field :recorded_at %>
+    <%= form.datetime_local_field :recorded_at, step: 60 %>
   </div>
 
   <div>

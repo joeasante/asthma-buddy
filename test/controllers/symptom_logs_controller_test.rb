@@ -59,6 +59,14 @@ class SymptomLogsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "create turbo stream response includes trend_bar replace" do
+    post symptom_logs_url,
+      params: { symptom_log: { symptom_type: "coughing", severity: "severe", recorded_at: Time.current } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+    assert_match "trend_bar", response.body
+  end
+
   test "create without authentication redirects to sign in" do
     sign_out
     post symptom_logs_url,
