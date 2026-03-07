@@ -10,16 +10,16 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 6 of 9 (Peak Flow Recording) — IN PROGRESS
-Plan: 3 of N in phase 06 (06-01, 06-02, 06-03 complete)
-Status: Phase 6 Plan 3 Complete
-Last activity: 2026-03-07 — Completed 06-03: PeakFlowReadingsController (new+create), entry form with large numeric input + L/min label, conditional personal best banner, zone-aware Turbo Stream flash, peak_flow.css; 123 total tests passing
+Plan: 4 of 4 in phase 06 (06-01, 06-02, 06-03, 06-04 complete)
+Status: Phase 6 Plan 4 Complete — Phase 6 ship-ready
+Last activity: 2026-03-07 — Completed 06-04: 19 controller integration tests + 5 system tests; PEAK-01/02/03 requirements covered; full suite 142 tests, 409 assertions, 0 failures
 
 Progress: [███████░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: ~5.1 min
 - Total execution time: ~82 min
 
@@ -32,11 +32,11 @@ Progress: [███████░░░] 30%
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
-| 06-peak-flow-recording | 3 | ~14 min | ~4.7 min |
+| 06-peak-flow-recording | 4 | ~17 min | ~4.25 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (6 min), 05-03 (3 min), 06-01 (8 min), 06-02 (5 min), 06-03 (1 min)
+- Last 5 plans: 05-03 (3 min), 06-01 (8 min), 06-02 (5 min), 06-03 (1 min), 06-04 (3 min)
 - Trend: stable — recent plans averaging ~1-8 min
 
 *Updated after each plan completion*
@@ -102,6 +102,8 @@ Recent decisions affecting current work:
 - recorded_at merged server-side in personal_best_params — form never exposes timestamp, prevents client-side tampering (06-02)
 - turbo_stream.prepend "main-content" used for zone-aware flash in create.turbo_stream.erb — main-content is the established skip-link target DOM id, no separate flash container needed (06-03)
 - zone_flash_message reads personal_best_at_reading_time after before_save :assign_zone runs — zone and percentage always consistent (06-03)
+- System test sign_in_as defined as local helper using form-based login — SessionTestHelper only loads for ActionDispatch::IntegrationTest, not ApplicationSystemTestCase (06-04)
+- execute_script to strip HTML5 required attribute before blank-submit system test — prevents browser-native validation blocking server-side validation path (06-04)
 
 ### Pending Todos
 
@@ -114,5 +116,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 06-03-PLAN.md — Peak flow entry form, PeakFlowReadingsController, Turbo Stream create with zone flash; 123 tests, 343 assertions, 0 failures
+Stopped at: Completed 06-04-PLAN.md — Controller integration tests (19) + system tests (5) for peak flow recording; 142 tests, 409 assertions, 0 failures; Phase 6 ship-ready
 Resume file: None
