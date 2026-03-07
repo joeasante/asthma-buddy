@@ -1,0 +1,4 @@
+<%= turbo_stream.prepend "symptom_logs_list", partial: "symptom_log", locals: { symptom_log: @symptom_log } %>
+<%= turbo_stream.replace "symptom_log_form" do %>
+  <%= render "form", symptom_log: Current.user.symptom_logs.new(recorded_at: Time.current) %>
+<% end %>

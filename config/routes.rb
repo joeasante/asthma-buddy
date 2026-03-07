@@ -4,7 +4,12 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   get "email_verification/:token", to: "email_verifications#show", as: :email_verification
   resources :passwords, param: :token
+  resources :symptom_logs, only: %i[ index create ]
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # CSP violation reports from browsers (report-only mode).
+  post "/csp-violations", to: "csp_reports#create"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
