@@ -5,23 +5,23 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 3 — Symptom Logging
+**Current focus:** Phase 4 — Symptom Management
 
 ## Current Position
 
-Phase: 3 of 9 (Symptom Recording) — IN PROGRESS
-Plan: 2 of 5 in phase 03 (03-01, 03-02 complete)
-Status: Phase 3 Plan 2 Complete, Plan 3 Next
-Last activity: 2026-03-07 — Completed 03-02: SymptomLogs controller, views, Turbo Stream, 7 controller tests, 55 total tests passing
+Phase: 4 of 9 (Symptom Management) — IN PROGRESS
+Plan: 1 of N in phase 04 (04-01 complete)
+Status: Phase 4 Plan 1 Complete, Plan 2 Next
+Last activity: 2026-03-07 — Completed 04-01: Inline edit/delete for symptom log entries via Turbo Frame/Stream, 16 controller tests, 64 total tests passing
 
-Progress: [█████░░░░░] 21%
+Progress: [█████░░░░░] 23%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: ~7 min
-- Total execution time: ~61 min
+- Total execution time: ~64 min
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: [█████░░░░░] 21%
 | 01-foundation | 4 | ~28 min | ~7 min |
 | 02-authentication | 3 | ~21 min | ~7 min |
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
-| Phase 03 P03 | 15 | 1 tasks | 3 files |
+| 04-symptom-management | 1 | ~3 min | ~3 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (3 min), 02-03 (15 min), 03-01 (8 min), 03-02 (4 min)
-- Trend: steady execution, controller+views+tests plan completed in 4 min
+- Last 5 plans: 02-03 (15 min), 03-01 (8 min), 03-02 (4 min), 04-01 (3 min)
+- Trend: accelerating — edit/delete + Turbo Frame/Stream plan completed in 3 min
 
 *Updated after each plan completion*
 
@@ -77,6 +77,10 @@ Recent decisions affecting current work:
 - sign_in_as helper used in controller tests instead of POST session_url — consistent with existing test suite and correct fixture password (03-02)
 - turbo_frame_tag wraps form and list for targeted Turbo Stream replace/prepend by DOM id (03-02)
 - HTTP 422 on validation failure required for Turbo Drive to process error stream instead of treating as redirect (03-02)
+- ActionView::RecordIdentifier included in controller to access dom_id for Turbo Stream targeting in respond_to blocks (04-01)
+- Flash not streamed on update — layout flash has no DOM id to target; entry replacement sufficient for MVP (04-01)
+- Cancel on edit form uses full page reload (data-turbo: false) to avoid needing a show action — simplest correct MVP approach (04-01)
+- edit.html.erb wraps form in turbo_frame_tag matching entry frame id so inline edit works without data-turbo-frame on the Edit link (04-01)
 
 ### Pending Todos
 
@@ -89,5 +93,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 03-02-PLAN.md — SymptomLogs controller, views, Turbo Stream, 7 controller tests, 55 total tests passing
+Stopped at: Completed 04-01-PLAN.md — Inline edit/delete for symptom log entries via Turbo Frame/Stream, 16 controller tests, 64 total tests passing
 Resume file: None
