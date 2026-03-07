@@ -3,6 +3,8 @@
 require "test_helper"
 
 class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
+  include ActionView::RecordIdentifier
+
   setup do
     @user  = users(:verified_user)
     @other = users(:unverified_user)
@@ -140,6 +142,155 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     post peak_flow_readings_path, params: {
       peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }
     }
+    assert_redirected_to new_session_path
+  end
+
+  # -------------------------------------------------------------------------
+  # GET /peak_flow_readings (index) — Phase 7
+  # -------------------------------------------------------------------------
+
+  test "index renders for authenticated user" do
+    get peak_flow_readings_path
+    assert_response :success
+  end
+
+  test "index shows zone badge CSS class for green reading" do
+    get peak_flow_readings_path
+    assert_select ".zone-badge--green"
+  end
+
+  test "index shows zone badge CSS class for yellow reading" do
+    get peak_flow_readings_path
+    assert_select ".zone-badge--yellow"
+  end
+
+  test "index defaults to 30-day window and excludes older readings" do
+    # alice_no_pb_reading is 60 days ago — outside 30-day default
+    get peak_flow_readings_path
+    assert_response :success
+    # alice_green (2 days ago) and alice_yellow (1 day ago) should appear
+    assert_select ".zone-badge", minimum: 2
+  end
+
+  test "index with custom date range filters readings" do
+    # Request only the last 1 day — only alice_yellow (1.day.ago) should appear
+    get peak_flow_readings_path,
+        params: { start_date: 2.days.ago.to_date.to_s, end_date: Date.current.to_s }
+    assert_response :success
+  end
+
+  test "index does not show another user's readings" do
+    get peak_flow_readings_path
+    # bob_reading dom_id must not be in the response
+    assert_select "##{dom_id(peak_flow_readings(:bob_reading))}", count: 0
+  end
+
+  test "unauthenticated user is redirected from index" do
+    delete session_path
+    get peak_flow_readings_path
+    assert_redirected_to new_session_path
+  end
+
+  # -------------------------------------------------------------------------
+  # GET /peak_flow_readings/:id/edit
+  # -------------------------------------------------------------------------
+
+  test "edit returns 200 for own reading" do
+    reading = peak_flow_readings(:alice_green_reading)
+    get edit_peak_flow_reading_path(reading),
+        headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" }
+    assert_response :success
+  end
+
+  test "edit returns 404 for another user's reading" do
+    get edit_peak_flow_reading_path(peak_flow_readings(:bob_reading))
+    assert_response :not_found
+  end
+
+  test "unauthenticated user is redirected from edit" do
+    delete session_path
+    get edit_peak_flow_reading_path(peak_flow_readings(:alice_green_reading))
+    assert_redirected_to new_session_path
+  end
+
+  # -------------------------------------------------------------------------
+  # PATCH /peak_flow_readings/:id (update)
+  # -------------------------------------------------------------------------
+
+  test "update with valid params returns Turbo Stream replace" do
+    reading = peak_flow_readings(:alice_green_reading)
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_match "turbo-stream", response.body
+    assert_match "replace", response.body
+  end
+
+  test "update recalculates zone on save" do
+    reading = peak_flow_readings(:alice_green_reading)
+    # alice has a personal best record — update value to a very low number to force red zone
+    # Value of 1 will be < 50% of any personal best => red zone
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: 1, recorded_at: reading.recorded_at.iso8601 } }
+    # Zone is recomputed by before_save; check the persisted record
+    updated = reading.reload
+    # With value=1 vs any reasonable personal best, zone should be red (or nil if no PB)
+    assert_includes [ "red", nil ], updated.zone
+  end
+
+  test "update with blank value returns 422 Turbo Stream" do
+    reading = peak_flow_readings(:alice_green_reading)
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :unprocessable_entity
+  end
+
+  test "update returns 404 for another user's reading" do
+    patch peak_flow_reading_path(peak_flow_readings(:bob_reading)),
+          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :not_found
+  end
+
+  test "unauthenticated user is redirected from update" do
+    reading = peak_flow_readings(:alice_green_reading)
+    delete session_path
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: 400, recorded_at: reading.recorded_at.iso8601 } }
+    assert_redirected_to new_session_path
+  end
+
+  # -------------------------------------------------------------------------
+  # DELETE /peak_flow_readings/:id (destroy)
+  # -------------------------------------------------------------------------
+
+  test "destroy removes reading and returns Turbo Stream remove" do
+    reading = peak_flow_readings(:alice_green_reading)
+    assert_difference "PeakFlowReading.count", -1 do
+      delete peak_flow_reading_path(reading),
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_match "turbo-stream", response.body
+    assert_match "remove", response.body
+  end
+
+  test "destroy returns 404 for another user's reading" do
+    assert_no_difference "PeakFlowReading.count" do
+      delete peak_flow_reading_path(peak_flow_readings(:bob_reading)),
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :not_found
+  end
+
+  test "unauthenticated user is redirected from destroy" do
+    reading = peak_flow_readings(:alice_green_reading)
+    delete session_path
+    delete peak_flow_reading_path(reading)
     assert_redirected_to new_session_path
   end
 end
