@@ -1,0 +1,16 @@
+<% total = severity_counts.values.sum %>
+<% if total > 0 %>
+  <div class="trend-bar" role="img" aria-label="Severity trend: <%= severity_counts[:mild] || 0 %> mild, <%= severity_counts[:moderate] || 0 %> moderate, <%= severity_counts[:severe] || 0 %> severe">
+    <% [[:mild, "Mild"], [:moderate, "Moderate"], [:severe, "Severe"]].each do |key, label| %>
+      <% count = severity_counts[key] || 0 %>
+      <% pct = ((count.to_f / total) * 100).round(1) %>
+      <% if count > 0 %>
+        <div class="trend-segment trend-segment--<%= key %>"
+             style="width: <%= pct %>%"
+             title="<%= label %>: <%= count %>">
+          <span class="trend-segment-label"><%= label %> <%= count %></span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

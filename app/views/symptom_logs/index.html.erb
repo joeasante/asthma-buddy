@@ -1,4 +1,4 @@
-<% content_for :title, "Log Symptom" %>
+<% content_for :title, "Symptom Timeline" %>
 
 <h1>Log a Symptom</h1>
 
@@ -8,15 +8,27 @@
   <% end %>
 </section>
 
-<section aria-label="Recent symptom logs">
-  <h2>Recent Entries</h2>
-  <%= turbo_frame_tag "symptom_logs_list" do %>
+<section aria-label="Symptom timeline">
+  <h2>Your Symptom History</h2>
+
+  <%= render "filter_bar",
+        active_preset: @active_preset,
+        start_date: @start_date,
+        end_date: @end_date %>
+
+  <%= turbo_frame_tag "timeline_content" do %>
+    <%= render "trend_bar", severity_counts: @severity_counts %>
+
     <% if @symptom_logs.empty? %>
-      <p>No symptoms logged yet. Use the form above to add your first entry.</p>
+      <p class="timeline-empty-state">No symptoms recorded for this period. Try a wider date range or log your first entry above.</p>
     <% else %>
-      <% @symptom_logs.each do |symptom_log| %>
-        <%= render "symptom_log", symptom_log: symptom_log %>
-      <% end %>
+      <ol class="timeline-list" aria-label="Symptom entries">
+        <% @symptom_logs.each do |log| %>
+          <li><%= render "timeline_row", symptom_log: log %></li>
+        <% end %>
+      </ol>
+      <%= render "pagination", current_page: @current_page, total_pages: @total_pages,
+            active_preset: @active_preset, start_date: @start_date, end_date: @end_date %>
     <% end %>
   <% end %>
 </section>
