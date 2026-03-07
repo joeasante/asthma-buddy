@@ -13,10 +13,21 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "lexxy", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body data-controller="confirm">
+    <dialog class="confirm-dialog"
+            data-confirm-target="dialog"
+            data-action="click->confirm#backdropClick">
+      <p class="confirm-dialog-message" data-confirm-target="message"></p>
+      <div class="confirm-dialog-actions">
+        <button class="btn-confirm-cancel" data-action="confirm#dismiss">Cancel</button>
+        <button class="btn-confirm-delete" data-action="confirm#accept">Delete</button>
+      </div>
+    </dialog>
+
     <header>
       <nav aria-label="Main navigation">
         <%= link_to "Asthma Buddy", root_path, class: "nav-brand" %>
