@@ -10,18 +10,18 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 7 of 9 (Peak Flow Display) — IN PROGRESS
-Plan: 1 of 3 in phase 07 (07-01 complete)
-Status: Phase 7 Plan 1 Complete — filterable paginated index with zone badges and nav link
-Last activity: 2026-03-07 — Completed 07-01: zone badge CSS (WCAG AA), filter chips, pagination, _reading_row/_filter_bar/_pagination partials, Peak Flow nav link; 13 controller tests, 0 failures
+Plan: 2 of 3 in phase 07 (07-02 complete)
+Status: Phase 7 Plan 2 Complete — edit/update/destroy for peak flow readings with inline Turbo Frame edit and Turbo Stream responses
+Last activity: 2026-03-07 — Completed 07-02: routes edit/update/destroy, controller set_peak_flow_reading (Current.user scoped), edit.html.erb, update/update_error/destroy turbo stream views, _reading_row Edit/Delete buttons; 13 controller tests, 0 failures
 
-Progress: [███████░░░] 33%
+Progress: [████████░░] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: ~5.1 min
-- Total execution time: ~82 min
+- Total plans completed: 19
+- Average duration: ~4.9 min
+- Total execution time: ~84 min
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [███████░░░] 33%
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
 | 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
-| 07-peak-flow-display | 1 | ~2 min | ~2 min |
+| 07-peak-flow-display | 2 | ~4 min | ~2 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (5 min), 06-03 (1 min), 06-04 (3 min), 06-05 (5 min), 07-01 (2 min)
+- Last 5 plans: 06-03 (1 min), 06-04 (3 min), 06-05 (5 min), 07-01 (2 min), 07-02 (2 min)
 - Trend: stable — recent plans averaging ~1-5 min
 
 *Updated after each plan completion*
@@ -112,6 +112,9 @@ Recent decisions affecting current work:
 - filter_bar rendered INSIDE turbo_frame_tag readings_content — matches 05-03 precedent; active chip state re-renders correctly on filter click (07-01)
 - zone-badge background-fill pill approach (not text-colour only) — visually distinguishable at a glance without reading zone label; WCAG AA contrast on all three zones (07-01)
 - edit/delete stubs intentionally omitted from _reading_row — routes do not exist yet; 07-02 adds them when routes are in place to avoid routing errors at render time (07-01)
+- ActionView::RecordIdentifier included in PeakFlowReadingsController matching Phase 4 symptom_logs pattern — dom_id available in controller for Turbo Stream responses (07-02)
+- update_error.turbo_stream.erb wraps form in both turbo_stream.replace and turbo_frame_tag — outer replace targets DOM, inner frame keeps subsequent edits functional (07-02)
+- has_personal_best: false passed to _form partial in edit context — suppresses personal best banner for existing users (07-02)
 
 ### Pending Todos
 
@@ -124,5 +127,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 07-01-PLAN.md — filterable paginated peak flow index: zone badge CSS (WCAG AA), filter chips, pagination, _reading_row/_filter_bar/_pagination partials, Peak Flow nav link; 13 controller tests, 0 failures
+Stopped at: Completed 07-02-PLAN.md — edit/update/destroy for peak flow readings: inline Turbo Frame edit, Turbo Stream replace/remove, Current.user-scoped set_peak_flow_reading, Edit/Delete buttons in _reading_row; 13 controller tests, 0 failures
 Resume file: None
