@@ -1,4 +1,4 @@
-<%= form_with model: symptom_log, url: symptom_logs_path, data: { turbo: true } do |form| %>
+<%= form_with model: symptom_log, data: { turbo: true } do |form| %>
   <% if symptom_log.errors.any? %>
     <div role="alert" aria-live="assertive">
       <p><%= pluralize(symptom_log.errors.count, "error") %> prevented this entry from being saved:</p>
@@ -34,5 +34,9 @@
     <%= form.rich_text_area :notes, aria: { label: "Notes" } %>
   </div>
 
-  <%= form.submit "Log symptom" %>
+  <%= form.submit symptom_log.persisted? ? "Update symptom" : "Log symptom" %>
+
+  <% if symptom_log.persisted? %>
+    <%= link_to "Cancel", symptom_logs_path, data: { turbo: false }, class: "btn-cancel" %>
+  <% end %>
 <% end %>
