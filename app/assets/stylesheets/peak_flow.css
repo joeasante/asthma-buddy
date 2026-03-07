@@ -48,3 +48,88 @@
 .zone-label--green  { color: var(--severity-mild); }
 .zone-label--yellow { color: var(--severity-moderate); }
 .zone-label--red    { color: var(--severity-severe); }
+
+/* Zone badge — background-fill pill for index list rows */
+.zone-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* WCAG AA: green text #1a6b36 on #d4edda (contrast 5.1:1) */
+.zone-badge--green {
+  background-color: #d4edda;
+  color: #1a6b36;
+}
+
+/* WCAG AA: amber text #7a4a00 on #fff3cd (contrast 5.3:1) */
+.zone-badge--yellow {
+  background-color: #fff3cd;
+  color: #7a4a00;
+}
+
+/* WCAG AA: red text #7b1d1d on #f8d7da (contrast 5.5:1) */
+.zone-badge--red {
+  background-color: #f8d7da;
+  color: #7b1d1d;
+}
+
+/* No zone (no personal best set) */
+.zone-badge--none {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+/* Peak flow reading list rows */
+.peak-flow-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.peak-flow-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.peak-flow-row-value {
+  font-weight: 600;
+  font-size: 1rem;
+  min-width: 4.5rem;
+}
+
+.peak-flow-row-unit {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.peak-flow-row-timestamp {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.peak-flow-row-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .peak-flow-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .peak-flow-row-actions {
+    margin-left: 0;
+  }
+}

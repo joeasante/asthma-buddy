@@ -33,6 +33,7 @@
         <%= link_to "Asthma Buddy", root_path, class: "nav-brand" %>
         <div class="nav-auth">
           <% if authenticated? %>
+            <%= link_to "Peak Flow", peak_flow_readings_path, class: "nav-link" %>
             <span class="nav-user-email"><%= Current.user&.email_address %></span>
             <%= button_to "Sign out", session_path, method: :delete, class: "btn-sign-out" %>
           <% else %>
