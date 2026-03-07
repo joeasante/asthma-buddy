@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Phase 7 — Peak Flow Display
+**Current focus:** Phase 8 — Trend Analysis
 
 ## Current Position
 
-Phase: 7 of 9 (Peak Flow Display) — IN PROGRESS
-Plan: 3 of 3 in phase 07 (07-03 complete — phase 07 DONE)
-Status: Phase 7 Complete — Peak Flow Display: index with zone badges, date filter, edit/update/destroy with Turbo Stream, comprehensive controller test suite
-Last activity: 2026-03-07 — Completed 07-03: 18 new controller tests for index/edit/update/destroy; zone badge CSS class assertions, cross-user 404 isolation, Turbo Stream replace/remove contracts, zone recalculation regression, unauthenticated redirects; 31 total tests, 0 failures
+Phase: 7 of 9 (Peak Flow Display) — COMPLETE
+Plan: 4 of 4 in phase 07 (07-04 complete — phase 07 fully DONE with system tests)
+Status: Phase 7 Complete — Peak Flow Display: index with zone badges, date filter, edit/update/destroy with Turbo Stream, controller tests, browser system tests
+Last activity: 2026-03-07 — Completed 07-04: 7 system tests for zone badge rendering, inline edit Turbo Frame flow, custom Stimulus confirm delete, cross-user URL isolation; 0 failures
 
-Progress: [████████░░] 49%
+Progress: [████████░░] 51%
 
 ## Performance Metrics
 
@@ -33,12 +33,12 @@ Progress: [████████░░] 49%
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
 | 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
-| 07-peak-flow-display | 3 | ~7 min | ~2.3 min |
+| 07-peak-flow-display | 4 | ~19 min | ~4.8 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 06-04 (3 min), 06-05 (5 min), 07-01 (2 min), 07-02 (2 min), 07-03 (3 min)
-- Trend: stable — recent plans averaging ~1-5 min
+- Last 5 plans: 07-01 (2 min), 07-02 (2 min), 07-03 (3 min), 07-04 (12 min)
+- Trend: stable — recent plans averaging ~1-12 min (07-04 longer due to system test debugging)
 
 *Updated after each plan completion*
 
@@ -117,6 +117,9 @@ Recent decisions affecting current work:
 - has_personal_best: false passed to _form partial in edit context — suppresses personal best banner for existing users (07-02)
 - ActionView::RecordIdentifier included at class level in controller test — dom_id available for cross-user isolation assertion (07-03)
 - delete session_path for sign-out in unauthenticated tests — consistent with existing peak flow controller tests, not sign_out helper (07-03)
+- execute_script to strip HTML5 validation attrs must run after within block asserts target input is present — prevents race condition where script runs before Turbo Frame loads edit form (07-04)
+- submit value 0 (not blank) for validation error system test — blank number field triggers browser "Please fill in this field" even without required; 0 passes browser, fails Rails greater_than: 0 validation (07-04)
+- Custom Stimulus confirm dialog (dialog.showModal()) requires direct .btn-confirm-delete click — not intercepted by Capybara accept_confirm (07-04)
 
 ### Pending Todos
 
@@ -129,5 +132,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 07-03-PLAN.md — controller tests for index/edit/update/destroy: zone badge CSS assertions, cross-user 404 isolation, Turbo Stream replace/remove contracts, zone recalculation, unauthenticated redirects; 31 total tests, 0 failures; Phase 7 complete
+Stopped at: Completed 07-04-PLAN.md — 7 browser system tests for zone badge rendering, inline Turbo Frame edit, custom Stimulus confirm delete, cross-user URL isolation; all pass; Phase 7 fully complete
 Resume file: None
