@@ -113,11 +113,12 @@ Plans:
   2. A user can enter a start date and end date to filter the timeline and see only entries within that range.
   3. A user can see a severity trend summary (e.g., counts of mild / moderate / severe entries) across their history so they can identify whether their symptoms are getting better or worse.
   4. The timeline loads within 2 seconds for a user with up to 365 entries.
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
 - [ ] 05-01-PLAN.md — Model scopes, controller filter/pagination, timeline views (filter bar, trend bar, compact rows, pagination)
 - [ ] 05-02-PLAN.md — Model tests, controller filter tests, system test for Turbo Frame chip interaction
+- [ ] 05-03-PLAN.md — Gap closure: trend bar live update on create, chip active state fix, datetime step fix
 
 ---
 
@@ -217,7 +218,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 2. Authentication | 3/3 | Complete | 2026-03-06 |
 | 3. Symptom Recording | 0/3 | Not started | - |
 | 4. Symptom Management | 0/2 | Not started | - |
-| 5. Symptom Timeline | 0/2 | Not started | - |
+| 5. Symptom Timeline | 0/3 | Not started | - |
 | 6. Peak Flow Recording | 0/6 | Not started | - |
 | 7. Peak Flow Display and Management | 0/5 | Not started | - |
 | 8. Peak Flow Trends | 0/5 | Not started | - |
