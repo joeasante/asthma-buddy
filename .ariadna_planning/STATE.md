@@ -10,18 +10,18 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 7 of 9 (Peak Flow Display) — COMPLETE
-Plan: 4 of 4 in phase 07 (07-04 complete — phase 07 fully DONE with system tests)
-Status: Phase 7 Complete — Peak Flow Display: index with zone badges, date filter, edit/update/destroy with Turbo Stream, controller tests, browser system tests
-Last activity: 2026-03-07 — Completed 07-04: 7 system tests for zone badge rendering, inline edit Turbo Frame flow, custom Stimulus confirm delete, cross-user URL isolation; 0 failures
+Plan: GAP complete — phase 07 fully DONE including global base stylesheet gap closure
+Status: Phase 7 Complete — Peak Flow Display: index with zone badges, date filter, edit/update/destroy with Turbo Stream, controller tests, browser system tests; GAP plan filled empty application.css with complete base stylesheet
+Last activity: 2026-03-07 — Completed 07-GAP: global application.css with CSS custom properties, layout, nav classes, flash classes, form base styles; 177 tests pass
 
 Progress: [████████░░] 51%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: ~4.9 min
-- Total execution time: ~84 min
+- Total execution time: ~87 min
 
 **By Phase:**
 
@@ -33,7 +33,7 @@ Progress: [████████░░] 51%
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
 | 06-peak-flow-recording | 5 | ~22 min | ~4.4 min |
-| 07-peak-flow-display | 4 | ~19 min | ~4.8 min |
+| 07-peak-flow-display | 5 | ~22 min | ~4.4 min |
 
 
 **Recent Trend:**
@@ -120,6 +120,7 @@ Recent decisions affecting current work:
 - execute_script to strip HTML5 validation attrs must run after within block asserts target input is present — prevents race condition where script runs before Turbo Frame loads edit form (07-04)
 - submit value 0 (not blank) for validation error system test — blank number field triggers browser "Please fill in this field" even without required; 0 passes browser, fails Rails greater_than: 0 validation (07-04)
 - Custom Stimulus confirm dialog (dialog.showModal()) requires direct .btn-confirm-delete click — not intercepted by Capybara accept_confirm (07-04)
+- --severity-* custom properties declared on :root in application.css even though symptom_timeline.css also declares them — ensures confirm_dialog.css resolves them regardless of stylesheet load order; re-declaration with identical values is harmless (07-GAP)
 
 ### Pending Todos
 
@@ -132,5 +133,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 07-04-PLAN.md — 7 browser system tests for zone badge rendering, inline Turbo Frame edit, custom Stimulus confirm delete, cross-user URL isolation; all pass; Phase 7 fully complete
+Stopped at: Completed 07-GAP-PLAN.md — global application.css with :root custom properties, base reset, typography, sticky-header layout, nav/flash classes, form base styles; 177 tests pass; Phase 7 + GAP fully complete
 Resume file: None
