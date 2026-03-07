@@ -10,16 +10,16 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 6 of 9 (Peak Flow Recording) — IN PROGRESS
-Plan: 1 of N in phase 06 (06-01 complete)
-Status: Phase 6 Plan 1 Complete
-Last activity: 2026-03-07 — Completed 06-01: PeakFlowReading and PersonalBestRecord models, zone calculation, 22 model tests; 123 total tests passing
+Plan: 2 of N in phase 06 (06-01, 06-02 complete)
+Status: Phase 6 Plan 2 Complete
+Last activity: 2026-03-07 — Completed 06-02: Settings page with SettingsController, personal best form, validation, CSS utilities; 123 total tests passing
 
 Progress: [███████░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: ~6 min
 - Total execution time: ~81 min
 
@@ -32,11 +32,11 @@ Progress: [███████░░░] 30%
 | 03-symptom-recording | 2 | ~12 min | ~6 min |
 | 04-symptom-management | 2 | ~11 min | ~5.5 min |
 | 05-symptom-timeline | 3 | ~12 min | ~4 min |
-| 06-peak-flow-recording | 1 | ~8 min | ~8 min |
+| 06-peak-flow-recording | 2 | ~13 min | ~6.5 min |
 
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (8 min), 05-01 (3 min), 05-02 (6 min), 05-03 (3 min), 06-01 (8 min)
+- Last 5 plans: 05-01 (3 min), 05-02 (6 min), 05-03 (3 min), 06-01 (8 min), 06-02 (5 min)
 - Trend: stable — recent plans averaging ~3-8 min
 
 *Updated after each plan completion*
@@ -98,6 +98,8 @@ Recent decisions affecting current work:
 - zone column is nullable; enum uses validate: { allow_nil: true } — nil zone when no personal best exists is a valid state (06-01)
 - PersonalBestRecord validation range 100-900 L/min — covers physiologically plausible peak flow values (06-01)
 - before_save :assign_zone on PeakFlowReading — zone is always derived, never manually set by callers (06-01)
+- form_with model: personal_best_record, url: settings_personal_best_path — model for error binding only, URL explicit for non-resourceful route (06-02)
+- recorded_at merged server-side in personal_best_params — form never exposes timestamp, prevents client-side tampering (06-02)
 
 ### Pending Todos
 
@@ -110,5 +112,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 06-01-PLAN.md — PeakFlowReading + PersonalBestRecord models; 123 tests, 343 assertions, 0 failures
+Stopped at: Completed 06-02-PLAN.md — Settings page with SettingsController, personal best form; 123 tests, 343 assertions, 0 failures
 Resume file: None
