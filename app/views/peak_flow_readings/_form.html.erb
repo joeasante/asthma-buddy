@@ -1,0 +1,42 @@
+<% has_personal_best ||= false %>
+
+<% unless has_personal_best %>
+  <div class="peak-flow-banner" role="note">
+    <p>
+      Set your personal best to see zone calculations (Green / Yellow / Red) for each reading.
+      <%= link_to "Go to Settings", settings_path %>
+    </p>
+  </div>
+<% end %>
+
+<%= form_with model: peak_flow_reading, data: { turbo: true } do |form| %>
+  <% if peak_flow_reading.errors.any? %>
+    <div role="alert" aria-live="assertive">
+      <p><%= pluralize(peak_flow_reading.errors.count, "error") %> prevented this reading from being saved:</p>
+      <ul>
+        <% peak_flow_reading.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="peak-flow-value-field">
+    <%= form.label :value, "Reading value" %>
+    <div class="peak-flow-value-input-row">
+      <%= form.number_field :value,
+            min: 1,
+            placeholder: "e.g. 430",
+            class: "peak-flow-value-input",
+            aria: { label: "Peak flow reading in litres per minute" } %>
+      <span class="peak-flow-unit" aria-hidden="true">L/min</span>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :recorded_at, "When was this reading taken?" %>
+    <%= form.datetime_local_field :recorded_at, step: 60 %>
+  </div>
+
+  <%= form.submit "Log reading" %>
+<% end %>

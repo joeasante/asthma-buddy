@@ -1,0 +1,11 @@
+<% content_for :title, "Log Peak Flow Reading" %>
+
+<h1>Log Peak Flow Reading</h1>
+
+<section aria-label="Peak flow reading form">
+  <%= turbo_frame_tag "peak_flow_reading_form" do %>
+    <%= render "form",
+          peak_flow_reading: @peak_flow_reading,
+          has_personal_best: @has_personal_best %>
+  <% end %>
+</section>

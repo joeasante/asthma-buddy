@@ -1,0 +1,49 @@
+/* ==========================================================================
+   Peak Flow entry form
+   Zone colors inherit --severity-mild/moderate/severe from symptom_timeline.css
+   ========================================================================== */
+
+/* Personal best banner */
+.peak-flow-banner {
+  background: #fff8e6;
+  border: 1px solid #f0d080;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+
+/* Large numeric value input */
+.peak-flow-value-field {
+  margin-bottom: 1rem;
+}
+
+.peak-flow-value-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.peak-flow-value-input {
+  font-size: 2rem;
+  font-weight: 600;
+  width: 7rem;
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  -moz-appearance: textfield;
+}
+
+.peak-flow-value-input::-webkit-outer-spin-button,
+.peak-flow-value-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.peak-flow-unit {
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: 500;
+}
