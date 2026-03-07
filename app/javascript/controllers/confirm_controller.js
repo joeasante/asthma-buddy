@@ -7,7 +7,7 @@ export default class extends Controller {
   static targets = ["dialog", "message"]
 
   connect() {
-    Turbo.config.confirmMethod = (message) => this.#ask(message)
+    Turbo.config.forms.confirm = (message) => this.#ask(message)
   }
 
   accept() {
