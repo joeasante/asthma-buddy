@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SymptomLogsController < ApplicationController
-  include ActionView::RecordIdentifier
   before_action :set_symptom_log, only: %i[ edit update destroy ]
 
   def index

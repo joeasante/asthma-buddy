@@ -6,8 +6,7 @@
     </span>
 
     <% zone_label = reading.zone&.capitalize || "No zone" %>
-    <% badge_modifier = reading.zone.present? ? reading.zone : "none" %>
-    <span class="zone-badge zone-badge--<%= badge_modifier %>"
+    <span class="zone-badge zone-badge--<%= reading.zone_css_modifier %>"
           aria-label="Zone: <%= zone_label %>">
       <%= zone_label %>
     </span>

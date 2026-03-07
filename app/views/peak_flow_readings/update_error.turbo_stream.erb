@@ -1,5 +1,5 @@
 <%= turbo_stream.replace dom_id(@peak_flow_reading) do %>
   <%= turbo_frame_tag dom_id(@peak_flow_reading) do %>
-    <%= render "form", peak_flow_reading: @peak_flow_reading, has_personal_best: false %>
+    <%= render "form", peak_flow_reading: @peak_flow_reading, has_personal_best: @has_personal_best %>
   <% end %>
 <% end %>

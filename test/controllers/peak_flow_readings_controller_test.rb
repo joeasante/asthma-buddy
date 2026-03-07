@@ -110,7 +110,8 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal reading_value, body["value"]
     assert_equal "green", body["zone"]
-    assert body["zone_percentage"].present?
+    assert body.key?("id")
+    assert body.key?("recorded_at")
   end
 
   test "create returns 422 JSON with errors on failure" do
@@ -292,5 +293,77 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     delete session_path
     delete peak_flow_reading_path(reading)
     assert_redirected_to new_session_path
+  end
+
+  # -------------------------------------------------------------------------
+  # JSON API — index envelope, update, destroy (Phase 7 agent-native parity)
+  # -------------------------------------------------------------------------
+
+  test "index JSON response includes pagination envelope keys" do
+    get peak_flow_readings_path, headers: { "Accept" => "application/json" }
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body.key?("readings"),        "missing readings key"
+    assert body.key?("current_page"),    "missing current_page key"
+    assert body.key?("total_pages"),     "missing total_pages key"
+    assert body.key?("per_page"),        "missing per_page key"
+    assert body.key?("applied_filters"), "missing applied_filters key"
+    assert_kind_of Array, body["readings"]
+  end
+
+  test "index JSON readings include id, value, zone, recorded_at" do
+    get peak_flow_readings_path(preset: "all"), headers: { "Accept" => "application/json" }
+    body = JSON.parse(response.body)
+    reading = body["readings"].first
+    assert reading.key?("id")
+    assert reading.key?("value")
+    assert reading.key?("zone")
+    assert reading.key?("recorded_at")
+    assert_not reading.key?("created_at"), "created_at should not be exposed in JSON"
+  end
+
+  test "update with valid params returns JSON reading" do
+    reading = peak_flow_readings(:alice_green_reading)
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 } },
+          headers: { "Accept" => "application/json" }
+    assert_response :success
+    assert_equal "application/json", response.media_type
+    body = JSON.parse(response.body)
+    assert_equal 420, body["value"]
+    assert body.key?("zone")
+  end
+
+  test "update with blank value returns 422 JSON with errors" do
+    reading = peak_flow_readings(:alice_green_reading)
+    patch peak_flow_reading_path(reading),
+          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 } },
+          headers: { "Accept" => "application/json" }
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+    assert body["errors"].present?
+  end
+
+  test "update returns 404 JSON for another user's reading" do
+    patch peak_flow_reading_path(peak_flow_readings(:bob_reading)),
+          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+          headers: { "Accept" => "application/json" }
+    assert_response :not_found
+  end
+
+  test "destroy returns 204 JSON for own reading" do
+    reading = peak_flow_readings(:alice_green_reading)
+    assert_difference "PeakFlowReading.count", -1 do
+      delete peak_flow_reading_path(reading), headers: { "Accept" => "application/json" }
+    end
+    assert_response :no_content
+  end
+
+  test "destroy returns 404 JSON for another user's reading" do
+    assert_no_difference "PeakFlowReading.count" do
+      delete peak_flow_reading_path(peak_flow_readings(:bob_reading)),
+             headers: { "Accept" => "application/json" }
+    end
+    assert_response :not_found
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PeakFlowReadingsController < ApplicationController
-  include ActionView::RecordIdentifier
+  ALLOWED_PRESETS = %w[7 30 90 all custom].freeze
 
   rate_limit to: 10, within: 1.minute, only: :create, with: -> {
     respond_to do |format|
@@ -18,7 +18,7 @@ class PeakFlowReadingsController < ApplicationController
     end
   }
 
-  before_action :set_has_personal_best, only: %i[new create]
+  before_action :set_has_personal_best, only: %i[new create edit]
   before_action :set_peak_flow_reading, only: %i[edit update destroy]
 
   def new
@@ -28,11 +28,11 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def index
-    @active_preset = params[:preset].presence || "30"
+    @active_preset = ALLOWED_PRESETS.include?(params[:preset]) ? params[:preset] : "30"
 
     if params[:start_date].present? || params[:end_date].present?
-      @start_date = params[:start_date].present? ? (Date.parse(params[:start_date]) rescue nil) : nil
-      @end_date   = params[:end_date].present?   ? (Date.parse(params[:end_date])   rescue nil) : nil
+      @start_date = parse_date_param(:start_date)
+      @end_date   = parse_date_param(:end_date)
     else
       @end_date = nil
       @start_date = case @active_preset
@@ -44,19 +44,33 @@ class PeakFlowReadingsController < ApplicationController
     end
 
     base_relation = Current.user.peak_flow_readings
-      .chronological
-      .where(recorded_at: (@start_date&.beginning_of_day || Time.at(0))..(@end_date&.end_of_day || Time.current.end_of_day))
+                           .chronological
+                           .in_date_range(@start_date, @end_date)
 
-    # When preset is "all", remove the date filter
-    base_relation = Current.user.peak_flow_readings.chronological if @active_preset == "all"
+    # Cache COUNT via Solid Cache to avoid re-querying on every filter/page navigation.
+    # 1-minute TTL: a newly logged reading appears on the next natural page refresh.
+    cache_key    = [ "pfr_count", Current.user.id, @active_preset, @start_date, @end_date ]
+    cached_total = Rails.cache.fetch(cache_key, expires_in: 1.minute) { base_relation.count }
 
-    @total_pages  = [ (base_relation.count.to_f / 25).ceil, 1 ].max
-    @current_page = [ [ params[:page].to_i, 1 ].max, @total_pages ].min
-    @peak_flow_readings = base_relation.offset((@current_page - 1) * 25).limit(25)
+    @peak_flow_readings, @total_pages, @current_page = base_relation.paginate(
+      page: params[:page], total: cached_total
+    )
 
     respond_to do |format|
       format.html
-      format.json { render json: @peak_flow_readings.map { |r| peak_flow_reading_json(r) } }
+      format.json do
+        render json: {
+          readings:        @peak_flow_readings.map { |r| peak_flow_reading_json(r) },
+          current_page:    @current_page,
+          total_pages:     @total_pages,
+          per_page:        25,
+          applied_filters: {
+            preset:     @active_preset,
+            start_date: @start_date&.to_s,
+            end_date:   @end_date&.to_s
+          }
+        }
+      end
     end
   end
 
@@ -83,8 +97,7 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def edit
-    # @peak_flow_reading set by before_action
-    # Turbo Frame inline editing: renders edit.html.erb into the frame matching dom_id(@peak_flow_reading)
+    # @peak_flow_reading and @has_personal_best set by before_actions
   end
 
   def update
@@ -92,11 +105,13 @@ class PeakFlowReadingsController < ApplicationController
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to peak_flow_readings_path, notice: "Reading updated." }
+        format.json { render json: peak_flow_reading_json(@peak_flow_reading) }
       end
     else
       respond_to do |format|
         format.turbo_stream { render :update_error, status: :unprocessable_entity }
         format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @peak_flow_reading.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end
@@ -106,6 +121,7 @@ class PeakFlowReadingsController < ApplicationController
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to peak_flow_readings_path, notice: "Reading deleted." }
+      format.json { head :no_content }
     end
   end
 
@@ -119,18 +135,24 @@ class PeakFlowReadingsController < ApplicationController
     @peak_flow_reading = Current.user.peak_flow_readings.find(params[:id])
   end
 
+  def parse_date_param(key)
+    value = params[key]
+    return nil if value.blank?
+    Date.parse(value)
+  rescue ArgumentError
+    nil
+  end
+
   def peak_flow_reading_params
     params.require(:peak_flow_reading).permit(:value, :recorded_at)
   end
 
   def peak_flow_reading_json(reading)
     {
-      id: reading.id,
-      value: reading.value,
+      id:          reading.id,
+      value:       reading.value,
       recorded_at: reading.recorded_at,
-      zone: reading.zone,
-      zone_percentage: reading.zone_percentage,
-      created_at: reading.created_at
+      zone:        reading.zone
     }
   end
 end

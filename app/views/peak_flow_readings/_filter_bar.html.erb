@@ -4,7 +4,7 @@
       <%= link_to label,
             peak_flow_readings_path(preset: value),
             class: "filter-chip #{"filter-chip--active" if active_preset == value}",
-            aria: { pressed: (active_preset == value).to_s },
+            aria: { pressed: active_preset == value },
             data: { turbo_frame: "readings_content" } %>
     <% end %>
   </div>

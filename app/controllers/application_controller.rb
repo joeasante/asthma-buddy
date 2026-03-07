@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   include Authentication
+  include ActionView::RecordIdentifier
   # Scope modern browser check to HTML requests only.
   # Non-browser clients (agents, API callers, curl) request JSON and must not be rejected.
   before_action do

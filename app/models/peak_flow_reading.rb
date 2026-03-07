@@ -23,6 +23,27 @@ class PeakFlowReading < ApplicationRecord
   before_save { self.zone = compute_zone }
 
   scope :chronological, -> { order(recorded_at: :desc) }
+  scope :in_date_range, ->(start_date, end_date) {
+    result = all
+    result = result.where(recorded_at: start_date.beginning_of_day..) if start_date.present?
+    result = result.where(recorded_at: ..end_date.end_of_day) if end_date.present?
+    result
+  }
+
+  # Returns [records, total_pages, current_page]. Mirrors SymptomLog.paginate.
+  # Pass `total:` to skip the COUNT query when the caller has a cached count.
+  def self.paginate(page:, per_page: 25, total: nil)
+    page        = [ page.to_i, 1 ].max
+    total       = total || count
+    total_pages = [ (total.to_f / per_page).ceil, 1 ].max
+    page        = [ page, total_pages ].min
+    records     = offset((page - 1) * per_page).limit(per_page)
+    [ records, total_pages, page ]
+  end
+
+  def zone_css_modifier
+    zone.presence || "none"
+  end
 
   def personal_best_at_reading_time
     # Not memoized — recorded_at can change on update (future edit action), which
