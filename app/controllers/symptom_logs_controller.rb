@@ -15,6 +15,7 @@ class SymptomLogsController < ApplicationController
         format.html { redirect_to symptom_logs_path, notice: "Symptom logged." }
       end
     else
+      @symptom_logs = Current.user.symptom_logs.chronological.includes(:rich_text_notes)
       respond_to do |format|
         format.turbo_stream { render turbo_stream: turbo_stream.replace("symptom_log_form", partial: "form", locals: { symptom_log: @symptom_log }), status: :unprocessable_entity }
         format.html { render :index, status: :unprocessable_entity }
