@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 12 (Dose Logging) — IN PROGRESS
-Plan: 12-02 complete — Dose log views: inline form, history section, Turbo Stream responses
-Status: Plan 02 done. 256 tests passing (no regressions). All Turbo Stream view files in place.
-Last activity: 2026-03-08 — Phase 12 Plan 02: medication card updated with dose log form + history, Turbo Stream responses, N+1 fix.
+Phase: Phase 12 (Dose Logging) — COMPLETE
+Plan: 12-03 complete — Controller integration tests + system tests for dose logging and deletion flows
+Status: All 3 plans done. 267 tests passing (no regressions). Phase 12 fully delivered.
+Last activity: 2026-03-08 — Phase 12 Plan 03: controller integration tests (11), system tests (5), fixed missing layouts/_flash partial and Turbo Stream wrapper IDs.
 
 Progress: [███████░░░] 70% (Milestone 2 — 7/~10 plans complete)
 
@@ -52,6 +52,8 @@ All 9 phases delivered:
 - Tests at Phase 12-01 close: 256 passing (no regressions)
 - Phase 12 Plan 02 completed: 2026-03-08 (~1 min, 2 tasks, 7 files, 0 new tests)
 - Tests at Phase 12-02 close: 256 passing (no regressions)
+- Phase 12 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 6 files, 16 new tests)
+- Tests at Phase 12-03 close: 267 passing (no regressions)
 
 ## Accumulated Context
 
@@ -69,6 +71,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 12 Plan 03 Decisions (2026-03-08)
+
+- **turbo_stream.replace must include container element**: `turbo_stream.replace "dose_history_NNN"` replaces the entire matched element; replacement block must include `<div id="dose_history_NNN">` wrapper or the ID is dropped from the DOM
+- **layouts/_flash partial**: Extracted from application.html.erb for use in Turbo Stream views; renders `<div id="flash-messages">` with conditional notice/alert paragraphs
+- **System test confirm_dialog pattern**: Same as medication_management_test.rb — `find("dialog.confirm-dialog button[data-action='confirm#accept']").click`
 
 ### Phase 12 Plan 02 Decisions (2026-03-08)
 
@@ -144,5 +152,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 12 Plan 02 complete — Dose log views: inline form, history section, Turbo Stream responses, N+1 fix, 256 tests passing
+Stopped at: Phase 12 Plan 03 complete — Controller integration tests (11) + system tests (5) for dose logging, 267 tests passing
 Resume file: None
