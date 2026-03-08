@@ -38,5 +38,13 @@ class DashboardController < ApplicationController
 
     # Low-stock medications — loaded with dose_logs to avoid N+1 in low_stock?
     @low_stock_medications = user.medications.includes(:dose_logs).select(&:low_stock?)
+
+    # Today's preventer adherence — only preventers with a doses_per_day schedule
+    today = Date.current
+    @preventer_adherence = user.medications
+      .where(medication_type: :preventer)
+      .includes(:dose_logs)
+      .select { |m| m.doses_per_day.present? }
+      .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
   end
 end
