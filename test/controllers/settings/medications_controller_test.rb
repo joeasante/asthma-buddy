@@ -145,4 +145,49 @@ class Settings::MedicationsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :not_found
   end
+
+  # Refill action
+
+  test "refill updates starting_dose_count and sets refilled_at" do
+    medication = medications(:alice_preventer)
+    assert_nil medication.refilled_at
+
+    patch refill_settings_medication_path(medication),
+          params: { medication: { starting_dose_count: 180 } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    medication.reload
+    assert_equal 180, medication.starting_dose_count
+    assert_not_nil medication.refilled_at
+  end
+
+  test "refill with count of 0 is valid (empty inhaler logged)" do
+    medication = medications(:alice_preventer)
+
+    patch refill_settings_medication_path(medication),
+          params: { medication: { starting_dose_count: 0 } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal 0, medication.reload.starting_dose_count
+  end
+
+  test "refill returns 404 for another user's medication" do
+    other_medication = medications(:bob_reliever)
+
+    patch refill_settings_medication_path(other_medication),
+          params: { medication: { starting_dose_count: 100 } }
+
+    assert_response :not_found
+  end
+
+  test "refill redirects unauthenticated user" do
+    sign_out
+    patch refill_settings_medication_path(medications(:alice_preventer)),
+          params: { medication: { starting_dose_count: 100 } }
+
+    assert_redirected_to new_session_path
+  end
 end

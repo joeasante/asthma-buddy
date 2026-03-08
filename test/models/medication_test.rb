@@ -238,4 +238,49 @@ class MedicationTest < ActiveSupport::TestCase
     med.update!(refilled_at: time)
     assert_in_delta time.to_f, med.reload.refilled_at.to_f, 1.0
   end
+
+  # low_stock?
+
+  test "low_stock? returns false when doses_per_day is nil (no schedule)" do
+    med = medications(:alice_reliever)  # doses_per_day is nil
+    assert_not med.low_stock?
+  end
+
+  test "low_stock? returns false when days_of_supply_remaining is exactly 14" do
+    # 14 days * 2 doses/day = 28 doses remaining needed; starting_count=28, no logs
+    med = Medication.create!(
+      user: @user, name: "Boundary", medication_type: :preventer,
+      standard_dose_puffs: 2, starting_dose_count: 28, doses_per_day: 2
+    )
+    assert_equal 14.0, med.days_of_supply_remaining
+    assert_not med.low_stock?
+  end
+
+  test "low_stock? returns true when days_of_supply_remaining is below 14" do
+    # 13 days * 2 doses/day = 26 doses remaining; starting=26, no logs
+    med = Medication.create!(
+      user: @user, name: "LowBoundary", medication_type: :preventer,
+      standard_dose_puffs: 2, starting_dose_count: 26, doses_per_day: 2
+    )
+    assert_equal 13.0, med.days_of_supply_remaining
+    assert med.low_stock?
+  end
+
+  test "low_stock? returns false when starting count is zero and doses_per_day is nil" do
+    med = Medication.new(
+      user: @user, name: "Empty reliever", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 0
+    )
+    assert_not med.low_stock?
+  end
+
+  test "low_stock? returns true after doses are logged and remaining drops below threshold" do
+    med = Medication.create!(
+      user: @user, name: "Running low", medication_type: :preventer,
+      standard_dose_puffs: 2, starting_dose_count: 30, doses_per_day: 2
+    )
+    # Log 6 puffs — 24 remaining / 2 per day = 12 days → low stock
+    DoseLog.create!(user: @user, medication: med, puffs: 6, recorded_at: Time.current)
+    assert med.low_stock?
+  end
 end
