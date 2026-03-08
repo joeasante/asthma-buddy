@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 10 (Medication Data Layer) — IN PROGRESS
-Plan: 10-01 complete — Medication model and migration
-Status: 10-01 done (medications table, Medication model, 19 tests passing). Ready for 10-02.
-Last activity: 2026-03-08 — Phase 10 Plan 01: Medication ActiveRecord model, four-value enum, validations, fixtures, 19 model tests (214 tests total).
+Plan: 10-02 complete — DoseLog model and migration
+Status: 10-02 done (dose_logs table, DoseLog model, 15 new tests passing). Ready for 10-03.
+Last activity: 2026-03-08 — Phase 10 Plan 02: DoseLog ActiveRecord model, puffs/recorded_at validations, belongs_to :user and :medication, fixtures, 15 model tests (229 tests total).
 
-Progress: [█░░░░░░░░░] 10% (Milestone 2 — 1/~10 plans complete)
+Progress: [██░░░░░░░░] 20% (Milestone 2 — 2/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -38,6 +38,8 @@ All 9 phases delivered:
 **Milestone 2 Velocity:**
 - Phase 10 Plan 01 completed: 2026-03-08 (~6 min, 2 tasks, 5 files, 19 new tests)
 - Tests at Phase 10-01 close: 214 passing
+- Phase 10 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 6 files, 15 new tests)
+- Tests at Phase 10-02 close: 229 passing
 
 ## Accumulated Context
 
@@ -55,6 +57,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 10 Plan 02 Decisions (2026-03-08)
+
+- **puffs validated as integer > 0**: Zero or negative puffs would corrupt remaining-dose calculations in Plan 10-03
+- **Compound index [:medication_id, :recorded_at]**: Added at table creation to support the sum query pattern in Plan 10-03
+- **dependent: :destroy on both User and Medication**: Dose logs are meaningless without either parent — cleaned up on either cascade path
+- **Cascade test uses DoseLog.exists?**: assert_difference fails when fixtures already hold records for the same medication — scoping to the specific created record is correct
 
 ### Phase 10 Plan 01 Decisions (2026-03-08)
 
@@ -86,5 +95,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 10 Plan 01 complete — Medication model, migration, fixtures, 19 tests passing
+Stopped at: Phase 10 Plan 02 complete — DoseLog model, migration, fixtures, 15 tests passing
 Resume file: None
