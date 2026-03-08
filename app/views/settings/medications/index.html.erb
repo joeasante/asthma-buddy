@@ -1,0 +1,20 @@
+<% content_for :title, "Medications — Settings" %>
+
+<h1>Medications</h1>
+
+<section aria-label="Your medications">
+  <div id="medications_list">
+    <% if @medications.any? %>
+      <%= render @medications %>
+    <% else %>
+      <div class="medications-empty-state" id="medications_empty_state">
+        <p>You have not added any medications yet.</p>
+        <%= link_to "Add your first medication", new_settings_medication_path, class: "btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<div class="medications-actions">
+  <%= link_to "Add medication", new_settings_medication_path, class: "btn-primary" %>
+</div>

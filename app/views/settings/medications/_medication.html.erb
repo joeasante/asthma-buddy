@@ -1,0 +1,35 @@
+<%= turbo_frame_tag dom_id(medication) do %>
+  <article class="medication-card">
+    <div class="medication-card-header">
+      <h3 class="medication-card-name"><%= medication.name %></h3>
+      <span class="medication-badge medication-badge--<%= medication.medication_type %>">
+        <%= medication.medication_type.humanize %>
+      </span>
+    </div>
+
+    <dl class="medication-card-details">
+      <dt>Standard dose</dt>
+      <dd><%= medication.standard_dose_puffs %> <%= "puff".pluralize(medication.standard_dose_puffs) %></dd>
+
+      <dt>Starting count</dt>
+      <dd><%= medication.starting_dose_count %> doses</dd>
+
+      <% if medication.sick_day_dose_puffs.present? %>
+        <dt>Sick-day dose</dt>
+        <dd><%= medication.sick_day_dose_puffs %> <%= "puff".pluralize(medication.sick_day_dose_puffs) %></dd>
+      <% end %>
+
+      <% if medication.doses_per_day.present? %>
+        <dt>Doses per day</dt>
+        <dd><%= medication.doses_per_day %></dd>
+      <% end %>
+    </dl>
+
+    <div class="medication-card-actions">
+      <%= link_to "Edit", edit_settings_medication_path(medication), class: "btn-edit" %>
+      <%= button_to "Remove", settings_medication_path(medication), method: :delete,
+            class: "btn-delete",
+            form: { data: { turbo: true, turbo_confirm: "Remove this medication? This can't be undone." } } %>
+    </div>
+  </article>
+<% end %>
