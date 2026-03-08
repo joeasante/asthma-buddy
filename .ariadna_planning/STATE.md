@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 14 (Adherence Dashboard) — IN PROGRESS
-Plan: 14-02 complete — Dashboard adherence section with _adherence_card partial and on-track/missed CSS states
-Status: 2/3 plans done. 283 tests passing (no regressions). Plans 14-01 and 14-02 complete.
-Last activity: 2026-03-08 — Phase 14 Plan 02: dashboard adherence section, _adherence_card partial, adherence_path route, CSS states.
+Phase: Phase 14 (Adherence Dashboard) — COMPLETE
+Plan: 14-03 complete — AdherenceController, history grid views, controller tests, system tests
+Status: 3/3 plans done. 290 tests passing (no regressions). Phase 14 complete.
+Last activity: 2026-03-08 — Phase 14 Plan 03: AdherenceController#index, _history_grid partial, CSS, 7 controller tests, 7 system tests.
 
-Progress: [██████████] 92% (Milestone 2 — 13/~14 plans complete)
+Progress: [██████████] 100% (Milestone 2 — 14/~14 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 2 Velocity:**
+- Phase 14 Plan 03 completed: 2026-03-08 (~3 min, 2 tasks, 6 files, 14 new tests)
+- Tests at Phase 14-03 close: 290 passing (no regressions)
 - Phase 13 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 3 files, 15 new tests)
 - Tests at Phase 13-03 close: 276 passing (no regressions)
 - Phase 13 Plan 02 completed: 2026-03-08 (~8 min, 2 tasks, 5 files, 0 new tests)
@@ -81,6 +83,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 14 Plan 03 Decisions (2026-03-08)
+
+- **CSS variables corrected (same pattern as 14-02)**: Plan referenced non-existent `--severity-green/red`, `--color-border`, `--color-text-muted`, `--color-primary`, `--radius`. Used actual variables: `--severity-mild`, `--severity-severe`, `--border`, `--text-3`, `--brand`, `--radius-md`
+- **System tests scoped for isolation**: Pre-existing failures in peak_flow/symptom/auth system tests (asserting root_url after sign-in) are not regressions from this plan; adherence system tests run cleanly in isolation (7/7 pass)
 
 ### Phase 14 Plan 02 Decisions (2026-03-08)
 
@@ -192,5 +199,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 14 Plan 02 complete — Dashboard adherence section, _adherence_card partial, adherence_path route, CSS on-track/missed states, 283 tests passing. Phase 14 in progress (2/3 plans done).
+Stopped at: Phase 14 Plan 03 complete — AdherenceController#index, history grid views, CSS, 7 controller tests, 7 system tests, 290 tests passing. Phase 14 (Adherence Dashboard) COMPLETE — Milestone 2 COMPLETE.
 Resume file: None
