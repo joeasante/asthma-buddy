@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 10 (Medication Data Layer) — IN PROGRESS
-Plan: 10-02 complete — DoseLog model and migration
-Status: 10-02 done (dose_logs table, DoseLog model, 15 new tests passing). Ready for 10-03.
-Last activity: 2026-03-08 — Phase 10 Plan 02: DoseLog ActiveRecord model, puffs/recorded_at validations, belongs_to :user and :medication, fixtures, 15 model tests (229 tests total).
+Plan: 10-03 complete — Medication domain methods and refilled_at column
+Status: 10-03 done (remaining_doses, days_of_supply_remaining, refilled_at, 12 new tests passing, 241 total). Ready for 10-04.
+Last activity: 2026-03-08 — Phase 10 Plan 03: remaining_doses/days_of_supply_remaining instance methods, refilled_at datetime column, 12 model tests (241 tests total).
 
-Progress: [██░░░░░░░░] 20% (Milestone 2 — 2/~10 plans complete)
+Progress: [███░░░░░░░] 30% (Milestone 2 — 3/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -40,6 +40,8 @@ All 9 phases delivered:
 - Tests at Phase 10-01 close: 214 passing
 - Phase 10 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 6 files, 15 new tests)
 - Tests at Phase 10-02 close: 229 passing
+- Phase 10 Plan 03 completed: 2026-03-08 (~5 min, 2 tasks, 3 files, 12 new tests)
+- Tests at Phase 10-03 close: 241 passing
 
 ## Accumulated Context
 
@@ -57,6 +59,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 10 Plan 03 Decisions (2026-03-08)
+
+- **doses_per_day zero guard uses blank? || == 0**: Ruby's `blank?` returns false for integer 0 — explicit zero check required to prevent Infinity from division; `0.blank?` is false in Ruby
+- **remaining_doses uses dose_logs.sum(:puffs)**: Single SQL SUM aggregate, not Ruby-side sum — zero on empty result, no N+1
+- **remaining_doses.to_f before division**: Float coercion ensures float division rather than integer truncation before rounding
 
 ### Phase 10 Plan 02 Decisions (2026-03-08)
 
@@ -95,5 +103,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 10 Plan 02 complete — DoseLog model, migration, fixtures, 15 tests passing
+Stopped at: Phase 10 Plan 03 complete — remaining_doses/days_of_supply_remaining, refilled_at, 12 new tests (241 total)
 Resume file: None
