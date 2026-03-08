@@ -18,7 +18,7 @@ Milestone 2 takes Asthma Buddy from a symptom and peak flow tracker to a full me
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 10: Medication Data Layer** — Medication and DoseLog models, validations, remaining-dose calculation
+- [x] **Phase 10: Medication Data Layer** — Medication and DoseLog models, validations, remaining-dose calculation
 - [ ] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
 - [ ] **Phase 12: Dose Logging** — Log a dose taken and delete accidental entries
 - [ ] **Phase 13: Dose Tracking & Low Stock** — Remaining dose display, low-stock warning, refill action
@@ -200,7 +200,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 10. Medication Data Layer | 0/3 | Not started | - |
+| 10. Medication Data Layer | 3/3 | Complete ✓ | 2026-03-08 |
 | 11. Medication Management UI | 0/3 | Not started | - |
 | 12. Dose Logging | 0/3 | Not started | - |
 | 13. Dose Tracking & Low Stock | 0/3 | Not started | - |
