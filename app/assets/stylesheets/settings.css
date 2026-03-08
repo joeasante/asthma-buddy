@@ -1,6 +1,35 @@
 /* Settings page */
-.settings-pb-unset { color: #888; font-style: italic; }
-.settings-pb-date  { color: #888; font-size: 0.85rem; margin-left: 0.25rem; }
-.input-with-unit   { display: flex; align-items: center; gap: 0.5rem; }
-.input-unit        { font-size: 0.9rem; color: #666; white-space: nowrap; }
-.field-hint        { font-size: 0.8rem; color: #888; margin-top: 0.25rem; }
+.settings-pb-unset { color: #9ca3af; }
+.settings-pb-date  { color: #9ca3af; font-size: 0.875rem; margin-left: 0.35rem; }
+.input-with-unit   { display: flex; align-items: center; gap: 0.75rem; }
+.input-unit        { font-size: 0.95rem; color: #6b7280; white-space: nowrap; font-weight: 500; }
+.field-hint        { font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem; line-height: 1.5; }
+
+/* --------------------------------------------------------------------------
+   Low-stock badge — used in medication card and dashboard
+   -------------------------------------------------------------------------- */
+
+.low-stock-badge {
+  display: inline-block;
+  background: var(--severity-moderate-bg, #fef3c7);
+  color: var(--severity-moderate-text, #92400e);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* Days-of-supply secondary text inside the remaining-doses dd */
+.medication-days-supply {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  display: block;
+  margin-top: 0.125rem;
+}
+
+/* Medication card low-stock highlight */
+.medication-card--low-stock {
+  border-color: var(--severity-moderate-bg, #fef3c7);
+  box-shadow: 0 0 0 2px var(--severity-moderate-bg, #fef3c7);
+}

@@ -1,5 +1,5 @@
 <%= turbo_frame_tag dom_id(medication) do %>
-  <article class="medication-card">
+  <article class="medication-card<%= ' medication-card--low-stock' if medication.low_stock? %>">
     <div class="medication-card-header">
       <h3 class="medication-card-name"><%= medication.name %></h3>
       <span class="medication-badge medication-badge--<%= medication.medication_type %>">
@@ -25,7 +25,15 @@
       <% end %>
 
       <dt>Remaining</dt>
-      <dd id="remaining_count_<%= dom_id(medication) %>"><%= medication.remaining_doses %> doses</dd>
+      <dd id="remaining_count_<%= dom_id(medication) %>">
+        <%= medication.remaining_doses %> doses
+        <% if medication.days_of_supply_remaining.present? %>
+          <span class="medication-days-supply">~<%= medication.days_of_supply_remaining %> days remaining</span>
+        <% end %>
+        <% if medication.low_stock? %>
+          <span class="low-stock-badge">Low stock</span>
+        <% end %>
+      </dd>
     </dl>
 
     <section class="dose-log-section" aria-label="Log a dose">
