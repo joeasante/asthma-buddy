@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Starting Milestone 2 — Phase 10 (Medication Data Layer) — NOT STARTED
-Plan: Milestone 2 roadmap created 2026-03-08
-Status: Milestone 1 complete (all 9 phases done including dashboard, trend charts, UI polish, security hardening). Ready to begin Milestone 2.
-Last activity: 2026-03-08 — Completed Milestone 1; UI redesign (solid teal dashboard hero card, severity pill buttons, chart improvements); Chart.js invisible bar bug fixed; defense-in-depth hardening on `update_all`; 195 tests pass.
+Phase: Phase 10 (Medication Data Layer) — IN PROGRESS
+Plan: 10-01 complete — Medication model and migration
+Status: 10-01 done (medications table, Medication model, 19 tests passing). Ready for 10-02.
+Last activity: 2026-03-08 — Phase 10 Plan 01: Medication ActiveRecord model, four-value enum, validations, fixtures, 19 model tests (214 tests total).
 
-Progress: [░░░░░░░░░░] 0% (Milestone 2)
+Progress: [█░░░░░░░░░] 10% (Milestone 2 — 1/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -35,6 +35,10 @@ All 9 phases delivered:
 - Total plans completed: ~25+
 - Tests at close: 195 passing
 
+**Milestone 2 Velocity:**
+- Phase 10 Plan 01 completed: 2026-03-08 (~6 min, 2 tasks, 5 files, 19 new tests)
+- Tests at Phase 10-01 close: 214 passing
+
 ## Accumulated Context
 
 ### Decisions (carried forward to Milestone 2)
@@ -51,6 +55,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 10 Plan 01 Decisions (2026-03-08)
+
+- **enum :medication_type stored as integer with validate: true**: Unknown values produce validation errors not ArgumentError — safer for form submissions
+- **starting_dose_count allows zero**: An empty inhaler at start is valid; uses greater_than_or_equal_to: 0
+- **Optional numeric columns use allow_nil: true**: sick_day_dose_puffs and doses_per_day validated only when present
+- **Fixture enum values are raw integers**: Rails fixtures bypass enum accessors; write 0/1/2/3 directly
+- **Chronological scope test must scope comparison**: Compare @user.medications.order(...) not Medication.order(...)
 
 ### Milestone 2 Key Decisions
 
@@ -74,5 +86,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Milestone 2 planning complete — roadmap created, REQUIREMENTS.md updated
+Stopped at: Phase 10 Plan 01 complete — Medication model, migration, fixtures, 19 tests passing
 Resume file: None
