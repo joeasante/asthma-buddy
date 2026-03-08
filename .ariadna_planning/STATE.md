@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 12 (Dose Logging) — IN PROGRESS
-Plan: 12-01 complete — Settings::DoseLogsController with create and destroy
-Status: Plan 01 done. 256 tests passing (no regressions). Routes and controller in place.
-Last activity: 2026-03-08 — Phase 12 Plan 01: nested dose_logs routes, DoseLogsController, 0 new tests (tests are Plan 12-03).
+Plan: 12-02 complete — Dose log views: inline form, history section, Turbo Stream responses
+Status: Plan 02 done. 256 tests passing (no regressions). All Turbo Stream view files in place.
+Last activity: 2026-03-08 — Phase 12 Plan 02: medication card updated with dose log form + history, Turbo Stream responses, N+1 fix.
 
 Progress: [███████░░░] 70% (Milestone 2 — 7/~10 plans complete)
 
@@ -50,6 +50,8 @@ All 9 phases delivered:
 - Tests at Phase 11-03 close: 256 passing (no regressions)
 - Phase 12 Plan 01 completed: 2026-03-08 (~2 min, 2 tasks, 2 files, 0 new tests)
 - Tests at Phase 12-01 close: 256 passing (no regressions)
+- Phase 12 Plan 02 completed: 2026-03-08 (~1 min, 2 tasks, 7 files, 0 new tests)
+- Tests at Phase 12-02 close: 256 passing (no regressions)
 
 ## Accumulated Context
 
@@ -67,6 +69,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 12 Plan 02 Decisions (2026-03-08)
+
+- **DoseLog.new(medication:) not medication.dose_logs.new in views**: Avoids pushing unsaved record into eager-loaded in-memory association array (MEMORY.md safety rule)
+- **Ruby-side sort for index view dose history**: sort_by(&:recorded_at).reverse.first(5) uses eager-loaded association — zero additional DB queries
+- **Turbo Stream responses re-query fresh**: @medication.dose_logs.chronological.limit(5) after save/destroy guarantees correct SQL order
+- **flash.now[:notice] before respond_to**: Required so flash partial rendered via turbo_stream.replace receives the notice value
 
 ### Phase 12 Plan 01 Decisions (2026-03-08)
 
@@ -135,5 +144,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 12 Plan 01 complete — Settings::DoseLogsController with create/destroy, nested routes, 256 tests passing
+Stopped at: Phase 12 Plan 02 complete — Dose log views: inline form, history section, Turbo Stream responses, N+1 fix, 256 tests passing
 Resume file: None
