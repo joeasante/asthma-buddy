@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 14 (Adherence Dashboard) — IN PROGRESS
-Plan: 14-01 complete — AdherenceCalculator service object with full TDD unit test coverage
-Status: 1/3 plans done. 283 tests passing (no regressions). Plan 14-01 complete.
-Last activity: 2026-03-08 — Phase 14 Plan 01: AdherenceCalculator service object, Result struct, 7 unit tests (on_track/missed/no_schedule branches), 283 tests passing.
+Plan: 14-02 complete — Dashboard adherence section with _adherence_card partial and on-track/missed CSS states
+Status: 2/3 plans done. 283 tests passing (no regressions). Plans 14-01 and 14-02 complete.
+Last activity: 2026-03-08 — Phase 14 Plan 02: dashboard adherence section, _adherence_card partial, adherence_path route, CSS states.
 
 Progress: [██████████] 92% (Milestone 2 — 13/~14 plans complete)
 
@@ -58,6 +58,8 @@ All 9 phases delivered:
 - Tests at Phase 12-01 close: 256 passing (no regressions)
 - Phase 12 Plan 02 completed: 2026-03-08 (~1 min, 2 tasks, 7 files, 0 new tests)
 - Tests at Phase 12-02 close: 256 passing (no regressions)
+- Phase 14 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 5 files, 0 new tests)
+- Tests at Phase 14-02 close: 283 passing (no regressions)
 - Phase 14 Plan 01 completed: 2026-03-08 (~5 min, 2 tasks, 2 files, 7 new tests)
 - Tests at Phase 14-01 close: 283 passing (no regressions)
 - Phase 12 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 6 files, 16 new tests)
@@ -79,6 +81,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 14 Plan 02 Decisions (2026-03-08)
+
+- **CSS variables corrected**: Plan referenced non-existent `--severity-green/red`, `--color-surface/border/text-muted`, `--radius`. Used actual codebase variables: `--severity-mild`, `--severity-severe`, `--surface`, `--border`, `--text-3`, `--radius-md`
+- **adherence route pre-registered in 14-02**: Route `GET /adherence` added now so `adherence_path` resolves in the dashboard view before AdherenceController is created in 14-03
 
 ### Phase 14 Plan 01 Decisions (2026-03-08)
 
@@ -185,5 +192,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 14 Plan 01 complete — AdherenceCalculator service object (TDD: 7 unit tests, on_track/missed/no_schedule), 283 tests passing. Phase 14 in progress (1/3 plans done).
+Stopped at: Phase 14 Plan 02 complete — Dashboard adherence section, _adherence_card partial, adherence_path route, CSS on-track/missed states, 283 tests passing. Phase 14 in progress (2/3 plans done).
 Resume file: None
