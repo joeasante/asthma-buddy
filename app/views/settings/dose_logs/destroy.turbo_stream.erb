@@ -1,16 +1,18 @@
 <%= turbo_stream.replace "dose_history_#{dom_id(@medication)}" do %>
-  <% recent_logs = @medication.dose_logs.chronological.limit(5) %>
-  <% if recent_logs.any? %>
-    <ul class="dose-history-list">
-      <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
-    </ul>
-  <% else %>
-    <p class="dose-history-empty">No doses logged yet.</p>
-  <% end %>
+  <div id="dose_history_<%= dom_id(@medication) %>">
+    <% recent_logs = @medication.dose_logs.chronological.limit(5) %>
+    <% if recent_logs.any? %>
+      <ul class="dose-history-list">
+        <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
+      </ul>
+    <% else %>
+      <p class="dose-history-empty">No doses logged yet.</p>
+    <% end %>
+  </div>
 <% end %>
 
 <%= turbo_stream.replace "remaining_count_#{dom_id(@medication)}" do %>
-  <%= @medication.remaining_doses %> doses
+  <dd id="remaining_count_<%= dom_id(@medication) %>"><%= @medication.remaining_doses %> doses</dd>
 <% end %>
 
 <%= turbo_stream.replace "flash-messages" do %>
