@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 11 (Medication Management UI) — IN PROGRESS
-Plan: 11-02 complete — All 8 medication management view files
-Status: 11-02 done (index + empty state, card partial with turbo frame, shared form, new/edit wrappers, 3 Turbo Stream responses, 241 tests passing). Ready for 11-03 (CSS).
-Last activity: 2026-03-08 — Phase 11 Plan 02: 8 ERB view files for /settings/medications, Turbo Frame inline editing, Turbo Stream CRUD responses (241 tests, no regressions).
+Phase: Phase 11 (Medication Management UI) — COMPLETE
+Plan: 11-03 complete — Controller + system tests for medication management
+Status: All 3 plans done. 256 tests passing. Phase 11 fully verified end-to-end.
+Last activity: 2026-03-08 — Phase 11 Plan 03: 15 controller tests + 6 system tests, 256 total tests, no regressions.
 
-Progress: [█████░░░░░] 50% (Milestone 2 — 5/~10 plans complete)
+Progress: [██████░░░░] 60% (Milestone 2 — 6/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -46,6 +46,8 @@ All 9 phases delivered:
 - Tests at Phase 11-01 close: 241 passing (no regressions)
 - Phase 11 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 8 files, 0 new tests)
 - Tests at Phase 11-02 close: 241 passing (no regressions)
+- Phase 11 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 2 files, 15 new tests)
+- Tests at Phase 11-03 close: 256 passing (no regressions)
 
 ## Accumulated Context
 
@@ -63,6 +65,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 11 Plan 03 Decisions (2026-03-08)
+
+- **System test sign_in_as asserts dashboard_url**: HomeController redirects authenticated users to /dashboard; assert_current_path root_url always fails after sign-in
+- **Custom confirm dialog in system tests**: confirm_controller.js (Stimulus) replaces native window.confirm with a <dialog> modal; Capybara's accept_confirm only works with native dialogs; tests click dialog.confirm-dialog button[data-action='confirm#accept'] directly
+- **Optional fields system tests assert via DOM**: Medication.find_by in test thread returns nil due to SQLite WAL + transactional tests cross-thread visibility; assert by navigating to index and checking card text instead
 
 ### Phase 11 Plan 02 Decisions (2026-03-08)
 
@@ -119,5 +127,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 11 Plan 02 complete — 8 medication view files, Turbo Frame inline edit, Turbo Stream CRUD responses, 241 tests passing
+Stopped at: Phase 11 Plan 03 complete — 15 controller tests + 6 system tests, 256 tests passing, Phase 11 fully verified
 Resume file: None
