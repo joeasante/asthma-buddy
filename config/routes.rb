@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
 
   scope "/settings", module: :settings, as: :settings do
-    resources :medications, only: %i[index new create edit update destroy]
+    resources :medications, only: %i[index new create edit update destroy] do
+      resources :dose_logs, only: %i[create destroy]
+    end
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
