@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :peak_flow_readings, dependent: :destroy
   has_many :personal_best_records, dependent: :destroy
   has_many :medications, dependent: :destroy
+  has_many :dose_logs, dependent: :destroy
   has_one_attached :avatar
 
   validates :avatar,
