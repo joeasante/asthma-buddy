@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 10: Medication Data Layer** — Medication and DoseLog models, validations, remaining-dose calculation
 - [x] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
 - [x] **Phase 12: Dose Logging** (complete 2026-03-08) — Log a dose taken and delete accidental entries
-- [ ] **Phase 13: Dose Tracking & Low Stock** — Remaining dose display, low-stock warning, refill action
+- [x] **Phase 13: Dose Tracking & Low Stock** (complete 2026-03-08) — Remaining dose display, low-stock warning, refill action
 - [ ] **Phase 14: Adherence Dashboard** — Today's preventer adherence indicator and 7/30-day history grid
 - [ ] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
 - [ ] **Phase 16: Account Management & Legal** — Account deletion with confirmation; Terms, Privacy, cookie notice
@@ -105,10 +105,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A user can trigger a refill action on a medication; the starting_dose_count resets to the new count and refilled_at is recorded — the low-stock warning disappears if the new count is sufficient.
   4. Medications with no doses_per_day schedule do not show days-of-supply or trigger the 14-day warning (no division by zero).
 
-**Plans**:
-- [ ] 13-01: `remaining_doses` display on medication card; low-stock warning component (conditional CSS class / partial); dashboard integration for low-stock alert
-- [ ] 13-02: Refill action — `PATCH /medications/:id/refill` route, controller action, updates starting_dose_count + refilled_at, Turbo Stream response
-- [ ] 13-03: Controller tests for refill action; model tests for days_of_supply edge cases; system test for low-stock warning appearing and clearing after refill
+**Plans:** 3 plans
+- [ ] 13-01-PLAN.md — LOW_STOCK_DAYS constant + low_stock? predicate on Medication model; days-of-supply text and low-stock badge on medication card; dashboard Medications section for low-stock medications
+- [ ] 13-02-PLAN.md — Refill action: PATCH /settings/medications/:id/refill route, Settings::MedicationsController#refill updating starting_dose_count + refilled_at, details/summary inline form, Turbo Stream response
+- [ ] 13-03-PLAN.md — Model tests for low_stock? (boundary, nil schedule); controller tests for refill (success, count=0, cross-user 404, unauthenticated); system tests (badge on card, badge clears after refill, dashboard section)
 
 ---
 
@@ -202,8 +202,8 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 |-------|----------------|--------|-----------|
 | 10. Medication Data Layer | 3/3 | Complete ✓ | 2026-03-08 |
 | 11. Medication Management UI | 3/3 | Complete ✓ | 2026-03-08 |
-| 12. Dose Logging | 0/3 | Planned | - |
-| 13. Dose Tracking & Low Stock | 0/3 | Not started | - |
+| 12. Dose Logging | 3/3 | Complete ✓ | 2026-03-08 |
+| 13. Dose Tracking & Low Stock | 0/3 | Planned | - |
 | 14. Adherence Dashboard | 0/3 | Not started | - |
 | 15. Health Events | 0/3 | Not started | - |
 | 16. Account Management & Legal | 0/3 | Not started | - |
