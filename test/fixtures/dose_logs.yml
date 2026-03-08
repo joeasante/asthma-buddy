@@ -1,0 +1,26 @@
+# Alice's dose logs for her reliever (Ventolin — alice_reliever fixture)
+alice_reliever_dose_1:
+  user: verified_user
+  medication: alice_reliever
+  puffs: 2
+  recorded_at: <%= 2.days.ago %>
+
+alice_reliever_dose_2:
+  user: verified_user
+  medication: alice_reliever
+  puffs: 2
+  recorded_at: <%= 1.day.ago %>
+
+# Alice's dose log for her preventer
+alice_preventer_dose_1:
+  user: verified_user
+  medication: alice_preventer
+  puffs: 2
+  recorded_at: <%= 1.day.ago %>
+
+# Bob's dose log — cross-user isolation testing
+bob_reliever_dose_1:
+  user: unverified_user
+  medication: bob_reliever
+  puffs: 2
+  recorded_at: <%= 1.day.ago %>
