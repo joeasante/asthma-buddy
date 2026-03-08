@@ -1,0 +1,37 @@
+# Alice's medications
+alice_reliever:
+  user: verified_user
+  name: Ventolin
+  medication_type: 0
+  standard_dose_puffs: 2
+  starting_dose_count: 200
+  sick_day_dose_puffs:
+  doses_per_day:
+
+alice_preventer:
+  user: verified_user
+  name: Clenil Modulite
+  medication_type: 1
+  standard_dose_puffs: 2
+  starting_dose_count: 120
+  sick_day_dose_puffs:
+  doses_per_day: 2
+
+alice_combination:
+  user: verified_user
+  name: Fostair
+  medication_type: 2
+  standard_dose_puffs: 1
+  starting_dose_count: 120
+  sick_day_dose_puffs:
+  doses_per_day:
+
+# Bob's medication (cross-user isolation)
+bob_reliever:
+  user: unverified_user
+  name: Salbutamol
+  medication_type: 0
+  standard_dose_puffs: 2
+  starting_dose_count: 200
+  sick_day_dose_puffs:
+  doses_per_day:
