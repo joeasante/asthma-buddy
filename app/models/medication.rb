@@ -22,6 +22,8 @@ class Medication < ApplicationRecord
             numericality: { only_integer: true, greater_than: 0 },
             allow_nil: true
 
+  LOW_STOCK_DAYS = 14
+
   scope :chronological, -> { order(created_at: :desc) }
 
   # Returns how many doses remain in the current inhaler.
@@ -40,5 +42,13 @@ class Medication < ApplicationRecord
   def days_of_supply_remaining
     return nil if doses_per_day.blank? || doses_per_day == 0
     (remaining_doses.to_f / doses_per_day).round(1)
+  end
+
+  # Returns true when a days-of-supply estimate is available AND fewer than
+  # LOW_STOCK_DAYS remain. Returns false when doses_per_day is nil (relievers
+  # with no schedule must never trigger the low-stock warning).
+  def low_stock?
+    days = days_of_supply_remaining
+    days.present? && days < LOW_STOCK_DAYS
   end
 end
