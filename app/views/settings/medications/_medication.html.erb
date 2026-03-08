@@ -23,7 +23,31 @@
         <dt>Doses per day</dt>
         <dd><%= medication.doses_per_day %></dd>
       <% end %>
+
+      <dt>Remaining</dt>
+      <dd id="remaining_count_<%= dom_id(medication) %>"><%= medication.remaining_doses %> doses</dd>
     </dl>
+
+    <section class="dose-log-section" aria-label="Log a dose">
+      <h4 class="dose-log-section-title">Log a dose</h4>
+      <%= render "settings/dose_logs/form",
+            medication: medication,
+            dose_log: DoseLog.new(medication: medication, recorded_at: Time.current) %>
+    </section>
+
+    <section class="dose-history-section" aria-label="Recent doses">
+      <h4 class="dose-history-title">Recent doses</h4>
+      <div id="dose_history_<%= dom_id(medication) %>">
+        <% recent_logs = medication.dose_logs.sort_by(&:recorded_at).reverse.first(5) %>
+        <% if recent_logs.any? %>
+          <ul class="dose-history-list">
+            <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
+          </ul>
+        <% else %>
+          <p class="dose-history-empty">No doses logged yet.</p>
+        <% end %>
+      </div>
+    </section>
 
     <div class="medication-card-actions">
       <%= link_to "Edit", edit_settings_medication_path(medication), class: "btn-edit" %>

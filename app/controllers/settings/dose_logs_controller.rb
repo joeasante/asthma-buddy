@@ -9,6 +9,7 @@ module Settings
       @dose_log = @medication.dose_logs.new(dose_log_params)
       @dose_log.user = Current.user
       if @dose_log.save
+        flash.now[:notice] = "Dose logged."
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Dose logged." }
@@ -23,6 +24,7 @@ module Settings
 
     def destroy
       @dose_log.destroy
+      flash.now[:notice] = "Dose removed."
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to settings_medications_path, notice: "Dose removed." }
