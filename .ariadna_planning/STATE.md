@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 11 (Medication Management UI) — COMPLETE
-Plan: 11-03 complete — Controller + system tests for medication management
-Status: All 3 plans done. 256 tests passing. Phase 11 fully verified end-to-end.
-Last activity: 2026-03-08 — Phase 11 Plan 03: 15 controller tests + 6 system tests, 256 total tests, no regressions.
+Phase: Phase 12 (Dose Logging) — IN PROGRESS
+Plan: 12-01 complete — Settings::DoseLogsController with create and destroy
+Status: Plan 01 done. 256 tests passing (no regressions). Routes and controller in place.
+Last activity: 2026-03-08 — Phase 12 Plan 01: nested dose_logs routes, DoseLogsController, 0 new tests (tests are Plan 12-03).
 
-Progress: [██████░░░░] 60% (Milestone 2 — 6/~10 plans complete)
+Progress: [███████░░░] 70% (Milestone 2 — 7/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -48,6 +48,8 @@ All 9 phases delivered:
 - Tests at Phase 11-02 close: 241 passing (no regressions)
 - Phase 11 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 2 files, 15 new tests)
 - Tests at Phase 11-03 close: 256 passing (no regressions)
+- Phase 12 Plan 01 completed: 2026-03-08 (~2 min, 2 tasks, 2 files, 0 new tests)
+- Tests at Phase 12-01 close: 256 passing (no regressions)
 
 ## Accumulated Context
 
@@ -65,6 +67,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 12 Plan 01 Decisions (2026-03-08)
+
+- **Nested resource isolation pattern**: set_dose_log uses @medication.dose_logs.find — transitively scoped to Current.user via set_medication; no separate user check on dose log needed
+- **Build via @medication.dose_logs.new**: Not Current.user.dose_logs.new(medication:) — avoids pushing unsaved record into user association in-memory array (MEMORY.md safety rule)
+- **Strong params for dose logs**: Only :puffs and :recorded_at permitted — :user_id and :medication_id sourced from Current.user and URL params, never from form
 
 ### Phase 11 Plan 03 Decisions (2026-03-08)
 
@@ -127,5 +135,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 11 Plan 03 complete — 15 controller tests + 6 system tests, 256 tests passing, Phase 11 fully verified
+Stopped at: Phase 12 Plan 01 complete — Settings::DoseLogsController with create/destroy, nested routes, 256 tests passing
 Resume file: None
