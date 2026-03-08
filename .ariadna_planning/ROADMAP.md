@@ -19,8 +19,8 @@ Milestone 2 takes Asthma Buddy from a symptom and peak flow tracker to a full me
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 10: Medication Data Layer** — Medication and DoseLog models, validations, remaining-dose calculation
-- [ ] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
-- [ ] **Phase 12: Dose Logging** — Log a dose taken and delete accidental entries
+- [x] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
+- [x] **Phase 12: Dose Logging** (complete 2026-03-08) — Log a dose taken and delete accidental entries
 - [ ] **Phase 13: Dose Tracking & Low Stock** — Remaining dose display, low-stock warning, refill action
 - [ ] **Phase 14: Adherence Dashboard** — Today's preventer adherence indicator and 7/30-day history grid
 - [ ] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
@@ -66,9 +66,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. A user can delete a medication from their list and it is removed; a user cannot access another user's medications (cross-user isolation enforced).
 
 **Plans**:
-- [ ] 11-01: MedicationsController (index, new, create, edit, update, destroy), routes (`resources :medications` under /settings or top-level), scoped to Current.user
-- [ ] 11-02: Views — medications index (list + empty state), new/edit shared form partial, Turbo Stream responses for create and destroy
-- [ ] 11-03: Controller tests (CRUD + cross-user 404) and system tests (add medication, edit name, remove medication)
+- [x] 11-01-PLAN.md — Settings::MedicationsController (6 CRUD actions) and /settings/medications routes
+- [x] 11-02-PLAN.md — Medication views: index, card partial, form partial, Turbo Stream responses
+- [x] 11-03-PLAN.md — Controller tests (CRUD + cross-user 404) and system tests (add, edit, remove)
 
 ---
 
@@ -85,10 +85,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A user can delete a dose log entry they recorded and it is removed from the history; the remaining dose count updates accordingly.
   4. A user cannot log a dose against another user's medication (isolation enforced at controller level).
 
-**Plans**:
-- [ ] 12-01: DoseLogsController (create, destroy), routes, scoped to Current.user; Turbo Stream response on create
-- [ ] 12-02: Dose log form on medication detail/show page; dose history list per medication with delete button
-- [ ] 12-03: Controller tests (create, destroy, cross-user isolation) and system tests (log a dose, delete a dose, count updates)
+**Plans:** 3 plans
+- [ ] 12-01-PLAN.md — Settings::DoseLogsController (create, destroy), nested routes under /settings/medications, scoped to Current.user; Turbo Stream responses
+- [ ] 12-02-PLAN.md — Dose log form inline on medication card; dose history list (3-5 entries); remaining count display; Turbo Stream responses updating card on create/destroy
+- [ ] 12-03-PLAN.md — Controller tests (create, destroy, cross-user isolation, auth) and system tests (log dose, delete dose, remaining count updates)
 
 ---
 
@@ -139,7 +139,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Phase 14
 **Requirements**: EVT-01, EVT-02, EVT-03
 
-**Success Criteria** (what must be TRUE):
+**Success Criteria** (called must be TRUE):
   1. A logged-in user can log a health event by selecting a type (illness episode / GP appointment / prescription course), entering a start date, optionally an end date, and optional notes — and the event appears in a health events history list.
   2. A user can edit any field of a health event and save the changes; they can delete an event and it is removed permanently.
   3. The peak flow trend chart displays a vertical line or marker at the date of each health event, visually distinguishable by event type; hovering or tapping the marker reveals the event type and date.
@@ -201,8 +201,8 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 10. Medication Data Layer | 3/3 | Complete ✓ | 2026-03-08 |
-| 11. Medication Management UI | 0/3 | Not started | - |
-| 12. Dose Logging | 0/3 | Not started | - |
+| 11. Medication Management UI | 3/3 | Complete ✓ | 2026-03-08 |
+| 12. Dose Logging | 0/3 | Planned | - |
 | 13. Dose Tracking & Low Stock | 0/3 | Not started | - |
 | 14. Adherence Dashboard | 0/3 | Not started | - |
 | 15. Health Events | 0/3 | Not started | - |
