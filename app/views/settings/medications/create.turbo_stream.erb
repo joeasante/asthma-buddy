@@ -1,0 +1,9 @@
+<%= turbo_stream.prepend "medications_list", partial: "settings/medications/medication", locals: { medication: @medication } %>
+<%= turbo_stream.replace "medication_form" do %>
+  <%= render "settings/medications/form", medication: Current.user.medications.new %>
+<% end %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages">
+    <p role="status" class="flash flash--notice">Medication added.</p>
+  </div>
+<% end %>

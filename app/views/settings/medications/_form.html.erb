@@ -1,0 +1,60 @@
+<%= form_with model: [:settings, medication], id: "medication_form", data: { turbo: true } do |form| %>
+  <% if medication.errors.any? %>
+    <div role="alert" aria-live="assertive">
+      <p><%= pluralize(medication.errors.count, "error") %> prevented this medication from being saved:</p>
+      <ul>
+        <% medication.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name, "Medication name" %>
+    <%= form.text_field :name, placeholder: "e.g. Ventolin, Clenil Modulite", required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :medication_type, "Type" %>
+    <%= form.select :medication_type,
+          Medication.medication_types.keys.map { |k| [k.humanize, k] },
+          { include_blank: "Select a type", selected: medication.medication_type },
+          required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :standard_dose_puffs, "Standard dose (puffs)" %>
+    <%= form.number_field :standard_dose_puffs, min: 1, step: 1, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :starting_dose_count, "Starting dose count" %>
+    <p class="field-hint">How many doses are in the inhaler when you start tracking.</p>
+    <%= form.number_field :starting_dose_count, min: 0, step: 1, required: true %>
+  </div>
+
+  <fieldset class="field-group">
+    <legend>Optional</legend>
+
+    <div class="field">
+      <%= form.label :sick_day_dose_puffs, "Sick-day dose (puffs)" %>
+      <p class="field-hint">Leave blank if not applicable.</p>
+      <%= form.number_field :sick_day_dose_puffs, min: 1, step: 1 %>
+    </div>
+
+    <div class="field">
+      <%= form.label :doses_per_day, "Doses per day" %>
+      <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
+      <%= form.number_field :doses_per_day, min: 1, step: 1 %>
+    </div>
+  </fieldset>
+
+  <%= form.submit medication.persisted? ? "Update medication" : "Add medication" %>
+
+  <% if medication.persisted? %>
+    <%= link_to "Cancel", settings_medications_path,
+          data: { turbo_frame: dom_id(medication) },
+          class: "btn-cancel" %>
+  <% end %>
+<% end %>

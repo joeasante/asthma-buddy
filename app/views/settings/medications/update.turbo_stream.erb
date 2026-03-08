@@ -1,0 +1,6 @@
+<%= turbo_stream.replace dom_id(@medication), partial: "settings/medications/medication", locals: { medication: @medication } %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages">
+    <p role="status" class="flash flash--notice">Medication updated.</p>
+  </div>
+<% end %>

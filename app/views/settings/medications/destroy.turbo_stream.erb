@@ -1,0 +1,6 @@
+<%= turbo_stream.remove dom_id(@medication) %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages">
+    <p role="status" class="flash flash--notice">Medication removed.</p>
+  </div>
+<% end %>
