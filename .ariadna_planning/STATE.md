@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 10 (Medication Data Layer) — IN PROGRESS
-Plan: 10-03 complete — Medication domain methods and refilled_at column
-Status: 10-03 done (remaining_doses, days_of_supply_remaining, refilled_at, 12 new tests passing, 241 total). Ready for 10-04.
-Last activity: 2026-03-08 — Phase 10 Plan 03: remaining_doses/days_of_supply_remaining instance methods, refilled_at datetime column, 12 model tests (241 tests total).
+Phase: Phase 11 (Medication Management UI) — IN PROGRESS
+Plan: 11-01 complete — Settings::MedicationsController + /settings/medications routes
+Status: 11-01 done (6 CRUD actions scoped to Current.user, 6 routes, 241 tests passing). Ready for 11-02 (views).
+Last activity: 2026-03-08 — Phase 11 Plan 01: Settings::MedicationsController with 6 actions, /settings/medications routes, RuboCop clean (241 tests total).
 
-Progress: [███░░░░░░░] 30% (Milestone 2 — 3/~10 plans complete)
+Progress: [████░░░░░░] 40% (Milestone 2 — 4/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -42,6 +42,8 @@ All 9 phases delivered:
 - Tests at Phase 10-02 close: 229 passing
 - Phase 10 Plan 03 completed: 2026-03-08 (~5 min, 2 tasks, 3 files, 12 new tests)
 - Tests at Phase 10-03 close: 241 passing
+- Phase 11 Plan 01 completed: 2026-03-08 (~1 min, 2 tasks, 2 files, 0 new tests)
+- Tests at Phase 11-01 close: 241 passing (no regressions)
 
 ## Accumulated Context
 
@@ -59,6 +61,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 11 Plan 01 Decisions (2026-03-08)
+
+- **Settings scope pattern**: `scope '/settings', module: :settings, as: :settings` (not `namespace`) allows coexistence with bare `get "settings"` route without path prefix conflicts
+- **Authorization by association scope**: `Current.user.medications.find` — RecordNotFound auto-returns 404; `Medication.find` is never used in settings controllers
+- **No show action**: No medication detail page per CONTEXT.md deferred decisions; index + edit inline are sufficient
 
 ### Phase 10 Plan 03 Decisions (2026-03-08)
 
@@ -103,5 +111,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 10 Plan 03 complete — remaining_doses/days_of_supply_remaining, refilled_at, 12 new tests (241 total)
+Stopped at: Phase 11 Plan 01 complete — Settings::MedicationsController, /settings/medications routes, 241 tests passing
 Resume file: None
