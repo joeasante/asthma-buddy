@@ -5,7 +5,7 @@ module Settings
     before_action :set_medication, only: %i[edit update destroy]
 
     def index
-      @medications = Current.user.medications.chronological
+      @medications = Current.user.medications.chronological.includes(:dose_logs)
     end
 
     def new
