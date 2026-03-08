@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 12 (Dose Logging) — COMPLETE
-Plan: 12-03 complete — Controller integration tests + system tests for dose logging and deletion flows
-Status: All 3 plans done. 267 tests passing (no regressions). Phase 12 fully delivered.
-Last activity: 2026-03-08 — Phase 12 Plan 03: controller integration tests (11), system tests (5), fixed missing layouts/_flash partial and Turbo Stream wrapper IDs.
+Phase: Phase 13 (Dose Tracking — Low Stock) — IN PROGRESS
+Plan: 13-01 complete — LOW_STOCK_DAYS constant, low_stock? predicate, medication card badge/days-of-supply, dashboard Medications section
+Status: 1/2 plans done. 267 tests passing (no regressions). Plan 01 delivered.
+Last activity: 2026-03-08 — Phase 13 Plan 01: low_stock? predicate on Medication model, medication card updates, dashboard low-stock medications section.
 
-Progress: [███████░░░] 70% (Milestone 2 — 7/~10 plans complete)
+Progress: [████████░░] 75% (Milestone 2 — 8/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 2 Velocity:**
+- Phase 13 Plan 01 completed: 2026-03-08 (~10 min, 2 tasks, 6 files, 0 new tests)
+- Tests at Phase 13-01 close: 267 passing (no regressions)
 - Phase 10 Plan 01 completed: 2026-03-08 (~6 min, 2 tasks, 5 files, 19 new tests)
 - Tests at Phase 10-01 close: 214 passing
 - Phase 10 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 6 files, 15 new tests)
@@ -71,6 +73,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 13 Plan 01 Decisions (2026-03-08)
+
+- **low_stock? guards nil from days_of_supply_remaining**: Reliever inhalers with no `doses_per_day` return nil from `days_of_supply_remaining`; `low_stock?` checks `days.present?` before threshold comparison — never triggers for unscheduled medications
+- **includes(:dose_logs).select(&:low_stock?) avoids N+1**: One SQL query loads all medications with their dose_logs; Ruby-side `select` filters using `low_stock?` which calls `remaining_doses` which calls `dose_logs.sum` — computed from already-loaded records
+- **Dashboard Medications section absent when no low-stock medications**: `@low_stock_medications.any?` guard means no empty-state card shown when all medications are well-stocked
 
 ### Phase 12 Plan 03 Decisions (2026-03-08)
 
@@ -152,5 +160,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 12 Plan 03 complete — Controller integration tests (11) + system tests (5) for dose logging, 267 tests passing
+Stopped at: Phase 13 Plan 01 complete — low_stock? predicate, medication card badge/days-of-supply, dashboard Medications section, 267 tests passing
 Resume file: None
