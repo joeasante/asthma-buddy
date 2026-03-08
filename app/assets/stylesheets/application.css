@@ -964,6 +964,85 @@ button {
   color: var(--text-3);
 }
 
+/* ── Adherence History Page ─────────────────────────────────────── */
+.adherence-page { max-width: 800px; margin: 0 auto; padding: var(--space-lg); }
+
+.adherence-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.adherence-toggle { display: flex; gap: var(--space-xs); }
+
+.adherence-toggle-btn {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-3);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.adherence-toggle-btn--active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.adherence-medication-section { margin-bottom: var(--space-xl); }
+.adherence-medication-name { margin-bottom: 0.25rem; }
+.adherence-medication-schedule { font-size: 0.85rem; color: var(--text-3); margin-bottom: var(--space-sm); }
+
+.adherence-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.adherence-cell {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: default;
+}
+
+.adherence-cell--on_track  { background: var(--severity-mild); color: #fff; }
+.adherence-cell--missed    { background: var(--severity-severe); color: #fff; }
+.adherence-cell--no_schedule { background: var(--border); color: var(--text-3); }
+
+.adherence-legend {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  font-size: 0.8rem;
+}
+
+.adherence-legend-item { display: flex; align-items: center; gap: 4px; }
+
+.adherence-legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.adherence-legend-item--on_track::before  { background: var(--severity-mild); }
+.adherence-legend-item--missed::before    { background: var(--severity-severe); }
+.adherence-legend-item--no_schedule::before { background: var(--border); }
+
+.adherence-empty { padding: var(--space-lg); text-align: center; color: var(--text-3); }
+.adherence-back  { margin-top: var(--space-lg); }
+
 /* ==========================================================================
    Bottom navigation — mobile only, authenticated users
    ========================================================================== */

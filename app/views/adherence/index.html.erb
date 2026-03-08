@@ -1,0 +1,31 @@
+<% content_for :title, "Adherence History" %>
+
+<div class="adherence-page">
+  <div class="adherence-header">
+    <h1>Preventer Adherence</h1>
+    <div class="adherence-toggle" aria-label="Select date range">
+      <%= link_to "7 days",  adherence_path(days: 7),
+            class: "adherence-toggle-btn #{"adherence-toggle-btn--active" if @days == 7}" %>
+      <%= link_to "30 days", adherence_path(days: 30),
+            class: "adherence-toggle-btn #{"adherence-toggle-btn--active" if @days == 30}" %>
+    </div>
+  </div>
+
+  <% if @adherence_history.any? %>
+    <% @adherence_history.each do |entry| %>
+      <%= render "adherence/history_grid",
+            medication: entry[:medication],
+            days_data: entry[:days_data],
+            days: @days %>
+    <% end %>
+  <% else %>
+    <div class="adherence-empty">
+      <p>No scheduled preventer medications found.</p>
+      <p><%= link_to "Add a medication", settings_medications_path %> and set a daily dose schedule to track adherence.</p>
+    </div>
+  <% end %>
+
+  <p class="adherence-back">
+    <%= link_to "Back to dashboard", dashboard_path %>
+  </p>
+</div>

@@ -1,0 +1,28 @@
+<section class="adherence-medication-section" aria-label="Adherence for <%= medication.name %>">
+  <h2 class="adherence-medication-name"><%= medication.name %></h2>
+  <p class="adherence-medication-schedule">
+    <%= medication.doses_per_day %> dose<%= "s" if medication.doses_per_day != 1 %> per day scheduled
+  </p>
+
+  <div class="adherence-grid adherence-grid--<%= days %>"
+       role="list"
+       aria-label="<%= days %>-day adherence grid for <%= medication.name %>">
+    <% days_data.each do |day| %>
+      <% status = day[:result].status %>
+      <% taken = day[:result].taken %>
+      <% scheduled = day[:result].scheduled %>
+      <div class="adherence-cell adherence-cell--<%= status %>"
+           role="listitem"
+           title="<%= day[:date].strftime("%-d %b") %>: <%= status == :no_schedule ? "No data" : "#{taken}/#{scheduled} taken" %>"
+           aria-label="<%= day[:date].strftime("%-d %b") %>: <%= status.to_s.humanize %>">
+        <span class="adherence-cell-date"><%= day[:date].strftime("%-d") %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="adherence-legend">
+    <span class="adherence-legend-item adherence-legend-item--on_track">On track</span>
+    <span class="adherence-legend-item adherence-legend-item--missed">Missed</span>
+    <span class="adherence-legend-item adherence-legend-item--no_schedule">No data</span>
+  </div>
+</section>
