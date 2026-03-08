@@ -85,6 +85,23 @@
     </div>
   </div>
 
+  <%# ── Preventer adherence ──────────────────────────────────────── %>
+  <% if @preventer_adherence.any? %>
+    <section class="dash-adherence" aria-label="Preventer adherence today">
+      <div class="dash-section-header">
+        <h2>Preventers Today</h2>
+        <%= link_to "View history", adherence_path, class: "dash-section-link" %>
+      </div>
+      <ul class="dash-adherence-list">
+        <% @preventer_adherence.each do |entry| %>
+          <%= render "dashboard/adherence_card",
+                medication: entry[:medication],
+                result: entry[:result] %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
   <%# ── Low-stock medications ──────────────────────────────────────── %>
   <% if @low_stock_medications.any? %>
     <section class="dash-medications" aria-label="Low stock medications">
