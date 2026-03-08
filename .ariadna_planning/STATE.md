@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 13 (Dose Tracking — Low Stock) — COMPLETE
-Plan: 13-02 complete — refill route, controller action, inline details/summary form on medication card, Turbo Stream card refresh
-Status: 2/2 plans done. 267 tests passing (no regressions). Phase 13 complete.
-Last activity: 2026-03-08 — Phase 13 Plan 02: PATCH refill route, Settings::MedicationsController#refill, inline refill form on medication card, refill.turbo_stream.erb.
+Plan: 13-03 complete — model unit tests for low_stock?, controller integration tests for refill action, system tests for low-stock badge and refill flow
+Status: 3/3 plans done. 276 tests passing (no regressions). Phase 13 fully complete with test coverage.
+Last activity: 2026-03-08 — Phase 13 Plan 03: 5 model tests (low_stock? boundary/nil/after-logging), 4 controller tests (refill success/count=0/cross-user/unauthenticated), 6 system tests (badge on card, dashboard section, refill clears badge).
 
-Progress: [█████████░] 80% (Milestone 2 — 9/~10 plans complete)
+Progress: [██████████] 90% (Milestone 2 — 12/~13 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 2 Velocity:**
+- Phase 13 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 3 files, 15 new tests)
+- Tests at Phase 13-03 close: 276 passing (no regressions)
 - Phase 13 Plan 02 completed: 2026-03-08 (~8 min, 2 tasks, 5 files, 0 new tests)
 - Tests at Phase 13-02 close: 267 passing (no regressions)
 - Phase 13 Plan 01 completed: 2026-03-08 (~10 min, 2 tasks, 6 files, 0 new tests)
@@ -75,6 +77,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 13 Plan 03 Decisions (2026-03-08)
+
+- **System tests create low-stock medication inline in setup**: 20 doses / 2 per day = 10 days below 14-day threshold; fixtures not modified to avoid affecting other tests relying on alice_preventer's 59-day supply
+- **Refill unauthenticated test calls sign_out first**: Controller test setup signs in as @user via SessionTestHelper; unauthenticated test must explicitly sign out before testing redirect behaviour
+- **Route confirmed as refill_settings_medication_path**: Verified via bin/rails routes; plan noted to check this
 
 ### Phase 13 Plan 02 Decisions (2026-03-08)
 
@@ -169,5 +177,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 13 Plan 02 complete — PATCH refill route, Settings::MedicationsController#refill, inline refill form on medication card, refill.turbo_stream.erb, 267 tests passing. Phase 13 complete.
+Stopped at: Phase 13 Plan 03 complete — 5 model tests (low_stock?), 4 controller tests (refill action), 6 system tests (low-stock badge, dashboard, refill flow), 276 tests passing. Phase 13 fully complete.
 Resume file: None
