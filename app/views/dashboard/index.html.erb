@@ -98,7 +98,7 @@
             <span class="low-stock-badge">Low stock</span>
             <span class="dash-low-stock-name"><%= medication.name %></span>
             <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining %> days remaining</span>
-            <%= link_to "Refill", settings_medication_path(medication), class: "dash-low-stock-refill-link" %>
+            <%= link_to "Refill", settings_medications_path, class: "dash-low-stock-refill-link" %>
           </li>
         <% end %>
       </ul>

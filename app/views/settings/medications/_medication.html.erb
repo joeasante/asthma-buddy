@@ -57,6 +57,21 @@
       </div>
     </section>
 
+    <details class="refill-details">
+      <summary class="btn-refill">Refill</summary>
+      <%= form_with url: refill_settings_medication_path(medication), method: :patch do |f| %>
+        <div class="refill-form">
+          <%= f.label :starting_dose_count, "New dose count" %>
+          <%= f.number_field :starting_dose_count,
+                value: medication.starting_dose_count,
+                min: 0,
+                class: "refill-count-input",
+                name: "medication[starting_dose_count]" %>
+          <%= f.submit "Confirm refill", class: "btn-primary btn-sm" %>
+        </div>
+      <% end %>
+    </details>
+
     <div class="medication-card-actions">
       <%= link_to "Edit", edit_settings_medication_path(medication), class: "btn-edit" %>
       <%= button_to "Remove", settings_medication_path(medication), method: :delete,
