@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 11 (Medication Management UI) — IN PROGRESS
-Plan: 11-01 complete — Settings::MedicationsController + /settings/medications routes
-Status: 11-01 done (6 CRUD actions scoped to Current.user, 6 routes, 241 tests passing). Ready for 11-02 (views).
-Last activity: 2026-03-08 — Phase 11 Plan 01: Settings::MedicationsController with 6 actions, /settings/medications routes, RuboCop clean (241 tests total).
+Plan: 11-02 complete — All 8 medication management view files
+Status: 11-02 done (index + empty state, card partial with turbo frame, shared form, new/edit wrappers, 3 Turbo Stream responses, 241 tests passing). Ready for 11-03 (CSS).
+Last activity: 2026-03-08 — Phase 11 Plan 02: 8 ERB view files for /settings/medications, Turbo Frame inline editing, Turbo Stream CRUD responses (241 tests, no regressions).
 
-Progress: [████░░░░░░] 40% (Milestone 2 — 4/~10 plans complete)
+Progress: [█████░░░░░] 50% (Milestone 2 — 5/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -44,6 +44,8 @@ All 9 phases delivered:
 - Tests at Phase 10-03 close: 241 passing
 - Phase 11 Plan 01 completed: 2026-03-08 (~1 min, 2 tasks, 2 files, 0 new tests)
 - Tests at Phase 11-01 close: 241 passing (no regressions)
+- Phase 11 Plan 02 completed: 2026-03-08 (~2 min, 2 tasks, 8 files, 0 new tests)
+- Tests at Phase 11-02 close: 241 passing (no regressions)
 
 ## Accumulated Context
 
@@ -61,6 +63,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 11 Plan 02 Decisions (2026-03-08)
+
+- **Cancel link uses turbo_frame data attribute**: `data: { turbo_frame: dom_id(medication) }` pointing to `settings_medications_path` — Turbo loads the matching frame from index response, restoring the card without full reload or separate show action
+- **Form reset uses Current.user.medications.new**: Consistent with symptom_logs pattern; avoids pushing unsaved record into user association in-memory array (MEMORY.md safety rule)
+- **rubocop does not lint ERB files**: This project's rubocop config does not target .html.erb; parse errors appear on all ERB files when explicitly passed; 241 tests are the verification mechanism
 
 ### Phase 11 Plan 01 Decisions (2026-03-08)
 
@@ -111,5 +119,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 11 Plan 01 complete — Settings::MedicationsController, /settings/medications routes, 241 tests passing
+Stopped at: Phase 11 Plan 02 complete — 8 medication view files, Turbo Frame inline edit, Turbo Stream CRUD responses, 241 tests passing
 Resume file: None
