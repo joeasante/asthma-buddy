@@ -37,26 +37,51 @@
 
 ---
 
-## v2 Requirements (Milestone 2)
+## v2 Requirements (Milestone 2 — Medication & Compliance)
 
-### Medication Management
+### Medication Profile
 
-- **MED-01**: User can maintain a list of their medications (name, type, dosage, frequency)
-- **MED-02**: User can log when they take a dose of a medication
-- **MED-03**: User can set reminders for scheduled medications
-- **MED-04**: User can view their medication adherence statistics
+- [x] **MED-01**: User can add a medication to their profile: name, type (reliever / preventer / combination / other), standard dose in puffs, and starting dose count — *enables the user to model the actual medications they use*
+- [x] **MED-02**: User can optionally set a sick-day dose and a daily schedule (doses per day) for preventers — *captures the extra detail needed for adherence tracking*
+- [x] **MED-03**: User can edit or remove a medication from their profile — *corrects mistakes; handles medication changes at review appointments*
 
-### Trigger Tracking
+### Dose Logging
 
-- **TRIG-01**: User can record exposure to a potential asthma trigger (type, timestamp, notes)
-- **TRIG-02**: System identifies correlations between trigger exposures and symptom events
-- **TRIG-03**: User can view a summary of their most common triggers
+- [x] **DOSE-01**: User can log a dose taken: which medication, how many puffs, and timestamp — *creates the event log that drives all dose tracking*
+- [x] **DOSE-02**: User can delete a dose log entry they recorded — *user controls their own data; corrects accidental double-logs*
 
-### Dashboard
+### Dose Tracking
 
-- **DASH-01**: User sees a dashboard summarising their current asthma control status
-- **DASH-02**: Dashboard shows today's symptom and peak flow summary
-- **DASH-03**: Dashboard highlights any Red zone readings requiring attention
+- [x] **TRACK-01**: System calculates and displays remaining doses for each medication (starting count − logged doses) — *prevents the user running out without realising*
+- [x] **TRACK-02**: System shows a low-stock warning when remaining doses fall below 14 days' estimated supply — *14-day threshold gives time to request a prescription before running out*
+- [x] **TRACK-03**: User can mark a medication as refilled, resetting the dose count to the new starting value — *models the real-world prescription renewal cycle*
+
+### Adherence Tracking
+
+- [x] **ADH-01**: Dashboard shows a preventer adherence indicator for today: doses taken vs scheduled (e.g. 1/2) — *immediate feedback on whether the preventer has been taken; key for ICS compliance*
+- [x] **ADH-02**: User can view a recent adherence history for their preventers (last 7 or 30 days) — *surfaces patterns; supports conversations with a GP or asthma nurse*
+
+### Health Events
+
+- [x] **EVT-01**: User can log a health event with a type (illness episode / GP appointment / prescription course), date, and optional notes — *captures the external events that affect asthma control and help explain chart patterns*
+- [x] **EVT-02**: User can edit or delete a health event — *user controls their own data*
+- [x] **EVT-03**: Health events appear as vertical markers on the peak flow trend chart — *visually correlates events (illness, steroids) with changes in peak flow readings*
+
+### Account Management
+
+- [x] **ACC-01**: User can delete their account — all data (readings, logs, medications, events) is permanently erased (GDPR right to erasure) — *legal requirement; builds trust that the app is not a data trap*
+- [x] **ACC-02**: Account deletion requires a confirmation step (type "DELETE" or re-enter password) — *prevents accidental deletion of irreplaceable health data*
+
+### Onboarding
+
+- [x] **ONBD-01**: After signup, a new user is prompted to complete onboarding: set personal best, add first medication — *reduces the activation gap; a first-time user with no data sees no value*
+- [x] **ONBD-02**: Onboarding can be skipped and completed later — *respects the user who signs up before they have their inhaler to hand*
+
+### Legal & Compliance
+
+- [x] **LEGAL-01**: App has a Terms of Service page linked from the footer — *required for public launch*
+- [x] **LEGAL-02**: App has a Privacy Policy page (UK GDPR + Data Protection Act 2018 compliant) — *legal requirement; reassures users their health data is handled responsibly*
+- [x] **LEGAL-03**: App displays a brief session cookie notice on first visit (informational — no consent banner needed for essential session cookies only) — *GDPR compliance for essential cookies*
 
 ---
 
@@ -107,33 +132,59 @@
 
 ## Traceability
 
+### Milestone 1 (v1.0 — Complete)
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 2 — Authentication | Pending |
-| AUTH-02 | Phase 2 — Authentication | Pending |
-| AUTH-03 | Phase 2 — Authentication | Pending |
-| AUTH-04 | Phase 2 — Authentication | Pending |
-| AUTH-05 | Phase 2 — Authentication | Pending |
-| SYMP-01 | Phase 3 — Symptom Recording | Pending |
-| SYMP-02 | Phase 3 — Symptom Recording | Pending |
-| SYMP-03 | Phase 5 — Symptom Timeline | Pending |
-| SYMP-04 | Phase 5 — Symptom Timeline | Pending |
-| SYMP-05 | Phase 4 — Symptom Management | Pending |
-| SYMP-06 | Phase 4 — Symptom Management | Pending |
-| SYMP-07 | Phase 5 — Symptom Timeline | Pending |
-| PEAK-01 | Phase 6 — Peak Flow Recording | Pending |
-| PEAK-02 | Phase 6 — Peak Flow Recording | Pending |
-| PEAK-03 | Phase 6 — Peak Flow Recording | Pending |
-| PEAK-04 | Phase 7 — Peak Flow Display and Management | Pending |
-| PEAK-05 | Phase 8 — Peak Flow Trends | Pending |
-| PEAK-06 | Phase 7 — Peak Flow Display and Management | Pending |
-| PEAK-07 | Phase 7 — Peak Flow Display and Management | Pending |
+| AUTH-01 | Phase 2 — Authentication | ✅ Complete |
+| AUTH-02 | Phase 2 — Authentication | ✅ Complete |
+| AUTH-03 | Phase 2 — Authentication | ✅ Complete |
+| AUTH-04 | Phase 2 — Authentication | ✅ Complete |
+| AUTH-05 | Phase 2 — Authentication | ✅ Complete |
+| SYMP-01 | Phase 3 — Symptom Recording | ✅ Complete |
+| SYMP-02 | Phase 3 — Symptom Recording | ✅ Complete |
+| SYMP-03 | Phase 5 — Symptom Timeline | ✅ Complete |
+| SYMP-04 | Phase 5 — Symptom Timeline | ✅ Complete |
+| SYMP-05 | Phase 4 — Symptom Management | ✅ Complete |
+| SYMP-06 | Phase 4 — Symptom Management | ✅ Complete |
+| SYMP-07 | Phase 5 — Symptom Timeline | ✅ Complete |
+| PEAK-01 | Phase 6 — Peak Flow Recording | ✅ Complete |
+| PEAK-02 | Phase 6 — Peak Flow Recording | ✅ Complete |
+| PEAK-03 | Phase 6 — Peak Flow Recording | ✅ Complete |
+| PEAK-04 | Phase 7 — Peak Flow Display | ✅ Complete |
+| PEAK-05 | Phase 8 — Peak Flow Trends | ✅ Complete |
+| PEAK-06 | Phase 7 — Peak Flow Display | ✅ Complete |
+| PEAK-07 | Phase 7 — Peak Flow Display | ✅ Complete |
+
+### Milestone 2 (v2.0 — In Progress)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| MED-01 | Phase 10 — Medication Data Layer | Pending |
+| MED-02 | Phase 10 — Medication Data Layer | Pending |
+| MED-03 | Phase 11 — Medication Management UI | Pending |
+| DOSE-01 | Phase 12 — Dose Logging | Pending |
+| DOSE-02 | Phase 12 — Dose Logging | Pending |
+| TRACK-01 | Phase 13 — Dose Tracking | Pending |
+| TRACK-02 | Phase 13 — Dose Tracking | Pending |
+| TRACK-03 | Phase 13 — Dose Tracking | Pending |
+| ADH-01 | Phase 14 — Adherence Dashboard | Pending |
+| ADH-02 | Phase 14 — Adherence Dashboard | Pending |
+| EVT-01 | Phase 15 — Health Events | Pending |
+| EVT-02 | Phase 15 — Health Events | Pending |
+| EVT-03 | Phase 15 — Health Events | Pending |
+| ACC-01 | Phase 16 — Account Management | Pending |
+| ACC-02 | Phase 16 — Account Management | Pending |
+| ONBD-01 | Phase 17 — Onboarding | Pending |
+| ONBD-02 | Phase 17 — Onboarding | Pending |
+| LEGAL-01 | Phase 16 — Account Management | Pending |
+| LEGAL-02 | Phase 16 — Account Management | Pending |
+| LEGAL-03 | Phase 16 — Account Management | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total
-- Mapped to phases: 19
-- Unmapped: 0 ✓ (100% coverage)
+- v1 requirements: 19 total — 19 mapped, 0 unmapped ✓
+- v2 requirements: 20 total — 20 mapped, 0 unmapped ✓
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after roadmap creation*
+*Last updated: 2026-03-08 — Milestone 2 requirements defined*

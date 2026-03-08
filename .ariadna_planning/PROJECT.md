@@ -27,26 +27,31 @@ Built initially for personal use (self or family), then opened to others — mul
 
 ### Validated
 
-(None yet — ship to validate)
+**Milestone 1 (v1.0) — Complete 2026-03-08:**
+- User authentication (email + password, email verification, password reset) ✓
+- Symptom logging with type, severity, notes, and timeline view ✓
+- Peak flow recording with personal best, zone calculation (Green/Yellow/Red) ✓
+- Peak flow history with zone colour coding, edit/delete, trend charts ✓
+- Dashboard with 7-day summary cards and charts ✓
+- Multi-user data isolation from day one ✓
 
 ### Active
 
-<!-- Milestone 1 scope -->
+<!-- Milestone 2 scope — v2.0 Medication & Compliance -->
 
-- [ ] User can create an account and log in securely
-- [ ] User can log asthma symptoms (type, severity, timestamp, optional notes)
-- [ ] User can view a timeline of past symptom logs
-- [ ] User can record peak flow readings manually
-- [ ] User can set their personal best peak flow value
-- [ ] System automatically calculates and displays zone (Green / Yellow / Red) per reading
-- [ ] User can view peak flow trends over time
+- [ ] User can manage their medication profile (reliever, preventer, combination inhaler)
+- [ ] User can log dose events (which medication, puffs, timestamp)
+- [ ] System tracks remaining doses and warns when stock is low (14-day threshold)
+- [ ] Dashboard shows preventer adherence indicator for today (taken / missed)
+- [ ] User can log health events (illness, GP appointment, prescription course) with chart markers
+- [ ] User can delete their account (GDPR right to erasure, full cascade)
+- [ ] New users are guided through an onboarding flow
+- [ ] App has Terms of Service and Privacy Policy pages
 
 ### Out of Scope
 
-- Medication management — Milestone 2
-- Trigger tracking — Milestone 2
-- Dashboard — Milestone 2
-- Environmental API integrations — Milestone 3
+- Trigger correlation analysis — Milestone 3
+- Environmental API integrations (pollen, AQI) — Milestone 3
 - Reports (PDF/CSV export) — Milestone 3
 - Caregiver accounts and shared monitoring — Milestone 4
 - Analytics and advanced insights — Milestone 4
@@ -83,5 +88,12 @@ Built initially for personal use (self or family), then opened to others — mul
 | Rails 8 auth generator over Devise | Rails built-in covers all v1 auth needs with zero external dependencies | — Pending |
 | Lexxy for rich text | Basecamp's editor, aligns with Rails Omakase philosophy | — Pending |
 
+## Milestone History
+
+| Milestone | Version | Theme | Status | Completed |
+|-----------|---------|-------|--------|-----------|
+| Milestone 1 | v1.0 | Foundation & Core Tracking | Complete | 2026-03-08 |
+| Milestone 2 | v2.0 | Medication & Compliance | In Progress | — |
+
 ---
-*Last updated: 2026-03-06 after initialization*
+*Last updated: 2026-03-08 — Milestone 2 started*

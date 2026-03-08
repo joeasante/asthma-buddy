@@ -1,223 +1,244 @@
-# Roadmap: Asthma Buddy — Milestone 1
+# Roadmap: Asthma Buddy — Milestone 2
 
 ## Overview
 
-Milestone 1 establishes the complete foundation of Asthma Buddy: a secure, multi-user Rails application where people with asthma can log symptoms and record peak flow readings. The nine phases move from bare infrastructure through authentication, into symptom logging (recording, managing, viewing), then into peak flow tracking (entry, zone display, trend charting), and finally accessibility and polish. When complete, a user can open the app, create an account, log their daily symptoms and peak flow readings, view their history with zone colour coding, and spot patterns over time.
+Milestone 2 takes Asthma Buddy from a symptom and peak flow tracker to a full medication management and compliance tool. The eight phases move from the data foundations of medication modelling, through dose logging, stock tracking, and preventer adherence, into health event correlation, account control, legal compliance, and finally a guided onboarding experience for new users. When complete, a user can open the app, manage their inhalers, log doses, be warned before running out of medication, see whether they have taken their preventer today, correlate illness episodes with their peak flow chart, delete their account if they choose, and be legally protected to launch publicly.
 
 **Product vision:** Users log consistently enough that patterns emerge — reducing asthma attacks and improving medication adherence.
 **Building for:** Person with asthma who wants frictionless daily logging and is frustrated by forgetting to track or losing paper diaries.
+**Milestone 2 theme:** Medication & Compliance
+
+---
 
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- Integer phases (10–17): Planned Milestone 2 work
+- Decimal phases (e.g. 10.1): Urgent insertions if needed (marked INSERTED)
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Rails app infrastructure, database configuration, and CI baseline
-- [x] **Phase 2: Authentication** - User accounts, sessions, email verification, and password reset — completed 2026-03-06
-- [ ] **Phase 3: Symptom Recording** - Create symptom entries with type, severity, timestamp, and notes
-- [ ] **Phase 4: Symptom Management** - Edit and delete symptom entries
-- [ ] **Phase 5: Symptom Timeline** - Chronological view, date filtering, and severity trends
-- [ ] **Phase 6: Peak Flow Recording** - Enter readings, set personal best, calculate zones
-- [x] **Phase 7: Peak Flow Display and Management** - View readings with zone colour coding, edit, delete — Complete 2026-03-07
-- [ ] **Phase 8: Peak Flow Trends** - Trend chart of readings over time
-- [ ] **Phase 9: Accessibility and Polish** - WCAG 2.2 AA compliance, performance, PWA manifest
+- [ ] **Phase 10: Medication Data Layer** — Medication and DoseLog models, validations, remaining-dose calculation
+- [ ] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
+- [ ] **Phase 12: Dose Logging** — Log a dose taken and delete accidental entries
+- [ ] **Phase 13: Dose Tracking & Low Stock** — Remaining dose display, low-stock warning, refill action
+- [ ] **Phase 14: Adherence Dashboard** — Today's preventer adherence indicator and 7/30-day history grid
+- [ ] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
+- [ ] **Phase 16: Account Management & Legal** — Account deletion with confirmation; Terms, Privacy, cookie notice
+- [ ] **Phase 17: Onboarding Flow** — Post-signup wizard prompting personal best and first medication
+
+---
 
 ## Phase Details
 
-### Phase 1: Foundation
-**Goal**: A working Rails 8 application with a configured database, test suite baseline, and deployment pipeline in place so all subsequent phases build on solid ground.
-**Why this matters**: Enables everything that follows — without the infrastructure layer there is nothing to build on.
-**Depends on**: Nothing (first phase)
-**Requirements**: None (foundational — no v1 functional requirements map here; this unblocks AUTH-01 through PEAK-07)
-**Success Criteria** (what must be TRUE):
-  1. The application boots in development with `bin/rails server` and returns a 200 response on the root path.
-  2. The test suite runs with `bin/rails test` and produces zero failures on an empty test baseline.
-  3. SQLite is running in WAL mode and the database schema can be created with `bin/rails db:schema:load`.
-  4. A Kamal deploy configuration exists and a staging deploy succeeds without errors.
-**Plans**: 4 plans
+### Phase 10: Medication Data Layer
 
-Plans:
-- [ ] 01-01-PLAN.md — Enable WAL mode SQLite via database.yml or initializer
-- [ ] 01-02-PLAN.md — Root route, HomeController, and application layout with nav shell
-- [ ] 01-03-PLAN.md — Minitest baseline: HomeController integration test and system test setup
-- [ ] 01-04-PLAN.md — Kamal staging deployment config and CI verification (has checkpoint)
+**Goal**: The Medication and DoseLog data models exist with correct associations, validations, and the domain logic needed to calculate remaining doses and days of supply.
+**Why this matters**: Every Milestone 2 feature — logging, tracking, adherence — operates on this data layer. A correct, well-tested foundation means no broken calculations surface to the user later.
+**Depends on**: Milestone 1 complete (Phase 9 done; `Current.user` and User model in place)
+**Requirements**: MED-01, MED-02, TRACK-01
+
+**Success Criteria** (what must be TRUE):
+  1. A Medication record can be created for a user with name, type (reliever / preventer / combination / other), standard_dose_puffs, starting_dose_count — and persisted without errors.
+  2. A Medication record can optionally store sick_day_dose_puffs and doses_per_day (required only for preventers with a schedule).
+  3. A DoseLog record associates a user, a medication, a puff count, and a recorded_at timestamp — and is rejected without all required fields.
+  4. Calling `medication.remaining_doses` returns `starting_dose_count` minus the sum of all logged puffs for that medication.
+  5. Calling `medication.days_of_supply_remaining` returns the remaining doses divided by the daily dose rate, rounded to one decimal place; returns nil when doses_per_day is blank.
+
+**Plans**:
+- [ ] 10-01: Medication migration, model, enum (reliever/preventer/combination/other), validations, belongs_to :user, fixtures, model tests
+- [ ] 10-02: DoseLog migration, model, belongs_to :user + :medication, validations (puffs >= 1, recorded_at present), fixtures, model tests
+- [ ] 10-03: `remaining_doses` and `days_of_supply_remaining` instance methods on Medication; `refilled_at` column; model tests for edge cases (no logs, refill resets count)
 
 ---
 
-### Phase 2: Authentication
-**Goal**: Users can create accounts, verify their email, log in and stay logged in across sessions, log out from any page, and recover a forgotten password.
-**Why this matters**: Users need a verified identity before they can own their health data — without this every subsequent feature is inaccessible and the multi-user isolation required from day one cannot be enforced.
-**Depends on**: Phase 1
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05
-**Success Criteria** (what must be TRUE):
-  1. A new visitor can register with an email address and password and receives a verification email.
-  2. A user cannot log in until their email address is verified.
-  3. A logged-in user remains authenticated after closing and reopening the browser (persistent session).
-  4. A user can click "Sign out" from any page and is immediately logged out.
-  5. A user who has forgotten their password can request a reset link, receive it by email, and set a new password.
-**Plans**: 3 plans
+### Phase 11: Medication Management UI
 
-Plans:
-- [ ] 02-01-PLAN.md — Auth scaffold + RegistrationsController + User model with signup and login
-- [ ] 02-02-PLAN.md — Email verification mailer, token flow, and login gate on verified email
-- [ ] 02-03-PLAN.md — Persistent sessions, password reset, nav auth links, route protection, system test
+**Goal**: An authenticated user can view their medication list, add a new medication, edit an existing one, and remove one they no longer use — all within the Settings section.
+**Why this matters**: Before any dose can be logged, the user's inhalers must exist in the system. This phase gives users full control over their medication profile, which is the prerequisite for every downstream tracking feature.
+**Depends on**: Phase 10
+**Requirements**: MED-01, MED-02, MED-03
+
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user can navigate to Settings, see a list of their medications (or an empty-state prompt), and add a new medication by completing a form with name, type, standard dose, and starting count — then see it appear in the list without a full page reload.
+  2. Optional fields (sick-day dose, doses per day) are visible on the form and save correctly when filled in; they can be left blank.
+  3. A user can open an existing medication, change any field, save, and see updated values reflected immediately.
+  4. A user can delete a medication from their list and it is removed; a user cannot access another user's medications (cross-user isolation enforced).
+
+**Plans**:
+- [ ] 11-01: MedicationsController (index, new, create, edit, update, destroy), routes (`resources :medications` under /settings or top-level), scoped to Current.user
+- [ ] 11-02: Views — medications index (list + empty state), new/edit shared form partial, Turbo Stream responses for create and destroy
+- [ ] 11-03: Controller tests (CRUD + cross-user 404) and system tests (add medication, edit name, remove medication)
 
 ---
 
-### Phase 3: Symptom Recording
-**Goal**: An authenticated user can create a symptom log entry specifying the symptom type, a severity level, a timestamp, and optional free-text notes.
-**Why this matters**: This is the core tracking loop — without the ability to record symptoms the app delivers no value to the person with asthma.
-**Depends on**: Phase 2
-**Requirements**: SYMP-01, SYMP-02
-**Success Criteria** (what must be TRUE):
-  1. A logged-in user can open the "Log Symptom" form, select a symptom type from a predefined list, choose a severity level, confirm or adjust the timestamp, and submit the entry successfully.
-  2. Optional notes can be added to a symptom entry and are saved and displayed as entered.
-  3. A submitted entry appears immediately in the user's data without requiring a page refresh.
-  4. A user cannot see or interact with another user's symptom entries (multi-user isolation enforced).
-**Plans**: 3 plans
+### Phase 12: Dose Logging
 
-Plans:
-- [ ] 03-01-PLAN.md — SymptomLog model, ActionText install, enums (4 types, 3 severities), user association, model tests
-- [ ] 03-02-PLAN.md — SymptomLogs controller (index + create), views, Turbo Stream create response, controller tests
-- [ ] 03-03-PLAN.md — System tests: complete logging flow, form clear, notes, multi-user isolation
+**Goal**: A user can log a dose taken for any of their medications — specifying puffs and timestamp — and can delete an accidental or duplicate entry.
+**Why this matters**: The dose log is the raw event record that powers remaining-dose calculations, low-stock warnings, and adherence tracking. Without it the medication profile is static and delivers no ongoing value.
+**Depends on**: Phase 11
+**Requirements**: DOSE-01, DOSE-02
+
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user can log a dose taken for one of their medications — choosing the medication, entering puff count, and confirming the timestamp — and the entry appears in that medication's dose history.
+  2. After logging a dose, the remaining dose count for that medication reflects the new total immediately.
+  3. A user can delete a dose log entry they recorded and it is removed from the history; the remaining dose count updates accordingly.
+  4. A user cannot log a dose against another user's medication (isolation enforced at controller level).
+
+**Plans**:
+- [ ] 12-01: DoseLogsController (create, destroy), routes, scoped to Current.user; Turbo Stream response on create
+- [ ] 12-02: Dose log form on medication detail/show page; dose history list per medication with delete button
+- [ ] 12-03: Controller tests (create, destroy, cross-user isolation) and system tests (log a dose, delete a dose, count updates)
 
 ---
 
-### Phase 4: Symptom Management
-**Goal**: A user can edit or delete any symptom entry they previously recorded.
-**Why this matters**: People make data entry mistakes — giving users control over their own records removes the frustration of permanent incorrect data and builds trust in the app as a reliable diary.
-**Depends on**: Phase 3
-**Requirements**: SYMP-05, SYMP-06
-**Success Criteria** (what must be TRUE):
-  1. A user can open an existing symptom entry, change any field (type, severity, timestamp, notes), save the change, and see the updated values immediately.
-  2. A user can delete a symptom entry and it is removed from their record permanently.
-  3. A user cannot edit or delete another user's symptom entries — attempting to do so returns a 404 or redirect.
-**Plans**: 2 plans
+### Phase 13: Dose Tracking & Low Stock
 
-Plans:
-- [ ] 04-01-PLAN.md — Routes, controller (edit/update/destroy), views (inline Turbo Frame edit, delete button, Turbo Stream responses)
-- [ ] 04-02-PLAN.md — Controller tests (edit/update/destroy own + cross-user) and system tests (inline edit flow, delete flow)
+**Goal**: Each medication card shows the remaining dose count; a low-stock warning appears when fewer than 14 days of supply remain; and a user can mark a medication as refilled to reset the count.
+**Why this matters**: The worst outcome for a person with asthma is running out of their reliever. This phase turns the raw dose log into an active safety net — surfacing the warning early enough to request a prescription.
+**Depends on**: Phase 12
+**Requirements**: TRACK-01, TRACK-02, TRACK-03
+
+**Success Criteria** (what must be TRUE):
+  1. Every medication in the user's list displays a remaining dose count, and the number decreases as doses are logged.
+  2. When remaining doses represent fewer than 14 days of supply (based on doses_per_day), a visually distinct low-stock warning appears on the medication card and on the dashboard.
+  3. A user can trigger a refill action on a medication; the starting_dose_count resets to the new count and refilled_at is recorded — the low-stock warning disappears if the new count is sufficient.
+  4. Medications with no doses_per_day schedule do not show days-of-supply or trigger the 14-day warning (no division by zero).
+
+**Plans**:
+- [ ] 13-01: `remaining_doses` display on medication card; low-stock warning component (conditional CSS class / partial); dashboard integration for low-stock alert
+- [ ] 13-02: Refill action — `PATCH /medications/:id/refill` route, controller action, updates starting_dose_count + refilled_at, Turbo Stream response
+- [ ] 13-03: Controller tests for refill action; model tests for days_of_supply edge cases; system test for low-stock warning appearing and clearing after refill
 
 ---
 
-### Phase 5: Symptom Timeline
-**Goal**: A user can view all their symptom logs in reverse-chronological order, filter them by date range, and see a summary of severity trends across their history.
-**Why this matters**: The timeline turns isolated log entries into a picture of the user's asthma over time — this is where patterns become visible before a doctor visit.
-**Depends on**: Phase 4
-**Requirements**: SYMP-03, SYMP-04, SYMP-07
-**Success Criteria** (what must be TRUE):
-  1. A user's symptom history is displayed in reverse-chronological order with type, severity, and timestamp visible at a glance.
-  2. A user can enter a start date and end date to filter the timeline and see only entries within that range.
-  3. A user can see a severity trend summary (e.g., counts of mild / moderate / severe entries) across their history so they can identify whether their symptoms are getting better or worse.
-  4. The timeline loads within 2 seconds for a user with up to 365 entries.
-**Plans**: 3 plans
+### Phase 14: Adherence Dashboard
 
-Plans:
-- [ ] 05-01-PLAN.md — Model scopes, controller filter/pagination, timeline views (filter bar, trend bar, compact rows, pagination)
-- [ ] 05-02-PLAN.md — Model tests, controller filter tests, system test for Turbo Frame chip interaction
-- [ ] 05-03-PLAN.md — Gap closure: trend bar live update on create, chip active state fix, datetime step fix
+**Goal**: The dashboard shows a preventer adherence indicator for today (doses taken vs scheduled), and a user can open a history view showing adherence for each preventer over the last 7 or 30 days.
+**Why this matters**: Preventer inhalers only work when taken daily — missed doses are the single biggest controllable factor in avoidable asthma attacks. This phase makes adherence visible at a glance, which is the core medication compliance promise of Milestone 2.
+**Depends on**: Phase 13
+**Requirements**: ADH-01, ADH-02
+
+**Success Criteria** (what must be TRUE):
+  1. The dashboard displays an adherence card for each preventer medication showing doses logged today versus scheduled (e.g. "1 / 2 taken") with a clear visual distinction between on-track (all taken) and behind (fewer taken than scheduled).
+  2. A preventer with no doses_per_day schedule does not appear in the adherence card (no misleading data shown).
+  3. A user can navigate to an adherence history view and see a day-by-day grid for the last 7 days and last 30 days, where each day is colour-coded: green (all scheduled doses logged), red (fewer than scheduled), grey (no schedule or no data).
+  4. The adherence history correctly handles days before the medication was added (shown as grey, not red).
+
+**Plans**:
+- [ ] 14-01: Adherence helper / service object — given a medication and a date, returns `{taken: N, scheduled: N, status: :on_track | :missed | :no_schedule}`; model/unit tests
+- [ ] 14-02: Dashboard adherence card partial; logic to collect today's adherence for all preventer medications scoped to Current.user
+- [ ] 14-03: Adherence history view — 7 / 30 day toggle, calendar grid partial, colour coding; controller action; system test for grid rendering and day status
 
 ---
 
-### Phase 6: Peak Flow Recording
-**Goal**: A user can manually enter a peak flow reading with a numeric value and timestamp, set their personal best value, and have the system automatically calculate and assign a zone (Green / Yellow / Red) to each reading.
-**Why this matters**: A raw peak flow number means nothing without context — the personal best and zone calculation turn it into actionable information that tells the user (and their doctor) whether their asthma is under control.
-**Depends on**: Phase 2
-**Requirements**: PEAK-01, PEAK-02, PEAK-03
-**Success Criteria** (what must be TRUE):
-  1. A logged-in user can enter a peak flow reading (numeric value in L/min) and a timestamp and save it successfully.
-  2. A user can set their personal best peak flow value in their profile or settings; this value persists across sessions.
-  3. When a reading is saved, the system automatically computes the zone: Green (>= 80% of personal best), Yellow (50-79%), Red (< 50%) — and stores it against the reading.
-  4. A user cannot record or view another user's peak flow data (isolation enforced).
-**Plans**: 5 plans
+### Phase 15: Health Events
 
-Plans:
-- [ ] 06-01-PLAN.md — PeakFlowReading + PersonalBestRecord models, migrations, zone calculation, fixtures, model tests
-- [ ] 06-02-PLAN.md — Settings routes, SettingsController, personal best form with 100-900 validation
-- [ ] 06-03-PLAN.md — PeakFlowReadingsController (new + create), entry form, Turbo Stream response, zone flash
-- [ ] 06-04-PLAN.md — Controller tests (recording + settings) and system tests for full recording flow
-- [ ] 06-05-PLAN.md — Gap closure: required field, form reset, flash replace, zone colour in flash
+**Goal**: A user can log a health event (illness episode, GP appointment, or prescription course) with a date and notes; they can edit or delete events; and health events appear as vertical markers on the peak flow trend chart.
+**Why this matters**: Peak flow numbers alone don't explain why a chart dips — a logged illness or steroid course makes the correlation visible. This is what turns the chart from interesting to clinically useful for a GP conversation.
+**Depends on**: Phase 14
+**Requirements**: EVT-01, EVT-02, EVT-03
+
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user can log a health event by selecting a type (illness episode / GP appointment / prescription course), entering a start date, optionally an end date, and optional notes — and the event appears in a health events history list.
+  2. A user can edit any field of a health event and save the changes; they can delete an event and it is removed permanently.
+  3. The peak flow trend chart displays a vertical line or marker at the date of each health event, visually distinguishable by event type; hovering or tapping the marker reveals the event type and date.
+  4. A user cannot view, edit, or delete another user's health events (isolation enforced).
+
+**Plans**:
+- [ ] 15-01: HealthEvent model — user association, event_type enum (illness/appointment/prescription_course), started_on, ended_on (nullable), notes (ActionText rich text), validations, migrations, fixtures, model tests
+- [ ] 15-02: HealthEventsController (index, new, create, edit, update, destroy), routes, views (list, form), Turbo Stream responses; controller tests and system tests
+- [ ] 15-03: Peak flow chart integration — pass health event dates and types as JSON to the Stimulus chart controller; render vertical annotation lines using Chart.js annotation plugin (pinned via importmap) or canvas overlay; system test confirming markers appear
 
 ---
 
-### Phase 7: Peak Flow Display and Management
-**Goal**: A user can view all their peak flow readings with zone colour coding applied, and can edit or delete individual readings.
-**Why this matters**: Instant visual feedback — green, yellow, red — gives the user an immediate, actionable read on their asthma control without needing to interpret numbers.
-**Depends on**: Phase 6
-**Requirements**: PEAK-04, PEAK-06, PEAK-07
-**Success Criteria** (what must be TRUE):
-  1. A user's peak flow reading list shows each reading's value, timestamp, and zone with a distinct colour (green / yellow / red) so the zone is identifiable at a glance without reading the label.
-  2. A user can edit a peak flow reading (value or timestamp), save the change, and see the zone recalculated and updated immediately.
-  3. A user can delete a peak flow reading and it is removed permanently.
-  4. A user cannot edit or delete another user's readings.
-**Plans**: TBD
+### Phase 16: Account Management & Legal
 
-Plans:
-- [x] 07-01: Build peak flow readings index view with zone colour coding (CSS classes per zone)
-- [x] 07-02: Build edit/update/destroy with Turbo Streams, cross-user 404 isolation
-- [x] 07-03: Controller tests — 18 new cases, 170 total, 0 failures
-- [x] 07-04: System tests — 7 browser tests for zone badges, inline edit, delete, isolation
+**Goal**: A user can permanently delete their account and all associated data; deletion requires typing "DELETE" as confirmation; and the app has publicly accessible Terms of Service, Privacy Policy, and a first-visit cookie notice.
+**Why this matters**: Account deletion is a GDPR legal requirement — without it the app cannot launch publicly. The legal pages (Terms, Privacy Policy) and cookie notice are also required for public launch and build the trust that health data deserves.
+**Depends on**: Phase 15
+**Requirements**: ACC-01, ACC-02, LEGAL-01, LEGAL-02, LEGAL-03
+
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user can navigate to account settings, initiate account deletion, and is presented with a confirmation step requiring them to type "DELETE" before the action proceeds.
+  2. After confirmed deletion, the user's record and all dependent data (readings, logs, medications, dose logs, health events) are permanently erased; the user is redirected to the home page with a confirmation message and cannot log back in.
+  3. `/terms` and `/privacy` pages are accessible without being logged in and are linked from the app footer on every page.
+  4. A first-time visitor sees a dismissible cookie notice banner; once dismissed it does not reappear for that session (stored in the Rails session — no JavaScript cookie consent library required).
+
+**Plans**:
+- [ ] 16-01: Account deletion — `DELETE /account` route and AccountsController#destroy; User model `dependent: :destroy` audit across all associations; confirmation form requiring typed "DELETE"; redirect + flash on completion; controller tests
+- [ ] 16-02: Static legal pages — TermsController and PrivacyController (or PagesController), `/terms` and `/privacy` routes accessible without authentication, ERB content for ToS and Privacy Policy (UK GDPR); footer partial with links
+- [ ] 16-03: Session cookie notice — ApplicationController before_action sets `session[:cookie_notice_shown]`; dismissible banner partial rendered in layout when flag absent; dismiss action sets flag; system test for show-once behaviour
 
 ---
 
-### Phase 8: Peak Flow Trends
-**Goal**: A user can view a trend chart of their peak flow readings over time, showing how their readings and zone distribution change across days and weeks.
-**Why this matters**: A list of numbers reveals nothing about trajectory — the trend chart is what lets the user and their doctor see whether asthma control is improving, stable, or deteriorating, which is core to the product vision.
-**Depends on**: Phase 7
-**Requirements**: PEAK-05
+### Phase 17: Onboarding Flow
+
+**Goal**: A user who has just signed up and has neither a personal best nor any medications is guided through a two-step onboarding wizard; each step can be skipped and completed later.
+**Why this matters**: A new user who opens the app and sees an empty dashboard with no prompts finds no value and churns. The onboarding wizard closes the activation gap — it gets users to their first meaningful data point in the same session as signup.
+**Depends on**: Phase 16
+**Requirements**: ONBD-01, ONBD-02
+
 **Success Criteria** (what must be TRUE):
-  1. A user can navigate to a peak flow trends view and see their readings plotted over time with zone boundaries (Green / Yellow / Red) visually indicated.
-  2. The chart renders using data the server provides — no external API calls to third-party chart services.
-  3. The trends view loads within 2 seconds for up to 365 readings.
-**Plans**: TBD
+  1. A user who signs up and has no personal best record and no medications is automatically shown the onboarding wizard after email verification and login.
+  2. Step 1 prompts the user to set their personal best peak flow value using the existing personal best form; completing it advances to Step 2.
+  3. Step 2 prompts the user to add their first medication using the existing medication form; completing it redirects to the dashboard.
+  4. Each step has a visible skip link; skipping advances to the next step (or to the dashboard if skipping Step 2); a skipped step does not re-appear on subsequent logins once either step has been completed or explicitly skipped in that session.
+  5. A returning user who already has a personal best and at least one medication is never shown the onboarding wizard.
 
-Plans:
-- [ ] 08-01: Design and implement data serialisation for chart (JSON endpoint or inline data)
-- [ ] 08-02: Integrate a Stimulus-driven charting library (e.g., Chart.js via importmap)
-- [ ] 08-03: Render peak flow trend chart with zone bands
-- [ ] 08-04: Add date range selector to filter chart data
-- [ ] 08-05: Write Minitest coverage for data serialisation; system test for chart render
-
----
-
-### Phase 9: Accessibility and Polish
-**Goal**: The entire application meets WCAG 2.2 AA accessibility requirements, pages load within 2 seconds, and the PWA web app manifest is in place so the app is installable on mobile.
-**Why this matters**: The primary user logs symptoms on their phone, often when symptomatic — if the app is slow, uninstallable, or unusable with assistive technology it fails the people who most need it.
-**Depends on**: Phase 8
-**Requirements**: None (cross-cutting quality requirement across all features)
-**Success Criteria** (what must be TRUE):
-  1. All pages pass an automated WCAG 2.2 AA audit (axe or equivalent) with zero violations.
-  2. All interactive elements (forms, buttons, navigation) are fully usable by keyboard alone.
-  3. All pages return a Lighthouse performance score of >= 90 and load within 2 seconds on a 4G connection.
-  4. The web app manifest is present, the app can be installed to a mobile home screen, and the install prompt appears on a supported browser.
-**Plans**: TBD
-
-Plans:
-- [ ] 09-01: Audit all views with axe — fix colour contrast, label associations, heading hierarchy
-- [ ] 09-02: Keyboard navigation audit — focus management, skip links, modal traps
-- [ ] 09-03: Semantic HTML pass — landmark regions, ARIA roles only where native HTML is insufficient
-- [ ] 09-04: Add PWA web app manifest and theme colour meta tags
-- [ ] 09-05: Performance audit — database query counts, N+1 checks, asset compression
-- [ ] 09-06: System test suite for critical user flows end-to-end
+**Plans**:
+- [ ] 17-01: OnboardingController with steps (:personal_best, :medication); before_action guard redirects to dashboard if user already has personal best and medication; step routing logic
+- [ ] 17-02: Onboarding views — Step 1 (personal best form, skip link), Step 2 (medication form, skip link), progress indicator; reuse existing form partials
+- [ ] 17-03: After-login redirect hook — check onboarding conditions in SessionsController or ApplicationController after_sign_in; system tests for full wizard completion, skip step 1, skip step 2, skip both, returning user bypass
 
 ---
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
-| 2. Authentication | 3/3 | Complete | 2026-03-06 |
-| 3. Symptom Recording | 0/3 | Not started | - |
-| 4. Symptom Management | 0/2 | Not started | - |
-| 5. Symptom Timeline | 0/3 | Not started | - |
-| 6. Peak Flow Recording | 0/5 | Not started | - |
-| 7. Peak Flow Display and Management | 0/5 | Not started | - |
-| 8. Peak Flow Trends | 0/5 | Not started | - |
-| 9. Accessibility and Polish | 0/6 | Not started | - |
+| 10. Medication Data Layer | 0/3 | Not started | - |
+| 11. Medication Management UI | 0/3 | Not started | - |
+| 12. Dose Logging | 0/3 | Not started | - |
+| 13. Dose Tracking & Low Stock | 0/3 | Not started | - |
+| 14. Adherence Dashboard | 0/3 | Not started | - |
+| 15. Health Events | 0/3 | Not started | - |
+| 16. Account Management & Legal | 0/3 | Not started | - |
+| 17. Onboarding Flow | 0/3 | Not started | - |
+
+---
+
+## Requirement Coverage
+
+**Milestone 2 — 20 requirements — 20 mapped — 0 unmapped**
+
+| Requirement | Phase |
+|-------------|-------|
+| MED-01 | Phase 10, Phase 11 |
+| MED-02 | Phase 10, Phase 11 |
+| MED-03 | Phase 11 |
+| DOSE-01 | Phase 12 |
+| DOSE-02 | Phase 12 |
+| TRACK-01 | Phase 10, Phase 13 |
+| TRACK-02 | Phase 13 |
+| TRACK-03 | Phase 13 |
+| ADH-01 | Phase 14 |
+| ADH-02 | Phase 14 |
+| EVT-01 | Phase 15 |
+| EVT-02 | Phase 15 |
+| EVT-03 | Phase 15 |
+| ACC-01 | Phase 16 |
+| ACC-02 | Phase 16 |
+| LEGAL-01 | Phase 16 |
+| LEGAL-02 | Phase 16 |
+| LEGAL-03 | Phase 16 |
+| ONBD-01 | Phase 17 |
+| ONBD-02 | Phase 17 |
+
+---
+
+*Roadmap created: 2026-03-08 — Milestone 2*
+*Milestone 1 (Phases 1–9) archived — all 9 phases complete*
