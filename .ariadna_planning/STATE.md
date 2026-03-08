@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 13 (Dose Tracking — Low Stock) — COMPLETE
-Plan: 13-03 complete — model unit tests for low_stock?, controller integration tests for refill action, system tests for low-stock badge and refill flow
-Status: 3/3 plans done. 276 tests passing (no regressions). Phase 13 fully complete with test coverage.
-Last activity: 2026-03-08 — Phase 13 Plan 03: 5 model tests (low_stock? boundary/nil/after-logging), 4 controller tests (refill success/count=0/cross-user/unauthenticated), 6 system tests (badge on card, dashboard section, refill clears badge).
+Phase: Phase 14 (Adherence Dashboard) — IN PROGRESS
+Plan: 14-01 complete — AdherenceCalculator service object with full TDD unit test coverage
+Status: 1/3 plans done. 283 tests passing (no regressions). Plan 14-01 complete.
+Last activity: 2026-03-08 — Phase 14 Plan 01: AdherenceCalculator service object, Result struct, 7 unit tests (on_track/missed/no_schedule branches), 283 tests passing.
 
-Progress: [██████████] 90% (Milestone 2 — 12/~13 plans complete)
+Progress: [██████████] 92% (Milestone 2 — 13/~14 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -58,6 +58,8 @@ All 9 phases delivered:
 - Tests at Phase 12-01 close: 256 passing (no regressions)
 - Phase 12 Plan 02 completed: 2026-03-08 (~1 min, 2 tasks, 7 files, 0 new tests)
 - Tests at Phase 12-02 close: 256 passing (no regressions)
+- Phase 14 Plan 01 completed: 2026-03-08 (~5 min, 2 tasks, 2 files, 7 new tests)
+- Tests at Phase 14-01 close: 283 passing (no regressions)
 - Phase 12 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 6 files, 16 new tests)
 - Tests at Phase 12-03 close: 267 passing (no regressions)
 
@@ -77,6 +79,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 14 Plan 01 Decisions (2026-03-08)
+
+- **AdherenceCalculator pre-creation early return**: When `date < medication.created_at.to_date`, returns `Result.new(0, nil, :no_schedule)` before querying dose_logs — medication did not exist that day, so counting logs would be semantically wrong
+- **taken = count of DoseLog records, not sum of puffs**: Each log record = one administration event; count of records = "doses taken today" for adherence purposes
+- **Result = Struct.new(:taken, :scheduled, :status)**: Typed value object preferred over Hash or OpenStruct; used in both dashboard partial (14-02) and history controller (14-03)
 
 ### Phase 13 Plan 03 Decisions (2026-03-08)
 
@@ -177,5 +185,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 13 Plan 03 complete — 5 model tests (low_stock?), 4 controller tests (refill action), 6 system tests (low-stock badge, dashboard, refill flow), 276 tests passing. Phase 13 fully complete.
+Stopped at: Phase 14 Plan 01 complete — AdherenceCalculator service object (TDD: 7 unit tests, on_track/missed/no_schedule), 283 tests passing. Phase 14 in progress (1/3 plans done).
 Resume file: None
