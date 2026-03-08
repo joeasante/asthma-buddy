@@ -2,11 +2,15 @@
 <html lang="en">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Asthma Buddy" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -14,6 +18,9 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "lexxy", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "profile", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "charts", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "dashboard", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -24,41 +31,71 @@
       <p class="confirm-dialog-message" data-confirm-target="message"></p>
       <div class="confirm-dialog-actions">
         <button class="btn-confirm-cancel" data-action="confirm#dismiss">Cancel</button>
-        <button class="btn-confirm-delete" data-action="confirm#accept">Delete</button>
+        <button class="btn-confirm-delete" data-action="confirm#accept">Remove</button>
       </div>
     </dialog>
 
     <header>
       <nav aria-label="Main navigation">
-        <%= link_to "Asthma Buddy", root_path, class: "nav-brand" %>
+        <%= link_to "Asthma Buddy",
+              authenticated? ? dashboard_path : root_path,
+              class: "nav-brand" %>
         <div class="nav-auth">
           <% if authenticated? %>
-            <%= link_to "Peak Flow", peak_flow_readings_path, class: "nav-link" %>
-            <span class="nav-user-email"><%= Current.user&.email_address %></span>
-            <%= button_to "Sign out", session_path, method: :delete, class: "btn-sign-out" %>
+            <%= link_to "Symptoms", symptom_logs_path,
+                  class: nav_link_class(symptom_logs_path),
+                  aria: { current: nav_current(symptom_logs_path) } %>
+            <%= link_to "Peak Flow", peak_flow_readings_path,
+                  class: nav_link_class(peak_flow_readings_path),
+                  aria: { current: nav_current(peak_flow_readings_path) } %>
+            <div class="nav-user" data-controller="nav-dropdown">
+              <button class="nav-avatar-btn"
+                      data-action="click->nav-dropdown#toggle"
+                      aria-haspopup="true"
+                      aria-label="User menu">
+                <% if Current.user.avatar.attached? %>
+                  <%= image_tag Current.user.avatar.variant(resize_to_fill: [36, 36]),
+                        class: "nav-avatar-img",
+                        alt: Current.user.full_name.presence || "Profile" %>
+                <% else %>
+                  <span class="nav-avatar-initials" aria-hidden="true">
+                    <%= (Current.user.full_name.presence || Current.user.email_address).first.upcase %>
+                  </span>
+                <% end %>
+                <span class="nav-user-name">
+                  <%= Current.user.full_name.presence || Current.user.email_address.split("@").first %>
+                </span>
+                <svg class="nav-avatar-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="nav-dropdown" data-nav-dropdown-target="menu" hidden>
+                <%= link_to "Profile", profile_path, class: "nav-dropdown-item" %>
+                <%= button_to "Sign out", session_path, method: :delete,
+                      class: "nav-dropdown-item nav-dropdown-item--signout",
+                      form: { style: "width: 100%" } %>
+              </div>
+            </div>
           <% else %>
-            <%= link_to "Sign in", new_session_path %>
-            <%= link_to "Sign up", new_registration_path %>
+            <%= link_to "Sign in", new_session_path, class: "nav-link" %>
+            <%= link_to "Sign up", new_registration_path, class: "nav-link nav-link--cta" %>
           <% end %>
         </div>
       </nav>
     </header>
 
     <main id="main-content">
-      <div id="flash-messages">
-        <% if notice.present? %>
-          <p role="status" class="flash flash--notice"><%= notice %></p>
-        <% end %>
-        <% if alert.present? %>
-          <p role="alert" class="flash flash--alert"><%= alert %></p>
-        <% end %>
-      </div>
+      <%= render "layouts/flash" %>
 
       <%= yield %>
     </main>
 
+    <% if authenticated? %>
+      <%= render "layouts/bottom_nav" %>
+    <% end %>
+
     <footer>
-      <p>Asthma Buddy</p>
+      <p>Asthma Buddy &mdash; track your breathing, understand your patterns</p>
     </footer>
   </body>
 </html>

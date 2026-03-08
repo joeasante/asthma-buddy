@@ -1,0 +1,8 @@
+<div id="flash-messages">
+  <% if notice.present? %>
+    <p role="status" class="flash flash--notice"><%= notice %></p>
+  <% end %>
+  <% if alert.present? %>
+    <p role="alert" class="flash flash--alert"><%= alert %></p>
+  <% end %>
+</div>
