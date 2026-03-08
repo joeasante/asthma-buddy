@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 13 (Dose Tracking — Low Stock) — IN PROGRESS
-Plan: 13-01 complete — LOW_STOCK_DAYS constant, low_stock? predicate, medication card badge/days-of-supply, dashboard Medications section
-Status: 1/2 plans done. 267 tests passing (no regressions). Plan 01 delivered.
-Last activity: 2026-03-08 — Phase 13 Plan 01: low_stock? predicate on Medication model, medication card updates, dashboard low-stock medications section.
+Phase: Phase 13 (Dose Tracking — Low Stock) — COMPLETE
+Plan: 13-02 complete — refill route, controller action, inline details/summary form on medication card, Turbo Stream card refresh
+Status: 2/2 plans done. 267 tests passing (no regressions). Phase 13 complete.
+Last activity: 2026-03-08 — Phase 13 Plan 02: PATCH refill route, Settings::MedicationsController#refill, inline refill form on medication card, refill.turbo_stream.erb.
 
-Progress: [████████░░] 75% (Milestone 2 — 8/~10 plans complete)
+Progress: [█████████░] 80% (Milestone 2 — 9/~10 plans complete)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 2 Velocity:**
+- Phase 13 Plan 02 completed: 2026-03-08 (~8 min, 2 tasks, 5 files, 0 new tests)
+- Tests at Phase 13-02 close: 267 passing (no regressions)
 - Phase 13 Plan 01 completed: 2026-03-08 (~10 min, 2 tasks, 6 files, 0 new tests)
 - Tests at Phase 13-01 close: 267 passing (no regressions)
 - Phase 10 Plan 01 completed: 2026-03-08 (~6 min, 2 tasks, 5 files, 19 new tests)
@@ -73,6 +75,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 13 Plan 02 Decisions (2026-03-08)
+
+- **Dashboard Refill link points to settings_medications_path**: refill_settings_medication_path is PATCH-only; no GET counterpart exists; the inline form on the medication card handles the actual refill submission
+- **details/summary for inline refill form**: Zero JavaScript, native browser accessibility, collapses automatically when Turbo Stream replaces the card frame — chosen over Stimulus toggle or Turbo Frame src approach
+- **Turbo Stream replaces full medication card frame**: dom_id(@medication) replacement re-renders all computed fields and resets the details element to closed atomically
+- **refill_params independent from medication_params**: Only :starting_dose_count permitted; keeps refill surface area minimal and separate from full medication edit params
 
 ### Phase 13 Plan 01 Decisions (2026-03-08)
 
@@ -160,5 +169,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Phase 13 Plan 01 complete — low_stock? predicate, medication card badge/days-of-supply, dashboard Medications section, 267 tests passing
+Stopped at: Phase 13 Plan 02 complete — PATCH refill route, Settings::MedicationsController#refill, inline refill form on medication card, refill.turbo_stream.erb, 267 tests passing. Phase 13 complete.
 Resume file: None
