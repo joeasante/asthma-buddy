@@ -9,8 +9,15 @@ Rails.application.routes.draw do
   resources :symptom_logs, path: "symptom-logs", only: %i[ index create edit update destroy ]
   resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index edit update destroy ]
 
+  resource :profile, only: %i[show update]
+  post "profile/personal_best", to: "profiles#update_personal_best", as: :profile_personal_best
+
   get  "settings",               to: "settings#show",                as: :settings
   post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
+
+  scope "/settings", module: :settings, as: :settings do
+    resources :medications, only: %i[index new create edit update destroy]
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -24,6 +31,8 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   # Defines the root path route ("/")
   root "home#index"
