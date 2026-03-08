@@ -6,6 +6,15 @@ class User < ApplicationRecord
   has_many :symptom_logs, dependent: :destroy
   has_many :peak_flow_readings, dependent: :destroy
   has_many :personal_best_records, dependent: :destroy
+  has_many :medications, dependent: :destroy
+  has_one_attached :avatar
+
+  validates :avatar,
+    content_type: { in: %w[image/jpeg image/png image/webp image/gif],
+                    message: "must be a JPEG, PNG, WebP, or GIF" },
+    size: { less_than: 5.megabytes, message: "must be smaller than 5 MB" },
+    if: -> { avatar.attached? }
+  validates :full_name, length: { maximum: 100 }, allow_blank: true
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

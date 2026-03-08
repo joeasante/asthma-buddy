@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_07_212026) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_162300) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -49,6 +49,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_212026) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "medications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "doses_per_day"
+    t.integer "medication_type", null: false
+    t.string "name", null: false
+    t.integer "sick_day_dose_puffs"
+    t.integer "standard_dose_puffs", null: false
+    t.integer "starting_dose_count", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["medication_type"], name: "index_medications_on_medication_type"
+    t.index ["user_id"], name: "index_medications_on_user_id"
+  end
+
   create_table "peak_flow_readings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "recorded_at", null: false
@@ -85,6 +99,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_212026) do
     t.datetime "recorded_at", null: false
     t.integer "severity", null: false
     t.integer "symptom_type", null: false
+    t.text "triggers", default: "[]"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id", "recorded_at"], name: "index_symptom_logs_on_user_id_and_recorded_at"
@@ -93,8 +108,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_212026) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.date "date_of_birth"
     t.string "email_address", null: false
     t.datetime "email_verified_at"
+    t.string "full_name"
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
@@ -102,6 +119,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_212026) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "medications", "users"
   add_foreign_key "peak_flow_readings", "users"
   add_foreign_key "personal_best_records", "users"
   add_foreign_key "sessions", "users"
