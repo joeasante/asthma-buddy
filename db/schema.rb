@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_162658) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_08_163025) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_162658) do
     t.integer "doses_per_day"
     t.integer "medication_type", null: false
     t.string "name", null: false
+    t.datetime "refilled_at"
     t.integer "sick_day_dose_puffs"
     t.integer "standard_dose_puffs", null: false
     t.integer "starting_dose_count", null: false
