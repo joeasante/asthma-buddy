@@ -2,7 +2,7 @@
 
 module Settings
   class MedicationsController < ApplicationController
-    before_action :set_medication, only: %i[edit update destroy]
+    before_action :set_medication, only: %i[edit update destroy refill]
 
     def index
       @medications = Current.user.medications.chronological.includes(:dose_logs)
@@ -53,6 +53,23 @@ module Settings
       end
     end
 
+    def refill
+      new_count = refill_params[:starting_dose_count].to_i
+      if new_count >= 0 && @medication.update(starting_dose_count: new_count, refilled_at: Time.current)
+        flash.now[:notice] = "#{@medication.name} refilled. #{new_count} doses recorded."
+        respond_to do |format|
+          format.turbo_stream
+          format.html { redirect_to settings_medications_path, notice: flash.now[:notice] }
+        end
+      else
+        flash.now[:alert] = "Refill count must be 0 or greater."
+        respond_to do |format|
+          format.turbo_stream { render turbo_stream: turbo_stream.replace("flash-messages", partial: "layouts/flash"), status: :unprocessable_entity }
+          format.html { redirect_to settings_medications_path, alert: flash.now[:alert] }
+        end
+      end
+    end
+
     private
 
     def set_medication
@@ -68,6 +85,10 @@ module Settings
         :sick_day_dose_puffs,
         :doses_per_day
       )
+    end
+
+    def refill_params
+      params.require(:medication).permit(:starting_dose_count)
     end
   end
 end

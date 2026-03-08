@@ -18,6 +18,9 @@ Rails.application.routes.draw do
 
   scope "/settings", module: :settings, as: :settings do
     resources :medications, only: %i[index new create edit update destroy] do
+      member do
+        patch :refill
+      end
       resources :dose_logs, only: %i[create destroy]
     end
   end
