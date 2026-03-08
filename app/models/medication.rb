@@ -38,7 +38,7 @@ class Medication < ApplicationRecord
   # before displaying or triggering low-stock logic (Phase 13).
   # Rounded to one decimal place for display (e.g. 6.5 days remaining).
   def days_of_supply_remaining
-    return nil if doses_per_day.blank?
+    return nil if doses_per_day.blank? || doses_per_day == 0
     (remaining_doses.to_f / doses_per_day).round(1)
   end
 end

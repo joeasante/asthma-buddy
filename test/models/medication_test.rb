@@ -140,4 +140,102 @@ class MedicationTest < ActiveSupport::TestCase
     assert_equal @user.medications.order(created_at: :desc).to_a,
                  @user.medications.chronological.to_a
   end
+
+  # remaining_doses
+
+  test "remaining_doses returns starting_dose_count when no dose logs exist" do
+    med = medications(:alice_combination)   # combination has no dose logs in fixtures
+    assert_equal med.starting_dose_count, med.remaining_doses
+  end
+
+  test "remaining_doses subtracts all logged puffs" do
+    med = medications(:alice_reliever)
+    # alice_reliever_dose_1 (2 puffs) + alice_reliever_dose_2 (2 puffs) = 4 puffs total
+    expected = med.starting_dose_count - 4
+    assert_equal expected, med.remaining_doses
+  end
+
+  test "remaining_doses counts only logs for this medication" do
+    med = medications(:alice_preventer)
+    # alice_preventer has alice_preventer_dose_1 (2 puffs) — reliever logs should not be counted
+    expected = med.starting_dose_count - 2
+    assert_equal expected, med.remaining_doses
+  end
+
+  test "remaining_doses can return zero when all doses are logged" do
+    med  = Medication.create!(
+      user: @user, name: "Empty", medication_type: :other,
+      standard_dose_puffs: 2, starting_dose_count: 2
+    )
+    DoseLog.create!(user: @user, medication: med, puffs: 2, recorded_at: Time.current)
+    assert_equal 0, med.remaining_doses
+  end
+
+  test "remaining_doses can go negative when more puffs are logged than starting count" do
+    med = Medication.create!(
+      user: @user, name: "Overused", medication_type: :other,
+      standard_dose_puffs: 2, starting_dose_count: 2
+    )
+    DoseLog.create!(user: @user, medication: med, puffs: 4, recorded_at: Time.current)
+    assert_equal(-2, med.remaining_doses)
+  end
+
+  # days_of_supply_remaining
+
+  test "days_of_supply_remaining returns nil when doses_per_day is nil" do
+    med = medications(:alice_reliever)   # doses_per_day is nil
+    assert_nil med.days_of_supply_remaining
+  end
+
+  test "days_of_supply_remaining returns nil when doses_per_day is zero" do
+    # Should not happen via validations but defensive test
+    med = Medication.new(
+      user: @user, name: "Bad", medication_type: :other,
+      standard_dose_puffs: 2, starting_dose_count: 100
+    )
+    med.instance_variable_set(:@doses_per_day_raw, 0)
+    # Use direct attribute write to bypass validation — test the method's nil guard
+    med.write_attribute(:doses_per_day, 0)
+    assert_nil med.days_of_supply_remaining
+  end
+
+  test "days_of_supply_remaining divides remaining_doses by doses_per_day rounded to 1dp" do
+    med = medications(:alice_preventer)
+    # 120 starting - 2 logged puffs = 118 remaining; 118 / 2 = 59.0
+    assert_equal 59.0, med.days_of_supply_remaining
+  end
+
+  test "days_of_supply_remaining rounds to one decimal place" do
+    med = Medication.create!(
+      user: @user, name: "Odd", medication_type: :preventer,
+      standard_dose_puffs: 2, starting_dose_count: 100,
+      doses_per_day: 3
+    )
+    # 100 / 3 = 33.333... → rounds to 33.3
+    assert_equal 33.3, med.days_of_supply_remaining
+  end
+
+  test "days_of_supply_remaining returns 0.0 when no doses remain" do
+    med = Medication.create!(
+      user: @user, name: "Depleted", medication_type: :preventer,
+      standard_dose_puffs: 2, starting_dose_count: 2,
+      doses_per_day: 2
+    )
+    DoseLog.create!(user: @user, medication: med, puffs: 2, recorded_at: Time.current)
+    assert_equal 0.0, med.days_of_supply_remaining
+  end
+
+  # refilled_at
+
+  test "refilled_at is nil by default" do
+    med = Medication.create!(valid_attributes)
+    assert_nil med.refilled_at
+  end
+
+  test "refilled_at can be set and persisted" do
+    med = Medication.create!(valid_attributes)
+    time = Time.current
+    med.update!(refilled_at: time)
+    assert_in_delta time.to_f, med.reload.refilled_at.to_f, 1.0
+  end
 end
