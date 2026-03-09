@@ -1,0 +1,29 @@
+alice_gp_appointment:
+  user: verified_user
+  event_type: gp_appointment
+  recorded_at: <%= 5.days.ago %>
+  ended_at:
+
+alice_illness_ongoing:
+  user: verified_user
+  event_type: illness
+  recorded_at: <%= 10.days.ago %>
+  ended_at:
+
+alice_illness_resolved:
+  user: verified_user
+  event_type: illness
+  recorded_at: <%= 20.days.ago %>
+  ended_at: <%= 15.days.ago %>
+
+alice_medication_change:
+  user: verified_user
+  event_type: medication_change
+  recorded_at: <%= 3.days.ago %>
+  ended_at:
+
+bob_hospital:
+  user: unverified_user
+  event_type: hospital_visit
+  recorded_at: <%= 2.days.ago %>
+  ended_at:
