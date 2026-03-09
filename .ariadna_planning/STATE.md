@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 15 (Health Events) — IN PROGRESS
-Plan: 15-02 complete — Medical History system tests (11 tests, all green)
-Status: 2/? plans done. 11 system tests added; pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-02.
-Last activity: 2026-03-09 — Phase 15 Plan 02: 11 system tests (CRUD, display, auth, cross-user isolation, chart marker).
+Plan: 15-03 complete — Health event markers on dashboard 7-day peak flow chart
+Status: 3/? plans done. Controller, view, and JS wired end-to-end; 4 new controller tests + 1 system test; pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-03.
+Last activity: 2026-03-09 — Phase 15 Plan 03: @health_event_markers in controller, canvas data attribute, afterDraw Chart.js plugin, 5 new tests.
 
-Progress: [██████████] Phase 15 started (Milestone 3 — Health Events)
+Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -36,6 +36,7 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 15 Plan 03 completed: 2026-03-09 (~15 min, 2 tasks, 5 files, 5 new tests)
 - Phase 15 Plan 02 completed: 2026-03-09 (~12 min, 1 task, 1 file, 11 new system tests)
 - Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
 
@@ -94,6 +95,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Edit page h1 is "Edit medical event"**: `edit.html.erb` has `<h1>Edit medical event</h1>` — system tests must use this exact text, not "Edit event" as the plan suggested
 - **Pre-commit hook adds chart marker integration test**: Hook automatically added test 11 checking `canvas[data-chart-health-events-value]` contains event date — passes
 - **Toast flash assert_text works for Turbo Stream deletions**: `assert_text "Medical event deleted."` works because toast_controller.js injects `<span class="toast-message">` into `#toast-region` which Capybara sees as visible DOM text
+
+### Phase 15 Plan 03 Decisions (2026-03-09)
+
+- **assigns() unavailable without rails-controller-testing gem**: Rewrote controller tests to assert on rendered HTML attribute content via `assert_select "canvas[data-chart-health-events-value]"` blocks and `JSON.parse` — the standard approach for Rails apps without that gem
+- **Chart section requires @chart_data.any? to render**: Tests asserting canvas attributes must create a PeakFlowReading within the current week window inline — fixture readings (2 and 1 days ago) fall before `beginning_of_week(:monday)` on a Monday
+- **dateLabelMap bridges ISO dates to Chart.js x-axis labels**: `xAxis.getPixelForValue()` takes the label string (e.g. "Mon 9") not ISO date — dateLabelMap translates via `toDayLabel()` before pixel lookup
+- **markerPlugin passed as plugins: [markerPlugin] top-level key in new Chart() call**: Not via Chart.register() which would apply globally to all chart instances
 
 ### Phase 15 Plan 01 Decisions (2026-03-09)
 
@@ -223,5 +231,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Phase 15 Plan 02 complete — 11 system tests for Medical History UI (CRUD, display, auth, cross-user, chart marker), all passing. Phase 15 (Health Events) in progress.
+Stopped at: Phase 15 Plan 03 complete — health event markers on dashboard 7-day peak flow chart (controller @health_event_markers, canvas data attribute, chart_controller.js afterDraw plugin, 4 controller tests + 1 system test). Phase 15 (Health Events) in progress.
 Resume file: None
