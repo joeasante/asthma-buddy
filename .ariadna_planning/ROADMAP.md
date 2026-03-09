@@ -23,9 +23,12 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Dose Logging** (complete 2026-03-08) — Log a dose taken and delete accidental entries
 - [x] **Phase 13: Dose Tracking & Low Stock** (complete 2026-03-08) — Remaining dose display, low-stock warning, refill action
 - [ ] **Phase 14: Adherence Dashboard** — Today's preventer adherence indicator and 7/30-day history grid
-- [ ] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
+- [x] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
 - [ ] **Phase 16: Account Management & Legal** — Account deletion with confirmation; Terms, Privacy, cookie notice
 - [ ] **Phase 17: Onboarding Flow** — Post-signup wizard prompting personal best and first medication
+- [ ] **Phase 18: Temporary Medication Courses** — Record short-duration prescriptions (e.g. rescue steroids) with start/end date; auto-archive on expiry; excluded from adherence and low-stock tracking
+- [ ] **Phase 19: Notifications** — In-app notification feed for low stock, missed doses, and peak flow reminders; unread badge on nav; mark read via Turbo Stream
+- [ ] **Phase 20: Legal Pages & Cookie Banner** — Standalone Terms, Privacy, and Cookie Policy pages; dismissible cookie consent banner; error pages (404, 500, maintenance)
 
 ---
 
@@ -145,10 +148,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The peak flow trend chart displays a vertical line or marker at the date of each health event, visually distinguishable by event type; hovering or tapping the marker reveals the event type and date.
   4. A user cannot view, edit, or delete another user's health events (isolation enforced).
 
-**Plans**:
-- [ ] 15-01: HealthEvent model — user association, event_type enum (illness/appointment/prescription_course), started_on, ended_on (nullable), notes (ActionText rich text), validations, migrations, fixtures, model tests
-- [ ] 15-02: HealthEventsController (index, new, create, edit, update, destroy), routes, views (list, form), Turbo Stream responses; controller tests and system tests
-- [ ] 15-03: Peak flow chart integration — pass health event dates and types as JSON to the Stimulus chart controller; render vertical annotation lines using Chart.js annotation plugin (pinned via importmap) or canvas overlay; system test confirming markers appear
+**Plans:** 3 plans
+- [ ] 15-01-PLAN.md — HealthEvent fixtures, model unit tests (validations, helpers, scopes), controller integration tests (CRUD + auth + cross-user isolation)
+- [ ] 15-02-PLAN.md — System tests: add/edit/delete event flows, point-in-time vs duration vs ongoing display, auth guard, cross-user URL isolation
+- [ ] 15-03-PLAN.md — Chart marker canvas overlay: DashboardController assigns @health_event_markers JSON, dashboard canvas gets data attribute, chart_controller.js afterDraw plugin draws coloured vertical lines per event type, dashboard controller tests, system test confirming marker data wiring
 
 ---
 
@@ -196,7 +199,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
+Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -205,9 +208,12 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 | 12. Dose Logging | 3/3 | Complete ✓ | 2026-03-08 |
 | 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
 | 14. Adherence Dashboard | 0/3 | Planned | - |
-| 15. Health Events | 0/3 | Not started | - |
+| 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
 | 16. Account Management & Legal | 0/3 | Not started | - |
 | 17. Onboarding Flow | 0/3 | Not started | - |
+| 18. Temporary Medication Courses | 0/3 | Not started | - |
+| 19. Notifications | 0/3 | Not started | - |
+| 20. Legal Pages & Cookie Banner | 0/3 | Not started | - |
 
 ---
 
@@ -242,3 +248,103 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 
 *Roadmap created: 2026-03-08 — Milestone 2*
 *Milestone 1 (Phases 1–9) archived — all 9 phases complete*
+
+### Phase 18: Temporary Medication Courses
+
+**Goal**: A user can record a short-duration prescription (e.g. a rescue prednisolone course) as a temporary medication with a start date, end date, prescribed dose, and total unit count. Once the end date passes the course auto-archives and is excluded from adherence tracking, low-stock alerts, and the "Preventers Today" dashboard section.
+**Why this matters**: Rescue steroid courses are a standard part of asthma management but don't fit the ongoing-medication model. Without this, users either skip recording them (losing medically important history) or pollute their active medication list with expired courses.
+**Depends on**: Phase 15 (Health Events), Phase 17 (Onboarding)
+**Requirements**: COURSE-01, COURSE-02, COURSE-03
+
+**Design rules (DESIGN-SYSTEM.md is the single source of truth):**
+- All colours via CSS custom property — no raw hex values outside :root
+- Spacing tokens only (--space-xs through --space-2xl) — no px except 1px/2px borders
+- Typography: --font-heading / --font-body, base 1.125rem, match type scale in DESIGN-SYSTEM.md §1.2
+- Touch targets 44px minimum on `pointer: coarse` devices
+- Reuse existing components: .section-card, .btn-primary, .field, .field-error, .medication-badge
+- Form: label above input, .field-error below input, focus ring `var(--brand-ring)`, min input height 44px
+- Every destructive action through the `<dialog>` confirm modal via confirm_controller.js — never fire DELETE on direct click
+- Turbo Stream responses for all mutations; `toast:show` CustomEvent for success feedback
+- Stimulus controllers for interactive behaviour (course toggle, date fields) — no inline JS in ERB
+- Mobile-first: works at 375px (bottom nav), 768px, 1280px (top nav)
+- Preflight checklist: all colours CSS vars, spacing tokens, 44px touch targets, hover/focus/active/disabled states on every interactive element, empty state with icon+headline+description+CTA, prefers-reduced-motion overrides
+
+**Success Criteria** (what must be TRUE):
+  1. A user can add a medication and mark it as a temporary course, entering a start date, end date, prescribed dose, and total unit count — distinct from the ongoing preventer/reliever form fields.
+  2. An active course (end date in the future or today) appears in the medication list clearly labelled as a course with its end date shown; it does not appear in "Preventers Today" or trigger low-stock alerts.
+  3. Once a course's end date has passed, it is automatically treated as archived — it disappears from the active list and moves to a "Past courses" section, which is collapsible and empty-stated.
+  4. Dose logging for a course works identically to regular medications; remaining units count down as doses are logged.
+  5. A user cannot interact with another user's course medications (isolation enforced).
+
+**Plans**:
+- [ ] 18-01: Medication model — add `course` boolean (default false), `starts_on` date, `ends_on` date; `active` and `archived` scopes; validations (ends_on after starts_on when course); update AdherenceCalculator and low_stock? to exclude active courses; model tests
+- [ ] 18-02: Medication form — "This is a temporary course" checkbox (Stimulus controller shows/hides course date fields and hides doses_per_day); controller permits new params; index page splits active vs archived with collapsible "Past courses" section; Turbo Stream responses; CSS
+- [ ] 18-03: Controller tests (create course, archive boundary, cross-user isolation) and system tests (add course, verify excluded from adherence, verify archived after end date, dose logging on course)
+
+---
+
+### Phase 19: Notifications
+
+**Goal**: Users receive in-app notifications for actionable events — low medication stock, missed preventer doses, and peak flow reminders. A notification feed at `/notifications` lists all notifications newest-first; unread notifications show a badge count on the nav bell icon; individual and bulk mark-as-read via Turbo Stream.
+**Why this matters**: Passive tracking only works if the app surfaces the moments that require action. Without notifications, a user must remember to check their stock and adherence themselves — defeating the compliance purpose of the medication tracking features.
+**Depends on**: Phase 18
+**Requirements**: NOTIF-01, NOTIF-02, NOTIF-03
+
+**Design rules (DESIGN-SYSTEM.md is the single source of truth):**
+- All colours via CSS custom property — no raw hex values outside :root
+- Notification type colours: low stock `--severity-moderate-text`, missed dose `--severity-severe`, peak flow reminder `--brand`, system/general `--text-3`
+- Unread row background `--brand-light`; read row background `--surface`
+- Unread dot: 6px circle, `background: var(--brand)`
+- Unread nav badge: 8px red circle as CSS `::after` pseudo-element on the bell icon button; defined via `data-unread-count` attribute
+- Spacing tokens only — no px except borders
+- Touch targets 44px minimum
+- Reuse .section-card, .page-header, .empty-state, .btn-secondary
+- Every row is a link — full 44px min-height tap target
+- Turbo Stream for mark-read (single row) and mark-all-read (all rows + badge update)
+- Relative timestamps via `relative_time_controller.js` Stimulus controller updating every 60 seconds
+- Mobile-first; bottom nav tab decision: replace Profile tab with Notifications; Profile accessible via avatar dropdown (already present on desktop)
+- Preflight: colours CSS vars, touch targets, hover/focus/active states, empty state ("You're all caught up."), reduced-motion overrides
+
+**Success Criteria** (what must be TRUE):
+  1. A notification is created automatically when a medication falls below the low-stock threshold, when a scheduled preventer dose is missed by end of day, or when triggered by a system event.
+  2. The `/notifications` feed lists all notifications for the current user, newest first, with type icon, body text (bold if unread), relative timestamp, and an unread indicator dot.
+  3. Clicking a notification row marks it as read (Turbo Stream updates that row inline) and navigates to the relevant record.
+  4. "Mark all read" updates all rows simultaneously via Turbo Stream and removes the nav badge.
+  5. The nav bell icon shows an unread count badge when there are unread notifications; the badge disappears when count reaches zero.
+  6. The empty state ("You're all caught up.") displays when all notifications are read or none exist.
+
+**Plans**:
+- [ ] 19-01: Notification model — user association, `notification_type` enum (low_stock/missed_dose/peak_flow_reminder/system), `read` boolean (default false), `body` string, `target_path` string, `created_at`; `unread` scope; migration; model tests; background job or ActiveSupport::Notifications hook to create low-stock notifications
+- [ ] 19-02: NotificationsController (index, update for mark-read, `mark_all_read` action); routes; `_notification.html.erb` partial; `mark_read.turbo_stream.erb`; `mark_all_read.turbo_stream.erb`; `notifications.css`; `relative_time_controller.js`; nav bell icon with unread badge via layout change
+- [ ] 19-03: Controller tests (index, mark read, mark all read, cross-user isolation) and system tests (badge appears, mark single read, mark all read, empty state)
+
+---
+
+### Phase 20: Legal Pages, Cookie Banner & Error Pages
+
+**Goal**: The app has publicly accessible Terms of Service, Privacy Policy, and Cookie Policy pages; a dismissible cookie consent banner shown on first visit; and custom 404, 500, and maintenance error pages that match the app's visual design.
+**Why this matters**: These are non-negotiable requirements for public launch — GDPR mandates accessible privacy and deletion rights documentation, the cookie banner satisfies ePrivacy Directive obligations, and branded error pages prevent users from seeing a broken Rails default during incidents.
+**Depends on**: Phase 19
+**Requirements**: LEGAL-01, LEGAL-02, LEGAL-03, ERR-01, ERR-02
+
+**Design rules (DESIGN-SYSTEM.md is the single source of truth):**
+- Legal pages: single .section-card at max-width 680px (narrower than standard 860px); plain prose layout (`<h2>` section titles, `<p>`, `<ul>`); `<p class="legal-date">` in `--text-3`, 0.875rem
+- Cookie banner: `position: fixed; bottom: 0; left: 0; right: 0; z-index: 200`; on mobile `bottom: 52px` (above bottom nav); background `--surface`; `border-top: 1px solid var(--border)`; `box-shadow: 0 -2px 8px rgba(0,0,0,0.06)`; flex row (desktop) → stacked column (mobile)
+- Error pages (404/500): large muted error code number in `--font-heading`, `font-size: clamp(4rem, 12vw, 8rem)`, `color: var(--brand-light)`, positioned absolute behind content; headline in `--text`; description in `--text-3`; .btn-primary action link
+- Maintenance page (`public/maintenance.html`): fully self-contained HTML with inline `<style>`; Plus Jakarta Sans from Google Fonts CDN; teal brand colour inline; no JavaScript; no Rails layout dependency
+- All colours CSS vars except maintenance page inline styles and :root definitions
+- Preflight: colours CSS vars, spacing tokens, touch targets, hover/focus/active states, reduced-motion overrides, no lorem ipsum (realistic UK GDPR-appropriate legal copy)
+
+**Success Criteria** (what must be TRUE):
+  1. `/terms`, `/privacy`, and `/cookies` are accessible without authentication and render correctly at 375px, 768px, and 1280px with appropriate legal content (no lorem ipsum).
+  2. A first-time visitor sees the cookie consent banner; dismissing it sets a session flag and the banner never reappears in that session or on return visits (persistent cookie).
+  3. A `404` response renders the branded not-found page with a link to the dashboard (or home if unauthenticated); a `500` renders the branded error page.
+  4. `public/maintenance.html` is a standalone file that renders correctly without Rails, showing the Asthma Buddy name and maintenance message.
+  5. Footer on every page links to `/terms` and `/privacy`.
+
+**Plans**:
+- [ ] 20-01: PagesController (`terms`, `privacy`, `cookies` actions, no auth); routes; ERB content (UK GDPR-appropriate); `legal.css`; footer partial with links rendered in application layout; `main--narrow` modifier for 680px content width
+- [ ] 20-02: Cookie consent banner — `_cookie_banner.html.erb` partial; `cookie_banner_controller.js` Stimulus controller (sets persistent cookie, CSS transition to hide); ApplicationController `before_action` sets `@show_cookie_banner`; `cookie_banner.css`
+- [ ] 20-03: Error pages — ErrorsController (`not_found`, `internal_server_error`); routes (`match '/404'`, `match '/500'`); `config.exceptions_app = self.routes` in application.rb; `errors.css`; `public/maintenance.html` standalone file; controller tests
+
+---

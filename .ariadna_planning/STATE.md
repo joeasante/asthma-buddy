@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 15 (Health Events) — IN PROGRESS
-Plan: 15-03 complete — Health event markers on dashboard 7-day peak flow chart
-Status: 3/? plans done. Controller, view, and JS wired end-to-end; 4 new controller tests + 1 system test; pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-03.
-Last activity: 2026-03-09 — Phase 15 Plan 03: @health_event_markers in controller, canvas data attribute, afterDraw Chart.js plugin, 5 new tests.
+Phase: Phase 15 (Health Events) — COMPLETE
+Plan: 15-03 complete — chart_controller.js afterDraw marker plugin, DashboardController @health_event_markers, system test
+Status: 3/3 plans done. 329+ tests passing (no regressions). Phase 15 complete.
+Last activity: 2026-03-09 — Phase 15: HealthEvent model/fixtures/tests (15-01), Medical History system tests (15-02), chart marker integration (15-03).
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -41,6 +41,9 @@ All 9 phases delivered:
 - Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
 
 **Milestone 2 Velocity:**
+- Phase 15 Plan 03 completed: 2026-03-09 (~15 min, 2 tasks, 5 files, 5 new tests)
+- Phase 15 Plan 02 completed: 2026-03-09 (~12 min, 1 task, 1 file, 11 new system tests)
+- Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
 - Phase 14 Plan 03 completed: 2026-03-08 (~3 min, 2 tasks, 6 files, 14 new tests)
 - Tests at Phase 14-03 close: 290 passing (no regressions)
 - Phase 13 Plan 03 completed: 2026-03-08 (~8 min, 2 tasks, 3 files, 15 new tests)
@@ -109,6 +112,16 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Cross-user 404 tests stay signed in as alice**: Stay signed in as alice and access bob's resource by ID — `set_health_event` uses `Current.user.health_events.find` which raises `ActiveRecord::RecordNotFound` (renders 404); no sign-in switch needed
 - **Separate fixtures for turbo stream vs html destroy tests**: alice_illness_ongoing used for turbo stream destroy, alice_illness_resolved used for HTML fallback destroy to avoid fixture interference between the two test cases
 - **Pre-existing test failures are not regressions**: adherence, dashboard, settings, passwords controller test failures exist in accumulated working-tree changes predating Phase 15 — confirmed pre-existing before 15-01 test files added
+
+### Phase 15 Decisions (2026-03-09)
+
+- **point_in_time? event types**: `gp_appointment` and `medication_change` only — these never show an ended_at field or Ongoing badge; `illness`, `hospital_visit`, `other` are duration types
+- **ended_at validation uses <=**: `ended_at <= recorded_at` is rejected — equal timestamps are invalid (must be strictly after)
+- **Chart markers dateLabelMap**: Bridges ISO date strings (`"YYYY-MM-DD"`) to Chart.js x-axis label format (`"Mon 9"`) via `toDayLabel()`; `xAxis.getPixelForValue(label)` finds the x-position
+- **afterDraw plugin registered in renderPeakFlowBandsChart only**: Other chart renderers (symptoms, peakflow, peakflow-zones) are untouched
+- **System test case-insensitive assertions**: CSS `text-transform: uppercase` on event type labels — use regex `/illness/i` not string `"Illness"` in Capybara assertions
+- **assigns() not used in controller tests**: Gem `rails-controller-testing` not installed; use `assert_select` with JSON parsing or `assert_response` instead
+- **Chart marker system test verifies data wiring only**: Canvas pixel-level drawing cannot be asserted with Capybara; `data-chart-health-events-value` JSON attribute confirms correct data flow
 
 ### Phase 14 Plan 03 Decisions (2026-03-08)
 
