@@ -8,9 +8,10 @@ class PeakFlowReadingTest < ActiveSupport::TestCase
 
   def valid_attributes
     {
-      user: @user,
-      value: 400,
-      recorded_at: Time.current
+      user:        @user,
+      value:       400,
+      recorded_at: Time.current,
+      time_of_day: :morning
     }
   end
 

@@ -7,6 +7,23 @@
 <% end %>
 
 <%= form_with model: peak_flow_reading, data: { turbo: true } do |form| %>
+  <%# Morning / Evening toggle — shown prominently as it's the key clinical input %>
+  <div class="field">
+    <%= form.label :time_of_day, "Session" %>
+    <div class="tod-toggle" role="group" aria-label="Time of day">
+      <%= form.label :time_of_day, class: "tod-option #{"tod-option--morning" if peak_flow_reading.morning?}" do %>
+        <%= form.radio_button :time_of_day, "morning" %>
+        Morning
+      <% end %>
+      <%= form.label :time_of_day, class: "tod-option #{"tod-option--evening" if peak_flow_reading.evening?}" do %>
+        <%= form.radio_button :time_of_day, "evening" %>
+        Evening
+      <% end %>
+    </div>
+    <% if peak_flow_reading.errors[:time_of_day].any? %>
+      <p class="field-error"><%= peak_flow_reading.errors[:time_of_day].first %></p>
+    <% end %>
+  </div>
   <%# Field error summary %>
   <% if peak_flow_reading.errors.any? %>
     <div class="field-errors" role="alert" aria-live="assertive">

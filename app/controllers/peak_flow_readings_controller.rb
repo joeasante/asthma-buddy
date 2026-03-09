@@ -23,7 +23,8 @@ class PeakFlowReadingsController < ApplicationController
 
   def new
     @peak_flow_reading = Current.user.peak_flow_readings.new(
-      recorded_at: Time.current.change(sec: 0)
+      recorded_at: Time.current.change(sec: 0),
+      time_of_day: Time.current.hour < 13 ? :morning : :evening
     )
   end
 
@@ -68,15 +69,18 @@ class PeakFlowReadingsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        # One bar per day showing the best (highest) reading for that day.
-        # Multiple readings on the same day would otherwise produce overlapping bars in Chart.js.
+        # One entry per day with separate morning/evening values for the two-line chart.
         @chart_data = base_relation
           .reorder(recorded_at: :asc)
           .limit(500)
-          .pluck(:recorded_at, :value, :zone)
-          .map { |ts, v, z| { date: ts.to_date.to_s, value: v, zone: z } }
+          .pluck(:recorded_at, :value, :zone, :time_of_day)
+          .map { |ts, v, z, tod| { date: ts.to_date.to_s, value: v, zone: z, time_of_day: tod || (ts.hour < 13 ? "morning" : "evening") } }
           .group_by { |d| d[:date] }
-          .map { |_date, readings| readings.max_by { |r| r[:value] } }
+          .map do |date, readings|
+            am = readings.select { |r| r[:time_of_day] == "morning" }.max_by { |r| r[:value] }
+            pm = readings.select { |r| r[:time_of_day] == "evening" }.max_by { |r| r[:value] }
+            { date: date, morning: am&.dig(:value), morning_zone: am&.dig(:zone), evening: pm&.dig(:value), evening_zone: pm&.dig(:zone) }
+          end
           .sort_by { |d| d[:date] }
 
         @period_count = cached_total
@@ -167,7 +171,7 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def peak_flow_reading_params
-    params.require(:peak_flow_reading).permit(:value, :recorded_at)
+    params.require(:peak_flow_reading).permit(:value, :recorded_at, :time_of_day)
   end
 
   def peak_flow_reading_json(reading)

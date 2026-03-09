@@ -248,6 +248,9 @@
                 <span class="zone-badge zone-badge--<%= reading.zone_css_modifier %>" aria-label="Zone: <%= reading.zone&.capitalize || "No zone" %>">
                   <%= reading.zone&.capitalize || "No zone" %>
                 </span>
+                <% if reading.time_of_day.present? %>
+                  <span class="tod-badge tod-badge--<%= reading.time_of_day %>"><%= reading.time_of_day_label %></span>
+                <% end %>
                 <time class="dash-recent-time" datetime="<%= reading.recorded_at.iso8601 %>">
                   <%= reading.recorded_at.strftime("%-d %b, %H:%M") %>
                 </time>

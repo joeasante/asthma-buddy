@@ -2,12 +2,14 @@
 class PeakFlowReading < ApplicationRecord
   belongs_to :user
 
-  enum :zone, { green: 0, yellow: 1, red: 2 }, validate: { allow_nil: true }
+  enum :zone,        { green: 0, yellow: 1, red: 2 }, validate: { allow_nil: true }
+  enum :time_of_day, { morning: "morning", evening: "evening" }, validate: true
 
   # British Thoracic Society peak flow zone thresholds (% of personal best)
   GREEN_ZONE_THRESHOLD  = 80
   YELLOW_ZONE_THRESHOLD = 50
 
+  validates :time_of_day, presence: true
   validates :value, presence: true,
                     numericality: { only_integer: true, greater_than: 0,
                                     less_than_or_equal_to: 900,
@@ -39,6 +41,10 @@ class PeakFlowReading < ApplicationRecord
     page        = [ page, total_pages ].min
     records     = offset((page - 1) * per_page).limit(per_page)
     [ records, total_pages, page ]
+  end
+
+  def time_of_day_label
+    morning? ? "AM" : "PM"
   end
 
   def zone_css_modifier

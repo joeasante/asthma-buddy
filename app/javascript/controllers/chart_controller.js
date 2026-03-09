@@ -148,23 +148,29 @@ export default class extends Controller {
     })
   }
 
-  // Line chart with filled zone bands behind it — dashboard 7-day view.
-  // Three filled datasets (red/yellow/green bands) sit beneath the readings line.
+  // Line chart with filled zone bands — dashboard 7-day view.
+  // Two lines (morning + evening) sit above three filled zone band datasets.
   // Avoids the annotation plugin — uses chart.js native fill between datasets.
   renderPeakFlowBandsChart() {
     const data   = this.dataValue
     const pb     = this.personalBestValue || 0
     const labels = data.map(d => toDayLabel(d.date))
-    const values = data.map(d => d.value)
     const zc     = zoneColors()
 
-    // Zone thresholds derived from personal best
-    const redTop    = pb > 0 ? Math.round(pb * 0.5)  : null
-    const yellowTop = pb > 0 ? Math.round(pb * 0.8)  : null
-    const ceiling   = pb > 0 ? Math.max(Math.round(pb * 1.3), Math.max(...values) + 60) : null
+    // Separate morning / evening values (null when not recorded that session)
+    const morningValues = data.map(d => d.morning ?? null)
+    const eveningValues = data.map(d => d.evening ?? null)
+    const allValues     = [...morningValues, ...eveningValues].filter(v => v !== null)
+    if (!allValues.length) return
 
-    // Point colour per reading based on zone
-    const pointColors = data.map(d => (zc[d.zone] || zc.none).bar)
+    // Zone thresholds derived from personal best
+    const redTop    = pb > 0 ? Math.round(pb * 0.5) : null
+    const yellowTop = pb > 0 ? Math.round(pb * 0.8) : null
+    const ceiling   = pb > 0 ? Math.max(Math.round(pb * 1.3), Math.max(...allValues) + 60) : null
+
+    // Point colours based on zone of each reading
+    const morningColors = data.map(d => (zc[d.morning_zone] || zc.none).bar)
+    const eveningColors = data.map(d => (zc[d.evening_zone] || zc.none).bar)
 
     const datasets = []
 
@@ -198,23 +204,41 @@ export default class extends Controller {
       })
     }
 
-    // Readings line — always the last dataset
-    const lineDatasetIndex = datasets.length
+    // Morning line
+    const morningDatasetIndex = datasets.length
     datasets.push({
-      label:               "Peak Flow (L/min)",
-      data:                values,
-      borderColor:         cssVar("--teal-600"),
-      backgroundColor:     "transparent",
-      pointBackgroundColor: pb > 0 ? pointColors : cssVar("--teal-600"),
-      pointBorderColor:    pb > 0 ? pointColors : cssVar("--teal-600"),
-      pointRadius:         4,
-      pointHoverRadius:    6,
-      tension:             0.3,
-      fill:                false,
-      borderWidth:         2
+      label:                "Morning",
+      data:                 morningValues,
+      borderColor:          "#f59e0b",
+      backgroundColor:      "transparent",
+      pointBackgroundColor: pb > 0 ? morningColors : "#f59e0b",
+      pointBorderColor:     pb > 0 ? morningColors : "#f59e0b",
+      pointRadius:          4,
+      pointHoverRadius:     6,
+      tension:              0.3,
+      fill:                 false,
+      borderWidth:          2,
+      spanGaps:             false
     })
 
-    const minValue = Math.min(...values)
+    // Evening line
+    const eveningDatasetIndex = datasets.length
+    datasets.push({
+      label:                "Evening",
+      data:                 eveningValues,
+      borderColor:          cssVar("--teal-600"),
+      backgroundColor:      "transparent",
+      pointBackgroundColor: pb > 0 ? eveningColors : cssVar("--teal-600"),
+      pointBorderColor:     pb > 0 ? eveningColors : cssVar("--teal-600"),
+      pointRadius:          4,
+      pointHoverRadius:     6,
+      tension:              0.3,
+      fill:                 false,
+      borderWidth:          2,
+      spanGaps:             false
+    })
+
+    const minValue = Math.min(...allValues)
     const yMin     = pb > 0 ? 0 : Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
     const yMax     = pb > 0 ? ceiling : undefined
 
@@ -275,10 +299,19 @@ export default class extends Controller {
           padding: { top: healthEvents.length ? 26 : 4 }
         },
         plugins: {
-          legend: { display: false },
+          legend: {
+            display: true,
+            position: "bottom",
+            labels: {
+              filter:   item => item.text === "Morning" || item.text === "Evening",
+              boxWidth: 12,
+              padding:  16,
+              font:     { size: 12 }
+            }
+          },
           tooltip: {
-            filter: item => item.datasetIndex === lineDatasetIndex,
-            callbacks: { label: ctx => `${ctx.raw} L/min` }
+            filter:    item => item.datasetIndex === morningDatasetIndex || item.datasetIndex === eveningDatasetIndex,
+            callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} L/min` }
           }
         },
         scales: {
@@ -342,53 +375,78 @@ export default class extends Controller {
     })
   }
 
-  // Bar chart — each bar coloured by zone (dashboard 7-day + history page)
+  // Two-line chart — morning and evening series for the history page.
+  // Replaces the previous best-per-day bar chart; shows both sessions separately.
   renderPeakFlowZonesChart() {
-    const data         = this.dataValue
-    const labels       = data.map(d => toDayLabel(d.date))
-    const zc           = zoneColors()
-    const barColors    = data.map(d => (zc[d.zone] || zc.none).barAlpha)
-    const borderColors = data.map(d => (zc[d.zone] || zc.none).bar)
+    const data   = this.dataValue
+    const labels = data.map(d => toDayLabel(d.date))
+    const zc     = zoneColors()
 
-    // Set Y-axis minimum well below the lowest value so every bar has visible height.
-    // Without this, Chart.js can set the floor exactly at the minimum data value,
-    // making the shortest bar render with zero height.
-    const minValue = Math.min(...data.map(d => d.value))
-    const yMin = Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
+    const morningValues = data.map(d => d.morning ?? null)
+    const eveningValues = data.map(d => d.evening ?? null)
+    const allValues     = [...morningValues, ...eveningValues].filter(v => v !== null)
+    if (!allValues.length) return
+
+    const morningColors = data.map(d => (zc[d.morning_zone] || zc.none).bar)
+    const eveningColors = data.map(d => (zc[d.evening_zone] || zc.none).bar)
+
+    const minValue = Math.min(...allValues)
+    const yMin     = Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
 
     this.chart = new Chart(this.element, {
-      type: "bar",
+      type: "line",
       data: {
         labels,
         datasets: [
           {
-            label:            "Peak Flow (L/min)",
-            data:             data.map(d => d.value),
-            backgroundColor:  barColors,
-            borderColor:      borderColors,
-            borderWidth:      2,
-            borderRadius:     4,
-            borderSkipped:    false
+            label:                "Morning",
+            data:                 morningValues,
+            borderColor:          "#f59e0b",
+            backgroundColor:      "transparent",
+            pointBackgroundColor: morningColors,
+            pointBorderColor:     morningColors,
+            pointRadius:          3,
+            pointHoverRadius:     5,
+            tension:              0.3,
+            fill:                 false,
+            borderWidth:          2,
+            spanGaps:             false
+          },
+          {
+            label:                "Evening",
+            data:                 eveningValues,
+            borderColor:          cssVar("--teal-600"),
+            backgroundColor:      "transparent",
+            pointBackgroundColor: eveningColors,
+            pointBorderColor:     eveningColors,
+            pointRadius:          3,
+            pointHoverRadius:     5,
+            tension:              0.3,
+            fill:                 false,
+            borderWidth:          2,
+            spanGaps:             false
           }
         ]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { display: false },
+          legend: {
+            display:  true,
+            position: "bottom",
+            labels:   { boxWidth: 12, padding: 16, font: { size: 12 } }
+          },
           tooltip: {
-            callbacks: {
-              label: ctx => `${ctx.raw} L/min`
-            }
+            callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} L/min` }
           }
         },
         scales: {
           y: {
             min:   yMin,
-            ticks: { callback: v => `${v}` },
+            ticks: { callback: v => `${v}`, font: { size: 12 } },
             grid:  { color: "rgba(0,0,0,0.05)" }
           },
-          x: { grid: { display: false } }
+          x: { grid: { display: false }, ticks: { font: { size: 12 } } }
         }
       }
     })

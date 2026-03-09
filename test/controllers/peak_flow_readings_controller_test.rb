@@ -44,8 +44,9 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_difference "PeakFlowReading.count", 1 do
       post peak_flow_readings_path, params: {
         peak_flow_reading: {
-          value: reading_value,
-          recorded_at: Time.current.iso8601
+          value:       reading_value,
+          recorded_at: Time.current.iso8601,
+          time_of_day: "morning"
         }
       }
     end
@@ -60,7 +61,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference "PeakFlowReading.count", 1 do
       post peak_flow_readings_path, params: {
-        peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }
+        peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601, time_of_day: "morning" }
       }
     end
 
@@ -71,7 +72,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "create with missing value returns 422 turbo stream" do
     assert_no_difference "PeakFlowReading.count" do
       post peak_flow_readings_path,
-           params: { peak_flow_reading: { value: "", recorded_at: Time.current.iso8601 } },
+           params: { peak_flow_reading: { value: "", recorded_at: Time.current.iso8601 }, time_of_day: "morning" },
            headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
@@ -81,7 +82,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "create with missing recorded_at returns 422" do
     assert_no_difference "PeakFlowReading.count" do
       post peak_flow_readings_path,
-           params: { peak_flow_reading: { value: 400, recorded_at: "" } },
+           params: { peak_flow_reading: { value: 400, recorded_at: "" }, time_of_day: "morning" },
            headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
@@ -92,7 +93,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   # A create POST always creates for the authenticated user regardless of params.
   test "create always creates for the authenticated user" do
     post peak_flow_readings_path, params: {
-      peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }
+      peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601, time_of_day: "morning" }
     }
     assert_equal @user, PeakFlowReading.last.user
   end
@@ -103,7 +104,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     reading_value = (pb.value * 0.85).to_i
 
     post peak_flow_readings_path,
-         params: { peak_flow_reading: { value: reading_value, recorded_at: Time.current.iso8601 } },
+         params: { peak_flow_reading: { value: reading_value, recorded_at: Time.current.iso8601, time_of_day: "morning" } },
          as: :json
 
     assert_response :created
@@ -116,7 +117,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
 
   test "create returns 422 JSON with errors on failure" do
     post peak_flow_readings_path,
-         params: { peak_flow_reading: { value: "", recorded_at: Time.current.iso8601 } },
+         params: { peak_flow_reading: { value: "", recorded_at: Time.current.iso8601 }, time_of_day: "morning" },
          as: :json
 
     assert_response :unprocessable_entity
@@ -126,7 +127,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "unauthenticated JSON create returns 401" do
     delete session_path
     post peak_flow_readings_path,
-         params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+         params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }, time_of_day: "morning" },
          as: :json
 
     assert_response :unauthorized
@@ -141,7 +142,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "unauthenticated user is redirected from create" do
     delete session_path
     post peak_flow_readings_path, params: {
-      peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }
+      peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601, time_of_day: "morning" }
     }
     assert_redirected_to new_session_path
   end
@@ -221,7 +222,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "update with valid params returns Turbo Stream replace" do
     reading = peak_flow_readings(:alice_green_reading)
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 } },
+          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html", response.media_type
@@ -234,7 +235,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     # alice has a personal best record — update value to a very low number to force red zone
     # Value of 1 will be < 50% of any personal best => red zone
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: 1, recorded_at: reading.recorded_at.iso8601 } }
+          params: { peak_flow_reading: { value: 1, recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" }
     # Zone is recomputed by before_save; check the persisted record
     updated = reading.reload
     # With value=1 vs any reasonable personal best, zone should be red (or nil if no PB)
@@ -244,14 +245,14 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "update with blank value returns 422 Turbo Stream" do
     reading = peak_flow_readings(:alice_green_reading)
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 } },
+          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
     assert_response :unprocessable_entity
   end
 
   test "update returns 404 for another user's reading" do
     patch peak_flow_reading_path(peak_flow_readings(:bob_reading)),
-          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "text/vnd.turbo-stream.html" }
     assert_response :not_found
   end
@@ -260,7 +261,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     reading = peak_flow_readings(:alice_green_reading)
     delete session_path
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: 400, recorded_at: reading.recorded_at.iso8601 } }
+          params: { peak_flow_reading: { value: 400, recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" }
     assert_redirected_to new_session_path
   end
 
@@ -325,7 +326,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "update with valid params returns JSON reading" do
     reading = peak_flow_readings(:alice_green_reading)
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 } },
+          params: { peak_flow_reading: { value: 420, recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "application/json" }
     assert_response :success
     assert_equal "application/json", response.media_type
@@ -337,7 +338,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   test "update with blank value returns 422 JSON with errors" do
     reading = peak_flow_readings(:alice_green_reading)
     patch peak_flow_reading_path(reading),
-          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 } },
+          params: { peak_flow_reading: { value: "", recorded_at: reading.recorded_at.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "application/json" }
     assert_response :unprocessable_entity
     body = JSON.parse(response.body)
@@ -346,7 +347,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
 
   test "update returns 404 JSON for another user's reading" do
     patch peak_flow_reading_path(peak_flow_readings(:bob_reading)),
-          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 } },
+          params: { peak_flow_reading: { value: 400, recorded_at: Time.current.iso8601 }, time_of_day: "morning" },
           headers: { "Accept" => "application/json" }
     assert_response :not_found
   end

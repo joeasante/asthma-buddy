@@ -4,6 +4,9 @@
       <span class="pf-td-date"><%= reading.recorded_at.strftime("%-d %b %Y") %></span>
       <span class="pf-td-time"><%= reading.recorded_at.strftime("%H:%M") %></span>
     </time>
+    <% if reading.time_of_day.present? %>
+      <span class="tod-badge tod-badge--<%= reading.time_of_day %>"><%= reading.time_of_day_label %></span>
+    <% end %>
   </td>
   <td class="pf-td-value">
     <span class="pf-row-value"><%= reading.value %></span>

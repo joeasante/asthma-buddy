@@ -26,14 +26,17 @@ class DashboardController < ApplicationController
     @recent_readings = user.peak_flow_readings.chronological.limit(4)
     @recent_symptoms = user.symptom_logs.chronological.includes(:rich_text_notes).limit(4)
 
-    # 7-day chart data — one bar per day showing the best (highest) reading.
-    # Multiple readings on the same day would otherwise produce overlapping bars in Chart.js.
+    # 7-day chart data — one entry per day with separate morning/evening values.
     @chart_data = recent_readings
       .reorder(recorded_at: :asc)
-      .pluck(:recorded_at, :value, :zone)
-      .map { |ts, v, z| { date: ts.to_date.to_s, value: v, zone: z } }
+      .pluck(:recorded_at, :value, :zone, :time_of_day)
+      .map { |ts, v, z, tod| { date: ts.to_date.to_s, value: v, zone: z, time_of_day: tod || (ts.hour < 13 ? "morning" : "evening") } }
       .group_by { |d| d[:date] }
-      .map { |_date, readings| readings.max_by { |r| r[:value] } }
+      .map do |date, readings|
+        am = readings.select { |r| r[:time_of_day] == "morning" }.max_by { |r| r[:value] }
+        pm = readings.select { |r| r[:time_of_day] == "evening" }.max_by { |r| r[:value] }
+        { date: date, morning: am&.dig(:value), morning_zone: am&.dig(:zone), evening: pm&.dig(:value), evening_zone: pm&.dig(:zone) }
+      end
       .sort_by { |d| d[:date] }
 
     # Health event markers for the 7-day chart — one entry per event in window.

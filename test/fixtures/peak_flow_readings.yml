@@ -4,22 +4,26 @@ alice_green_reading:
   user: verified_user
   value: 430
   zone: 0
+  time_of_day: morning
   recorded_at: <%= 2.days.ago %>
 
 alice_yellow_reading:
   user: verified_user
   value: 260
   zone: 1
+  time_of_day: evening
   recorded_at: <%= 1.day.ago %>
 
 alice_no_pb_reading:
   user: verified_user
   value: 400
   zone:
+  time_of_day: morning
   recorded_at: <%= 60.days.ago %>
 
 bob_reading:
   user: unverified_user
   value: 380
   zone: 0
+  time_of_day: morning
   recorded_at: <%= 3.days.ago %>

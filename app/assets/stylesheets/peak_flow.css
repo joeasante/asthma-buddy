@@ -563,3 +563,87 @@ turbo-frame[busy] .pf-skeleton-block {
     opacity: 0.45;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Time-of-day toggle — Morning / Evening segmented control on the form
+   -------------------------------------------------------------------------- */
+
+.tod-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tod-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+/* Hide the actual radio input — label acts as the control */
+.tod-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Selected states */
+.tod-option:has(input:checked).tod-option--morning,
+.tod-option:has(input[value="morning"]:checked) {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.tod-option:has(input:checked).tod-option--evening,
+.tod-option:has(input[value="evening"]:checked) {
+  border-color: var(--teal-600);
+  background: var(--teal-50, #f0fdfa);
+  color: var(--teal-700, #0f766e);
+  font-weight: 600;
+}
+
+.tod-option:hover {
+  border-color: var(--brand);
+}
+
+/* Focus-visible ring for keyboard navigation */
+.tod-option:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   AM / PM badge — reading rows and dashboard recent list
+   -------------------------------------------------------------------------- */
+
+.tod-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tod-badge--morning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tod-badge--evening {
+  background: var(--teal-50, #f0fdfa);
+  color: var(--teal-700, #0f766e);
+}
