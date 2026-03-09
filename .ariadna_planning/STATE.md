@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 14 (Adherence Dashboard) — COMPLETE
-Plan: 14-03 complete — AdherenceController, history grid views, controller tests, system tests
-Status: 3/3 plans done. 290 tests passing (no regressions). Phase 14 complete.
-Last activity: 2026-03-08 — Phase 14 Plan 03: AdherenceController#index, _history_grid partial, CSS, 7 controller tests, 7 system tests.
+Phase: Phase 15 (Health Events) — IN PROGRESS
+Plan: 15-01 complete — HealthEvent fixtures, model unit tests, controller integration tests
+Status: 1/? plans done. 39 new tests added (19 model + 20 controller); pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-01.
+Last activity: 2026-03-09 — Phase 15 Plan 01: 5 fixtures, 19 model tests, 20 controller integration tests.
 
-Progress: [██████████] 100% (Milestone 2 — 14/~14 plans complete)
+Progress: [██████████] Phase 15 started (Milestone 3 — Health Events)
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
@@ -34,6 +34,9 @@ All 9 phases delivered:
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
 - Tests at close: 195 passing
+
+**Milestone 3 Velocity:**
+- Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
 
 **Milestone 2 Velocity:**
 - Phase 14 Plan 03 completed: 2026-03-08 (~3 min, 2 tasks, 6 files, 14 new tests)
@@ -83,6 +86,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 15 Plan 01 Decisions (2026-03-09)
+
+- **event_type enum uses string values**: HealthEvent enum stores strings ('gp_appointment', not integer) — fixture values must use string names directly, unlike Medication enum which stores integers
+- **Cross-user 404 tests stay signed in as alice**: Stay signed in as alice and access bob's resource by ID — `set_health_event` uses `Current.user.health_events.find` which raises `ActiveRecord::RecordNotFound` (renders 404); no sign-in switch needed
+- **Separate fixtures for turbo stream vs html destroy tests**: alice_illness_ongoing used for turbo stream destroy, alice_illness_resolved used for HTML fallback destroy to avoid fixture interference between the two test cases
+- **Pre-existing test failures are not regressions**: adherence, dashboard, settings, passwords controller test failures exist in accumulated working-tree changes predating Phase 15 — confirmed pre-existing before 15-01 test files added
 
 ### Phase 14 Plan 03 Decisions (2026-03-08)
 
@@ -188,6 +198,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Onboarding**: Prompted after signup if personal best is not set and no medications added
 - **Legal pages**: Static ERB pages; session cookie is essential (no consent banner needed); ToS + Privacy Policy required for public launch
 
+### Roadmap Evolution
+
+- Phase 18 added: Temporary Medication Courses — short-duration prescriptions with start/end date, auto-archive, excluded from adherence/low-stock
+- Phase 19 added: Notifications — in-app feed for low stock, missed doses, peak flow reminders; unread nav badge; Turbo Stream mark-read
+- Phase 20 added: Legal Pages, Cookie Banner & Error Pages — Terms/Privacy/Cookies pages, dismissible cookie consent banner, branded 404/500/maintenance error pages
+
 ### Pending Todos
 
 None.
@@ -198,6 +214,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-08
-Stopped at: Phase 14 Plan 03 complete — AdherenceController#index, history grid views, CSS, 7 controller tests, 7 system tests, 290 tests passing. Phase 14 (Adherence Dashboard) COMPLETE — Milestone 2 COMPLETE.
+Last session: 2026-03-09
+Stopped at: Phase 15 Plan 01 complete — HealthEvent fixtures (5), model unit tests (19), controller integration tests (20), 39 new tests passing. Phase 15 (Health Events) in progress.
 Resume file: None
