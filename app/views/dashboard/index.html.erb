@@ -82,15 +82,17 @@
         <%= link_to "View all", peak_flow_readings_path, class: "dash-section-link" %>
       </div>
       <div class="chart-section">
-        <canvas data-controller="chart"
-                data-chart-type-value="peakflow-bands"
-                data-chart-data-value="<%= @chart_data.to_json %>"
-                data-chart-personal-best-value="<%= @personal_best&.value || 0 %>"
-                data-chart-health-events-value="<%= @health_event_markers.to_json %>"
-                class="chart-canvas"
-                aria-label="Peak flow readings over the last 7 days"
-                role="img">
-        </canvas>
+        <div class="chart-canvas-wrapper">
+          <canvas data-controller="chart"
+                  data-chart-type-value="peakflow-bands"
+                  data-chart-data-value="<%= @chart_data.to_json %>"
+                  data-chart-personal-best-value="<%= @personal_best&.value || 0 %>"
+                  data-chart-health-events-value="<%= @health_event_markers.to_json %>"
+                  class="chart-canvas"
+                  aria-label="Peak flow readings over the last 7 days"
+                  role="img">
+          </canvas>
+        </div>
       </div>
       <% if @personal_best %>
         <div class="dash-zone-legend" aria-label="Zone legend">

@@ -77,6 +77,7 @@ export default class extends Controller {
       this.chart.destroy()
       this.chart = null
     }
+    this.element.parentElement?.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
   }
 
   // Stacked bar chart — symptoms by severity per day
@@ -246,7 +247,7 @@ export default class extends Controller {
 
           ctx.save()
 
-          // Vertical dashed line
+          // Vertical dashed line only — label is rendered as a DOM badge
           ctx.beginPath()
           ctx.setLineDash([4, 3])
           ctx.strokeStyle = color
@@ -255,14 +256,6 @@ export default class extends Controller {
           ctx.moveTo(xPos, top)
           ctx.lineTo(xPos, bottom)
           ctx.stroke()
-
-          // Short label text at top of line
-          ctx.setLineDash([])
-          ctx.globalAlpha = 1
-          ctx.fillStyle   = color
-          ctx.font        = "bold 10px system-ui, sans-serif"
-          ctx.textAlign   = "center"
-          ctx.fillText(event.label, xPos, top + 14)
 
           ctx.restore()
         })
@@ -275,6 +268,7 @@ export default class extends Controller {
       plugins: [markerPlugin],
       options: {
         responsive: true,
+        onResize: () => { this.positionEventBadges() },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -295,6 +289,55 @@ export default class extends Controller {
           }
         }
       }
+    })
+
+    this.positionEventBadges()
+  }
+
+  // Render health event labels as DOM badges positioned over the canvas.
+  // DOM text is anti-aliased and styleable; canvas fillText at small sizes is blurry.
+  // Called after chart creation and on every resize to keep positions in sync.
+  positionEventBadges() {
+    if (!this.chart) return
+
+    const healthEvents = this.healthEventsValue || []
+    const wrapper      = this.element.parentElement
+
+    // Clear stale badges before (re)positioning
+    wrapper.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
+    if (!healthEvents.length) return
+
+    const canvas   = this.element
+    const xAxis    = this.chart.scales.x
+    const chartTop = this.chart.chartArea.top
+
+    // chartTop is in canvas device-pixel coordinates; convert to CSS pixels
+    const cssChartTop = (chartTop / canvas.height) * canvas.offsetHeight
+
+    // Build date → axis label lookup
+    const dateLabelMap = {}
+    this.dataValue.forEach(d => { dateLabelMap[d.date] = toDayLabel(d.date) })
+
+    healthEvents.forEach(event => {
+      const axisLabel = dateLabelMap[event.date]
+      if (!axisLabel) return
+
+      const xPos = xAxis.getPixelForValue(axisLabel)
+      if (xPos === undefined || isNaN(xPos)) return
+
+      // xPos is in device-pixel coordinates; express as % of CSS width so the
+      // badge aligns correctly regardless of devicePixelRatio
+      const leftPct = (xPos / canvas.width) * 100
+
+      const badge = document.createElement("span")
+      badge.className         = "chart-event-badge"
+      badge.textContent       = event.label
+      badge.setAttribute("aria-label", `Health event: ${event.label}`)
+      badge.style.left            = `${leftPct}%`
+      badge.style.top             = `${cssChartTop + 8}px`
+      badge.style.backgroundColor = eventMarkerColor(event.css_modifier)
+
+      wrapper.appendChild(badge)
     })
   }
 

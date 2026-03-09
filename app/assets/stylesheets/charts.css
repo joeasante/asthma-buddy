@@ -9,6 +9,27 @@
   margin-bottom: 0;
 }
 
+.chart-canvas-wrapper {
+  position: relative;
+}
+
 .chart-canvas {
   max-height: 200px;
+}
+
+/* DOM badges positioned over chart canvas for health event markers.
+   Positioned by chart_controller.js after Chart.js renders, so x/y values
+   are synchronised with the actual axis positions. */
+.chart-event-badge {
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font: 700 10px/1.5 system-ui, -apple-system, sans-serif;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: 0.04em;
+  opacity: 0.92;
+  z-index: 1;
 }
