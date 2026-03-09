@@ -269,6 +269,11 @@ export default class extends Controller {
       options: {
         responsive: true,
         onResize: () => { this.positionEventBadges() },
+        layout: {
+          // Reserve space above the chart area for event badge labels.
+          // Badges are positioned in this strip, keeping them clear of Y-axis numbers.
+          padding: { top: healthEvents.length ? 26 : 4 }
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -307,12 +312,8 @@ export default class extends Controller {
     wrapper.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
     if (!healthEvents.length) return
 
-    const canvas   = this.element
-    const xAxis    = this.chart.scales.x
-    const chartTop = this.chart.chartArea.top
-
-    // chartTop is in canvas device-pixel coordinates; convert to CSS pixels
-    const cssChartTop = (chartTop / canvas.height) * canvas.offsetHeight
+    const canvas = this.element
+    const xAxis  = this.chart.scales.x
 
     // Build date → axis label lookup
     const dateLabelMap = {}
@@ -334,7 +335,7 @@ export default class extends Controller {
       badge.textContent       = event.label
       badge.setAttribute("aria-label", `Health event: ${event.label}`)
       badge.style.left            = `${leftPct}%`
-      badge.style.top             = `${cssChartTop + 8}px`
+      badge.style.top             = "4px"  // sits in the layout.padding.top strip, above the data area
       badge.style.backgroundColor = eventMarkerColor(event.css_modifier)
 
       wrapper.appendChild(badge)
