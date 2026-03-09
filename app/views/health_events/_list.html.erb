@@ -1,0 +1,24 @@
+<% if grouped_events.empty? %>
+  <div class="empty-state" id="health_events_empty_state">
+    <div class="empty-state-icon" aria-hidden="true">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="36" height="36" rx="4" stroke="currentColor" stroke-width="2"/>
+        <path d="M6 18h36" stroke="currentColor" stroke-width="2"/>
+        <path d="M16 8v4M32 8v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18 30l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>No medical history recorded</h3>
+    <p>Add GP visits, hospital stays, illnesses, and medication changes to build your medical history.</p>
+    <div class="empty-state-actions">
+      <%= link_to "Add an event", new_health_event_path, class: "btn-primary" %>
+    </div>
+  </div>
+<% else %>
+  <% grouped_events.each do |month_start, events| %>
+    <h3 class="events-month-heading"><%= month_start.strftime("%B %Y") %></h3>
+    <% events.each do |event| %>
+      <%= render "event_row", health_event: event %>
+    <% end %>
+  <% end %>
+<% end %>

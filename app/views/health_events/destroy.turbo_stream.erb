@@ -1,0 +1,14 @@
+<% grouped_events = Current.user.health_events.includes(:rich_text_notes).recent_first
+                              .group_by { |e| e.recorded_at.beginning_of_month } %>
+
+<%= turbo_stream.update "health_events_list" do %>
+  <%= render "list", grouped_events: grouped_events %>
+<% end %>
+
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Medical event deleted."
+       data-toast-variant="success">
+  </div>
+<% end %>

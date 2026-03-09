@@ -1,0 +1,15 @@
+<% content_for :title, "Add medical event" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Medical History", health_events_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep" aria-hidden="true">›</span>
+  <span class="breadcrumb-current">Add event</span>
+</nav>
+
+<div class="page-header">
+  <h1>Add a medical event</h1>
+</div>
+
+<div class="section-card">
+  <%= render "form", health_event: @health_event %>
+</div>

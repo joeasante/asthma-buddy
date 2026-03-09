@@ -1,0 +1,98 @@
+<%= form_with model: health_event, id: "health_event_form",
+      data: {
+        turbo: true,
+        controller: "end-date",
+        "end-date-point-in-time-types-value": HealthEvent::POINT_IN_TIME_TYPES.to_json
+      } do |form| %>
+  <% if health_event.errors.any? %>
+    <div class="field-errors" role="alert" aria-live="assertive">
+      <p><strong><%= pluralize(health_event.errors.count, "error") %></strong> prevented this event from being saved:</p>
+      <ul>
+        <% health_event.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :event_type, "Event type" %>
+    <%= form.select :event_type,
+          HealthEvent::TYPE_LABELS.map { |value, label| [label, value] },
+          { include_blank: "Select event type", selected: health_event.event_type },
+          {
+            "aria-describedby": health_event.errors[:event_type].any? ? "event_type_error" : nil,
+            data: {
+              "end-date-target": "eventTypeSelect",
+              action: "change->end-date#eventTypeChanged"
+            }
+          } %>
+    <% if health_event.errors[:event_type].any? %>
+      <p class="field-error" id="event_type_error" role="alert"><%= health_event.errors[:event_type].first %></p>
+    <% end %>
+  </div>
+
+  <div class="field" data-controller="now">
+    <%= form.label :recorded_at, "Date" %>
+    <div class="datetime-with-now">
+      <%= form.datetime_local_field :recorded_at,
+            step: 60,
+            data: { "now-target": "input" } %>
+      <button type="button" class="btn-now" data-action="now#fill">Right now</button>
+    </div>
+    <% if health_event.errors[:recorded_at].any? %>
+      <p class="field-error" id="recorded_at_error" role="alert"><%= health_event.errors[:recorded_at].first %></p>
+    <% end %>
+  </div>
+
+  <%# Duration section — hidden for point-in-time event types via Stimulus %>
+  <div data-end-date-target="durationSection">
+    <div class="field-checkbox-row">
+      <input type="checkbox"
+             id="health_event_still_ongoing"
+             data-end-date-target="checkbox"
+             data-action="change->end-date#toggle"
+             <%= (health_event.persisted? && health_event.ended_at.nil?) ? "checked" : "" %>>
+      <label for="health_event_still_ongoing">Still ongoing</label>
+    </div>
+    <div class="field" data-end-date-target="endDateField">
+      <%= form.label :ended_at, "End date" %>
+      <div class="datetime-with-now">
+        <%= form.datetime_local_field :ended_at,
+              step: 60,
+              value: health_event.ended_at&.strftime("%Y-%m-%dT%H:%M") %>
+      </div>
+      <% if health_event.errors[:ended_at].any? %>
+        <p class="field-error" id="ended_at_error" role="alert"><%= health_event.errors[:ended_at].first %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes do %>
+      Notes <span class="field-optional">(optional)</span>
+    <% end %>
+    <p class="field-hint" id="notes_hint">Any details about the event — symptoms, treatment, follow-up actions.</p>
+    <%= form.rich_text_area :notes,
+          toolbar: false,
+          aria: { label: "Notes", describedby: "notes_hint" },
+          placeholder: "e.g. Started prednisolone course, peak flow dropping, GP prescribed antibiotics…" %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.button health_event.persisted? ? "Update event" : "Save event",
+          type: "submit",
+          class: "btn-primary form-actions-submit" %>
+    <%= link_to "Cancel", health_events_path, data: { turbo: false }, class: "btn-cancel" %>
+  </div>
+
+  <% if health_event.persisted? %>
+    <div class="form-delete-zone">
+      <%= button_to "Delete event",
+            health_event_path(health_event),
+            method: :delete,
+            class: "btn-delete btn-delete--full",
+            form: { data: { turbo: true, turbo_confirm: "Delete this medical event? This can't be undone." } } %>
+    </div>
+  <% end %>
+<% end %>
