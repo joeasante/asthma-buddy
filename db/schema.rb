@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_163025) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_09_000001) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -60,6 +60,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_163025) do
     t.index ["medication_id"], name: "index_dose_logs_on_medication_id"
     t.index ["recorded_at"], name: "index_dose_logs_on_recorded_at"
     t.index ["user_id"], name: "index_dose_logs_on_user_id"
+  end
+
+  create_table "health_events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "ended_at"
+    t.string "event_type", null: false
+    t.datetime "recorded_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "ended_at"], name: "index_health_events_on_user_id_and_ended_at"
+    t.index ["user_id", "recorded_at"], name: "index_health_events_on_user_id_and_recorded_at"
+    t.index ["user_id"], name: "index_health_events_on_user_id"
   end
 
   create_table "medications", force: :cascade do |t|
@@ -135,6 +147,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_163025) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "dose_logs", "medications"
   add_foreign_key "dose_logs", "users"
+  add_foreign_key "health_events", "users"
   add_foreign_key "medications", "users"
   add_foreign_key "peak_flow_readings", "users"
   add_foreign_key "personal_best_records", "users"

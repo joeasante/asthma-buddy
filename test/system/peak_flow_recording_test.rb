@@ -8,16 +8,6 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     sign_in_as @user
   end
 
-  # Helper: sign in via the login form.
-  # Waits for the redirect to root to ensure the session cookie is established.
-  def sign_in_as(user, password: "password123")
-    visit new_session_url
-    fill_in "Email address", with: user.email_address
-    fill_in "Password", with: password
-    click_button "Sign in"
-    assert_current_path root_url
-  end
-
   test "user can log a peak flow reading and see zone feedback" do
     # alice has personal best records: 500 (30 days ago) and 520 (7 days ago)
     # Visit the entry form

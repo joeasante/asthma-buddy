@@ -11,14 +11,6 @@ class AdherenceTest < ApplicationSystemTestCase
     # alice_preventer fixture (Clenil Modulite) already has doses_per_day: 2
   end
 
-  def sign_in_as(user, password: "password123")
-    visit new_session_url
-    fill_in "Email address", with: user.email_address
-    fill_in "Password", with: password
-    click_button "Sign in"
-    assert_current_path dashboard_url
-  end
-
   # ── Dashboard adherence section ──
 
   test "dashboard shows adherence section for preventer with schedule" do

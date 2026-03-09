@@ -23,14 +23,6 @@ class LowStockTest < ApplicationSystemTestCase
     ActiveJob::Base.queue_adapter = :test
   end
 
-  def sign_in_as(user, password: "password123")
-    visit new_session_url
-    fill_in "Email address", with: user.email_address
-    fill_in "Password", with: password
-    click_button "Sign in"
-    assert_current_path dashboard_url
-  end
-
   # ── Medication row ──
 
   test "low-stock badge appears on medication row when supply is below 14 days" do

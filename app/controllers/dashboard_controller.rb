@@ -38,17 +38,14 @@ class DashboardController < ApplicationController
 
     # Health event markers for the 7-day chart — one entry per event in window.
     # Chart window matches recent_readings: week_start..Date.current (Mon–today).
-    chart_start = week_start
-    chart_end   = Date.current
-
     @health_event_markers = user.health_events
-      .where(recorded_at: chart_start.beginning_of_day..chart_end.end_of_day)
+      .where(recorded_at: week_start.beginning_of_day..Date.current.end_of_day)
       .order(recorded_at: :asc)
       .map do |e|
         {
           date:         e.recorded_at.to_date.to_s,   # "YYYY-MM-DD"
           type:         e.event_type,
-          label:        event_marker_label(e),
+          label:        e.chart_label,
           css_modifier: e.event_type_css_modifier
         }
       end
@@ -68,17 +65,4 @@ class DashboardController < ApplicationController
       .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
   end
 
-  private
-
-  MARKER_LABELS = {
-    "hospital_visit"    => "Hosp",
-    "gp_appointment"    => "GP",
-    "illness"           => "Ill",
-    "medication_change" => "Rx",
-    "other"             => "Evt"
-  }.freeze
-
-  def event_marker_label(event)
-    MARKER_LABELS[event.event_type] || "Evt"
-  end
 end

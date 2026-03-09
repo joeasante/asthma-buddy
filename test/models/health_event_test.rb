@@ -71,6 +71,29 @@ class HealthEventTest < ActiveSupport::TestCase
     assert event.valid?, event.errors.full_messages.inspect
   end
 
+  # --- Temporal bounds ---
+
+  test "invalid when recorded_at is in the future" do
+    event = HealthEvent.new(valid_attributes.merge(recorded_at: 1.day.from_now))
+    assert_not event.valid?
+    assert_includes event.errors[:recorded_at], "cannot be in the future"
+  end
+
+  test "invalid when recorded_at is before 1900" do
+    event = HealthEvent.new(valid_attributes.merge(recorded_at: Date.new(1899, 12, 31).to_time))
+    assert_not event.valid?
+    assert_includes event.errors[:recorded_at], "is too far in the past"
+  end
+
+  test "invalid when ended_at is in the future" do
+    event = HealthEvent.new(valid_attributes.merge(
+      event_type: :illness,
+      ended_at: 1.year.from_now
+    ))
+    assert_not event.valid?
+    assert_includes event.errors[:ended_at], "cannot be in the future"
+  end
+
   # --- Helpers ---
 
   test "point_in_time? returns true for gp_appointment" do
@@ -116,6 +139,12 @@ class HealthEventTest < ActiveSupport::TestCase
   test "ongoing? returns false for point_in_time type even with nil ended_at" do
     event = HealthEvent.new(valid_attributes.merge(event_type: :gp_appointment, ended_at: nil))
     assert_not event.ongoing?
+  end
+
+  test "chart_label returns short label for chart markers" do
+    assert_equal "Hosp", HealthEvent.new(valid_attributes.merge(event_type: :hospital_visit)).chart_label
+    assert_equal "GP",   HealthEvent.new(valid_attributes.merge(event_type: :gp_appointment)).chart_label
+    assert_equal "Rx",   HealthEvent.new(valid_attributes.merge(event_type: :medication_change)).chart_label
   end
 
   test "event_type_label returns human label from TYPE_LABELS" do

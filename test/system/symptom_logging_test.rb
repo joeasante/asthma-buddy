@@ -14,17 +14,6 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     ActiveJob::Base.queue_adapter = :test
   end
 
-  # Helper: sign in as a given user via the login form.
-  # Waits for the redirect to root to ensure session cookie is set before continuing.
-  def sign_in_as(user, password: "password123")
-    visit new_session_url
-    fill_in "Email address", with: user.email_address
-    fill_in "Password", with: password
-    click_button "Sign in"
-    # Wait for redirect away from sign-in page to confirm session is established
-    assert_current_path root_url
-  end
-
   # --- CORE LOGGING FLOW ---
 
   test "logged-in user can log a symptom and it appears in the list" do
