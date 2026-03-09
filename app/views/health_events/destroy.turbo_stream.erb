@@ -1,8 +1,13 @@
 <% grouped_events = Current.user.health_events.includes(:rich_text_notes).recent_first
                               .group_by { |e| e.recorded_at.beginning_of_month } %>
+<% event_count = grouped_events.values.sum(&:length) %>
 
 <%= turbo_stream.update "health_events_list" do %>
   <%= render "list", grouped_events: grouped_events %>
+<% end %>
+
+<%= turbo_stream.update "health_events_count" do %>
+  <strong><%= event_count %></strong> <%= "event".pluralize(event_count) %> recorded
 <% end %>
 
 <%= turbo_stream.replace "flash-messages" do %>
