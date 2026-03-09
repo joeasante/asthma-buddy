@@ -81,6 +81,17 @@
         <h2>Peak Flow — Last 7 Days</h2>
         <%= link_to "View all", peak_flow_readings_path, class: "dash-section-link" %>
       </div>
+      <% if @ongoing_health_events.any? %>
+        <div class="chart-ongoing-strip" aria-label="Currently active health events">
+          <span class="chart-ongoing-label">Currently active</span>
+          <% @ongoing_health_events.each do |e| %>
+            <span class="chart-ongoing-event">
+              <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
+              <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
       <div class="chart-section">
         <div class="chart-canvas-wrapper">
           <canvas data-controller="chart"
@@ -99,17 +110,6 @@
           <span class="dash-zone-legend-item dash-zone-legend-item--green">Green zone (&ge;80%)</span>
           <span class="dash-zone-legend-item dash-zone-legend-item--yellow">Yellow zone (&ge;50%)</span>
           <span class="dash-zone-legend-item dash-zone-legend-item--red">Red zone (&lt;50%)</span>
-        </div>
-      <% end %>
-      <% if @ongoing_health_events.any? %>
-        <div class="chart-ongoing-strip" aria-label="Currently active health events">
-          <span class="chart-ongoing-label">Currently active</span>
-          <% @ongoing_health_events.each do |e| %>
-            <span class="chart-ongoing-event">
-              <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
-              <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
-            </span>
-          <% end %>
         </div>
       <% end %>
     </section>
