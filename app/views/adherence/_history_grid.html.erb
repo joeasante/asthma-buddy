@@ -1,28 +1,172 @@
-<section class="adherence-medication-section" aria-label="Adherence for <%= medication.name %>">
-  <h2 class="adherence-medication-name"><%= medication.name %></h2>
-  <p class="adherence-medication-schedule">
-    <%= medication.doses_per_day %> dose<%= "s" if medication.doses_per_day != 1 %> per day scheduled
-  </p>
+<%
+  today = Date.current
 
-  <div class="adherence-grid adherence-grid--<%= days %>"
-       role="list"
-       aria-label="<%= days %>-day adherence grid for <%= medication.name %>">
-    <% days_data.each do |day| %>
-      <% status = day[:result].status %>
-      <% taken = day[:result].taken %>
-      <% scheduled = day[:result].scheduled %>
-      <div class="adherence-cell adherence-cell--<%= status %>"
-           role="listitem"
-           title="<%= day[:date].strftime("%-d %b") %>: <%= status == :no_schedule ? "No data" : "#{taken}/#{scheduled} taken" %>"
-           aria-label="<%= day[:date].strftime("%-d %b") %>: <%= status.to_s.humanize %>">
-        <span class="adherence-cell-date"><%= day[:date].strftime("%-d") %></span>
+  # ── Schedule subtitle ────────────────────────────────────────────
+  puffs      = medication.standard_dose_puffs
+  dpd        = medication.doses_per_day
+  frequency  = case dpd
+               when 1 then "once"
+               when 2 then "twice"
+               else        "#{dpd} times"
+               end
+  puff_label    = "puff#{"s" if puffs != 1}"
+  schedule_text = "#{puffs} #{puff_label}, #{frequency} daily"
+  sick_puffs    = medication.sick_day_dose_puffs
+  sick_suffix   = sick_puffs.present? && sick_puffs != puffs ? " (#{sick_puffs} when unwell)" : ""
+
+  # ── Adherence percentage (past completed days only) ──────────────
+  past_scheduled = days_data.reject { |d| [:no_schedule, :pending, :partial].include?(d[:result].status) || d[:date] == today }
+  on_track_count = past_scheduled.count { |d| d[:result].status == :on_track }
+  pct            = past_scheduled.any? ? (on_track_count.to_f / past_scheduled.size * 100).round : nil
+  pct_variant    = if pct.nil? then "neutral"
+                 elsif pct >= 80 then "good"
+                 elsif pct >= 50 then "moderate"
+                 else                 "poor"
+                 end
+
+  # ── Log dose button — shown below the grid when today is unfinished ──
+  today_status   = days_data.find { |d| d[:date] == today }&.[](:result)&.status
+  show_log_dose  = today_status&.in?([:pending, :partial]) || false
+%>
+
+<section class="adherence-medication-section section-card"
+         aria-label="Adherence for <%= medication.name %>">
+
+  <%# Medication name + summary badge ─────────────────────────── %>
+  <div class="adherence-medication-header">
+    <div>
+      <h2 class="adherence-medication-name"><%= medication.name %></h2>
+      <p class="adherence-medication-schedule">
+        <%= schedule_text %><% unless sick_suffix.empty? %><span class="adherence-sick-note"><%= sick_suffix %></span><% end %>
+      </p>
+    </div>
+    <% if pct %>
+      <div class="adherence-pct-badge adherence-pct-badge--<%= pct_variant %>"
+           aria-label="<%= pct %>% adherence over the last <%= period %> completed days">
+        <span class="adherence-pct-number"><%= pct %>%</span>
+        <span class="adherence-pct-label"><%= on_track_count %>/<%= past_scheduled.size %> days</span>
       </div>
     <% end %>
   </div>
 
-  <div class="adherence-legend">
-    <span class="adherence-legend-item adherence-legend-item--on_track">On track</span>
-    <span class="adherence-legend-item adherence-legend-item--missed">Missed</span>
-    <span class="adherence-legend-item adherence-legend-item--no_schedule">No data</span>
+  <%# Calendar grid ───────────────────────────────────────────── %>
+  <div class="adherence-grid adherence-grid--<%= period %>"
+       role="list"
+       aria-label="<%= period %>-day adherence grid for <%= medication.name %>">
+
+    <% if period == 30 %>
+      <%# Fixed Mon–Sun column headers %>
+      <% %w[Mon Tue Wed Thu Fri Sat Sun].each do |dow| %>
+        <div class="adherence-day-header" aria-hidden="true"><%= dow %></div>
+      <% end %>
+
+      <%# Padding cells — faint dates show the Monday-alignment context %>
+      <% padding_dates.each do |pad_date| %>
+        <div class="adherence-cell-wrapper adherence-cell-wrapper--empty" aria-hidden="true">
+          <div class="adherence-cell adherence-cell--empty">
+            <span class="adherence-cell-num adherence-cell-num--faint"><%= pad_date.strftime("%-d") %></span>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% days_data.each do |day| %>
+      <%
+        date      = day[:date]
+        result    = day[:result]
+        status    = result.status
+        taken     = result.taken
+        scheduled = result.scheduled
+        is_today  = date == today
+
+        full_date    = date.strftime("%A %-d %b")
+        tooltip_text = case status
+                       when :on_track    then "#{full_date} — #{taken}/#{scheduled} doses taken"
+                       when :missed      then "#{full_date} — #{taken}/#{scheduled} doses taken"
+                       when :partial     then "#{full_date} — #{taken}/#{scheduled} doses taken · in progress"
+                       when :pending     then "#{full_date} — No doses logged yet today"
+                       when :no_schedule then "#{full_date} — No data"
+                       end
+        cell_label = is_today ? "Today, #{full_date}: #{status.to_s.humanize}" : "#{full_date}: #{status.to_s.humanize}"
+      %>
+
+      <div class="adherence-cell-wrapper<%= " adherence-cell-wrapper--today" if is_today %>"
+           tabindex="0" role="listitem">
+
+        <% if period == 7 %>
+          <%# 7-day: day name + status icon live inside a tall self-contained card.
+              Today badge appears below the cell, consistent with the 30-day view. %>
+          <div class="adherence-cell adherence-cell--<%= status %>"
+               aria-label="<%= cell_label %>">
+            <span class="adherence-cell-day" aria-hidden="true"><%= date.strftime("%a") %></span>
+            <span class="adherence-cell-num" aria-hidden="true"><%= date.strftime("%-d") %></span>
+            <% if status.in?([:on_track, :missed, :partial]) %>
+              <span class="adherence-cell-icon" aria-hidden="true">
+                <%= status == :on_track ? "✓" : status == :missed ? "✗" : "~" %>
+              </span>
+            <% end %>
+          </div>
+          <% if is_today %>
+            <span class="adherence-today-badge" aria-hidden="true">Today</span>
+          <% end %>
+        <% else %>
+          <%# 30-day: icon above date number; today badge below the cell %>
+          <div class="adherence-cell adherence-cell--<%= status %>" aria-label="<%= cell_label %>">
+            <% if status == :on_track %>
+              <span class="adherence-cell-icon" aria-hidden="true">✓</span>
+            <% elsif status == :missed %>
+              <span class="adherence-cell-icon" aria-hidden="true">✗</span>
+            <% elsif status == :partial %>
+              <span class="adherence-cell-icon" aria-hidden="true">~</span>
+            <% end %>
+            <span class="adherence-cell-num" aria-hidden="true"><%= date.strftime("%-d") %></span>
+          </div>
+
+          <% if is_today %>
+            <span class="adherence-today-badge" aria-hidden="true">Today</span>
+          <% end %>
+        <% end %>
+
+        <span role="tooltip" class="adherence-tooltip"><%= tooltip_text %></span>
+      </div>
+    <% end %>
+
   </div>
+
+  <%# Log dose button — rendered below the grid, full width, properly sized %>
+  <% if show_log_dose %>
+    <div class="adherence-today-actions">
+      <%= link_to "#{settings_medications_path}##{dom_id(medication)}",
+            class: "btn-primary",
+            data: { turbo_frame: "_top" },
+            aria: { label: "Record a dose of #{medication.name} for today" } do %>
+        Record today's dose
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Legend — each state is a self-contained chip ──────────────── %>
+  <div class="adherence-legend" aria-label="Legend">
+    <span class="adherence-legend-item adherence-legend-item--on_track" tabindex="0">
+      On track
+      <span class="adherence-legend-tooltip" role="tooltip">All scheduled doses taken for the day</span>
+    </span>
+    <span class="adherence-legend-item adherence-legend-item--partial" tabindex="0">
+      In progress
+      <span class="adherence-legend-tooltip" role="tooltip">Some doses taken — day still running</span>
+    </span>
+    <span class="adherence-legend-item adherence-legend-item--pending" tabindex="0">
+      Not yet taken
+      <span class="adherence-legend-tooltip" role="tooltip">No doses logged yet today</span>
+    </span>
+    <span class="adherence-legend-item adherence-legend-item--missed" tabindex="0">
+      Missed
+      <span class="adherence-legend-tooltip" role="tooltip">Fewer doses taken than scheduled</span>
+    </span>
+    <span class="adherence-legend-item adherence-legend-item--no_schedule" tabindex="0">
+      No data
+      <span class="adherence-legend-tooltip" role="tooltip">No data for this date</span>
+    </span>
+  </div>
+
 </section>

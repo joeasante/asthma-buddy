@@ -59,6 +59,8 @@
 
   /* Severity palette — referenced by feature CSS */
   --severity-mild:          #16a34a;
+  /* Use --severity-mild-text for body/label text on white backgrounds — needs enough contrast */
+  --severity-mild-text:     #14532d;
   --severity-moderate:      #d97706;
   /* Use --severity-moderate-text for body/label text — #d97706 fails AA on white */
   --severity-moderate-text: #92400e;
@@ -99,6 +101,49 @@
 }
 
 /* ==========================================================================
+   Accessibility utilities
+   ========================================================================== */
+
+/* Skip to main content — visible only on focus, for keyboard/screen reader users */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--brand);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: top 100ms ease-out;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Screen-reader only — visually hidden but announced by assistive tech */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link { transition: none; }
+}
+
+/* ==========================================================================
    Reset (minimal — does NOT reset ul/ol to avoid breaking rich text editors)
    ========================================================================== */
 
@@ -107,6 +152,9 @@
 *::after {
   box-sizing: border-box;
 }
+
+/* Reinforce the HTML hidden attribute — prevents component display rules from overriding it */
+[hidden] { display: none !important; }
 
 /* Prevent sticky header from obscuring keyboard-focused elements (WCAG 2.4.11) */
 html {
@@ -430,7 +478,7 @@ main {
 
 footer {
   border-top: 1px solid var(--border);
-  padding: 1.5rem;
+  padding: 3.5rem 1.5rem;
   text-align: center;
   font-size: 0.875rem;
   color: var(--text-4);
@@ -439,6 +487,34 @@ footer {
 footer p {
   margin: 0;
   color: var(--text-4);
+}
+
+.footer-copy {
+  margin-bottom: 0;
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.footer-nav a {
+  font-size: 0.875rem;
+  color: var(--text-4);
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: var(--text-3);
+  text-decoration: underline;
+}
+
+.footer-legal {
+  font-size: 0.8125rem;
+  color: var(--text-4);
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -467,6 +543,13 @@ footer p {
   background: var(--severity-severe-bg);
   color: #7f1d1d;
   border-color: #fca5a5;
+}
+
+/* Warning / amber — e.g. zone classification offline banner */
+.flash--warning {
+  background: var(--severity-moderate-bg);
+  color: var(--severity-moderate-text);
+  border-color: var(--severity-moderate);
 }
 
 /* ==========================================================================
@@ -574,6 +657,32 @@ button {
   font-family: inherit;
 }
 
+/* Inline field error — appears immediately after the input, inside .field */
+.field-error {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--severity-severe);
+}
+
+/* Field hint — secondary helper text below a label */
+.field-hint {
+  display: block;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-4);
+  line-height: 1.5;
+}
+
+/* Optional field indicator — rendered inside the label */
+.field-optional {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-4);
+}
+
 /* ==========================================================================
    Datetime field with "Right now" shortcut
    ========================================================================== */
@@ -633,7 +742,7 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text-3);
   border: 1px solid var(--border);
@@ -655,7 +764,7 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text-3);
   border: 1px solid var(--border);
@@ -691,7 +800,7 @@ button {
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--dur), transform 80ms;
+  transition: background 150ms ease-out, box-shadow 150ms ease-out, transform 100ms ease-out;
   box-shadow: var(--shadow-sm);
 }
 
@@ -703,10 +812,19 @@ button {
 
 .btn-primary:active {
   transform: scale(0.98);
+  box-shadow: none;
+}
+
+.btn-primary:disabled,
+.btn-primary[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn-primary { transition: background var(--dur); }
+  .btn-primary { transition: background 150ms ease-out; }
   .btn-primary:active { transform: none; }
 }
 
@@ -724,20 +842,31 @@ button {
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--dur), color var(--dur);
+  transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
 }
 
 .btn-secondary:hover {
   background: var(--surface-alt);
   color: var(--text);
+  border-color: var(--gray-400);
   text-decoration: none;
+}
+
+.btn-secondary:active {
+  background: var(--gray-100);
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-secondary { transition: background 150ms ease-out, color 150ms ease-out; }
+  .btn-secondary:active { transform: none; }
 }
 
 .btn-cancel {
   display: inline-flex;
   align-items: center;
   padding: 0.625rem 0.875rem;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text-3);
   text-decoration: none;
@@ -769,6 +898,59 @@ button {
 }
 
 /* ==========================================================================
+   Data tables — .table-wrap > .data-table (DESIGN-SYSTEM.md §2.6)
+   ========================================================================== */
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.75rem;
+}
+
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.data-table th {
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border-mid);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--gray-50);
+}
+
+/* Right-align the actions column header and cells */
+.data-table th:last-child,
+.data-table td:last-child {
+  text-align: right;
+}
+
+/* ==========================================================================
    Section cards — white card containers used across pages
    ========================================================================== */
 
@@ -793,7 +975,7 @@ button {
 
 .section-card-title {
   font-family: var(--font-heading);
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
@@ -848,29 +1030,196 @@ button {
   color: var(--brand);
 }
 
-/* ==========================================================================
-   Home page
-   ========================================================================== */
-
-.home-hero {
+/* Brand mark — anchors every auth page to the app, links home */
+.auth-brand {
+  display: block;
   text-align: center;
-  padding: 4rem 0 3.5rem;
-  max-width: 560px;
-  margin: 0 auto;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--brand);
+  text-decoration: none;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
 }
 
-.home-hero h1 {
-  font-size: 2.25rem;
-  margin-bottom: 1.25rem;
-  line-height: 1.2;
+.auth-brand:hover {
+  color: var(--brand-dark);
+  text-decoration: none;
+}
+
+/* One-liner explanation below h1 on pages that need context */
+.auth-intro {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  text-align: center;
+  margin: -0.75rem 0 1.75rem;
+  line-height: 1.55;
+}
+
+/* Password field wrapper — relative container for the show/hide toggle */
+.field-password {
+  position: relative;
+}
+
+.field-password input {
+  padding-right: 3rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0;
+  height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  border-radius: var(--radius-sm);
+  padding: 0;
+  transition: color 150ms ease-out;
+}
+
+.password-toggle:hover {
   color: var(--text);
 }
 
-.home-hero p {
-  font-size: 1.125rem;
+.password-toggle:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Forgot password link — right-aligned, sits between field and submit */
+.field-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.field-forgot a {
+  font-size: 0.875rem;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.field-forgot a:hover {
+  text-decoration: underline;
+}
+
+/* Confirmation panel — replaces the form after a successful send */
+.auth-confirmation {
+  text-align: center;
+  padding: 0.25rem 0 1.25rem;
+}
+
+.auth-confirmation-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--teal-50);
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+  margin: 0 auto 1.25rem;
+}
+
+.auth-confirmation p {
+  font-size: 1rem;
   color: var(--text-3);
-  margin-bottom: 2rem;
-  line-height: 1.6;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.auth-email-highlight {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Full-width secondary in auth context — used for resend button */
+.auth-card .btn-secondary {
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    margin: 0.75rem;
+    padding: 2rem 1.25rem 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .password-toggle { transition: none; }
+}
+
+/* ==========================================================================
+   Home page
+   Three visual zones: gray hero → dark teal band → gray feature grid.
+   Contrast between zones does the heavy lifting — no decoration needed.
+   ========================================================================== */
+
+/* ── Hero ──────────────────────────────────────────────────────── */
+
+.home-hero {
+  text-align: center;
+  padding: 6rem 0 5.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Ambient teal wash — sits behind the text, never bleeds visibly to edges */
+.home-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 520px;
+  background: radial-gradient(ellipse at 50% 28%, var(--teal-100) 0%, transparent 60%);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Two deliberate lines — spans guarantee the break, accent colour makes it intentional */
+.home-hero h1 {
+  font-size: 3.75rem;
+  margin: 0 0 1.75rem;
+  line-height: 1.08;
+  color: var(--text);
+  letter-spacing: -0.035em;
+}
+
+.home-hero h1 span {
+  display: block;
+}
+
+.home-hero-h1-accent {
+  color: var(--brand);
+}
+
+.home-hero-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-2);
+  max-width: 44ch;
+  margin: 0 auto;
+  line-height: 1.65;
 }
 
 .home-hero-actions {
@@ -878,41 +1227,286 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  flex-wrap: wrap;
+  margin: 3.5rem 0;
 }
 
+/* Demoted secondary action — readable link, not a competing button */
+.home-hero-signin {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.home-hero-signin a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.home-hero-signin a:hover {
+  text-decoration: underline;
+}
+
+/* Three trust micro-signals below the sign-in prompt */
+.home-hero-trust {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-size: 0.9375rem;
+  color: var(--text-3);
+}
+
+.home-hero-trust li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.home-hero-trust svg {
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+/* Large hero CTA — pill shape distinguishes it from form buttons */
+.btn-primary--hero {
+  padding: 0.9375rem 2.25rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
+}
+
+.btn-primary--hero:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+}
+
+.btn-primary--hero:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+}
+
+/* ── How it works — dark teal band ────────────────────────────── */
+
+/* Negative margins bleed the band to the edges of main's padding.
+   Same value must match main's horizontal padding in both breakpoints. */
+.home-how {
+  margin: 2rem -1.5rem 0;
+  padding: 5rem 1.5rem;
+  background: var(--teal-700);
+}
+
+.home-how-heading {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  margin: 0 0 3.5rem;
+  letter-spacing: -0.03em;
+}
+
+/* 3-column grid — works because the dark band provides containment */
+.home-how-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+}
+
+.home-how-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  transition: background 150ms ease-out;
+}
+
+.home-how-step:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Large ordinal — decorative anchor, not a UI widget */
+.home-how-number {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--teal-200);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.home-how-step h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.home-how-step p {
+  font-size: 1rem;
+  color: var(--teal-100);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Features ──────────────────────────────────────────────────── */
+
+.home-features-section {
+  padding-top: 5rem;
+  padding-bottom: 2rem;
+}
+
+.home-features-heading {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 2.5rem;
+  letter-spacing: -0.03em;
+}
+
+/* Explicit 2×2 — never risks a 3+1 orphan */
 .home-features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  padding-top: 3rem;
-  border-top: 1px solid var(--border);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
 }
 
 .home-feature {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 1.5rem;
+  padding: 2rem 1.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+}
+
+.home-feature:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--teal-500);
+  transform: translateY(-2px);
+}
+
+.home-feature:hover .home-feature-icon {
+  background: var(--teal-100);
 }
 
 .home-feature-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  line-height: 1;
+  width: 44px;
+  height: 44px;
+  background: var(--brand-light);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: var(--brand);
+  flex-shrink: 0;
 }
 
 .home-feature h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
   color: var(--text);
 }
 
 .home-feature p {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--text-3);
   line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+/* Tablet (≤768px): band bleeds into smaller main padding */
+@media (max-width: 768px) {
+  .home-how-steps {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .home-how-step {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .home-how-number {
+    font-size: 1.75rem;
+    padding-top: 0.1rem;
+    flex-shrink: 0;
+    width: 2.5rem;
+  }
+}
+
+/* Narrow (≤640px): main uses 1rem padding — match band margins */
+@media (max-width: 640px) {
+  .home-how {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .home-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile (≤480px): smaller headline, stacked CTAs */
+@media (max-width: 480px) {
+  .home-hero {
+    padding: 3.5rem 0 3rem;
+  }
+
+  .home-hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .home-hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .home-hero-actions .btn-primary--hero {
+    width: 100%;
+  }
+
+  /* Sign in becomes a text link on mobile — it's a recovery action, not primary */
+  .home-hero-actions .btn-secondary {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--brand);
+    text-decoration: underline;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    min-height: 44px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .home-feature {
+    transition: none;
+  }
+
+  .home-feature:hover {
+    transform: none;
+  }
 }
 
 /* ── Dashboard: Preventer Adherence ─────────────────────────────── */
@@ -965,83 +1559,393 @@ button {
 }
 
 /* ── Adherence History Page ─────────────────────────────────────── */
-.adherence-page { max-width: 800px; margin: 0 auto; padding: var(--space-lg); }
 
-.adherence-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
-}
+/* Toggle button group — now lives inside the turbo-frame so it re-renders on navigation */
+.adherence-toggle { display: flex; gap: var(--space-xs); margin-bottom: var(--space-lg); }
 
-.adherence-toggle { display: flex; gap: var(--space-xs); }
-
-.adherence-toggle-btn {
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-3);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.adherence-toggle-btn--active {
-  background: var(--brand);
-  color: #fff;
-  border-color: var(--brand);
-}
-
+/* Per-medication card */
 .adherence-medication-section { margin-bottom: var(--space-xl); }
-.adherence-medication-name { margin-bottom: 0.25rem; }
-.adherence-medication-schedule { font-size: 0.85rem; color: var(--text-3); margin-bottom: var(--space-sm); }
 
+.adherence-medication-name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.adherence-medication-schedule {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  margin-bottom: var(--space-md);
+}
+
+/* Grid — shared base
+   7 × 36px + 6 × 8px gap = 300px — fits inside 319px (375px viewport minus card padding).
+   No overflow wrapper needed; removing it restores CSS-only tooltip positioning. */
 .adherence-grid {
+  display: grid;
+  column-gap: 8px;
+  row-gap: 10px;
+}
+
+/* 7-day: fluid columns — cells fill the card width, giving much more space per cell */
+.adherence-grid--7  { grid-template-columns: repeat(7, 1fr); }
+
+/* 30-day: fixed 42px columns — centred within the card via margin-inline: auto.
+   7×42 + 6×6 = 330px — fits comfortably within a 343px inner card on 375px viewport. */
+.adherence-grid--30 { grid-template-columns: repeat(7, 42px); column-gap: 6px; width: fit-content; margin-inline: auto; }
+
+/* 30-day only: day-of-week header row */
+.adherence-day-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+  padding-bottom: 6px;
+}
+
+/* Cell wrappers — each is a column-item in the grid */
+.adherence-cell-wrapper {
+  position: relative;     /* tooltip anchor */
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  /* Keyboard-focusable: the wrapper receives focus so tooltip shows on :focus-within */
+  outline: none;
+}
+
+.adherence-cell-wrapper:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+/* Empty padding cells (calendar-week offset, 30-day only) */
+.adherence-cell-wrapper--empty { pointer-events: none; }
+
+/* Day label above each cell (7-day view only) */
+.adherence-day-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1;
+}
+
+/* "Today" label is slightly wider — keep it on one line */
+.adherence-cell-wrapper--today .adherence-day-label {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* Cell square — two-line layout (icon + date number) */
+.adherence-cell {
+  width: 100%;             /* fills 1fr column in 7-day; overridden to 40px in 30-day */
+  height: 52px;            /* taller cells = more breathing room and larger touch target */
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+/* 30-day: constrain to fixed column width */
+.adherence-grid--30 .adherence-cell { width: 42px; }
+
+/* ── 7-day redesign: self-contained tall cards ───────────────────── */
+
+/* Taller cells — day name + date number + status icon all live inside */
+.adherence-grid--7 .adherence-cell {
+  height: 76px;
+  justify-content: center;
   gap: 4px;
 }
 
-.adherence-cell {
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
+/* Day abbreviation at the top of the cell (7-day only) */
+.adherence-cell-day {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.65;
+}
+
+/* Date number is the visual hero in the 7-day cell */
+.adherence-grid--7 .adherence-cell-num {
+  font-size: 1.375rem;
+  font-weight: 800;
+  opacity: 1;
+}
+
+/* Status icon is a small confirmation at the bottom */
+.adherence-grid--7 .adherence-cell-icon {
+  font-size: 0.6875rem;
+  opacity: 0.85;
+}
+
+/* Today badge appears below the cell in both 7-day and 30-day views */
+
+/* ─────────────────────────────────────────────────────────────────── */
+
+.adherence-cell-icon {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Date number shown in every cell */
+.adherence-cell-num {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.adherence-cell-num--faint { opacity: 0.3; }  /* padding cells (Fix #5) */
+
+/* Cell state modifiers */
+.adherence-cell--on_track    { background: var(--severity-mild);         color: #fff; }
+.adherence-cell--missed      { background: var(--severity-severe);        color: #fff; }
+.adherence-cell--partial     { background: var(--severity-moderate-bg);   color: var(--severity-moderate-text); border: 1px solid var(--severity-moderate); }
+.adherence-cell--pending     { background: var(--surface); color: var(--text-3); border: 2px dashed var(--border-mid); }
+.adherence-cell--no_schedule { background: var(--border); color: var(--text-3); }
+.adherence-cell--empty       { background: transparent; }
+
+
+/* "Today" badge below the cell — 30-day view only */
+.adherence-today-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-light);
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  line-height: 1.4;
+  white-space: nowrap;
+  margin-top: 3px;
+}
+
+/* Log dose button — rendered below the grid, not inside the narrow cell wrapper */
+.adherence-today-actions {
+  margin-top: var(--space-md);
   display: flex;
+  justify-content: center;
+}
+
+/* 30-day: subtle scale on small calendar cells */
+.adherence-grid--30 .adherence-cell-wrapper:not(.adherence-cell-wrapper--empty):hover .adherence-cell,
+.adherence-grid--30 .adherence-cell-wrapper:not(.adherence-cell-wrapper--empty):focus-within .adherence-cell {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 7-day: lift instead of scale — more appropriate for larger card-style cells */
+.adherence-grid--7 .adherence-cell-wrapper:hover .adherence-cell,
+.adherence-grid--7 .adherence-cell-wrapper:focus-within .adherence-cell {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* CSS-only tooltip — shown on hover or keyboard focus */
+.adherence-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  padding: 0.3125rem 0.625rem;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  /* Arrow */
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
+.adherence-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text);
+}
+
+.adherence-cell-wrapper:hover .adherence-tooltip,
+.adherence-cell-wrapper:focus-within .adherence-tooltip {
+  display: block;
+}
+
+/* Medication name row — Fix #10: badge sits inline with the heading */
+.adherence-medication-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.adherence-medication-header .adherence-medication-name { margin-bottom: 0.125rem; }
+.adherence-medication-header .adherence-medication-schedule { margin-bottom: 0; }
+
+/* Sick-day note — slightly smaller than schedule text, same muted tone */
+.adherence-sick-note {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  margin-left: 0.125rem;
+}
+
+/* Adherence percentage badge */
+.adherence-pct-badge {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  min-width: 76px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.adherence-pct-badge--good     { background: var(--severity-mild-bg);    border-color: var(--severity-mild);     color: var(--severity-mild-text); }
+.adherence-pct-badge--moderate { background: var(--severity-moderate-bg); border-color: var(--severity-moderate); color: var(--severity-moderate-text); }
+.adherence-pct-badge--poor     { background: var(--severity-severe-bg);   border-color: var(--severity-severe);   color: var(--severity-severe); }
+.adherence-pct-badge--neutral  { background: var(--surface-alt); color: var(--text-3); }
+
+.adherence-pct-number {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.adherence-pct-label {
+  font-size: 0.8125rem;
+  opacity: 0.85;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+/* Legend — each state is a self-contained chip so every item is unambiguously distinct */
+.adherence-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+/* Base chip */
+.adherence-legend-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.3125rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
   cursor: default;
 }
 
-.adherence-cell--on_track  { background: var(--severity-mild); color: #fff; }
-.adherence-cell--missed    { background: var(--severity-severe); color: #fff; }
-.adherence-cell--no_schedule { background: var(--border); color: var(--text-3); }
-
-.adherence-legend {
-  display: flex;
-  gap: var(--space-md);
-  margin-top: var(--space-sm);
-  font-size: 0.8rem;
+/* Legend chip tooltip */
+.adherence-legend-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  padding: 0.3125rem 0.625rem;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
 }
 
-.adherence-legend-item { display: flex; align-items: center; gap: 4px; }
-
-.adherence-legend-item::before {
+.adherence-legend-tooltip::after {
   content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text);
 }
 
-.adherence-legend-item--on_track::before  { background: var(--severity-mild); }
-.adherence-legend-item--missed::before    { background: var(--severity-severe); }
-.adherence-legend-item--no_schedule::before { background: var(--border); }
+.adherence-legend-item:hover .adherence-legend-tooltip,
+.adherence-legend-item:focus-within .adherence-legend-tooltip {
+  display: block;
+}
 
-.adherence-empty { padding: var(--space-lg); text-align: center; color: var(--text-3); }
-.adherence-back  { margin-top: var(--space-lg); }
+/* Symbol prefix — comes before the label text inside the chip */
+.adherence-legend-item--on_track::before    { content: "✓"; font-weight: 700; }
+.adherence-legend-item--partial::before     { content: "~"; font-weight: 700; }
+.adherence-legend-item--pending::before     { content: "·"; font-size: 1rem; line-height: 0; }
+.adherence-legend-item--missed::before      { content: "✗"; font-weight: 700; }
+.adherence-legend-item--no_schedule::before { content: "—"; }
+
+/* Chip colours mirror the cell states */
+.adherence-legend-item--on_track    { background: var(--severity-mild-bg);    border-color: var(--severity-mild);     color: var(--severity-mild-text); }
+.adherence-legend-item--partial     { background: var(--severity-moderate-bg); border-color: var(--severity-moderate); color: var(--severity-moderate-text); }
+.adherence-legend-item--pending     { background: var(--surface); border: 2px dashed var(--border-mid); color: var(--text-3); }
+.adherence-legend-item--missed      { background: var(--severity-severe-bg);   border-color: var(--severity-severe);   color: var(--severity-severe); }
+.adherence-legend-item--no_schedule { background: var(--surface-alt);          border-color: var(--border-mid);        color: var(--text-3); }
+
+/* Touch — reduce gaps slightly to keep the 30-day grid within the available card width.
+   7×42 + 6×5 = 324px — fits within 343px inner card on 375px viewport. */
+@media (pointer: coarse) {
+  .adherence-grid--30 { column-gap: 5px; row-gap: 9px; }
+  .adherence-grid--7  { row-gap: 8px; }
+}
+
+/* Fix #12: Turbo Frame loading state — fade stale content while period switches */
+#adherence-grid[busy],
+#adherence-grid[aria-busy="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 150ms ease-out;
+}
+
+/* Reduced motion — disable all transforms and transitions */
+@media (prefers-reduced-motion: reduce) {
+  .adherence-cell { transition: none; }
+
+  .adherence-grid--30 .adherence-cell-wrapper:not(.adherence-cell-wrapper--empty):hover .adherence-cell,
+  .adherence-grid--30 .adherence-cell-wrapper:not(.adherence-cell-wrapper--empty):focus-within .adherence-cell,
+  .adherence-grid--7 .adherence-cell-wrapper:hover .adherence-cell,
+  .adherence-grid--7 .adherence-cell-wrapper:focus-within .adherence-cell {
+    transform: none;
+    box-shadow: none;
+  }
+
+  #adherence-grid[busy],
+  #adherence-grid[aria-busy="true"] {
+    transition: none;
+  }
+}
 
 /* ==========================================================================
    Bottom navigation — mobile only, authenticated users
@@ -1121,13 +2025,13 @@ button {
     display: none;
   }
 
-  /* Account for the bottom nav height in main content so nothing gets obscured */
-  main {
+  /* Account for the bottom nav only on authenticated pages — unauthenticated pages
+     don't render the bottom nav, so they don't need the extra clearance */
+  .has-bottom-nav main {
     padding-bottom: calc(52px + env(safe-area-inset-bottom) + 1.5rem);
   }
 
-  /* Footer sits above bottom nav */
-  footer {
+  .has-bottom-nav footer {
     padding-bottom: calc(52px + env(safe-area-inset-bottom) + 1rem);
   }
 }
@@ -1167,5 +2071,608 @@ button {
   .timeline-row-actions,
   .peak-flow-row-actions {
     gap: 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   Medication cards
+   ========================================================================== */
+
+.medication-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.medication-card--low-stock {
+  border-color: var(--severity-moderate);
+}
+
+.medication-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.medication-card-name {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.medication-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.medication-badge--reliever   { background: var(--teal-100); color: var(--teal-700); }
+.medication-badge--preventer  { background: var(--severity-mild-bg); color: var(--severity-mild); }
+.medication-badge--combination { background: var(--severity-moderate-bg); color: var(--severity-moderate-text); }
+.medication-badge--other      { background: var(--surface-alt); color: var(--text-3); }
+
+.medication-card-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.375rem 1.25rem;
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+}
+
+.medication-card-details dt {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.medication-card-details dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.medication-days-supply {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-3);
+}
+
+.low-stock-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background: var(--severity-moderate-bg);
+  color: var(--severity-moderate-text);
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* Dose log form */
+.dose-log-section {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.dose-log-section-title,
+.dose-history-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 0 0 0.75rem;
+}
+
+.dose-log-form-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dose-log-form-fields label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-bottom: 0.25rem;
+}
+
+.dose-log-puffs-input { width: 80px; }
+.dose-log-time-input  { width: 220px; }
+
+/* Dose history */
+.dose-history-section {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.dose-history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.dose-log-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.dose-log-puffs {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 5rem;
+}
+
+.dose-log-time {
+  color: var(--text-3);
+  flex: 1;
+}
+
+.btn-delete--small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.dose-history-empty {
+  font-size: 0.875rem;
+  color: var(--text-3);
+  margin: 0;
+}
+
+/* Refill */
+.refill-details {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.btn-refill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--dur);
+}
+
+.btn-refill:hover {
+  background: var(--brand-light);
+}
+
+.refill-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.refill-count-input { width: 120px; }
+
+/* Card action row */
+.medication-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   Medication list rows — compact row layout for medications/index
+   ========================================================================== */
+
+.med-list {
+  padding: 0;
+  margin: 0;
+}
+
+.med-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.med-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.med-row--low-stock .med-row-name {
+  color: var(--severity-moderate-text);
+}
+
+.med-row-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.med-row-name {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  color: var(--text);
+}
+
+.med-row-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.med-row-supply {
+  color: var(--text-3);
+}
+
+.med-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Log dose details/summary inline panel */
+.med-log-details {
+  position: relative;
+}
+
+.med-log-details summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.med-log-details summary::-webkit-details-marker,
+.med-log-details summary::marker {
+  display: none;
+}
+
+.med-log-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 1rem;
+  z-index: 50;
+  min-width: 300px;
+}
+
+/* Overflow ⋮ menu */
+.med-overflow {
+  position: relative;
+}
+
+.med-overflow-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 1.125rem;
+  color: var(--text-3);
+  list-style: none;
+  transition: background var(--dur), color var(--dur), border-color var(--dur);
+  user-select: none;
+}
+
+.med-overflow-toggle:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--border-mid);
+}
+
+.med-overflow-toggle::-webkit-details-marker,
+.med-overflow-toggle::marker {
+  display: none;
+}
+
+.med-overflow-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  min-width: 160px;
+  overflow: hidden;
+}
+
+.med-overflow-item,
+button.med-overflow-item {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--dur), color var(--dur);
+}
+
+.med-overflow-item:last-child,
+button.med-overflow-item:last-child {
+  border-bottom: none;
+}
+
+.med-overflow-item:hover,
+button.med-overflow-item:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.med-overflow-item--danger,
+button.med-overflow-item--danger {
+  color: var(--severity-severe);
+}
+
+.med-overflow-item--danger:hover,
+button.med-overflow-item--danger:hover {
+  background: var(--severity-severe-bg);
+  color: var(--severity-severe);
+}
+
+/* Refill nested inside overflow */
+.med-refill-details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.med-refill-details > summary::-webkit-details-marker,
+.med-refill-details > summary::marker {
+  display: none;
+}
+
+.med-refill-form-wrap {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+/* Empty state */
+.medications-empty-state {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-3);
+}
+
+.medications-empty-state p { margin-bottom: 1.25rem; }
+
+/* ==========================================================================
+   Empty state — shared across all feature areas
+   Structure: icon → h3 → p → CTA (all optional except icon+h3)
+   ========================================================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.empty-state-icon {
+  color: var(--text-4);
+  margin-bottom: 0.25rem;
+}
+
+.empty-state h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.empty-state p {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  margin: 0;
+  max-width: 36ch;
+  line-height: 1.55;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   Shared utilities
+   ========================================================================== */
+
+/* Small button variant — used for toggle groups, compact actions */
+.btn-sm {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Active state for .btn-sm toggle buttons (e.g. 7-day / 30-day selector) */
+.btn-sm--active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.btn-sm--active:hover {
+  background: var(--brand-dark);
+  color: #fff;
+}
+
+/* Fix #9: active toggle button needs a visible focus ring */
+.btn-sm--active:focus-visible {
+  outline: 2px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+/* Back link */
+.page-back-link {
+  margin-top: var(--space-lg);
+  font-size: 0.9rem;
+}
+
+/* Static pages (privacy, terms) */
+.pages-updated {
+  font-size: 0.875rem;
+  color: var(--text-4);
+  margin-bottom: var(--space-lg);
+}
+
+.page-back-link a {
+  color: var(--text-3);
+  text-decoration: none;
+}
+
+.page-back-link a:hover {
+  color: var(--brand);
+}
+
+/* ==========================================================================
+   Toast notifications
+   Appended to #toast-region by toast_controller.js.
+   ========================================================================== */
+
+.toast-region {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  min-width: 260px;
+  max-width: 360px;
+  background: var(--gray-900);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  pointer-events: all;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast--success { background: var(--gray-900); }
+.toast--notice  { background: var(--gray-900); }
+.toast--alert   {
+  background: var(--severity-severe);
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem;
+  transition: color var(--dur), background var(--dur);
+}
+
+.toast-dismiss:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.toast-dismiss:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Mobile: centre the toast above the bottom nav */
+@media (max-width: 768px) {
+  .toast-region {
+    bottom: calc(52px + env(safe-area-inset-bottom) + 1rem);
+    right: 1rem;
+    left: 1rem;
+    align-items: stretch;
+  }
+
+  .toast {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: opacity 200ms ease-out;
+    transform: none;
   }
 }
