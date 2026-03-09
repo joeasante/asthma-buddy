@@ -37,11 +37,25 @@ function toDayLabel(dateStr) {
   return `${weekday} ${day}`
 }
 
+// Returns a stroke colour for a health event marker by its css_modifier.
+// Uses hardcoded fallbacks — event colours are not in CSS vars.
+function eventMarkerColor(cssModifier) {
+  const map = {
+    "hospital-visit":    "#dc2626",  // red
+    "gp-appointment":    "#2563eb",  // blue
+    "illness":           "#d97706",  // amber
+    "medication-change": "#7c3aed",  // purple
+    "other":             "#64748b"   // slate
+  }
+  return map[cssModifier] || "#64748b"
+}
+
 export default class extends Controller {
   static values = {
     type: String,
     data: Array,
-    personalBest: Number
+    personalBest: Number,
+    healthEvents: Array
   }
 
   connect() {
@@ -203,9 +217,62 @@ export default class extends Controller {
     const yMin     = pb > 0 ? 0 : Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
     const yMax     = pb > 0 ? ceiling : undefined
 
+    const healthEvents = this.healthEventsValue || []
+
+    // Build a lookup from date string ("YYYY-MM-DD") to chart x-axis label ("Day D")
+    // so we can map event dates to x positions on the chart.
+    const dateLabelMap = {}
+    data.forEach(d => { dateLabelMap[d.date] = toDayLabel(d.date) })
+
+    const markerPlugin = {
+      id: "healthEventMarkers",
+      afterDraw(chart) {
+        if (!healthEvents.length) return
+
+        const ctx    = chart.ctx
+        const xAxis  = chart.scales.x
+        const yAxis  = chart.scales.y
+        const top    = yAxis.top
+        const bottom = yAxis.bottom
+
+        healthEvents.forEach(event => {
+          const label = dateLabelMap[event.date]
+          if (!label) return  // event date not in current chart window
+
+          const xPos = xAxis.getPixelForValue(label)
+          if (xPos === undefined || isNaN(xPos)) return
+
+          const color = eventMarkerColor(event.css_modifier)
+
+          ctx.save()
+
+          // Vertical dashed line
+          ctx.beginPath()
+          ctx.setLineDash([4, 3])
+          ctx.strokeStyle = color
+          ctx.lineWidth   = 1.5
+          ctx.globalAlpha = 0.75
+          ctx.moveTo(xPos, top)
+          ctx.lineTo(xPos, bottom)
+          ctx.stroke()
+
+          // Short label text at top of line
+          ctx.setLineDash([])
+          ctx.globalAlpha = 1
+          ctx.fillStyle   = color
+          ctx.font        = "bold 10px system-ui, sans-serif"
+          ctx.textAlign   = "center"
+          ctx.fillText(event.label, xPos, top - 4)
+
+          ctx.restore()
+        })
+      }
+    }
+
     this.chart = new Chart(this.element, {
       type: "line",
       data: { labels, datasets },
+      plugins: [markerPlugin],
       options: {
         responsive: true,
         plugins: {
