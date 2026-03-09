@@ -6,6 +6,10 @@ module Settings
 
     def index
       @medications = Current.user.medications.chronological.includes(:dose_logs)
+
+      # Header eyebrow: medication count + low stock count
+      @header_medication_count = @medications.size
+      @header_low_stock_count  = @medications.count(&:low_stock?)
     end
 
     def new

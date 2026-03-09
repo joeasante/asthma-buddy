@@ -62,6 +62,20 @@ class HealthEvent < ApplicationRecord
     !point_in_time? && ended_at.nil?
   end
 
+  # Human-readable duration between recorded_at and ended_at.
+  # Examples: "3d 4h", "9d", "6h"
+  def formatted_duration
+    return unless ended_at.present? && recorded_at.present?
+    total_seconds = (ended_at - recorded_at).to_i
+    days  = total_seconds / 86_400
+    hours = (total_seconds % 86_400) / 3_600
+    if days > 0
+      hours > 0 ? "#{days}d #{hours}h" : "#{days}d"
+    else
+      "#{hours}h"
+    end
+  end
+
   private
 
   def ended_at_after_recorded_at

@@ -60,6 +60,12 @@ class PeakFlowReadingsController < ApplicationController
       page: params[:page], total: cached_total
     )
 
+    # Header eyebrow: most recent reading (all-time) + this month's count
+    @header_last_reading = Current.user.peak_flow_readings.chronological.first
+    @header_month_count  = Current.user.peak_flow_readings
+                                   .where(recorded_at: Date.current.beginning_of_month..)
+                                   .count
+
     respond_to do |format|
       format.html do
         # One bar per day showing the best (highest) reading for that day.

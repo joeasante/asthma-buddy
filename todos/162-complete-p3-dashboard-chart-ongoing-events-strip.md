@@ -1,5 +1,5 @@
 ---
-status: pending
+status: complete
 priority: p3
 issue_id: "162"
 tags: [uat, health-events, dashboard, chart, ui]

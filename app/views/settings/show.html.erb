@@ -1,20 +1,38 @@
 <% content_for :title, "Settings" %>
 
-<h1>Settings</h1>
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Your Account</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Settings</h1>
+        <p class="page-header-subtitle">Manage your account and preferences</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-<section aria-label="Personal best peak flow">
-  <h2>Personal Best Peak Flow</h2>
-
-  <% if @current_personal_best %>
-    <p>
-      Current personal best:
-      <strong><%= @current_personal_best.value %> L/min</strong>
-      <span class="settings-pb-date">(set <%= @current_personal_best.recorded_at.strftime("%-d %b %Y") %>)</span>
-    </p>
-  <% else %>
-    <p class="settings-pb-unset">No personal best set yet.</p>
-  <% end %>
-
-  <%= render "personal_best_form", personal_best_record: @personal_best_record,
-                                   current_personal_best: @current_personal_best %>
-</section>
+<div class="settings-nav-grid">
+  <a href="<%= profile_path %>" class="section-card section-card--nav" aria-label="Profile settings">
+    <div class="settings-nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.75"/>
+        <path d="M4.5 20c0-3.59 3.358-6.5 7.5-6.5s7.5 2.91 7.5 6.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="settings-nav-body">
+      <p class="settings-nav-title">Profile</p>
+      <p class="settings-nav-description">Update your name, avatar, and personal best.</p>
+    </div>
+    <span class="settings-nav-chevron" aria-hidden="true"></span>
+  </a>
+</div>

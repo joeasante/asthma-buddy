@@ -50,6 +50,15 @@ class DashboardController < ApplicationController
         }
       end
 
+    # Duration events that started before this week and are still ongoing.
+    # These have no valid x-axis position so they can't be chart markers,
+    # but they're clinically relevant context shown as an "Active" strip below the chart.
+    @ongoing_health_events = user.health_events
+      .where(recorded_at: ...week_start.beginning_of_day)
+      .where(ended_at: nil)
+      .where.not(event_type: HealthEvent::POINT_IN_TIME_TYPES)
+      .order(recorded_at: :asc)
+
     # Low-stock medications — loaded with dose_logs to avoid N+1 in low_stock?
     @low_stock_medications = user.medications.includes(:dose_logs).select(&:low_stock?)
 

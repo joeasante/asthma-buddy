@@ -1,7 +1,24 @@
 <% content_for :title, "Profile" %>
 
 <div class="page-header">
-  <h1>Profile</h1>
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Your Account</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4.5 20c0-3.59 3.358-6.5 7.5-6.5s7.5 2.91 7.5 6.5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Profile</h1>
+        <p class="page-header-subtitle">Your personal details and health baseline</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <%# Amber banner — persistent, shown only when no personal best is set %>

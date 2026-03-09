@@ -28,6 +28,7 @@
       <%= stylesheet_link_tag "settings",          "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "confirm_dialog",    "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "symptom_timeline",  "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "health_events",     "data-turbo-track": "reload" %>
     <% end %>
     <%= javascript_importmap_tags %>
   </head>
@@ -59,6 +60,12 @@
             <%= link_to "Peak Flow", peak_flow_readings_path,
                   class: nav_link_class(peak_flow_readings_path),
                   aria: { current: nav_current(peak_flow_readings_path) } %>
+            <%= link_to "Medications", settings_medications_path,
+                  class: nav_link_class(settings_medications_path),
+                  aria: { current: nav_current(settings_medications_path) } %>
+            <%= link_to "Medical History", health_events_path,
+                  class: nav_link_class(health_events_path),
+                  aria: { current: nav_current(health_events_path) } %>
             <div class="nav-user" data-controller="nav-dropdown">
               <button class="nav-avatar-btn"
                       data-action="click->nav-dropdown#toggle"
@@ -81,9 +88,7 @@
                 </svg>
               </button>
               <div class="nav-dropdown" data-nav-dropdown-target="menu" hidden>
-                <%= link_to "Profile", profile_path, class: "nav-dropdown-item" %>
-                <%= link_to "Medications", settings_medications_path, class: "nav-dropdown-item" %>
-                <%= link_to "Adherence", adherence_path, class: "nav-dropdown-item" %>
+                <%= link_to "Settings", settings_path, class: "nav-dropdown-item" %>
                 <%= button_to "Sign out", session_path, method: :delete,
                       class: "nav-dropdown-item nav-dropdown-item--signout",
                       form: { style: "width: 100%" } %>

@@ -75,6 +75,103 @@
 }
 
 /* ==========================================================================
+   Settings hub — nav grid and nav cards
+   ========================================================================== */
+
+.settings-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Nav card modifier — entire card is a link */
+a.section-card--nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+a.section-card--nav:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-md);
+}
+
+a.section-card--nav:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.settings-nav-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--brand-tint, color-mix(in srgb, var(--brand) 10%, transparent));
+  color: var(--brand);
+}
+
+.settings-nav-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-nav-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 0.25rem;
+  line-height: 1.3;
+}
+
+.settings-nav-description {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Pure CSS chevron arrow */
+.settings-nav-chevron {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-4);
+  border-bottom: 2px solid var(--text-4);
+  transform: rotate(-45deg);
+  transition: border-color 150ms ease-out;
+}
+
+a.section-card--nav:hover .settings-nav-chevron {
+  border-color: var(--brand);
+}
+
+/* Single column on narrow viewports */
+@media (max-width: 640px) {
+  .settings-nav-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.section-card--nav {
+    transition: none;
+  }
+
+  .settings-nav-chevron {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
    Low-stock badge — med rows and dashboard
    ========================================================================== */
 
@@ -89,10 +186,10 @@
   white-space: nowrap;
 }
 
-/* Low-stock row: amber left border accent */
+/* Low-stock row: amber left border accent — offset padding to compensate for the 3px border */
 .med-row--low-stock {
   border-left: 3px solid var(--severity-moderate);
-  padding-left: calc(1rem - 3px);
+  padding-left: calc(1.5rem - 3px);
 }
 
 /* Days-of-supply secondary text */
@@ -286,7 +383,9 @@
     border-color: var(--border);
   }
 
-  /* On narrow viewports stack stats and actions beneath info */
+  /* Stack info → stats → actions on three lines.
+     Combined width of stats + actions (~358px) exceeds the 319px content
+     area on a 375px viewport — stacking eliminates the overflow. */
   .med-row {
     flex-wrap: wrap;
   }
@@ -295,8 +394,23 @@
     width: 100%;
   }
 
+  /* Stats fill the full second line; wrap internally so "Low stock"
+     badge doesn't force a horizontal scroll. */
   .med-row-stats {
+    width: 100%;
     font-size: 0.875rem;
+    flex-wrap: wrap;
+  }
+
+  /* Actions take the full third line.
+     Log dose details (flex:1) fills available space; ⋮ button stays compact.
+     When the log panel opens it inherits width:100% and expands correctly. */
+  .med-row-actions {
+    width: 100%;
+  }
+
+  .med-log-details {
+    flex: 1;
   }
 
   .dose-log-time-input {

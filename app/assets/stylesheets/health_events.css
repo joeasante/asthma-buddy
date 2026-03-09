@@ -97,6 +97,13 @@
   color: var(--text-2);
 }
 
+.event-row-duration {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-left: 0.25rem;
+}
+
 /* --- Ongoing badge --- */
 
 .event-ongoing-badge {

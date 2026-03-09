@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :personal_best_records, dependent: :destroy
   has_many :medications, dependent: :destroy
   has_many :dose_logs, dependent: :destroy
+  has_many :health_events, dependent: :destroy
   has_one_attached :avatar
 
   validates :avatar,

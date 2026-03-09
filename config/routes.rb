@@ -9,13 +9,13 @@ Rails.application.routes.draw do
   resources :passwords, param: :token, only: %i[ new create edit update ]
   resources :symptom_logs, path: "symptom-logs", only: %i[ index new create edit update destroy ]
   resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index edit update destroy ]
+  resources :health_events, path: "medical-history", only: %i[ index new create edit update destroy ]
 
   resource :profile, only: %i[show update destroy]
   post "profile/personal_best", to: "profiles#update_personal_best", as: :profile_personal_best
   delete "profile/avatar", to: "profiles#remove_avatar", as: :profile_avatar
 
-  get  "settings",               to: "settings#show",                as: :settings
-  post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
+  get "settings", to: "settings#show", as: :settings
 
   scope "/settings", module: :settings, as: :settings do
     resources :medications, only: %i[index new create edit update destroy] do

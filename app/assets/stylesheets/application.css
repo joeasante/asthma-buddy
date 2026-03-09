@@ -470,6 +470,7 @@ main {
 
 @media (max-width: 640px) {
   main { padding: 1.5rem 1rem; }
+  .section-card { padding: 1rem 1.25rem; }
 }
 
 /* ==========================================================================
@@ -881,20 +882,147 @@ button {
 }
 
 /* ==========================================================================
-   Page header (title + action button side by side)
+   Page header — tinted band + eyebrow + icon badge + subtitle
    ========================================================================== */
 
 .page-header {
+  background: var(--teal-50);
+  border-bottom: 1px solid var(--teal-200);
+  /* Bleed to the edges of the content column */
+  margin-left: calc(-1 * var(--page-pad, 1.5rem));
+  margin-right: calc(-1 * var(--page-pad, 1.5rem));
+  margin-bottom: 2.5rem;
+  padding: 0.75rem var(--page-pad, 1.5rem) 1.5rem;
+}
+
+/* ── Eyebrow row ── */
+.page-header-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Live context stat (data pages) */
+.eyebrow-stat {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.eyebrow-stat strong {
+  color: var(--text-2);
+  font-weight: 700;
+}
+
+/* Section category label (account pages) */
+.eyebrow-section {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Dot separator between stats */
+.eyebrow-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--teal-200);
+  flex-shrink: 0;
+}
+
+/* Zone / status pill */
+.eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.eyebrow-pill--green  { background: var(--severity-mild-bg);    color: var(--severity-mild); }
+.eyebrow-pill--amber,
+.eyebrow-pill--yellow { background: var(--severity-moderate-bg); color: var(--severity-moderate-text); }
+.eyebrow-pill--red    { background: var(--severity-severe-bg);   color: var(--severity-severe); }
+
+/* Trailing rule — fills remaining horizontal space */
+.eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--teal-200);
+  min-width: 1rem;
+}
+
+/* ── Main row ── */
+.page-header-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-md);
   flex-wrap: wrap;
+}
+
+.page-header-left {
+  display: flex;
+  align-items: center;
   gap: 1rem;
-  margin-bottom: 2.5rem;
+}
+
+/* Icon badge — white card, drop shadow, brand-coloured icon inside */
+.page-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--brand);
 }
 
 .page-header h1 {
-  margin-bottom: 0;
+  margin-bottom: 0.2rem;
+}
+
+/* One-liner page context below the h1 */
+.page-header-subtitle {
+  font-size: 1rem;
+  color: var(--text-3);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Actions block — right side of main row */
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+/* Mobile — stack actions below text on very narrow viewports */
+@media (max-width: 480px) {
+  .page-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }
 
 /* ==========================================================================
@@ -2288,20 +2416,25 @@ button {
 .med-list {
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .med-row {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
   position: relative;
+  transition: box-shadow var(--dur) var(--ease);
 }
 
-.med-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.med-row:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .med-row--low-stock .med-row-name {

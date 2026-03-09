@@ -110,6 +110,17 @@ None - no external service configuration required.
 - Fixtures ready for reuse in system tests (Phase 15-02 or later)
 - Health event test infrastructure complete — Phase 15-02 can build UI/system tests on top
 
+## Self-Check: PASSED
+
+- FOUND: test/fixtures/health_events.yml
+- FOUND: test/models/health_event_test.rb
+- FOUND: test/controllers/health_events_controller_test.rb
+- FOUND: .ariadna_planning/phases/15-health-events/15-01-SUMMARY.md
+- FOUND commit: 27d6033 (fixtures)
+- FOUND commit: 06fe769 (model tests)
+- FOUND commit: 1adb566 (controller tests)
+- FOUND commit: 85cb3c9 (docs/metadata)
+
 ---
 *Phase: 15-health-events*
 *Completed: 2026-03-09*

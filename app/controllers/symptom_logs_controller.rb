@@ -51,6 +51,11 @@ class SymptomLogsController < ApplicationController
 
     @symptom_logs, @total_pages, @current_page = base_relation.paginate(page: params[:page])
 
+    # Header eyebrow: most recent log (all-time) + this month's count
+    all_logs = Current.user.symptom_logs.chronological
+    @header_last_log    = all_logs.first
+    @header_month_count = all_logs.where(recorded_at: Date.current.beginning_of_month..).count
+
     respond_to do |format|
       format.html do
         @chart_data = build_chart_data(base_relation)

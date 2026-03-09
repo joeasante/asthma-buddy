@@ -29,6 +29,14 @@ class AdherenceController < ApplicationController
       @padding_dates = []
     end
 
+    # Header eyebrow: distinct days with at least one dose logged this month
+    month_start = Date.current.beginning_of_month
+    @header_days_taken   = user.dose_logs
+                               .where(recorded_at: month_start..)
+                               .distinct
+                               .count("DATE(recorded_at)")
+    @header_days_elapsed = (Date.current - month_start).to_i + 1
+
     @adherence_history = preventers.map do |medication|
       days_data = date_range.map do |date|
         logs   = all_logs[ [ medication.id, date ] ]

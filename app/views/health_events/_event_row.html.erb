@@ -13,13 +13,14 @@
           </time>
         <% elsif health_event.ended_at.present? %>
           <span class="event-row-time">
-            <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y") %></time>
+            <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %></time>
             <span aria-hidden="true">–</span>
-            <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y") %></time>
+            <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y, %H:%M") %></time>
+            <span class="event-row-duration"><%= health_event.formatted_duration %></span>
           </span>
         <% else %>
           <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
-            <%= health_event.recorded_at.strftime("%-d %b %Y") %>
+            <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
           </time>
           <span class="event-ongoing-badge">Ongoing</span>
         <% end %>
