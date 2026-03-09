@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 15 (Health Events) — IN PROGRESS
-Plan: 15-01 complete — HealthEvent fixtures, model unit tests, controller integration tests
-Status: 1/? plans done. 39 new tests added (19 model + 20 controller); pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-01.
-Last activity: 2026-03-09 — Phase 15 Plan 01: 5 fixtures, 19 model tests, 20 controller integration tests.
+Plan: 15-02 complete — Medical History system tests (11 tests, all green)
+Status: 2/? plans done. 11 system tests added; pre-existing failures in adherence/dashboard/settings/passwords are not regressions from 15-02.
+Last activity: 2026-03-09 — Phase 15 Plan 02: 11 system tests (CRUD, display, auth, cross-user isolation, chart marker).
 
 Progress: [██████████] Phase 15 started (Milestone 3 — Health Events)
 
@@ -36,6 +36,7 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 15 Plan 02 completed: 2026-03-09 (~12 min, 1 task, 1 file, 11 new system tests)
 - Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
 
 **Milestone 2 Velocity:**
@@ -86,6 +87,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 15 Plan 02 Decisions (2026-03-09)
+
+- **CSS text-transform:uppercase badge assertions**: Event badges use CSS `text-transform: uppercase`; Capybara sees "ILLNESS" not "Illness"; use case-insensitive regex `assert_text(/illness/i)` and `assert_selector ".event-ongoing-badge", text: /ongoing/i`
+- **Edit page h1 is "Edit medical event"**: `edit.html.erb` has `<h1>Edit medical event</h1>` — system tests must use this exact text, not "Edit event" as the plan suggested
+- **Pre-commit hook adds chart marker integration test**: Hook automatically added test 11 checking `canvas[data-chart-health-events-value]` contains event date — passes
+- **Toast flash assert_text works for Turbo Stream deletions**: `assert_text "Medical event deleted."` works because toast_controller.js injects `<span class="toast-message">` into `#toast-region` which Capybara sees as visible DOM text
 
 ### Phase 15 Plan 01 Decisions (2026-03-09)
 
@@ -215,5 +223,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Phase 15 Plan 01 complete — HealthEvent fixtures (5), model unit tests (19), controller integration tests (20), 39 new tests passing. Phase 15 (Health Events) in progress.
+Stopped at: Phase 15 Plan 02 complete — 11 system tests for Medical History UI (CRUD, display, auth, cross-user, chart marker), all passing. Phase 15 (Health Events) in progress.
 Resume file: None
