@@ -1,6 +1,12 @@
 <%= turbo_stream.remove dom_id(@medication) %>
+
+<%# If no medications remain, show the empty state %>
+<% if Current.user.medications.none? %>
+  <%= turbo_stream.update "medications_list" do %>
+    <%= render "settings/medications/medications_empty_state" %>
+  <% end %>
+<% end %>
+
 <%= turbo_stream.replace "flash-messages" do %>
-  <div id="flash-messages">
-    <p role="status" class="flash flash--notice">Medication removed.</p>
-  </div>
+  <div id="flash-messages" data-controller="toast" data-toast-message="Medication removed." data-toast-variant="notice"></div>
 <% end %>

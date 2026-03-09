@@ -31,7 +31,7 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     fill_in "Reading value", with: "450"
     # recorded_at has a default value — leave it (already set to Time.current)
 
-    click_button "Log reading"
+    click_button "Save reading"
 
     # Flash message should appear with zone info
     # 450 / 520 = 86.5% => Green Zone
@@ -55,7 +55,7 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     visit new_peak_flow_reading_path
 
     fill_in "Reading value", with: "400"
-    click_button "Log reading"
+    click_button "Save reading"
 
     assert_text "set your personal best"
   end
@@ -67,7 +67,7 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     execute_script("document.querySelectorAll('input[required]').forEach(el => el.removeAttribute('required'))")
 
     # Leave value blank and submit
-    click_button "Log reading"
+    click_button "Save reading"
 
     assert_text "error"
     assert_text "Value"

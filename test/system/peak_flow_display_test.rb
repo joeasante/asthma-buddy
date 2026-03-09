@@ -77,7 +77,7 @@ class PeakFlowDisplayTest < ApplicationSystemTestCase
       # Alice's latest personal best applicable to this reading (recorded 7 days ago) is 520
       # 420 / 520 = 80.8% => still green
       fill_in "Reading value", with: "420"
-      click_button "Log reading"
+      click_button "Save reading"
     end
 
     # Row updates without a full page reload
@@ -119,7 +119,7 @@ class PeakFlowDisplayTest < ApplicationSystemTestCase
     # Submit a clearly invalid value (0 fails the greater_than: 0 validation server-side)
     within("##{dom_id(reading)}") do
       find("input[name='peak_flow_reading[value]']").set("0")
-      click_button "Log reading"
+      click_button "Save reading"
     end
 
     # Validation error appears — still on the same page (URL retains preset param)

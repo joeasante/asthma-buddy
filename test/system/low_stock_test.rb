@@ -31,22 +31,22 @@ class LowStockTest < ApplicationSystemTestCase
     assert_current_path dashboard_url
   end
 
-  # ── Medication card ──
+  # ── Medication row ──
 
-  test "low-stock badge appears on medication card when supply is below 14 days" do
+  test "low-stock badge appears on medication row when supply is below 14 days" do
     visit settings_medications_path
-    within ".medication-card", text: "TestPreventer" do
+    within ".med-row", text: "TestPreventer" do
       assert_text "Low stock"
-      assert_text "10.0 days remaining"
+      assert_text "10.0 days"
     end
   end
 
-  test "medication card without doses_per_day shows no low-stock badge" do
+  test "medication row without doses_per_day shows no low-stock badge" do
     # alice_reliever has no doses_per_day — should never show badge
     visit settings_medications_path
-    within ".medication-card", text: "Ventolin" do
+    within ".med-row", text: "Ventolin" do
       assert_no_text "Low stock"
-      assert_no_text "days remaining"
+      assert_no_text "days"
     end
   end
 
@@ -73,22 +73,22 @@ class LowStockTest < ApplicationSystemTestCase
   test "refilling a medication with sufficient count removes the low-stock badge" do
     visit settings_medications_path
 
-    within ".medication-card", text: "TestPreventer" do
+    within ".med-row", text: "TestPreventer" do
       assert_text "Low stock"
 
-      # Open the refill form (details/summary toggle)
-      find("details.refill-details summary").click
+      # Open overflow menu, then refill details
+      find("details.med-overflow summary").click
+      find("details.med-refill-details summary").click
 
-      # Clear the pre-filled count and enter a new sufficient count
       # 60 doses / 2 per day = 30 days → not low stock
       fill_in "medication[starting_dose_count]", with: "60"
       click_button "Confirm refill"
     end
 
     # After Turbo Stream update, badge should be gone
-    within ".medication-card", text: "TestPreventer" do
+    within ".med-row", text: "TestPreventer" do
       assert_no_text "Low stock"
-      assert_text "30.0 days remaining"
+      assert_text "30.0 days"
     end
   end
 

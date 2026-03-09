@@ -1,0 +1,40 @@
+<% section_titles = {
+  "avatar"   => "Profile Photo",
+  "details"  => "Personal Details",
+  "password" => "Change Password"
+} %>
+
+<% if Current.user.errors.any? %>
+  <%# Re-render the section that has errors %>
+  <%= turbo_stream.replace "#{@form_section}-section" do %>
+    <section class="section-card" id="<%= @form_section %>-section" aria-labelledby="<%= @form_section %>-heading">
+      <div class="section-card-header">
+        <h2 class="section-card-title" id="<%= @form_section %>-heading">
+          <%= section_titles[@form_section] %>
+        </h2>
+      </div>
+      <%= render "#{@form_section}_form", user: Current.user %>
+    </section>
+  <% end %>
+<% else %>
+  <%# Show success toast %>
+  <%= turbo_stream.replace "profile-toast" do %>
+    <div id="profile-toast"
+         data-controller="toast"
+         data-toast-message="<%= { "avatar" => "Photo saved.", "details" => "Details saved.", "password" => "Password changed." }[@form_section || "details"] %>"
+         data-toast-variant="success">
+    </div>
+  <% end %>
+
+  <%# Re-render the section with fresh state (clears form fields, shows new avatar, etc.) %>
+  <%= turbo_stream.replace "#{@form_section}-section" do %>
+    <section class="section-card" id="<%= @form_section %>-section" aria-labelledby="<%= @form_section %>-heading">
+      <div class="section-card-header">
+        <h2 class="section-card-title" id="<%= @form_section %>-heading">
+          <%= section_titles[@form_section] %>
+        </h2>
+      </div>
+      <%= render "#{@form_section}_form", user: Current.user %>
+    </section>
+  <% end %>
+<% end %>

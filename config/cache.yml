@@ -1,7 +1,9 @@
 default: &default
   store_options:
-    # Cap age of oldest cache entry to fulfill retention policies
-    # max_age: <%= 60.days.to_i %>
+    # Cap age of oldest cache entry. 7 days balances cache warmth against stale
+    # health data (symptom summaries, aggregates). Always set explicit expires_in:
+    # at the call site for any health data fetched via Rails.cache.fetch.
+    max_age: <%= 7.days.to_i %>
     max_size: <%= 256.megabytes %>
     namespace: <%= Rails.env %>
 
@@ -10,6 +12,7 @@ development:
 
 test:
   <<: *default
+  # config/environments/test.rb uses :null_store — these store_options are ignored in test.
 
 production:
   database: cache

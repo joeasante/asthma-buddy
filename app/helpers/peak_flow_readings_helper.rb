@@ -17,6 +17,14 @@ module PeakFlowReadingsHelper
   def zone_flash_message_text(reading)
     return "Reading saved \u2014 set your personal best to see your zone." if reading.zone.nil?
 
-    "Reading saved \u2014 #{reading.zone.capitalize} Zone (#{reading.zone_percentage}% of personal best)."
+    pct = reading.zone_percentage
+    case reading.zone
+    when "green"
+      "Reading saved \u2014 Green zone (#{pct}% of your personal best). Great work!"
+    when "yellow"
+      "Reading saved \u2014 Yellow zone (#{pct}%). Consider checking your action plan."
+    when "red"
+      "Reading saved \u2014 Red zone (#{pct}%). Follow your asthma action plan."
+    end
   end
 end

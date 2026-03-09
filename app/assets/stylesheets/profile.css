@@ -1,0 +1,559 @@
+/* ==========================================================================
+   Profile page
+   ========================================================================== */
+
+/* Smooth scroll for in-page anchor links (amber banner → personal best card) */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Layout */
+
+.profile-sections {
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   No-personal-best amber banner
+   ========================================================================== */
+
+.profile-no-pb-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  background: var(--severity-moderate-bg);
+  border: 1px solid var(--severity-moderate);
+  border-left: 4px solid var(--severity-moderate);
+  border-radius: var(--radius-lg);
+  padding: 0.875rem 1rem;
+  margin: 0 auto var(--space-lg);
+  max-width: 640px;
+}
+
+.profile-no-pb-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--severity-moderate-text);
+}
+
+.profile-no-pb-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--severity-moderate-text);
+  line-height: 1.5;
+}
+
+.profile-no-pb-link {
+  font-weight: 600;
+  color: var(--severity-moderate-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.profile-no-pb-link:hover {
+  color: var(--severity-moderate-text);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Danger zone — section-card modifiers
+   ========================================================================== */
+
+.section-card--danger {
+  border-color: var(--severity-severe);
+  border-top: 3px solid var(--severity-severe);
+}
+
+/* Bleed header to card edges with a red wash */
+.section-card--danger .section-card-header {
+  background: var(--severity-severe-bg);
+  margin: -1.5rem -1.75rem 1.25rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: calc(var(--radius-xl) - 1px) calc(var(--radius-xl) - 1px) 0 0;
+  border-bottom: 1px solid var(--error-border);
+}
+
+.section-card-title--danger {
+  color: var(--severity-severe);
+}
+
+/* Warning icon in danger header — aligned with title text */
+.profile-danger-header-icon {
+  color: var(--severity-severe);
+  flex-shrink: 0;
+  margin-bottom: -1px; /* optical baseline alignment with text */
+}
+
+/* ==========================================================================
+   Avatar section
+   ========================================================================== */
+
+.profile-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* 80px circle avatar image */
+.profile-avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* Initials fallback — same dimensions as .profile-avatar-img */
+.profile-avatar-initials {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 1.875rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.profile-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+/* "Change photo" — label contains the hidden file input.
+   :focus-within shows the ring when the input receives keyboard focus. */
+.profile-avatar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.profile-avatar-label:focus-within {
+  outline: 2px solid var(--teal-500);
+  outline-offset: 2px;
+}
+
+/* "Remove photo" — low-emphasis destructive text link */
+.profile-avatar-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--severity-severe);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  min-height: 44px;
+  transition: color 150ms ease-out;
+}
+
+.profile-avatar-remove:hover {
+  color: #b91c1c;
+  text-decoration: none;
+}
+
+.profile-avatar-remove:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* button_to generates its own <form> — keep it inline */
+form.button_to:has(.profile-avatar-remove) {
+  display: inline-flex;
+  margin: 0;
+}
+
+/* File type/size metadata — subtle, smaller than field-hint */
+.profile-avatar-meta {
+  font-size: 0.8125rem;
+  color: var(--text-4);
+  margin: 0 0 var(--space-md);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Shared form footer
+   ========================================================================== */
+
+.profile-form-actions {
+  margin-top: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Form error summary */
+.form-errors {
+  background: var(--severity-severe-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--error-text-dark);
+}
+
+.form-errors ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+/* ==========================================================================
+   Personal details
+   ========================================================================== */
+
+/* Read-only email — shown as plain text, not an input */
+.profile-email-readonly {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 0.25rem;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Personal best — compact inline layout
+   ========================================================================== */
+
+/* Current value pill — shown when a personal best is already saved */
+.profile-pb-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3125rem;
+  background: var(--teal-50);
+  border: 1px solid var(--teal-200);
+  border-radius: var(--radius-pill);
+  padding: 0.4375rem 0.875rem;
+  margin-bottom: var(--space-lg);
+}
+
+.profile-pb-badge-value {
+  font-size: 1.375rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.profile-pb-badge-unit {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.profile-pb-badge-dot {
+  font-size: 0.875rem;
+  color: var(--text-4);
+}
+
+.profile-pb-badge-date {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+/* Remove default field bottom margin on the pb field — hint is outside it */
+.profile-pb-field {
+  margin-bottom: 0;
+}
+
+/* Input + unit + submit button on one row */
+.profile-pb-input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+}
+
+.profile-pb-input-row .input-with-unit {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Submit button vertically matches the input height */
+.profile-pb-input-row .btn-primary {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Hint — smaller and lighter than .field-hint */
+.profile-pb-hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-4);
+  line-height: 1.5;
+}
+
+/* Number input + unit pill */
+.input-with-unit {
+  display: flex;
+  align-items: stretch;
+}
+
+.input-with-unit input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  flex: 1;
+}
+
+.input-unit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.875rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-mid);
+  border-left: none;
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Danger zone content
+   ========================================================================== */
+
+.profile-danger-text {
+  color: var(--text-2);
+  margin-bottom: var(--space-sm);
+}
+
+.profile-danger-list {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  margin: 0 0 var(--space-lg);
+  padding-left: 1.375rem;
+  line-height: 1.6;
+}
+
+.profile-danger-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Solid red button — the main delete trigger */
+.profile-danger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--severity-severe);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.profile-danger-btn:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+
+.profile-danger-btn:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+.profile-danger-btn:focus-visible {
+  outline: 2px solid var(--severity-severe);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Account deletion <dialog>
+   ========================================================================== */
+
+.profile-delete-dialog {
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 0;
+  max-width: 440px;
+  width: calc(100% - 2rem);
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-delete-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.profile-delete-dialog-inner {
+  padding: 2rem;
+}
+
+/* Warning icon circle */
+.profile-delete-dialog-icon-wrap {
+  width: 52px;
+  height: 52px;
+  background: var(--severity-severe-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--severity-severe);
+  margin: 0 auto var(--space-lg);
+  border: 2px solid var(--error-border);
+}
+
+.profile-delete-dialog-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 var(--space-sm);
+  letter-spacing: -0.015em;
+  text-align: center;
+}
+
+.profile-delete-dialog-body {
+  font-size: 0.9375rem;
+  color: var(--text-2);
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.profile-delete-dialog-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+/* Confirm submit button — solid red, full width, starts disabled */
+.profile-delete-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: var(--severity-severe);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 150ms ease-out;
+}
+
+.profile-delete-submit:not(:disabled):hover {
+  background: #b91c1c;
+}
+
+.profile-delete-submit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.profile-delete-submit:focus-visible {
+  outline: 2px solid var(--severity-severe);
+  outline-offset: 2px;
+}
+
+/* Cancel button — full width, secondary ghost style */
+.profile-delete-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+
+.profile-delete-cancel:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.profile-delete-cancel:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Strip default margin from the manual <form> tag */
+.profile-delete-form {
+  margin: 0;
+  display: block;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .section-card--danger .section-card-header {
+    margin: -1.25rem -1.25rem 1.25rem;
+    padding: 0.875rem 1.25rem;
+  }
+
+  .profile-pb-input-row {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .profile-pb-input-row .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-delete-dialog-inner {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .profile-avatar-remove,
+  .profile-danger-btn,
+  .profile-delete-submit,
+  .profile-delete-cancel {
+    transition: none;
+  }
+
+  .profile-danger-btn:active {
+    transform: none;
+  }
+}

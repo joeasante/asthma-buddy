@@ -1,0 +1,23 @@
+<% content_for :title, "Privacy Policy — Asthma Buddy" %>
+
+<div class="page-header">
+  <h1>Privacy Policy</h1>
+</div>
+
+<div class="section-card">
+  <p class="pages-updated">Last updated: <%= Date.today.strftime("%B %-d, %Y") %></p>
+
+  <h2>Your data stays private</h2>
+  <p>Asthma Buddy stores your health data — symptom logs, peak flow readings, and medication records — solely to provide you with the service. We do not sell, share, or monetise your data in any way.</p>
+
+  <h2>What we collect</h2>
+  <p>We collect only what you provide: your email address, any health logs you enter, and standard server logs (IP address, request timestamps) used for security and debugging.</p>
+
+  <h2>How we store it</h2>
+  <p>Your data is stored in an encrypted SQLite database on a dedicated server. Passwords are hashed using bcrypt and are never stored in plaintext. We do not use third-party analytics services.</p>
+
+  <h2>Your rights</h2>
+  <p>You can export or delete your account and all associated data at any time from your profile settings. If you have questions, contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>.</p>
+</div>
+
+<p class="page-back-link"><%= link_to "&larr; Back to home".html_safe, root_path %></p>

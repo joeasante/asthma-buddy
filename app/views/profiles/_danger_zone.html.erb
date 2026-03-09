@@ -1,0 +1,78 @@
+<div data-controller="confirm-email"
+     data-confirm-email-email-value="<%= user.email_address %>">
+
+  <p class="profile-danger-text">
+    This action is permanent and cannot be undone. Everything associated with your account will be destroyed.
+  </p>
+
+  <ul class="profile-danger-list">
+    <li>All symptom logs and written notes</li>
+    <li>Peak flow readings and trend history</li>
+    <li>Medications and dose logs</li>
+    <li>Personal best and zone settings</li>
+  </ul>
+
+  <button type="button"
+          class="profile-danger-btn"
+          data-action="click->confirm-email#open">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Delete my account
+  </button>
+
+  <dialog class="profile-delete-dialog"
+          data-confirm-email-target="dialog"
+          data-action="click->confirm-email#backdropClick">
+    <div class="profile-delete-dialog-inner">
+      <div class="profile-delete-dialog-icon-wrap" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h3 class="profile-delete-dialog-title">Delete your account?</h3>
+      <p class="profile-delete-dialog-body">
+        This will permanently delete all your health data — symptom logs, peak flow readings,
+        medications, and account settings. <strong>This cannot be undone.</strong>
+      </p>
+
+      <div class="field">
+        <label for="confirm-email-input">
+          Type <strong><%= user.email_address %></strong> to confirm
+        </label>
+        <input type="email"
+               id="confirm-email-input"
+               autocomplete="off"
+               spellcheck="false"
+               placeholder="<%= user.email_address %>"
+               data-confirm-email-target="input"
+               data-action="input->confirm-email#check">
+      </div>
+
+      <div class="profile-delete-dialog-actions">
+        <form action="<%= profile_path %>" method="post" class="profile-delete-form">
+          <%= hidden_field_tag :_method, :delete %>
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <button type="submit"
+                  class="profile-delete-submit"
+                  disabled
+                  data-confirm-email-target="button">
+            Delete my account permanently
+          </button>
+        </form>
+
+        <button type="button"
+                class="profile-delete-cancel"
+                data-action="click->confirm-email#dismiss">
+          Cancel, keep my account
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

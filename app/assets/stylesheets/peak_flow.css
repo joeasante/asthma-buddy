@@ -1,153 +1,565 @@
 /* ==========================================================================
-   Peak Flow entry form
-   Zone colors inherit --severity-mild/moderate/severe from symptom_timeline.css
+   Peak Flow — form, table, zone badges, personal best hero
    ========================================================================== */
 
-/* Primary action button */
-.btn-primary {
-  display: inline-block;
-  padding: 0.45rem 1rem;
-  background-color: #1a56db;
-  color: #fff;
-  border-radius: 4px;
-  text-decoration: none;
+/* --------------------------------------------------------------------------
+   No-personal-best banner (form page)
+   -------------------------------------------------------------------------- */
+
+.pf-form-banner {
+  margin-bottom: var(--space-lg);
+}
+
+.pf-form-banner a {
+  color: var(--severity-moderate-text);
   font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  text-decoration: underline;
 }
 
-.btn-primary:hover {
-  background-color: #1648c3;
-  color: #fff;
+/* Index-page no-PB banner link */
+.pf-banner-link {
+  font-weight: 600;
+  margin-left: 0.5rem;
+  color: var(--severity-moderate-text);
+  text-decoration: underline;
 }
 
-/* Personal best banner */
-.peak-flow-banner {
-  background: #fff8e6;
-  border: 1px solid #f0d080;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
+/* --------------------------------------------------------------------------
+   Personal best hero card — index page
+   -------------------------------------------------------------------------- */
+
+.pf-pb-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+  background: var(--brand);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg) 1.75rem;
   margin-bottom: 1.25rem;
-  font-size: 0.9rem;
+  box-shadow: var(--shadow-md);
 }
 
-/* Large numeric value input */
-.peak-flow-value-field {
+.pf-pb-hero-left {
+  flex-shrink: 0;
+}
+
+.pf-pb-hero-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 0.25rem;
+}
+
+.pf-pb-hero-reading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  line-height: 1;
+  margin-bottom: 0.375rem;
+}
+
+.pf-pb-hero-value {
+  font-size: 3rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: var(--surface);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pf-pb-hero-unit {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.pf-pb-hero-sub {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+}
+
+.pf-pb-hero-zones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  flex: 1;
+  align-items: center;
+}
+
+.pf-pb-zone-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pf-pb-zone-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-pb-zone-dot--green  { background: var(--severity-mild); }
+.pf-pb-zone-dot--yellow { background: var(--severity-moderate); }
+.pf-pb-zone-dot--red    { background: var(--severity-severe); }
+
+.pf-pb-hero-action {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.pf-pb-hero-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.125rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: var(--surface);
+  text-decoration: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  min-height: 44px;
+}
+
+.pf-pb-hero-link:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: var(--surface);
+  text-decoration: none;
+}
+
+.pf-pb-hero-link:focus-visible {
+  outline: 2px solid var(--surface);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Readings table
+   -------------------------------------------------------------------------- */
+
+.pf-readings-table {
+  width: 100%;
+}
+
+.pf-td-datetime {
+  white-space: nowrap;
+}
+
+.pf-td-date {
+  display: block;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.pf-td-time {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-3);
+  margin-top: 0.125rem;
+}
+
+.pf-td-value {
+  white-space: nowrap;
+}
+
+.pf-row-value {
+  font-weight: 700;
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.pf-row-unit {
+  font-size: 0.8rem;
+  color: var(--text-4);
+  font-weight: 400;
+  margin-left: 0.125rem;
+}
+
+.pf-td-zone {
+  white-space: nowrap;
+}
+
+.pf-td-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.pf-td-actions .btn-edit,
+.pf-td-actions .btn-delete {
+  font-size: 0.875rem;
+}
+
+/* Dim the table during turbo-frame loading */
+turbo-frame[busy] .pf-readings-table {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Skeleton rows — visible only when frame is busy
+   -------------------------------------------------------------------------- */
+
+.pf-skeleton-block {
+  display: none;
+}
+
+.pf-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.pf-skeleton-cell {
+  border-radius: var(--radius-md);
+  height: 1rem;
+}
+
+.pf-skeleton-cell--date    { width: 7rem; }
+.pf-skeleton-cell--value   { width: 4rem; }
+.pf-skeleton-cell--badge   { width: 5rem; border-radius: var(--radius-pill); }
+.pf-skeleton-cell--actions { width: 6rem; margin-left: auto; }
+
+turbo-frame[busy] .pf-skeleton-block {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
   margin-bottom: 1rem;
 }
 
-/* .input-with-unit layout defined in settings.css — shared pattern */
-.peak-flow-value-input-row {
-  margin-top: 0.25rem;
-}
+/* --------------------------------------------------------------------------
+   Zone badges
+   -------------------------------------------------------------------------- */
 
-.peak-flow-value-input {
-  font-size: 2rem;
+.zone-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
   font-weight: 600;
-  width: 7rem;
-  text-align: center;
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  -moz-appearance: textfield;
+  white-space: nowrap;
+  border: 1px solid transparent;
 }
 
-.peak-flow-value-input::-webkit-outer-spin-button,
-.peak-flow-value-input::-webkit-inner-spin-button {
+.zone-badge--green  { background: var(--severity-mild-bg);     color: var(--severity-mild-text);     border-color: var(--severity-mild); }
+.zone-badge--yellow { background: var(--severity-moderate-bg); color: var(--severity-moderate-text); border-color: var(--severity-moderate); }
+.zone-badge--red    { background: var(--severity-severe-bg);   color: var(--severity-severe);        border-color: var(--severity-severe); }
+.zone-badge--none   { background: var(--surface-alt);          color: var(--text-3);                 border-color: var(--border); }
+
+/* --------------------------------------------------------------------------
+   Zone legend — below the readings table
+   -------------------------------------------------------------------------- */
+
+.pf-zone-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem var(--space-lg);
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-3);
+}
+
+.pf-zone-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.pf-zone-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-zone-legend-dot--green  { background: var(--severity-mild); }
+.pf-zone-legend-dot--yellow { background: var(--severity-moderate); }
+.pf-zone-legend-dot--red    { background: var(--severity-severe); }
+
+/* --------------------------------------------------------------------------
+   Zone filter chips (zone-specific colour accents)
+   -------------------------------------------------------------------------- */
+
+.filter-chip--zone-green.filter-chip--active  {
+  background: var(--severity-mild-bg);
+  color: var(--severity-mild-text);
+  border-color: var(--severity-mild);
+}
+
+.filter-chip--zone-yellow.filter-chip--active {
+  background: var(--severity-moderate-bg);
+  color: var(--severity-moderate-text);
+  border-color: var(--severity-moderate);
+}
+
+.filter-chip--zone-red.filter-chip--active {
+  background: var(--severity-severe-bg);
+  color: var(--severity-severe);
+  border-color: var(--severity-severe);
+}
+
+/* --------------------------------------------------------------------------
+   Peak flow value input — centred big number entry widget
+   -------------------------------------------------------------------------- */
+
+.pf-value-field {
+  margin-bottom: var(--space-xl);
+}
+
+.pf-value-label {
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+.pf-value-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.pf-value-input {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  width: 9rem;
+  text-align: center;
+  padding: 0.625rem 0.75rem;
+  border: 2px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  color: var(--text);
+  background: var(--surface);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  -moz-appearance: textfield;
+  line-height: 1.2;
+}
+
+.pf-value-input:focus {
+  outline: none;
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+
+.pf-value-input--error {
+  border-color: var(--error-border);
+}
+
+.pf-value-input--error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.pf-value-input::-webkit-outer-spin-button,
+.pf-value-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Zone label colours in flash message — reuse severity custom properties */
-.zone-label {
-  font-weight: 600;
+.pf-value-unit {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-3);
 }
 
-.zone-label--green  { color: var(--severity-mild); }
-.zone-label--yellow { color: var(--severity-moderate); }
-.zone-label--red    { color: var(--severity-severe); }
-
-/* Zone badge — background-fill pill for index list rows */
-.zone-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1.4;
-  white-space: nowrap;
+.pf-zone-no-pb {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  margin-top: 0.625rem;
+  text-align: center;
 }
 
-/* WCAG AA: green text #1a6b36 on #d4edda (contrast 5.1:1) */
-.zone-badge--green {
-  background-color: #d4edda;
-  color: #1a6b36;
+.pf-zone-no-pb a {
+  color: var(--brand);
+  text-decoration: underline;
 }
 
-/* WCAG AA: amber text #7a4a00 on #fff3cd (contrast 5.3:1) */
-.zone-badge--yellow {
-  background-color: #fff3cd;
-  color: #7a4a00;
-}
+/* --------------------------------------------------------------------------
+   Zone preview — live feedback below the value input
+   -------------------------------------------------------------------------- */
 
-/* WCAG AA: red text #7b1d1d on #f8d7da (contrast 5.5:1) */
-.zone-badge--red {
-  background-color: #f8d7da;
-  color: #7b1d1d;
-}
-
-/* No zone (no personal best set) */
-.zone-badge--none {
-  background-color: #f0f0f0;
-  color: #555;
-}
-
-/* Peak flow reading list rows */
-.peak-flow-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.peak-flow-row {
+.zone-preview {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #eee;
+  gap: var(--space-sm);
+  margin-top: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+
+.zone-preview--green  { background: var(--severity-mild-bg);     color: var(--severity-mild-text);     border-color: var(--severity-mild); }
+.zone-preview--yellow { background: var(--severity-moderate-bg); color: var(--severity-moderate-text); border-color: var(--severity-moderate); }
+.zone-preview--red    { background: var(--severity-severe-bg);   color: var(--severity-severe);        border-color: var(--severity-severe); }
+
+.zone-preview-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.zone-preview--green  .zone-preview-dot { background: var(--severity-mild); }
+.zone-preview--yellow .zone-preview-dot { background: var(--severity-moderate); }
+.zone-preview--red    .zone-preview-dot { background: var(--severity-severe); }
+
+.zone-preview-pct {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   Form actions row
+   -------------------------------------------------------------------------- */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
 
-.peak-flow-row-value {
-  font-weight: 600;
-  font-size: 1rem;
-  min-width: 4.5rem;
+.form-actions-submit {
+  flex-shrink: 0;
 }
 
-.peak-flow-row-unit {
-  font-size: 0.8rem;
-  color: #666;
-}
+/* --------------------------------------------------------------------------
+   Mobile responsive — card-style rows for the table (≤ 640px)
+   -------------------------------------------------------------------------- */
 
-.peak-flow-row-timestamp {
-  font-size: 0.8rem;
-  color: #666;
-  white-space: nowrap;
-}
+@media (max-width: 640px) {
+  .table-wrap {
+    border: none;
+    box-shadow: none;
+  }
 
-.peak-flow-row-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 0.5rem;
-}
+  .pf-readings-table thead {
+    display: none;
+  }
 
-@media (max-width: 480px) {
-  .peak-flow-row {
+  .pf-readings-table tbody,
+  .pf-readings-table tr {
+    display: block;
+  }
+
+  .pf-table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 0.625rem;
+  }
+
+  /* Reset td to block in card layout — override data-table defaults */
+  .pf-table-row td,
+  .pf-table-row td:last-child {
+    display: block;
+    padding: 0;
+    border-bottom: none;
+    text-align: left;
+  }
+
+  .pf-td-datetime {
+    order: 2;
+  }
+
+  .pf-td-value {
+    order: 1;
+  }
+
+  .pf-td-zone {
+    order: 3;
+  }
+
+  .pf-td-actions {
+    order: 4;
+    text-align: left;
+    margin-top: 0.25rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .pf-td-date {
+    display: inline;
+  }
+
+  .pf-td-time {
+    display: inline;
+    margin-top: 0;
+    margin-left: 0.25rem;
+  }
+
+  .pf-pb-hero {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--space-md);
   }
-  .peak-flow-row-actions {
+
+  .pf-pb-hero-action {
     margin-left: 0;
+  }
+
+  .pf-pb-hero-value {
+    font-size: 2.5rem;
+  }
+
+  .pf-pb-hero-zones {
+    align-items: flex-start;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Turbo Frame loading states
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes skeleton-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-alt) 0%,
+      var(--border) 50%,
+      var(--surface-alt) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    background: var(--surface-alt);
+    animation: none;
+  }
+
+  turbo-frame[busy] .pf-readings-table {
+    opacity: 0.45;
   }
 }

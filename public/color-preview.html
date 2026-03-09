@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asthma Buddy — Colour Scheme Previews</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page-title {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #0f172a;
+    }
+    .page-sub {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9375rem;
+      margin-bottom: 3rem;
+    }
+
+    .schemes {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .schemes { grid-template-columns: 1fr; }
+    }
+
+    .scheme-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .scheme-label {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .scheme-label span {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 0.8125rem;
+      color: #64748b;
+      margin-left: 0.5rem;
+    }
+
+    /* ─── Shared mock UI chrome ─── */
+    .mock {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+      background: #f8fafc;
+      font-size: 13px;
+    }
+
+    .mock-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .mock-brand {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--brand);
+    }
+
+    .mock-nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .mock-nav-link {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .mock-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mock-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: #f8fafc;
+    }
+
+    /* Status card */
+    .mock-status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--brand);
+      border-radius: 12px;
+      padding: 1rem 1.125rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: var(--status-bg, var(--surface));
+    }
+
+    .mock-status-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 0.25rem;
+    }
+
+    .mock-status-value {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #0f172a;
+    }
+
+    .mock-status-unit {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-left: 2px;
+    }
+
+    .mock-status-zone {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #065f46;
+    }
+
+    .mock-zone-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .mock-status-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .mock-time {
+      font-size: 0.6875rem;
+      color: #94a3b8;
+    }
+
+    .mock-btn {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Stats grid */
+    .mock-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.625rem;
+    }
+
+    .mock-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .mock-stat-label {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 0.25rem;
+    }
+
+    .mock-stat-value {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .mock-stat-sub {
+      font-size: 0.5625rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Quick log */
+    .mock-quick {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.625rem;
+    }
+
+    .mock-quick-btn {
+      padding: 0.625rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .mock-quick-primary {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .mock-quick-outline {
+      background: var(--surface);
+      color: var(--brand);
+      border: 1.5px solid var(--brand-light-border, var(--brand));
+      opacity: 0.85;
+    }
+
+    /* Chart area */
+    .mock-chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+
+    .mock-chart-title {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .mock-chart-link {
+      font-size: 0.625rem;
+      font-weight: 500;
+      color: var(--brand);
+    }
+
+    .mock-chart {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 0.75rem 0.875rem 0.5rem;
+      overflow: hidden;
+    }
+
+    .mock-bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .mock-bar {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .mock-bar-label {
+      font-size: 0.4375rem;
+      color: #94a3b8;
+    }
+
+    /* Recents */
+    .mock-recents {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.625rem;
+    }
+
+    .mock-recent-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .mock-recent-title {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .mock-recent-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.625rem;
+    }
+
+    .mock-recent-row:last-child { border-bottom: none; }
+
+    .mock-recent-val {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .mock-recent-time {
+      margin-left: auto;
+      color: #94a3b8;
+    }
+
+    .mock-badge {
+      padding: 1px 5px;
+      border-radius: 999px;
+      font-size: 0.5rem;
+      font-weight: 600;
+    }
+
+    .mock-badge--green { background: #d1fae5; color: #065f46; }
+    .mock-badge--yellow { background: #fef3c7; color: #92400e; }
+    .mock-badge--red { background: #fee2e2; color: #991b1b; }
+
+    /* Bottom nav */
+    .mock-bottom-nav {
+      display: flex;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0.5rem 0 0.25rem;
+    }
+
+    .mock-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 2px 0;
+    }
+
+    .mock-tab--active {
+      color: var(--brand);
+    }
+
+    .mock-tab-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ─── Colour scheme tokens ─── */
+
+    /* 1. Teal */
+    .scheme-teal {
+      --brand: #0d9488;
+      --brand-dark: #0f766e;
+      --brand-light: #f0fdfa;
+      --brand-light-border: #99f6e4;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --status-bg: #f0fdfa;
+    }
+
+    /* 2. Indigo */
+    .scheme-indigo {
+      --brand: #6366f1;
+      --brand-dark: #4f46e5;
+      --brand-light: #eef2ff;
+      --brand-light-border: #c7d2fe;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --status-bg: #eef2ff;
+    }
+
+    /* 3. Emerald */
+    .scheme-emerald {
+      --brand: #059669;
+      --brand-dark: #047857;
+      --brand-light: #ecfdf5;
+      --brand-light-border: #a7f3d0;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --status-bg: #ecfdf5;
+    }
+
+    /* 4. Warm Slate */
+    .scheme-slate {
+      --brand: #475569;
+      --brand-dark: #334155;
+      --brand-light: #f8fafc;
+      --brand-light-border: #cbd5e1;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --status-bg: #f8fafc;
+      --accent: #f59e0b;
+    }
+    .scheme-slate .mock-btn { background: var(--brand-dark); }
+    .scheme-slate .mock-quick-primary { background: var(--brand-dark); }
+    .scheme-slate .mock-chart-link { color: var(--accent); }
+    .scheme-slate .mock-tab--active { color: var(--accent); }
+    .scheme-slate .mock-brand { color: var(--brand-dark); }
+    .scheme-slate .mock-status { border-left-color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Asthma Buddy — Colour Scheme Previews</h1>
+  <p class="page-sub">Dashboard view across four candidate palettes. Reply with the number or name you prefer.</p>
+
+  <div class="schemes">
+
+    <!-- 1. Teal -->
+    <div class="scheme-wrapper">
+      <div class="scheme-label">1 — Teal / Slate <span>calm · clinical · trustworthy</span></div>
+      <div class="mock scheme-teal">
+        <div class="mock-nav">
+          <span class="mock-brand">Asthma Buddy</span>
+          <div class="mock-nav-links">
+            <span class="mock-nav-link">Symptoms</span>
+            <span class="mock-nav-link">Peak Flow</span>
+            <div class="mock-avatar">JA</div>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-status">
+            <div>
+              <p class="mock-status-label">Last reading</p>
+              <div style="display:flex;align-items:baseline;gap:3px">
+                <span class="mock-status-value">490</span>
+                <span class="mock-status-unit">L/min</span>
+              </div>
+              <div class="mock-status-zone">
+                <span class="mock-zone-dot"></span> Green zone — 89% of personal best
+              </div>
+            </div>
+            <div class="mock-status-right">
+              <span class="mock-time">2 hours ago</span>
+              <button class="mock-btn">Log reading</button>
+            </div>
+          </div>
+
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-label">7-day avg</div>
+              <div class="mock-stat-value">468<span style="font-size:0.65rem;font-weight:500;color:#94a3b8"> L/min</span></div>
+              <div class="mock-stat-sub">85% of personal best</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Symptoms</div>
+              <div class="mock-stat-value">3</div>
+              <div class="mock-stat-sub">1 moderate</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Last severe</div>
+              <div class="mock-stat-value" style="font-size:0.75rem;color:#059669;font-weight:700">None</div>
+              <div class="mock-stat-sub">No episodes</div>
+            </div>
+          </div>
+
+          <div class="mock-quick">
+            <button class="mock-quick-btn mock-quick-primary">⚡ Log peak flow</button>
+            <button class="mock-quick-btn mock-quick-outline">📋 Log symptom</button>
+          </div>
+
+          <div>
+            <div class="mock-chart-header">
+              <span class="mock-chart-title">Peak Flow — Last 7 Days</span>
+              <span class="mock-chart-link">View full history →</span>
+            </div>
+            <div class="mock-chart">
+              <div class="mock-bar-group"><div class="mock-bar" style="height:60%;background:#0d9488;opacity:0.7"></div><span class="mock-bar-label">Mon</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:72%;background:#0d9488;opacity:0.7"></div><span class="mock-bar-label">Tue</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:55%;background:#f59e0b;opacity:0.7"></div><span class="mock-bar-label">Wed</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:80%;background:#0d9488;opacity:0.7"></div><span class="mock-bar-label">Thu</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:85%;background:#0d9488;opacity:0.7"></div><span class="mock-bar-label">Fri</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:78%;background:#0d9488;opacity:0.7"></div><span class="mock-bar-label">Sat</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:89%;background:#0d9488"></div><span class="mock-bar-label">Sun</span></div>
+            </div>
+          </div>
+
+          <div class="mock-recents">
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Peak Flow</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">490</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Today</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">465</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Yesterday</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">310</span><span class="mock-badge mock-badge--yellow">Yellow</span><span class="mock-recent-time">2d ago</span></div>
+            </div>
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Symptoms</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Cough</span><span class="mock-badge mock-badge--yellow">Moderate</span><span class="mock-recent-time">2d ago</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Wheeze</span><span class="mock-badge mock-badge--green">Mild</span><span class="mock-recent-time">4d ago</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-bottom-nav">
+          <div class="mock-tab mock-tab--active">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Peak Flow
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+            Symptoms
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Indigo -->
+    <div class="scheme-wrapper">
+      <div class="scheme-label">2 — Indigo / Violet <span>premium · modern · energetic</span></div>
+      <div class="mock scheme-indigo">
+        <div class="mock-nav">
+          <span class="mock-brand">Asthma Buddy</span>
+          <div class="mock-nav-links">
+            <span class="mock-nav-link">Symptoms</span>
+            <span class="mock-nav-link">Peak Flow</span>
+            <div class="mock-avatar">JA</div>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-status">
+            <div>
+              <p class="mock-status-label">Last reading</p>
+              <div style="display:flex;align-items:baseline;gap:3px">
+                <span class="mock-status-value">490</span>
+                <span class="mock-status-unit">L/min</span>
+              </div>
+              <div class="mock-status-zone">
+                <span class="mock-zone-dot"></span> Green zone — 89% of personal best
+              </div>
+            </div>
+            <div class="mock-status-right">
+              <span class="mock-time">2 hours ago</span>
+              <button class="mock-btn">Log reading</button>
+            </div>
+          </div>
+
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-label">7-day avg</div>
+              <div class="mock-stat-value">468<span style="font-size:0.65rem;font-weight:500;color:#94a3b8"> L/min</span></div>
+              <div class="mock-stat-sub">85% of personal best</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Symptoms</div>
+              <div class="mock-stat-value">3</div>
+              <div class="mock-stat-sub">1 moderate</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Last severe</div>
+              <div class="mock-stat-value" style="font-size:0.75rem;color:#059669;font-weight:700">None</div>
+              <div class="mock-stat-sub">No episodes</div>
+            </div>
+          </div>
+
+          <div class="mock-quick">
+            <button class="mock-quick-btn mock-quick-primary">⚡ Log peak flow</button>
+            <button class="mock-quick-btn mock-quick-outline">📋 Log symptom</button>
+          </div>
+
+          <div>
+            <div class="mock-chart-header">
+              <span class="mock-chart-title">Peak Flow — Last 7 Days</span>
+              <span class="mock-chart-link">View full history →</span>
+            </div>
+            <div class="mock-chart">
+              <div class="mock-bar-group"><div class="mock-bar" style="height:60%;background:#6366f1;opacity:0.7"></div><span class="mock-bar-label">Mon</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:72%;background:#6366f1;opacity:0.7"></div><span class="mock-bar-label">Tue</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:55%;background:#f59e0b;opacity:0.8"></div><span class="mock-bar-label">Wed</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:80%;background:#6366f1;opacity:0.7"></div><span class="mock-bar-label">Thu</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:85%;background:#6366f1;opacity:0.7"></div><span class="mock-bar-label">Fri</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:78%;background:#6366f1;opacity:0.7"></div><span class="mock-bar-label">Sat</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:89%;background:#6366f1"></div><span class="mock-bar-label">Sun</span></div>
+            </div>
+          </div>
+
+          <div class="mock-recents">
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Peak Flow</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">490</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Today</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">465</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Yesterday</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">310</span><span class="mock-badge mock-badge--yellow">Yellow</span><span class="mock-recent-time">2d ago</span></div>
+            </div>
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Symptoms</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Cough</span><span class="mock-badge mock-badge--yellow">Moderate</span><span class="mock-recent-time">2d ago</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Wheeze</span><span class="mock-badge mock-badge--green">Mild</span><span class="mock-recent-time">4d ago</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-bottom-nav">
+          <div class="mock-tab mock-tab--active">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Peak Flow
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+            Symptoms
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Emerald -->
+    <div class="scheme-wrapper">
+      <div class="scheme-label">3 — Emerald / Green <span>health · growth · positive</span></div>
+      <div class="mock scheme-emerald">
+        <div class="mock-nav">
+          <span class="mock-brand">Asthma Buddy</span>
+          <div class="mock-nav-links">
+            <span class="mock-nav-link">Symptoms</span>
+            <span class="mock-nav-link">Peak Flow</span>
+            <div class="mock-avatar">JA</div>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-status">
+            <div>
+              <p class="mock-status-label">Last reading</p>
+              <div style="display:flex;align-items:baseline;gap:3px">
+                <span class="mock-status-value">490</span>
+                <span class="mock-status-unit">L/min</span>
+              </div>
+              <div class="mock-status-zone">
+                <span class="mock-zone-dot"></span> Green zone — 89% of personal best
+              </div>
+            </div>
+            <div class="mock-status-right">
+              <span class="mock-time">2 hours ago</span>
+              <button class="mock-btn">Log reading</button>
+            </div>
+          </div>
+
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-label">7-day avg</div>
+              <div class="mock-stat-value">468<span style="font-size:0.65rem;font-weight:500;color:#94a3b8"> L/min</span></div>
+              <div class="mock-stat-sub">85% of personal best</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Symptoms</div>
+              <div class="mock-stat-value">3</div>
+              <div class="mock-stat-sub">1 moderate</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Last severe</div>
+              <div class="mock-stat-value" style="font-size:0.75rem;color:#059669;font-weight:700">None</div>
+              <div class="mock-stat-sub">No episodes</div>
+            </div>
+          </div>
+
+          <div class="mock-quick">
+            <button class="mock-quick-btn mock-quick-primary">⚡ Log peak flow</button>
+            <button class="mock-quick-btn mock-quick-outline">📋 Log symptom</button>
+          </div>
+
+          <div>
+            <div class="mock-chart-header">
+              <span class="mock-chart-title">Peak Flow — Last 7 Days</span>
+              <span class="mock-chart-link">View full history →</span>
+            </div>
+            <div class="mock-chart">
+              <div class="mock-bar-group"><div class="mock-bar" style="height:60%;background:#059669;opacity:0.7"></div><span class="mock-bar-label">Mon</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:72%;background:#059669;opacity:0.7"></div><span class="mock-bar-label">Tue</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:55%;background:#f59e0b;opacity:0.8"></div><span class="mock-bar-label">Wed</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:80%;background:#059669;opacity:0.7"></div><span class="mock-bar-label">Thu</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:85%;background:#059669;opacity:0.7"></div><span class="mock-bar-label">Fri</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:78%;background:#059669;opacity:0.7"></div><span class="mock-bar-label">Sat</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:89%;background:#059669"></div><span class="mock-bar-label">Sun</span></div>
+            </div>
+          </div>
+
+          <div class="mock-recents">
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Peak Flow</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">490</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Today</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">465</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Yesterday</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">310</span><span class="mock-badge mock-badge--yellow">Yellow</span><span class="mock-recent-time">2d ago</span></div>
+            </div>
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Symptoms</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Cough</span><span class="mock-badge mock-badge--yellow">Moderate</span><span class="mock-recent-time">2d ago</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Wheeze</span><span class="mock-badge mock-badge--green">Mild</span><span class="mock-recent-time">4d ago</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-bottom-nav">
+          <div class="mock-tab mock-tab--active">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Peak Flow
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+            Symptoms
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Warm Slate -->
+    <div class="scheme-wrapper">
+      <div class="scheme-label">4 — Warm Slate + Amber <span>understated · accessible · serious</span></div>
+      <div class="mock scheme-slate">
+        <div class="mock-nav">
+          <span class="mock-brand">Asthma Buddy</span>
+          <div class="mock-nav-links">
+            <span class="mock-nav-link">Symptoms</span>
+            <span class="mock-nav-link">Peak Flow</span>
+            <div class="mock-avatar" style="background:#475569">JA</div>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-status">
+            <div>
+              <p class="mock-status-label">Last reading</p>
+              <div style="display:flex;align-items:baseline;gap:3px">
+                <span class="mock-status-value">490</span>
+                <span class="mock-status-unit">L/min</span>
+              </div>
+              <div class="mock-status-zone">
+                <span class="mock-zone-dot"></span> Green zone — 89% of personal best
+              </div>
+            </div>
+            <div class="mock-status-right">
+              <span class="mock-time">2 hours ago</span>
+              <button class="mock-btn">Log reading</button>
+            </div>
+          </div>
+
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-label">7-day avg</div>
+              <div class="mock-stat-value">468<span style="font-size:0.65rem;font-weight:500;color:#94a3b8"> L/min</span></div>
+              <div class="mock-stat-sub">85% of personal best</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Symptoms</div>
+              <div class="mock-stat-value">3</div>
+              <div class="mock-stat-sub">1 moderate</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Last severe</div>
+              <div class="mock-stat-value" style="font-size:0.75rem;color:#059669;font-weight:700">None</div>
+              <div class="mock-stat-sub">No episodes</div>
+            </div>
+          </div>
+
+          <div class="mock-quick">
+            <button class="mock-quick-btn mock-quick-primary">⚡ Log peak flow</button>
+            <button class="mock-quick-btn" style="background:#f8fafc;color:#334155;border:1.5px solid #cbd5e1;font-weight:600">📋 Log symptom</button>
+          </div>
+
+          <div>
+            <div class="mock-chart-header">
+              <span class="mock-chart-title">Peak Flow — Last 7 Days</span>
+              <span class="mock-chart-link">View full history →</span>
+            </div>
+            <div class="mock-chart">
+              <div class="mock-bar-group"><div class="mock-bar" style="height:60%;background:#475569;opacity:0.7"></div><span class="mock-bar-label">Mon</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:72%;background:#475569;opacity:0.7"></div><span class="mock-bar-label">Tue</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:55%;background:#f59e0b;opacity:0.85"></div><span class="mock-bar-label">Wed</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:80%;background:#475569;opacity:0.7"></div><span class="mock-bar-label">Thu</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:85%;background:#475569;opacity:0.7"></div><span class="mock-bar-label">Fri</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:78%;background:#475569;opacity:0.7"></div><span class="mock-bar-label">Sat</span></div>
+              <div class="mock-bar-group"><div class="mock-bar" style="height:89%;background:#475569"></div><span class="mock-bar-label">Sun</span></div>
+            </div>
+          </div>
+
+          <div class="mock-recents">
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Peak Flow</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">490</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Today</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">465</span><span class="mock-badge mock-badge--green">Green</span><span class="mock-recent-time">Yesterday</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">310</span><span class="mock-badge mock-badge--yellow">Yellow</span><span class="mock-recent-time">2d ago</span></div>
+            </div>
+            <div class="mock-recent-col">
+              <div class="mock-recent-title">Symptoms</div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Cough</span><span class="mock-badge mock-badge--yellow">Moderate</span><span class="mock-recent-time">2d ago</span></div>
+              <div class="mock-recent-row"><span class="mock-recent-val">Wheeze</span><span class="mock-badge mock-badge--green">Mild</span><span class="mock-recent-time">4d ago</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-bottom-nav">
+          <div class="mock-tab" style="color:#f59e0b">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Peak Flow
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+            Symptoms
+          </div>
+          <div class="mock-tab">
+            <svg class="mock-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

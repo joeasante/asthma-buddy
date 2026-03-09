@@ -1,0 +1,37 @@
+<% if @personal_best_record.errors.any? %>
+  <%# Re-render section with validation errors %>
+  <%= turbo_stream.replace "personal-best-card" do %>
+    <section class="section-card" id="personal-best-card" aria-labelledby="pb-heading">
+      <div class="section-card-header">
+        <h2 class="section-card-title" id="pb-heading">Personal Best Peak Flow</h2>
+      </div>
+      <%= render "personal_best_form",
+            personal_best_record: @personal_best_record,
+            current_personal_best: @current_personal_best %>
+    </section>
+  <% end %>
+<% else %>
+  <%# Show success toast %>
+  <%= turbo_stream.replace "profile-toast" do %>
+    <div id="profile-toast"
+         data-controller="toast"
+         data-toast-message="Personal best set to <%= @personal_best_record.value %> L/min."
+         data-toast-variant="success">
+    </div>
+  <% end %>
+
+  <%# Update the personal best section to show the new value and a fresh form %>
+  <%= turbo_stream.replace "personal-best-card" do %>
+    <section class="section-card" id="personal-best-card" aria-labelledby="pb-heading">
+      <div class="section-card-header">
+        <h2 class="section-card-title" id="pb-heading">Personal Best Peak Flow</h2>
+      </div>
+      <%= render "personal_best_form",
+            personal_best_record: PersonalBestRecord.new(user: Current.user, recorded_at: Time.current),
+            current_personal_best: @current_personal_best %>
+    </section>
+  <% end %>
+
+  <%# Remove the amber banner — zone classification is now active %>
+  <%= turbo_stream.remove "no-pb-banner" %>
+<% end %>

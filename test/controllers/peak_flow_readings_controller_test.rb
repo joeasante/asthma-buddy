@@ -27,13 +27,13 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     PersonalBestRecord.where(user: @user).delete_all
     get new_peak_flow_reading_path
     assert_response :success
-    assert_select ".peak-flow-banner"
+    assert_select ".flash--warning"
   end
 
   test "new hides banner when user has a personal best" do
     # alice has personal best records in fixtures
     get new_peak_flow_reading_path
-    assert_select ".peak-flow-banner", count: 0
+    assert_select ".flash--warning", count: 0
   end
 
   # POST /peak_flow_readings
@@ -50,9 +50,9 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to new_peak_flow_reading_path
+    assert_redirected_to peak_flow_readings_path
     assert_match "Reading saved", flash[:notice]
-    assert_match "Green Zone", flash[:notice]
+    assert_match "Green zone", flash[:notice]
   end
 
   test "create with no personal best gives 'set your personal best' flash" do
@@ -64,7 +64,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to new_peak_flow_reading_path
+    assert_redirected_to peak_flow_readings_path
     assert_match "set your personal best", flash[:notice]
   end
 

@@ -54,6 +54,22 @@ class SymptomLogTest < ActiveSupport::TestCase
     assert SymptomLog.severities.key?("severe")
   end
 
+  test "valid with known triggers" do
+    log = SymptomLog.new(valid_attributes.merge(triggers: [ "exercise", "cold_air" ]))
+    assert log.valid?, log.errors.full_messages.inspect
+  end
+
+  test "invalid with unknown trigger values" do
+    log = SymptomLog.new(valid_attributes.merge(triggers: [ "exercise", "unknown_trigger" ]))
+    assert_not log.valid?
+    assert log.errors[:triggers].any?
+  end
+
+  test "valid with empty triggers array" do
+    log = SymptomLog.new(valid_attributes.merge(triggers: []))
+    assert log.valid?, log.errors.full_messages.inspect
+  end
+
   test "notes can store rich text" do
     log = SymptomLog.create!(valid_attributes)
     log.notes = "<p>Triggered by cold air</p>"

@@ -33,3 +33,11 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Kamal secrets file — contains shell commands that read credentials at deploy time.
+# Source RAILS_MASTER_KEY from a CI/CD secret (e.g., GitHub Actions secrets.RAILS_MASTER_KEY).
+/.kamal/secrets
+
+# macOS metadata files — add **/.DS_Store to your global gitignore too:
+# echo "**/.DS_Store" >> ~/.gitignore_global && git config --global core.excludesfile ~/.gitignore_global
+**/.DS_Store
+

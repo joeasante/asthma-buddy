@@ -1,0 +1,62 @@
+<%= form_with model: user, url: profile_path, method: :patch,
+      multipart: true,
+      data: { controller: "avatar-preview" } do |form| %>
+  <input type="hidden" name="_profile_section" value="avatar">
+
+  <div class="profile-avatar-row">
+    <%# Avatar image — shown when attached or after local preview %>
+    <img class="profile-avatar-img"
+         data-avatar-preview-target="image"
+         <% if user.avatar.attached? %>
+           src="<%= url_for(user.avatar.variant(resize_to_fill: [80, 80])) %>"
+           alt="<%= user.full_name.presence || "Profile photo" %>"
+         <% else %>
+           src=""
+           alt="Profile photo preview"
+           hidden
+         <% end %>>
+
+    <%# Initials fallback — hidden once a photo is attached or previewed %>
+    <div class="profile-avatar-initials"
+         data-avatar-preview-target="initials"
+         aria-hidden="true"
+         <%= "hidden" if user.avatar.attached? %>>
+      <%= (user.full_name.presence || user.email_address).first.upcase %>
+    </div>
+
+    <div class="profile-avatar-actions">
+      <%# File input nested inside label — activates picker on click/keyboard,
+          :focus-within on the label shows the focus ring correctly %>
+      <label class="btn-secondary profile-avatar-label">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Change photo
+        <%= form.file_field :avatar,
+              accept: "image/jpeg,image/png,image/webp",
+              class: "sr-only",
+              data: { action: "change->avatar-preview#preview", "avatar-preview-target": "fileInput" } %>
+      </label>
+
+      <% if user.avatar.attached? %>
+        <%= button_to "Remove photo",
+              profile_avatar_path,
+              method: :delete,
+              class: "profile-avatar-remove",
+              data: { turbo_confirm: "Remove your profile photo? You can upload a new one at any time." } %>
+      <% end %>
+    </div>
+  </div>
+
+  <p class="profile-avatar-meta">JPG, PNG, or WebP &middot; Max 5 MB</p>
+
+  <% if user.errors[:avatar].any? %>
+    <p class="field-error" role="alert"><%= user.errors[:avatar].first %></p>
+  <% end %>
+
+  <div class="profile-form-actions">
+    <%= form.submit "Save photo", class: "btn-primary" %>
+  </div>
+<% end %>

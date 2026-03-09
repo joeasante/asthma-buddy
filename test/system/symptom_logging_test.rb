@@ -37,7 +37,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     select "Moderate", from: "Severity"
     # recorded_at is pre-filled with current time — leave as is
 
-    click_button "Log symptom"
+    click_button "Save symptom"
 
     # Entry appears in the list without a full page load
     assert_text "Wheezing"
@@ -50,7 +50,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
     select "Coughing", from: "Symptom type"
     select "Mild", from: "Severity"
-    click_button "Log symptom"
+    click_button "Save symptom"
 
     # Form is cleared — symptom type select should be back to the blank prompt
     within("turbo-frame#symptom_log_form") do
@@ -71,7 +71,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     lexxy_editor.click
     lexxy_editor.send_keys "Triggered by cold air outside"
 
-    click_button "Log symptom"
+    click_button "Save symptom"
 
     assert_text "Chest tightness"
     assert_text "Triggered by cold air outside"
@@ -87,7 +87,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     execute_script("document.querySelectorAll('input[required]').forEach(el => el.removeAttribute('required'))")
 
     # Submit with no selections (blank symptom type and severity)
-    click_button "Log symptom"
+    click_button "Save symptom"
 
     # Rails validation error message appears on the same page via Turbo Stream
     assert_text "error"
@@ -168,7 +168,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     # Dismiss the browser confirm dialog (accept it)
     # Capybara handles data-turbo-confirm via the browser's native dialog.
     # accept_confirm wraps the action that triggers the dialog.
-    accept_confirm "Delete this entry?" do
+    accept_confirm "Remove this entry? This can't be undone." do
       within("##{dom_id(entry)}") do
         click_button "Delete"
       end

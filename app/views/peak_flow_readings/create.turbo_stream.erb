@@ -1,15 +1,23 @@
-<%# Reset the form — wrap partial in turbo_frame_tag so the frame element persists in DOM %>
+<%# Prepend the new row to the index table (no-op if user is on /new page) %>
+<%= turbo_stream.prepend "readings_tbody",
+      partial: "reading_row",
+      locals: { reading: @peak_flow_reading } %>
+
+<%# Reset the form for another entry %>
 <%= turbo_stream.replace "peak_flow_reading_form" do %>
   <%= turbo_frame_tag "peak_flow_reading_form" do %>
     <%= render "form",
-          peak_flow_reading: @new_peak_flow_reading,
-          has_personal_best: @has_personal_best %>
+          peak_flow_reading: PeakFlowReading.new(user: Current.user, recorded_at: Time.current.change(sec: 0)),
+          has_personal_best: @has_personal_best,
+          personal_best_value: @personal_best_value %>
   <% end %>
 <% end %>
 
-<%# Replace flash container — not prepend — so messages don't stack %>
+<%# Toast notification %>
 <%= turbo_stream.replace "flash-messages" do %>
-  <div id="flash-messages">
-    <p role="status" class="flash flash--notice"><%= @flash_message %></p>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Reading recorded."
+       data-toast-variant="success">
   </div>
 <% end %>

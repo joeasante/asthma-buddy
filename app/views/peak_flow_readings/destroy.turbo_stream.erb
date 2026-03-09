@@ -1,1 +1,11 @@
+<%# Remove the table row %>
 <%= turbo_stream.remove dom_id(@peak_flow_reading) %>
+
+<%# Toast notification %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Reading deleted."
+       data-toast-variant="success">
+  </div>
+<% end %>

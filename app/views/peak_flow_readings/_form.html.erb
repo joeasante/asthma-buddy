@@ -1,17 +1,15 @@
-<% has_personal_best ||= false %>
-
+<%# No-PB banner — amber flash style, not dismissible %>
 <% unless has_personal_best %>
-  <div class="peak-flow-banner" role="note">
-    <p>
-      Set your personal best to see zone calculations (Green / Yellow / Red) for each reading.
-      <%= link_to "Go to Settings", settings_path %>
-    </p>
+  <div class="flash flash--warning pf-form-banner" role="note">
+    Zone classification is off —
+    <%= link_to "set your personal best on your Profile page", profile_path %> to see your zone as you type.
   </div>
 <% end %>
 
 <%= form_with model: peak_flow_reading, data: { turbo: true } do |form| %>
+  <%# Field error summary %>
   <% if peak_flow_reading.errors.any? %>
-    <div role="alert" aria-live="assertive">
+    <div class="field-errors" role="alert" aria-live="assertive">
       <p><%= pluralize(peak_flow_reading.errors.count, "error") %> prevented this reading from being saved:</p>
       <ul>
         <% peak_flow_reading.errors.each do |error| %>
@@ -21,23 +19,59 @@
     </div>
   <% end %>
 
-  <div class="peak-flow-value-field">
-    <%= form.label :value, "Reading value" %>
-    <div class="input-with-unit">
+  <%# Large value entry field %>
+  <div class="field pf-value-field"
+       data-controller="zone-preview"
+       data-zone-preview-personal-best-value="<%= personal_best_value %>">
+    <%= form.label :value, "Reading value", class: "pf-value-label" %>
+    <p class="field-hint">Blow three times and record your best result.</p>
+
+    <div class="pf-value-input-wrap">
       <%= form.number_field :value,
             min: 1, max: 900,
             required: true,
-            placeholder: "e.g. 430",
-            class: "peak-flow-value-input",
-            aria: { label: "Peak flow reading in litres per minute" } %>
-      <span class="input-unit" aria-hidden="true">L/min</span>
+            inputmode: "numeric",
+            placeholder: "430",
+            class: "pf-value-input #{"pf-value-input--error" if peak_flow_reading.errors[:value].any?}",
+            data: { "zone-preview-target": "input", action: "input->zone-preview#update" },
+            aria: { label: "Peak flow reading in litres per minute",
+                    describedby: "pf-value-hint" } %>
+      <span class="pf-value-unit" aria-hidden="true">L/min</span>
     </div>
+
+    <% if peak_flow_reading.errors[:value].any? %>
+      <p class="field-error"><%= peak_flow_reading.errors[:value].first %></p>
+    <% end %>
+
+    <%# Zone preview — live feedback as user types %>
+    <% if has_personal_best %>
+      <div class="zone-preview" data-zone-preview-target="preview" hidden aria-live="polite"></div>
+    <% else %>
+      <p class="pf-zone-no-pb">
+        <%= link_to "Set a personal best in your Profile", profile_path %> to see your zone.
+      </p>
+    <% end %>
   </div>
 
-  <div>
+  <%# Recorded at — datetime + "Right now" shortcut %>
+  <div class="field" data-controller="now">
     <%= form.label :recorded_at, "When was this reading taken?" %>
-    <%= form.datetime_local_field :recorded_at, step: 60 %>
+    <div class="datetime-with-now">
+      <%= form.datetime_local_field :recorded_at,
+            step: 60,
+            class: "#{"field-input--error" if peak_flow_reading.errors[:recorded_at].any?}",
+            data: { "now-target": "input" } %>
+      <button type="button" class="btn-now" data-action="now#fill">Right now</button>
+    </div>
+    <% if peak_flow_reading.errors[:recorded_at].any? %>
+      <p class="field-error"><%= peak_flow_reading.errors[:recorded_at].first %></p>
+    <% end %>
   </div>
 
-  <%= form.submit "Log reading" %>
+  <div class="form-actions">
+    <%= form.button peak_flow_reading.persisted? ? "Update reading" : "Save reading",
+          type: "submit",
+          class: "btn-primary form-actions-submit" %>
+    <%= link_to "Cancel", peak_flow_readings_path, class: "btn-cancel" %>
+  </div>
 <% end %>

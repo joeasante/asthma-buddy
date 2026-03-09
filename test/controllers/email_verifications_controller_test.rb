@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "test_helper"
 
 class EmailVerificationsControllerTest < ActionDispatch::IntegrationTest
@@ -43,5 +44,35 @@ class EmailVerificationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
     assert_equal "Invalid or expired verification link.", flash[:alert]
+  end
+
+  # --- JSON ---
+
+  test "GET /email_verification/:token with valid token returns 200 JSON" do
+    user = users(:unverified_user)
+    token = user.generate_token_for(:email_verification)
+
+    get email_verification_path(token), as: :json
+
+    assert_response :ok
+    assert_equal "Email verified. You can now sign in.", response.parsed_body["message"]
+    assert_not_nil user.reload.email_verified_at
+  end
+
+  test "GET /email_verification/:token with already-verified user returns 200 JSON" do
+    user = users(:verified_user)
+    token = user.generate_token_for(:email_verification)
+
+    get email_verification_path(token), as: :json
+
+    assert_response :ok
+    assert_equal "Email already verified.", response.parsed_body["message"]
+  end
+
+  test "GET /email_verification/:token with invalid token returns 404 JSON" do
+    get email_verification_path("bad-token"), as: :json
+
+    assert_response :not_found
+    assert_match "invalid or expired", response.parsed_body["error"].downcase
   end
 end

@@ -1,3 +1,17 @@
-<%= turbo_frame_tag dom_id(@symptom_log) do %>
-  <%= render "form", symptom_log: @symptom_log %>
-<% end %>
+<% content_for :title, "Edit symptom" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Symptoms", symptom_logs_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep" aria-hidden="true">›</span>
+  <span class="breadcrumb-current">Edit</span>
+</nav>
+
+<div class="page-header">
+  <h1>Edit symptom</h1>
+</div>
+
+<div class="section-card">
+  <%= turbo_frame_tag dom_id(@symptom_log) do %>
+    <%= render "form", symptom_log: @symptom_log %>
+  <% end %>
+</div>

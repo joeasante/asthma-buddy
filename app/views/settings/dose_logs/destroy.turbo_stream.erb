@@ -1,20 +1,9 @@
-<%= turbo_stream.replace "dose_history_#{dom_id(@medication)}" do %>
-  <div id="dose_history_<%= dom_id(@medication) %>">
-    <% recent_logs = @medication.dose_logs.chronological.limit(5) %>
-    <% if recent_logs.any? %>
-      <ul class="dose-history-list">
-        <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
-      </ul>
-    <% else %>
-      <p class="dose-history-empty">No doses logged yet.</p>
-    <% end %>
-  </div>
-<% end %>
+<%# Replace the entire med row — remaining count, low_stock border, and history all update together %>
+<%= turbo_stream.replace dom_id(@medication),
+      partial: "settings/medications/medication",
+      locals: { medication: @medication } %>
 
-<%= turbo_stream.replace "remaining_count_#{dom_id(@medication)}" do %>
-  <dd id="remaining_count_<%= dom_id(@medication) %>"><%= @medication.remaining_doses %> doses</dd>
-<% end %>
-
+<%# Toast notification %>
 <%= turbo_stream.replace "flash-messages" do %>
-  <%= render "layouts/flash" %>
+  <div id="flash-messages" data-controller="toast" data-toast-message="Dose removed." data-toast-variant="notice"></div>
 <% end %>

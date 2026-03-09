@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "profile-toast" do %>
+  <div id="profile-toast"
+       data-controller="toast"
+       data-toast-message="Profile photo removed."
+       data-toast-variant="success">
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "avatar-section" do %>
+  <section class="section-card" id="avatar-section" aria-labelledby="avatar-heading">
+    <div class="section-card-header">
+      <h2 class="section-card-title" id="avatar-heading">Profile Photo</h2>
+    </div>
+    <%= render "avatar_form", user: Current.user %>
+  </section>
+<% end %>

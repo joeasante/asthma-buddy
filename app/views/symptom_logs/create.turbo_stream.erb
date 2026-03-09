@@ -1,9 +1,32 @@
+<%# Applies to any page that contains the form (#symptom_log_form) and/or the timeline (#timeline_list).
+    From /symptom_logs/new: trend_bar and timeline_list targets don't exist — those streams are no-ops.
+    The form is reset and a success flash is shown on whatever page the user is on. %>
+
 <%= turbo_stream.replace "trend_bar" do %>
   <div id="trend_bar">
     <%= render "trend_bar", severity_counts: @severity_counts %>
   </div>
 <% end %>
-<%= turbo_stream.prepend "timeline_list", partial: "timeline_row", locals: { symptom_log: @symptom_log } %>
+
+<%= turbo_stream.prepend "timeline_list",
+      partial: "timeline_row",
+      locals: { symptom_log: @symptom_log } %>
+
+<%# Reset the form so the user can immediately log another entry %>
 <%= turbo_stream.replace "symptom_log_form" do %>
-  <%= render "form", symptom_log: Current.user.symptom_logs.new(recorded_at: Time.current.change(sec: 0)) %>
+  <%= render "form", symptom_log: SymptomLog.new(
+        user: Current.user,
+        recorded_at: Time.current.change(sec: 0)
+      ) %>
+<% end %>
+
+<%# Success feedback.
+    When a toast_controller.js is added, it should read data-toast-message / data-toast-variant
+    and render an in-app toast. Until then this flash paragraph is shown as a standard notice. %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Symptom logged."
+       data-toast-variant="success">
+  </div>
 <% end %>

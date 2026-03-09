@@ -1,5 +1,11 @@
 <% content_for :title, "Add Medication — Settings" %>
 
-<h1>Add medication</h1>
+<div class="page-header">
+  <h1>Add medication</h1>
+  <%= link_to "Cancel", settings_medications_path, class: "btn-secondary" %>
+</div>
 
-<%= render "form", medication: @medication %>
+<div class="section-card">
+  <%# turbo: false — after create, the controller redirects to the list via HTML. %>
+  <%= render "form", medication: @medication, use_turbo: false %>
+</div>

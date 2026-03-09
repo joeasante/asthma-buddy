@@ -1,17 +1,35 @@
-<% content_for :title, "Reset your password" %>
+<% content_for :title, "Choose a new password — Asthma Buddy" %>
 
-<h1>Reset your password</h1>
+<div class="auth-card">
+  <%= link_to "Asthma Buddy", root_path, class: "auth-brand" %>
 
-<%= form_with url: password_path(params[:token]), method: :patch do |form| %>
-  <div>
-    <%= form.label :password, "New password" %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72 %>
-  </div>
+  <% if flash[:alert].present? %>
+    <p role="alert" class="flash flash--alert"><%= flash[:alert] %></p>
+    <div class="auth-links">
+      <p><%= link_to "Request a new reset link", new_password_path %></p>
+    </div>
+  <% else %>
+    <h1>Choose a new password</h1>
 
-  <div>
-    <%= form.label :password_confirmation, "Confirm new password" %>
-    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72 %>
-  </div>
+    <%= form_with url: password_path(params[:token]), method: :patch do |form| %>
+      <%= render "shared/password_field",
+            form: form,
+            field: :password,
+            label_text: "New password",
+            autocomplete: "new-password",
+            autofocus: true %>
 
-  <%= form.submit "Reset password" %>
-<% end %>
+      <%= render "shared/password_field",
+            form: form,
+            field: :password_confirmation,
+            label_text: "Confirm new password",
+            autocomplete: "new-password" %>
+
+      <%= form.submit "Set new password" %>
+    <% end %>
+
+    <div class="auth-links">
+      <p><%= link_to "Back to sign in", new_session_path %></p>
+    </div>
+  <% end %>
+</div>

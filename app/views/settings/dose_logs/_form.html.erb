@@ -3,7 +3,7 @@
       id: "dose_log_form_#{dom_id(medication)}" do |f| %>
 
   <% if dose_log.errors.any? %>
-    <div class="dose-log-errors" role="alert">
+    <div class="dose-log-errors" role="alert" aria-live="assertive">
       <ul>
         <% dose_log.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
@@ -13,12 +13,19 @@
   <% end %>
 
   <div class="dose-log-form-fields">
-    <%= f.label :puffs, "Puffs taken" %>
-    <%= f.number_field :puffs, min: 1, value: dose_log.puffs || medication.standard_dose_puffs, required: true, class: "dose-log-puffs-input" %>
+    <div class="dose-log-field">
+      <%= f.label :puffs, "Puffs taken" %>
+      <%= f.number_field :puffs, min: 1, value: dose_log.puffs || medication.standard_dose_puffs,
+            required: true, class: "dose-log-puffs-input" %>
+    </div>
 
-    <%= f.label :recorded_at, "When" %>
-    <%= f.datetime_local_field :recorded_at, value: (dose_log.recorded_at || Time.current).strftime("%Y-%m-%dT%H:%M"), class: "dose-log-time-input" %>
+    <div class="dose-log-field">
+      <%= f.label :recorded_at, "When" %>
+      <%= f.datetime_local_field :recorded_at,
+            value: (dose_log.recorded_at || Time.current).strftime("%Y-%m-%dT%H:%M"),
+            class: "dose-log-time-input" %>
+    </div>
   </div>
 
-  <%= f.submit "Log dose", class: "btn-primary" %>
+  <%= f.submit "Log dose", class: "btn-primary btn-sm" %>
 <% end %>

@@ -1,21 +1,63 @@
 <% if total_pages > 1 %>
+  <% filter_params = { preset: active_preset, start_date: start_date, end_date: end_date, zone: active_zone }.compact_blank %>
   <nav class="pagination" aria-label="Peak flow reading pages">
-    <span class="pagination-position">Page <%= current_page %> of <%= total_pages %></span>
-    <div class="pagination-controls">
-      <% if current_page > 1 %>
-        <%= link_to "← Prev",
-              peak_flow_readings_path(page: current_page - 1, preset: active_preset,
-                                      start_date: start_date, end_date: end_date),
-              class: "pagination-btn",
-              data: { turbo_frame: "readings_content" } %>
-      <% end %>
-      <% if current_page < total_pages %>
-        <%= link_to "Next →",
-              peak_flow_readings_path(page: current_page + 1, preset: active_preset,
-                                      start_date: start_date, end_date: end_date),
-              class: "pagination-btn",
-              data: { turbo_frame: "readings_content" } %>
-      <% end %>
-    </div>
+    <%# Previous page %>
+    <% if current_page > 1 %>
+      <%= link_to "← Prev",
+            peak_flow_readings_path(filter_params.merge(page: current_page - 1)),
+            class: "pagination-btn",
+            data: { turbo_frame: "readings_content" } %>
+    <% else %>
+      <span class="pagination-btn pagination-btn--disabled" aria-disabled="true">← Prev</span>
+    <% end %>
+
+    <%# Page numbers with ellipsis %>
+    <%
+      first_page  = 1
+      last_page   = total_pages
+      window      = 2
+      page_min    = [current_page - window, first_page + 1].max
+      page_max    = [current_page + window, last_page - 1].min
+    %>
+
+    <%= link_to first_page,
+          peak_flow_readings_path(filter_params.merge(page: first_page)),
+          class: "pagination-btn #{"pagination-btn--current" if current_page == first_page}",
+          aria: { current: (current_page == first_page ? "page" : nil) }.compact,
+          data: { turbo_frame: "readings_content" } %>
+
+    <% if page_min > first_page + 1 %>
+      <span class="pagination-ellipsis" aria-hidden="true">&hellip;</span>
+    <% end %>
+
+    <% (page_min..page_max).each do |page| %>
+      <%= link_to page,
+            peak_flow_readings_path(filter_params.merge(page: page)),
+            class: "pagination-btn #{"pagination-btn--current" if current_page == page}",
+            aria: { current: (current_page == page ? "page" : nil) }.compact,
+            data: { turbo_frame: "readings_content" } %>
+    <% end %>
+
+    <% if page_max < last_page - 1 %>
+      <span class="pagination-ellipsis" aria-hidden="true">&hellip;</span>
+    <% end %>
+
+    <% if last_page > first_page %>
+      <%= link_to last_page,
+            peak_flow_readings_path(filter_params.merge(page: last_page)),
+            class: "pagination-btn #{"pagination-btn--current" if current_page == last_page}",
+            aria: { current: (current_page == last_page ? "page" : nil) }.compact,
+            data: { turbo_frame: "readings_content" } %>
+    <% end %>
+
+    <%# Next page %>
+    <% if current_page < total_pages %>
+      <%= link_to "Next →",
+            peak_flow_readings_path(filter_params.merge(page: current_page + 1)),
+            class: "pagination-btn",
+            data: { turbo_frame: "readings_content" } %>
+    <% else %>
+      <span class="pagination-btn pagination-btn--disabled" aria-disabled="true">Next →</span>
+    <% end %>
   </nav>
 <% end %>

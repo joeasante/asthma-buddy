@@ -43,13 +43,17 @@ class PeakFlowReadingsController < ApplicationController
       end
     end
 
+    @active_zone = %w[green yellow red].include?(params[:zone]) ? params[:zone] : nil
+
     base_relation = Current.user.peak_flow_readings
                            .chronological
                            .in_date_range(@start_date, @end_date)
+    base_relation = base_relation.where(zone: @active_zone) if @active_zone.present?
+    @current_personal_best = PersonalBestRecord.current_for(Current.user)
 
     # Cache COUNT via Solid Cache to avoid re-querying on every filter/page navigation.
     # 1-minute TTL: a newly logged reading appears on the next natural page refresh.
-    cache_key    = [ "pfr_count", Current.user.id, @active_preset, @start_date, @end_date ]
+    cache_key    = [ "pfr_count", Current.user.id, @active_preset, @start_date, @end_date, @active_zone ]
     cached_total = Rails.cache.fetch(cache_key, expires_in: 1.minute) { base_relation.count }
 
     @peak_flow_readings, @total_pages, @current_page = base_relation.paginate(
@@ -57,7 +61,22 @@ class PeakFlowReadingsController < ApplicationController
     )
 
     respond_to do |format|
-      format.html
+      format.html do
+        # One bar per day showing the best (highest) reading for that day.
+        # Multiple readings on the same day would otherwise produce overlapping bars in Chart.js.
+        @chart_data = base_relation
+          .reorder(recorded_at: :asc)
+          .limit(500)
+          .pluck(:recorded_at, :value, :zone)
+          .map { |ts, v, z| { date: ts.to_date.to_s, value: v, zone: z } }
+          .group_by { |d| d[:date] }
+          .map { |_date, readings| readings.max_by { |r| r[:value] } }
+          .sort_by { |d| d[:date] }
+
+        @period_count = cached_total
+        @period_avg   = base_relation.average(:value)&.round
+        @period_best  = base_relation.maximum(:value)
+      end
       format.json do
         render json: {
           readings:        @peak_flow_readings.map { |r| peak_flow_reading_json(r) },
@@ -78,13 +97,9 @@ class PeakFlowReadingsController < ApplicationController
     @peak_flow_reading = Current.user.peak_flow_readings.new(peak_flow_reading_params)
 
     if @peak_flow_reading.save
-      @flash_message = helpers.zone_flash_message(@peak_flow_reading)
-      @new_peak_flow_reading = Current.user.peak_flow_readings.new(
-        recorded_at: Time.current.change(sec: 0)
-      )
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to new_peak_flow_reading_path, notice: helpers.zone_flash_message_text(@peak_flow_reading) }
+        format.html { redirect_to peak_flow_readings_path, notice: helpers.zone_flash_message_text(@peak_flow_reading) }
         format.json { render json: peak_flow_reading_json(@peak_flow_reading), status: :created }
       end
     else
@@ -128,7 +143,9 @@ class PeakFlowReadingsController < ApplicationController
   private
 
   def set_has_personal_best
-    @has_personal_best = PersonalBestRecord.exists_for?(Current.user)
+    best = PersonalBestRecord.current_for(Current.user)
+    @has_personal_best    = best.present?
+    @personal_best_value  = best&.value.to_i
   end
 
   def set_peak_flow_reading

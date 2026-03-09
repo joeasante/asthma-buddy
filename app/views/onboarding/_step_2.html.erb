@@ -1,0 +1,65 @@
+<div class="section-card">
+  <div class="onboarding-step-header">
+    <div class="onboarding-step-icon" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Add your inhaler</h1>
+    <p>Which inhaler do you use most often? You can add more and set full details later in Settings.</p>
+  </div>
+
+  <% if @medication.errors.any? %>
+    <div role="alert" class="flash flash--alert">
+      <ul>
+        <% @medication.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @medication, url: onboarding_submit_2_path do |form| %>
+    <div class="field">
+      <%= form.label :name, "Medication name" %>
+      <%= form.text_field :name,
+            required: true,
+            autofocus: true,
+            placeholder: "e.g. Ventolin" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :medication_type, "Type" %>
+      <%= form.select :medication_type,
+            Medication.medication_types.keys.map { |k| [k.capitalize, k] },
+            { selected: @medication.medication_type || "reliever" },
+            required: true %>
+    </div>
+
+    <div class="onboarding-fields-row">
+      <div class="field">
+        <%= form.label :standard_dose_puffs, "Puffs per dose" %>
+        <%= form.number_field :standard_dose_puffs,
+              min: 1,
+              max: 10,
+              required: true %>
+      </div>
+      <div class="field">
+        <%= form.label :doses_per_day, "Doses per day" %>
+        <%= form.number_field :doses_per_day,
+              min: 1,
+              max: 12 %>
+      </div>
+    </div>
+
+    <%= form.hidden_field :starting_dose_count, value: 200 %>
+    <%= form.hidden_field :sick_day_dose_puffs, value: 4 %>
+
+    <%= form.submit "Save and continue" %>
+  <% end %>
+</div>
+
+<div class="onboarding-nav">
+  <%= link_to "\u2190 Back", onboarding_step_path(1) %>
+  <%= link_to "Skip this step", onboarding_skip_path(2), class: "btn-cancel" %>
+</div>

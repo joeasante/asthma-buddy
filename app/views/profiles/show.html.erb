@@ -1,0 +1,72 @@
+<% content_for :title, "Profile" %>
+
+<div class="page-header">
+  <h1>Profile</h1>
+</div>
+
+<%# Amber banner — persistent, shown only when no personal best is set %>
+<% unless @current_personal_best %>
+  <div id="no-pb-banner" class="profile-no-pb-banner" role="alert">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" class="profile-no-pb-icon">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M10 6v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="10" cy="14" r="0.75" fill="currentColor"/>
+    </svg>
+    <p class="profile-no-pb-text">
+      Your zone classification is off.
+      <a href="#personal-best-card" class="profile-no-pb-link">Set your personal best below.</a>
+    </p>
+  </div>
+<% end %>
+
+<%# Toast anchor — replaced by turbo_stream on successful form submission %>
+<div id="profile-toast"></div>
+
+<div class="profile-sections">
+  <%# 1. Profile photo %>
+  <section class="section-card" id="avatar-section" aria-labelledby="avatar-heading">
+    <div class="section-card-header">
+      <h2 class="section-card-title" id="avatar-heading">Profile Photo</h2>
+    </div>
+    <%= render "avatar_form", user: Current.user %>
+  </section>
+
+  <%# 2. Personal details %>
+  <section class="section-card" id="details-section" aria-labelledby="details-heading">
+    <div class="section-card-header">
+      <h2 class="section-card-title" id="details-heading">Personal Details</h2>
+    </div>
+    <%= render "personal_details_form", user: Current.user %>
+  </section>
+
+  <%# 3. Change password %>
+  <section class="section-card" id="password-section" aria-labelledby="password-heading">
+    <div class="section-card-header">
+      <h2 class="section-card-title" id="password-heading">Change Password</h2>
+    </div>
+    <%= render "password_form", user: Current.user %>
+  </section>
+
+  <%# 4. Personal best peak flow %>
+  <section class="section-card" id="personal-best-card" aria-labelledby="pb-heading">
+    <div class="section-card-header">
+      <h2 class="section-card-title" id="pb-heading">Personal Best Peak Flow</h2>
+    </div>
+    <%= render "personal_best_form",
+          personal_best_record: @personal_best_record,
+          current_personal_best: @current_personal_best %>
+  </section>
+
+  <%# 5. Danger zone %>
+  <section class="section-card section-card--danger" id="danger-section" aria-labelledby="danger-heading">
+    <div class="section-card-header section-card-header--danger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="profile-danger-header-icon">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <h2 class="section-card-title section-card-title--danger" id="danger-heading">Danger Zone</h2>
+    </div>
+    <%= render "danger_zone", user: Current.user %>
+  </section>
+</div>

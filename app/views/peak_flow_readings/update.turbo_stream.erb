@@ -1,3 +1,13 @@
+<%# Replace the table row with updated data %>
 <%= turbo_stream.replace dom_id(@peak_flow_reading),
-      partial: "peak_flow_readings/reading_row",
+      partial: "reading_row",
       locals: { reading: @peak_flow_reading } %>
+
+<%# Toast notification %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Reading updated."
+       data-toast-variant="success">
+  </div>
+<% end %>

@@ -1,0 +1,14 @@
+/* Charts */
+
+.chart-section {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-xl, 14px);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0;
+}
+
+.chart-canvas {
+  max-height: 200px;
+}

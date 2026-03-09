@@ -1,82 +1,77 @@
 <%= turbo_frame_tag dom_id(medication) do %>
-  <article class="medication-card<%= ' medication-card--low-stock' if medication.low_stock? %>">
-    <div class="medication-card-header">
-      <h3 class="medication-card-name"><%= medication.name %></h3>
+  <div class="med-row<%= ' med-row--low-stock' if medication.low_stock? %>"
+       data-controller="med-overflow">
+    <div class="med-row-info">
+      <span class="med-row-name"><%= medication.name %></span>
       <span class="medication-badge medication-badge--<%= medication.medication_type %>">
         <%= medication.medication_type.humanize %>
       </span>
     </div>
 
-    <dl class="medication-card-details">
-      <dt>Standard dose</dt>
-      <dd><%= medication.standard_dose_puffs %> <%= "puff".pluralize(medication.standard_dose_puffs) %></dd>
-
-      <dt>Starting count</dt>
-      <dd><%= medication.starting_dose_count %> doses</dd>
-
-      <% if medication.sick_day_dose_puffs.present? %>
-        <dt>Sick-day dose</dt>
-        <dd><%= medication.sick_day_dose_puffs %> <%= "puff".pluralize(medication.sick_day_dose_puffs) %></dd>
+    <div class="med-row-stats" id="remaining_count_<%= dom_id(medication) %>">
+      <span><%= medication.remaining_doses %> doses</span>
+      <% if medication.days_of_supply_remaining.present? %>
+        <span class="med-row-supply">~<%= medication.days_of_supply_remaining %> days</span>
       <% end %>
-
-      <% if medication.doses_per_day.present? %>
-        <dt>Doses per day</dt>
-        <dd><%= medication.doses_per_day %></dd>
+      <% if medication.low_stock? %>
+        <span class="low-stock-badge">Low stock</span>
       <% end %>
-
-      <dt>Remaining</dt>
-      <dd id="remaining_count_<%= dom_id(medication) %>">
-        <%= medication.remaining_doses %> doses
-        <% if medication.days_of_supply_remaining.present? %>
-          <span class="medication-days-supply">~<%= medication.days_of_supply_remaining %> days remaining</span>
-        <% end %>
-        <% if medication.low_stock? %>
-          <span class="low-stock-badge">Low stock</span>
-        <% end %>
-      </dd>
-    </dl>
-
-    <section class="dose-log-section" aria-label="Log a dose">
-      <h4 class="dose-log-section-title">Log a dose</h4>
-      <%= render "settings/dose_logs/form",
-            medication: medication,
-            dose_log: DoseLog.new(medication: medication, recorded_at: Time.current) %>
-    </section>
-
-    <section class="dose-history-section" aria-label="Recent doses">
-      <h4 class="dose-history-title">Recent doses</h4>
-      <div id="dose_history_<%= dom_id(medication) %>">
-        <% recent_logs = medication.dose_logs.sort_by(&:recorded_at).reverse.first(5) %>
-        <% if recent_logs.any? %>
-          <ul class="dose-history-list">
-            <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
-          </ul>
-        <% else %>
-          <p class="dose-history-empty">No doses logged yet.</p>
-        <% end %>
-      </div>
-    </section>
-
-    <details class="refill-details">
-      <summary class="btn-refill">Refill</summary>
-      <%= form_with url: refill_settings_medication_path(medication), method: :patch do |f| %>
-        <div class="refill-form">
-          <%= f.label :starting_dose_count, "New dose count" %>
-          <%= f.number_field :starting_dose_count,
-                value: medication.starting_dose_count,
-                min: 0,
-                class: "refill-count-input",
-                name: "medication[starting_dose_count]" %>
-          <%= f.submit "Confirm refill", class: "btn-primary btn-sm" %>
-        </div>
-      <% end %>
-    </details>
-
-    <div class="medication-card-actions">
-      <%= link_to "Edit", edit_settings_medication_path(medication), class: "btn-edit" %>
-      <%= button_to "Remove", settings_medication_path(medication), method: :delete,
-            class: "btn-delete",
-            form: { data: { turbo: true, turbo_confirm: "Remove this medication? This can't be undone." } } %>
     </div>
-  </article>
+
+    <div class="med-row-actions">
+      <details class="med-log-details" data-med-overflow-target="logPanel"
+               data-action="toggle->med-overflow#logPanelToggle">
+        <summary class="btn-edit btn-sm" aria-label="Log a dose of <%= medication.name %>">Log dose</summary>
+        <div class="med-log-panel">
+          <section class="dose-log-section">
+            <h3 class="dose-log-section-title">Log a dose</h3>
+            <%= render "settings/dose_logs/form",
+                  medication: medication,
+                  dose_log: DoseLog.new(medication: medication, recorded_at: Time.current) %>
+          </section>
+
+          <section class="dose-history-section" id="dose_history_<%= dom_id(medication) %>">
+            <h3 class="dose-history-title">Last 7 days</h3>
+            <% recent_logs = medication.dose_logs.chronological.limit(7) %>
+            <% if recent_logs.any? %>
+              <ul class="dose-history-list">
+                <%= render recent_logs, medication: medication %>
+              </ul>
+            <% else %>
+              <p class="dose-history-empty">No doses logged yet.</p>
+            <% end %>
+          </section>
+        </div>
+      </details>
+
+      <details class="med-overflow" data-med-overflow-target="overflow"
+               data-action="toggle->med-overflow#overflowToggle">
+        <summary class="med-overflow-toggle" aria-label="More options for <%= medication.name %>">⋮</summary>
+        <div class="med-overflow-menu">
+          <%= link_to "Edit", edit_settings_medication_path(medication), class: "med-overflow-item", data: { turbo_frame: "_top" } %>
+          <details class="med-refill-details">
+            <summary class="med-overflow-item">Refill</summary>
+            <div class="med-refill-form-wrap">
+              <p class="refill-form-hint">Enter the puff count of your new inhaler.</p>
+              <%= form_with url: refill_settings_medication_path(medication), method: :patch do |f| %>
+                <div class="refill-form">
+                  <%= f.label :starting_dose_count, "Puffs in new inhaler", class: "sr-only" %>
+                  <%= f.number_field :starting_dose_count,
+                        value: medication.starting_dose_count,
+                        min: 0,
+                        placeholder: "Puff count",
+                        class: "refill-count-input",
+                        name: "medication[starting_dose_count]" %>
+                  <%= f.submit "Confirm refill", class: "btn-primary btn-sm" %>
+                </div>
+              <% end %>
+            </div>
+          </details>
+          <%= button_to "Remove", settings_medication_path(medication), method: :delete,
+                class: "med-overflow-item med-overflow-item--danger",
+                form: { data: { turbo: true, turbo_confirm: "Remove #{medication.name}? All dose history will also be deleted. This can't be undone." } } %>
+        </div>
+      </details>
+    </div>
+  </div>
 <% end %>

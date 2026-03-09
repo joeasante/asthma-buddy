@@ -10,13 +10,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "GET / renders application layout" do
     get root_url
-    assert_select "header[role=banner]"
-    assert_select "main[role=main]"
-    assert_select "footer[role=contentinfo]"
+    assert_select "header"
+    assert_select "main#main-content"
+    assert_select "main", count: 1
+    assert_select "footer"
   end
 
   test "GET / renders page title" do
     get root_url
-    assert_select "title", /Asthma Buddy/
+    assert_select "title", "Asthma Buddy — Breathe easier. Every day."
   end
 end

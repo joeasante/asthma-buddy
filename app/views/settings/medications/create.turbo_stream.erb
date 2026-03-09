@@ -1,9 +1,16 @@
-<%= turbo_stream.prepend "medications_list", partial: "settings/medications/medication", locals: { medication: @medication } %>
+<%# If this is the first medication, replace the empty state with the new row %>
+<% if Current.user.medications.count == 1 %>
+  <%= turbo_stream.update "medications_list" do %>
+    <%= render "settings/medications/medication", medication: @medication %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.prepend "medications_list", partial: "settings/medications/medication", locals: { medication: @medication } %>
+<% end %>
+
 <%= turbo_stream.replace "medication_form" do %>
   <%= render "settings/medications/form", medication: Current.user.medications.new %>
 <% end %>
+
 <%= turbo_stream.replace "flash-messages" do %>
-  <div id="flash-messages">
-    <p role="status" class="flash flash--notice">Medication added.</p>
-  </div>
+  <div id="flash-messages" data-controller="toast" data-toast-message="Medication added." data-toast-variant="success"></div>
 <% end %>

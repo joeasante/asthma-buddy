@@ -1,6 +1,7 @@
+<%# Replace the med row on the list page. No-op on the edit page — element not present there. %>
 <%= turbo_stream.replace dom_id(@medication), partial: "settings/medications/medication", locals: { medication: @medication } %>
+
+<%# Show inline toast on the list page %>
 <%= turbo_stream.replace "flash-messages" do %>
-  <div id="flash-messages">
-    <p role="status" class="flash flash--notice">Medication updated.</p>
-  </div>
+  <div id="flash-messages" data-controller="toast" data-toast-message="<%= @medication.name %> updated." data-toast-variant="success"></div>
 <% end %>

@@ -1,21 +1,51 @@
 <%= turbo_frame_tag dom_id(symptom_log) do %>
-  <article class="timeline-row" aria-label="<%= symptom_log.symptom_type.humanize %> on <%= symptom_log.recorded_at.strftime('%e %b %Y') %>">
+  <article class="timeline-row"
+           aria-label="<%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %> on <%= symptom_log.recorded_at.strftime("%-d %b %Y") %>">
+
     <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
+
     <div class="timeline-row-body">
-      <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
-      <span class="timeline-severity severity-label--<%= symptom_log.severity %>"><%= symptom_log.severity.capitalize %></span>
-      <time class="timeline-timestamp" datetime="<%= symptom_log.recorded_at.iso8601 %>">
-        <%= symptom_log.recorded_at.strftime("%-d %b %Y, %H:%M") %>
-      </time>
-      <% if symptom_log.notes.present? %>
-        <span class="timeline-notes-preview"><%= truncate(symptom_log.notes.to_plain_text, length: 60) %></span>
+      <div class="timeline-row-meta">
+        <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
+        <span class="timeline-severity severity-label--<%= symptom_log.severity %>">
+          <%= symptom_log.severity.capitalize %>
+        </span>
+        <time class="timeline-timestamp" datetime="<%= symptom_log.recorded_at.iso8601 %>">
+          <%= symptom_log.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+        </time>
+      </div>
+
+      <% if symptom_log.triggers.any? %>
+        <% visible_triggers = symptom_log.triggers.first(3) %>
+        <% extra_count = symptom_log.triggers.size - 3 %>
+        <div class="timeline-triggers">
+          <% visible_triggers.each do |t| %>
+            <span class="trigger-tag"><%= t.humanize.gsub("_", " ") %></span>
+          <% end %>
+          <% if extra_count > 0 %>
+            <span class="trigger-tag trigger-tag--more">+<%= extra_count %> more</span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if symptom_log.notes.body.present? %>
+        <div class="timeline-notes"><%= symptom_log.notes.to_plain_text %></div>
       <% end %>
     </div>
+
     <div class="timeline-row-actions">
-      <%= link_to "Edit", edit_symptom_log_path(symptom_log), class: "btn-edit" %>
-      <%= button_to "Delete", symptom_log_path(symptom_log), method: :delete,
+      <%= link_to edit_symptom_log_path(symptom_log),
+            class: "btn-edit",
+            aria: { label: "Edit #{symptom_log.symptom_type.humanize.gsub("_", " ")} entry" } do %>
+        Edit
+      <% end %>
+      <%= button_to "Delete",
+            symptom_log_path(symptom_log),
+            method: :delete,
             class: "btn-delete",
-            form: { data: { turbo: true, turbo_confirm: "Delete this entry?" } } %>
+            form: { data: { turbo: true, turbo_confirm: "Remove this entry? This can't be undone." } },
+            aria: { label: "Delete #{symptom_log.symptom_type.humanize.gsub("_", " ")} entry" } %>
     </div>
+
   </article>
 <% end %>

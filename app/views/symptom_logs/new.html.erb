@@ -1,0 +1,15 @@
+<% content_for :title, "Log a symptom" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Symptoms", symptom_logs_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep" aria-hidden="true">›</span>
+  <span class="breadcrumb-current">Log symptom</span>
+</nav>
+
+<div class="page-header">
+  <h1>Log a symptom</h1>
+</div>
+
+<div class="section-card">
+  <%= render "form", symptom_log: @symptom_log %>
+</div>

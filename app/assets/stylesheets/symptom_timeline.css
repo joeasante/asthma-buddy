@@ -1,140 +1,376 @@
 /* ==========================================================================
-   Severity color palette — shared with peak flow zone colors (Phase 6+)
-   green = mild/controlled, yellow = moderate/caution, red = severe/danger
+   Symptom Timeline
    ========================================================================== */
 
-:root {
-  --severity-mild:     #2d8a4e;   /* green */
-  --severity-moderate: #c57a00;   /* amber/yellow */
-  --severity-severe:   #c0392b;   /* red */
-  --severity-mild-bg:     #e8f5ee;
-  --severity-moderate-bg: #fff8e6;
-  --severity-severe-bg:   #fdecea;
+/* --------------------------------------------------------------------------
+   Breadcrumb — edit / new page navigation trail
+   -------------------------------------------------------------------------- */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9375rem;
+  color: var(--text-3);
 }
 
-/* Severity indicator bar (left edge of timeline row) */
+.breadcrumb-link {
+  color: var(--text-3);
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--text-4);
+  font-size: 1rem;
+}
+
+.breadcrumb-current {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   Severity left-edge indicator — 4px coloured bar
+   -------------------------------------------------------------------------- */
+
 .severity-indicator {
   width: 4px;
   flex-shrink: 0;
   border-radius: 2px;
   align-self: stretch;
-  min-height: 2.5rem;
+  min-height: 3rem;
 }
-.severity-indicator--mild     { background-color: var(--severity-mild); }
-.severity-indicator--moderate { background-color: var(--severity-moderate); }
-.severity-indicator--severe   { background-color: var(--severity-severe); }
 
-/* Severity labels */
-.severity-label--mild     { color: var(--severity-mild); }
-.severity-label--moderate { color: var(--severity-moderate); }
-.severity-label--severe   { color: var(--severity-severe); }
+.severity-indicator--mild     { background: var(--severity-mild); }
+.severity-indicator--moderate { background: var(--severity-moderate); }
+.severity-indicator--severe   { background: var(--severity-severe); }
 
-/* Timeline list */
+/* Severity text labels — use --severity-moderate-text for moderate
+   because --severity-moderate (#d97706) fails WCAG AA contrast on white */
+.severity-label--mild     { color: var(--severity-mild);          font-weight: 600; }
+.severity-label--moderate { color: var(--severity-moderate-text); font-weight: 600; }
+.severity-label--severe   { color: var(--severity-severe);        font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Timeline list
+   -------------------------------------------------------------------------- */
+
 .timeline-list {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-/* Timeline row */
+/* --------------------------------------------------------------------------
+   Timeline rows — card per entry
+   -------------------------------------------------------------------------- */
+
 .timeline-row {
   display: flex;
   align-items: stretch;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--dur) var(--ease);
+}
+
+.timeline-row:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .timeline-row-body {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.75rem;
+  flex-direction: column;
+  gap: 0.375rem;
   flex: 1;
   min-width: 0;
 }
 
+.timeline-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 1rem;
+}
+
 .timeline-type {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.0625rem;
+  color: var(--text);
 }
 
 .timeline-severity {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .timeline-timestamp {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.9375rem;
+  color: var(--text-3);
   white-space: nowrap;
 }
 
-.timeline-notes-preview {
-  width: 100%;
-  font-size: 0.8rem;
-  color: #888;
+/* Notes excerpt — clamped to 2 lines */
+.timeline-notes {
+  font-size: 0.9375rem;
+  color: var(--text-3);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
-/* Filter bar */
+.timeline-row-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* --------------------------------------------------------------------------
+   Trigger tags in the timeline row
+   -------------------------------------------------------------------------- */
+
+.timeline-triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.trigger-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1875rem 0.625rem;
+  background: var(--teal-50);
+  color: var(--brand);
+  border: 1px solid var(--teal-200);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.trigger-tag--more {
+  background: var(--surface-alt);
+  color: var(--text-3);
+  border-color: var(--border-mid);
+}
+
+/* --------------------------------------------------------------------------
+   Skeleton rows — shown by CSS while turbo-frame[busy]
+   -------------------------------------------------------------------------- */
+
+.timeline-skeleton {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.timeline-skeleton-row {
+  height: 84px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes skeleton-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .timeline-skeleton-row {
+    background: linear-gradient(
+      90deg,
+      var(--surface-alt) 0%,
+      var(--surface) 50%,
+      var(--surface-alt) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+}
+
+/* Show skeleton, hide real list while frame is loading */
+turbo-frame[busy] .timeline-skeleton { display: flex; }
+turbo-frame[busy] .timeline-list     { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline-skeleton-row { background: var(--surface-alt); }
+  turbo-frame[busy] .timeline-list { display: flex; opacity: 0.45; }
+  turbo-frame[busy] .timeline-skeleton { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Filter bar
+   -------------------------------------------------------------------------- */
+
 .filter-bar {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.filter-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-section-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-top: 0.5rem;
+  white-space: nowrap;
+  min-width: 3.5rem;
 }
 
 .filter-presets {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem;
 }
 
 .filter-chip {
-  display: inline-block;
-  padding: 0.3rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0.375rem 1rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-pill);
+  font-size: 0.9375rem;
+  font-weight: 500;
   text-decoration: none;
-  color: #333;
-  background: #f5f5f5;
+  color: var(--text-2);
+  background: var(--surface);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.filter-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 .filter-chip--active {
-  background: #333;
-  color: #fff;
-  border-color: #333;
+  background: var(--gray-900);
+  color: var(--surface);
+  border-color: var(--gray-900);
+}
+
+.filter-chip--active:hover {
+  background: var(--gray-900);
+  color: var(--surface);
+  border-color: var(--gray-900);
+}
+
+.filter-custom-dates {
+  margin-top: 0.25rem;
 }
 
 .filter-custom-dates .filter-date-inputs {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
+}
+
+.filter-custom-dates label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-bottom: 0;
+  white-space: nowrap;
 }
 
 .date-input {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color var(--dur), box-shadow var(--dur);
+}
+
+.date-input:focus-visible {
+  outline: none;
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 3px var(--brand-ring);
 }
 
 .btn-apply-dates {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  color: var(--text-2);
+  transition: background var(--dur) var(--ease);
 }
 
-/* Trend bar */
+.btn-apply-dates:hover {
+  background: var(--gray-200);
+  color: var(--text);
+}
+
+.btn-apply-dates:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Trend bar
+   -------------------------------------------------------------------------- */
+
+.trend-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .trend-bar {
   display: flex;
-  height: 1.75rem;
-  border-radius: 4px;
+  height: 1.5rem;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  margin-bottom: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  flex: 1;
 }
 
 .trend-segment {
@@ -142,59 +378,382 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: width 0.2s ease;
 }
 
-.trend-segment--mild     { background-color: var(--severity-mild); }
-.trend-segment--moderate { background-color: var(--severity-moderate); }
-.trend-segment--severe   { background-color: var(--severity-severe); }
+.trend-segment--mild     { background: var(--severity-mild); }
+.trend-segment--moderate { background: var(--severity-moderate); }
+.trend-segment--severe   { background: var(--severity-severe); }
 
 .trend-segment-label {
   font-size: 0.75rem;
   color: #fff;
   white-space: nowrap;
-  padding: 0 0.35rem;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  padding: 0 0.375rem;
+  font-weight: 600;
 }
 
-/* Pagination */
+.trend-clear-filter {
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-3);
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+.trend-clear-filter:hover {
+  color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
+   Pagination
+   -------------------------------------------------------------------------- */
+
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
-  font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-3);
+}
+
+.pagination-position {
+  font-size: 0.875rem;
+  color: var(--text-4);
 }
 
 .pagination-controls {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
 }
 
 .pagination-btn {
-  padding: 0.25rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
   text-decoration: none;
-  color: #333;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--surface);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 
-/* Empty state */
-.timeline-empty-state {
-  padding: 2rem 0;
-  color: #666;
-  text-align: center;
+.pagination-btn:hover {
+  background: var(--teal-50);
+  border-color: var(--teal-200);
+  color: var(--brand);
+  text-decoration: none;
 }
 
-/* Mobile: stack row body vertically on small screens */
+.pagination-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.pagination-btn--current {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination-btn--current:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  color: var(--text-4);
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   Empty state (also uses global .empty-state from application.css)
+   -------------------------------------------------------------------------- */
+
+/* The timeline uses the shared .empty-state class — no overrides needed here */
+
+/* --------------------------------------------------------------------------
+   Severity radio cards in the form
+   -------------------------------------------------------------------------- */
+
+.severity-btn-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.severity-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.875rem 0.5rem;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border-mid);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease);
+  user-select: none;
+}
+
+.severity-btn-input {
+  /* Visually hidden but accessible */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus ring via the label when the radio is focused */
+.severity-btn:has(.severity-btn-input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Hover on unchecked */
+.severity-btn:hover {
+  border-color: var(--gray-400);
+}
+
+/* Checked states — filled with severity background + coloured border */
+.severity-btn--mild:has(.severity-btn-input:checked) {
+  background: var(--severity-mild-bg);
+  border-color: var(--severity-mild);
+  color: var(--severity-mild-text);
+}
+
+.severity-btn--moderate:has(.severity-btn-input:checked) {
+  background: var(--severity-moderate-bg);
+  border-color: var(--severity-moderate);
+  color: var(--severity-moderate-text);
+}
+
+.severity-btn--severe:has(.severity-btn-input:checked) {
+  background: var(--severity-severe-bg);
+  border-color: var(--severity-severe);
+  color: var(--error-text-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Trigger chips in the form — pill-shaped toggles
+   -------------------------------------------------------------------------- */
+
+.triggers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.trigger-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0.375rem 0.875rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--surface);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur) var(--ease);
+  user-select: none;
+}
+
+.trigger-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.trigger-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Selected state */
+.trigger-chip--selected {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.trigger-chip--selected:hover {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Form actions row
+   -------------------------------------------------------------------------- */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.form-actions-submit {
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Field errors — inline validation feedback
+   -------------------------------------------------------------------------- */
+
+.field-errors {
+  background: var(--severity-severe-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-lg);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--error-text-dark);
+}
+
+.field-errors p {
+  margin-bottom: 0.375rem;
+  font-weight: 500;
+}
+
+.field-errors ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.field-errors li {
+  margin-bottom: 0.125rem;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive overrides
+   -------------------------------------------------------------------------- */
+
+/* Mobile — 480px and below */
 @media (max-width: 480px) {
-  .timeline-row-body {
+  .timeline-row {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .timeline-row-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.2rem;
+    gap: 0.125rem;
   }
+
+  .timeline-row-actions {
+    flex-direction: column;
+    align-self: flex-start;
+    gap: 0.375rem;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-section-label {
+    padding-top: 0;
+  }
+
   .filter-custom-dates .filter-date-inputs {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .severity-btn-group {
+    gap: 0.375rem;
+  }
+
+  .severity-btn {
+    padding: 0.625rem 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-actions-submit {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pagination-controls {
+    gap: 0.25rem;
+  }
+}
+
+/* Touch targets — ensure 44px on coarse pointer devices */
+@media (pointer: coarse) {
+  .filter-chip,
+  .trigger-chip,
+  .pagination-btn {
+    min-height: 44px;
+  }
+
+  .severity-btn {
+    min-height: 56px;
+  }
+
+  .date-input,
+  .btn-apply-dates {
+    min-height: 44px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion overrides
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-chip,
+  .trigger-chip,
+  .trend-segment,
+  .pagination-btn,
+  .timeline-row,
+  .severity-btn {
+    transition: none;
+  }
+
+  .trend-segment {
+    transition: none;
   }
 }

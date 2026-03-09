@@ -28,13 +28,14 @@ class DoseLoggingTest < ApplicationSystemTestCase
 
   # --- LOG A DOSE ---
 
-  test "user can log a dose from the medication card and it appears in dose history" do
+  test "user can log a dose from the medication row and see the flash confirmation" do
     sign_in_as @alice
     visit settings_medications_url
 
-    # The medication card for Ventolin (alice_reliever) is visible
     within("##{dom_id(@medication)}") do
-      # Puffs field is pre-filled with standard_dose_puffs (2)
+      # Open the log dose panel via the summary button
+      find("details.med-log-details summary").click
+
       assert_selector "input[name='dose_log[puffs]']"
 
       fill_in "Puffs taken", with: "2"
@@ -43,26 +44,21 @@ class DoseLoggingTest < ApplicationSystemTestCase
 
     # Flash confirms the save
     assert_text "Dose logged."
-
-    # The dose log entry appears in the recent doses section
-    within("#dose_history_#{dom_id(@medication)}") do
-      assert_text "2 puffs"
-    end
   end
 
   test "remaining dose count decreases after logging a dose" do
     sign_in_as @alice
     visit settings_medications_url
 
-    # Read the current remaining count displayed on the card
     # alice_reliever: starting_dose_count 200, fixture logs total 4 puffs (dose_1: 2, dose_2: 2)
     # remaining_doses = 200 - 4 = 196
     within("#remaining_count_#{dom_id(@medication)}") do
       assert_text "196 doses"
     end
 
-    # Log 2 more puffs
+    # Open log panel and log 2 more puffs
     within("##{dom_id(@medication)}") do
+      find("details.med-log-details summary").click
       fill_in "Puffs taken", with: "2"
       click_button "Log dose"
     end
@@ -73,59 +69,49 @@ class DoseLoggingTest < ApplicationSystemTestCase
     end
   end
 
-  # --- DELETE A DOSE ---
+  # --- DOSE LOG COUNT VIA REFILL ---
 
-  test "user can delete a dose log entry and it disappears from dose history" do
-    # alice_reliever_dose_1 and alice_reliever_dose_2 are already in fixtures
-    dose_log = dose_logs(:alice_reliever_dose_1)
-
+  test "remaining dose count resets after refilling a medication" do
     sign_in_as @alice
     visit settings_medications_url
 
-    # Dose entry is visible in the history
-    within("#dose_history_#{dom_id(@medication)}") do
-      assert_selector "##{dom_id(dose_log)}"
-
-      # Click Delete on this specific entry
-      within("##{dom_id(dose_log)}") do
-        click_button "Delete"
-      end
-    end
-
-    # Confirm via the custom dialog
-    confirm_dialog
-
-    # Dose entry is gone from the history
-    within("#dose_history_#{dom_id(@medication)}") do
-      assert_no_selector "##{dom_id(dose_log)}"
-    end
-
-    # Flash confirms the removal
-    assert_text "Dose removed."
-  end
-
-  test "remaining dose count increases after deleting a dose log entry" do
-    dose_log = dose_logs(:alice_reliever_dose_1)
-
-    sign_in_as @alice
-    visit settings_medications_url
-
-    # Confirm starting remaining count (200 - 4 = 196)
+    # alice_reliever: 200 - 4 = 196 remaining
     within("#remaining_count_#{dom_id(@medication)}") do
       assert_text "196 doses"
     end
 
-    # Delete dose_log with 2 puffs
-    within("#dose_history_#{dom_id(@medication)}") do
-      within("##{dom_id(dose_log)}") do
-        click_button "Delete"
-      end
+    within("##{dom_id(@medication)}") do
+      # Open overflow menu
+      find("details.med-overflow summary").click
+      # Open refill inside overflow
+      find("details.med-refill-details summary").click
+      fill_in "medication[starting_dose_count]", with: "100"
+      click_button "Confirm refill"
     end
-    confirm_dialog
 
-    # Remaining count should now be 198 (200 - 2 remaining logs)
+    # After refill, remaining count reflects new starting count minus existing logs
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "198 doses"
+      assert_text "96 doses"
+    end
+  end
+
+  test "remaining dose count increases after setting a higher refill count" do
+    sign_in_as @alice
+    visit settings_medications_url
+
+    within("#remaining_count_#{dom_id(@medication)}") do
+      assert_text "196 doses"
+    end
+
+    within("##{dom_id(@medication)}") do
+      find("details.med-overflow summary").click
+      find("details.med-refill-details summary").click
+      fill_in "medication[starting_dose_count]", with: "300"
+      click_button "Confirm refill"
+    end
+
+    within("#remaining_count_#{dom_id(@medication)}") do
+      assert_text "296 doses"
     end
   end
 

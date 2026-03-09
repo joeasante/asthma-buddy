@@ -1,9 +1,10 @@
 <li class="dose-log-entry" id="<%= dom_id(dose_log) %>">
   <span class="dose-log-puffs"><%= dose_log.puffs %> <%= "puff".pluralize(dose_log.puffs) %></span>
-  <span class="dose-log-time"><%= dose_log.recorded_at.strftime("%d %b %Y, %H:%M") %></span>
-  <%= button_to "Delete",
+  <span class="dose-log-time"><%= dose_log_time_label(dose_log.recorded_at) %></span>
+  <%= button_to "×",
         settings_medication_dose_log_path(dose_log.medication_id, dose_log),
         method: :delete,
         class: "btn-delete btn-delete--small",
+        aria: { label: "Remove dose logged at #{dose_log_time_label(dose_log.recorded_at)}" },
         form: { data: { turbo: true, turbo_confirm: "Remove this dose entry?" } } %>
 </li>

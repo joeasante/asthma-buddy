@@ -21,7 +21,7 @@ class SymptomLogsControllerTest < ActionDispatch::IntegrationTest
   test "index renders for authenticated user" do
     get symptom_logs_url
     assert_response :success
-    assert_select "h1", "Log a Symptom"
+    assert_select "h1", "Symptoms"
   end
 
   test "index shows only current user's symptom logs" do
@@ -146,36 +146,54 @@ class SymptomLogsControllerTest < ActionDispatch::IntegrationTest
 
   # --- JSON ---
 
-  test "GET /symptom_logs.json returns authenticated user's logs" do
+  test "GET /symptom_logs.json returns paginated envelope" do
     get symptom_logs_url, as: :json
     assert_response :ok
     json = response.parsed_body
-    assert json.is_a?(Array)
-    ids = json.map { |l| l["id"] }
+    assert json.key?("symptom_logs"),    "missing symptom_logs key"
+    assert json.key?("current_page"),   "missing current_page key"
+    assert json.key?("total_pages"),    "missing total_pages key"
+    assert json.key?("per_page"),       "missing per_page key"
+    assert json.key?("applied_filters"), "missing applied_filters key"
+    assert_kind_of Array, json["symptom_logs"]
+  end
+
+  test "GET /symptom_logs.json scopes to current user" do
+    get symptom_logs_url, as: :json
+    assert_response :ok
+    ids = response.parsed_body["symptom_logs"].map { |l| l["id"] }
     assert_includes ids, @symptom_log.id
     assert_not_includes ids, symptom_logs(:bob_coughing).id
   end
 
-  test "GET /symptom_logs.json returns expected fields" do
+  test "GET /symptom_logs.json returns expected fields including triggers" do
     get symptom_logs_url, as: :json
     assert_response :ok
-    log = response.parsed_body.first
+    log = response.parsed_body["symptom_logs"].first
     assert log.key?("id")
     assert log.key?("symptom_type")
     assert log.key?("severity")
     assert log.key?("recorded_at")
     assert log.key?("notes")
+    assert log.key?("triggers")
+  end
+
+  test "GET /symptom_logs.json with severity filter includes severity in applied_filters" do
+    get symptom_logs_url(severity: "mild"), as: :json
+    assert_response :ok
+    assert_equal "mild", response.parsed_body["applied_filters"]["severity"]
   end
 
   test "POST /symptom_logs with valid JSON params creates log and returns 201" do
     assert_difference "SymptomLog.count", 1 do
       post symptom_logs_url,
-        params: { symptom_log: { symptom_type: "coughing", severity: "mild", recorded_at: Time.current } },
+        params: { symptom_log: { symptom_type: "coughing", severity: "mild", recorded_at: Time.current, triggers: [ "exercise", "cold_air" ] } },
         as: :json
     end
     assert_response :created
     json = response.parsed_body
     assert_equal "coughing", json["symptom_type"]
+    assert_equal [ "exercise", "cold_air" ], json["triggers"]
     assert_equal @user, SymptomLog.last.user
   end
 

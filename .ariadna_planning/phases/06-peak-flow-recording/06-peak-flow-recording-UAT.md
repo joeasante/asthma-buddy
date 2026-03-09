@@ -1,9 +1,10 @@
 ---
-status: diagnosed
+status: complete
 phase: 06-peak-flow-recording
 source: [06-01-SUMMARY.md, 06-02-SUMMARY.md, 06-03-SUMMARY.md, 06-04-SUMMARY.md]
 started: 2026-03-07T00:00:00Z
-updated: 2026-03-07T00:00:00Z
+updated: 2026-03-07T12:00:00Z
+gaps_resolved_by: 06-05-PLAN.md
 ---
 
 ## Current Test

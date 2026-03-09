@@ -142,6 +142,88 @@
 }
 
 /* --------------------------------------------------------------------------
+   Personal best missing — persistent inline warning banner
+   -------------------------------------------------------------------------- */
+
+.dash-pb-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--severity-moderate-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-xl);
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  color: var(--severity-moderate-text);
+}
+
+.dash-pb-banner svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.dash-pb-banner p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dash-pb-banner a {
+  color: var(--severity-moderate-text);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.dash-pb-banner a:hover {
+  opacity: 0.8;
+}
+
+/* --------------------------------------------------------------------------
+   Symptom severity cards — Mild / Moderate / Severe weekly counts
+   -------------------------------------------------------------------------- */
+
+.dash-severity-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+}
+
+.dash-severity-card {
+  border-radius: var(--radius-xl);
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-severity-card--mild     { background: var(--severity-mild-bg); }
+.dash-severity-card--moderate { background: var(--severity-moderate-bg); }
+.dash-severity-card--severe   { background: var(--severity-severe-bg); }
+
+.dash-severity-count {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-severity-card--mild     .dash-severity-count { color: var(--severity-mild); }
+.dash-severity-card--moderate .dash-severity-count { color: var(--severity-moderate-text); }
+.dash-severity-card--severe   .dash-severity-count { color: var(--severity-severe); }
+
+.dash-severity-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dash-severity-card--mild     .dash-severity-label { color: var(--severity-mild); }
+.dash-severity-card--moderate .dash-severity-label { color: var(--severity-moderate-text); }
+.dash-severity-card--severe   .dash-severity-label { color: var(--severity-severe); }
+
+/* --------------------------------------------------------------------------
    Summary stat cards
    -------------------------------------------------------------------------- */
 
@@ -439,6 +521,64 @@
 }
 
 /* --------------------------------------------------------------------------
+   Zone legend — below the chart card
+   -------------------------------------------------------------------------- */
+
+.dash-zone-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+.dash-zone-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+.dash-zone-legend-item::before {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dash-zone-legend-item--green::before  { background: var(--severity-mild); }
+.dash-zone-legend-item--yellow::before { background: var(--severity-moderate); }
+.dash-zone-legend-item--red::before    { background: var(--severity-severe); }
+
+/* --------------------------------------------------------------------------
+   Adherence — "all medications taken today" green row
+   -------------------------------------------------------------------------- */
+
+.dash-adherence-item--all-on-track {
+  background: var(--severity-mild-bg);
+  border-left-color: var(--severity-mild);
+  font-weight: 500;
+  color: var(--severity-mild);
+}
+
+.dash-adherence-all-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--severity-mild);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 
@@ -475,6 +615,10 @@
   }
 
   .dash-quick-log {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-severity-cards {
     grid-template-columns: 1fr;
   }
 }

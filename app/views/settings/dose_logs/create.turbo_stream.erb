@@ -1,26 +1,9 @@
-<%= turbo_stream.replace "dose_history_#{dom_id(@medication)}" do %>
-  <div id="dose_history_<%= dom_id(@medication) %>">
-    <% recent_logs = @medication.dose_logs.chronological.limit(5) %>
-    <% if recent_logs.any? %>
-      <ul class="dose-history-list">
-        <%= render partial: "settings/dose_logs/dose_log", collection: recent_logs, as: :dose_log %>
-      </ul>
-    <% else %>
-      <p class="dose-history-empty">No doses logged yet.</p>
-    <% end %>
-  </div>
-<% end %>
+<%# Replace the entire med row — picks up updated remaining_doses, low_stock? border, and history %>
+<%= turbo_stream.replace dom_id(@medication),
+      partial: "settings/medications/medication",
+      locals: { medication: @medication } %>
 
-<%= turbo_stream.replace "remaining_count_#{dom_id(@medication)}" do %>
-  <dd id="remaining_count_<%= dom_id(@medication) %>"><%= @medication.remaining_doses %> doses</dd>
-<% end %>
-
-<%= turbo_stream.replace "dose_log_form_#{dom_id(@medication)}" do %>
-  <%= render "settings/dose_logs/form",
-        medication: @medication,
-        dose_log: DoseLog.new(medication: @medication, recorded_at: Time.current) %>
-<% end %>
-
+<%# Toast — picked up by toast_controller.js %>
 <%= turbo_stream.replace "flash-messages" do %>
-  <%= render "layouts/flash" %>
+  <div id="flash-messages" data-controller="toast" data-toast-message="Dose logged." data-toast-variant="success"></div>
 <% end %>

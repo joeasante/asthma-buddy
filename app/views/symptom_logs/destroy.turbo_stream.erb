@@ -3,4 +3,14 @@
     <%= render "trend_bar", severity_counts: @severity_counts %>
   </div>
 <% end %>
+
 <%= turbo_stream.remove dom_id(@symptom_log) %>
+
+<%# Show success feedback — see create.turbo_stream.erb comment about toast system. %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages"
+       data-controller="toast"
+       data-toast-message="Symptom log deleted."
+       data-toast-variant="success">
+  </div>
+<% end %>

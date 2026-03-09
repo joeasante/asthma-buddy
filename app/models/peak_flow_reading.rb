@@ -46,10 +46,12 @@ class PeakFlowReading < ApplicationRecord
   end
 
   def personal_best_at_reading_time
-    # Not memoized — recorded_at can change on update (future edit action), which
-    # would make a memoized result stale for before_save recomputation.
+    # Compare by date only — personal bests are set at a day-level granularity
+    # from the user's perspective. Using exact timestamps causes same-minute
+    # mismatches when a reading defaults to HH:MM:00 but the personal best was
+    # stored at HH:MM:45 earlier in the same minute.
     user.personal_best_records
-        .where("recorded_at <= ?", recorded_at)
+        .where(recorded_at: ..recorded_at.end_of_day)
         .order(recorded_at: :desc)
         .pick(:value)
   end

@@ -1,6 +1,7 @@
-<%= form_with model: [:settings, medication], id: "medication_form", data: { turbo: true } do |form| %>
+<%= form_with model: [:settings, medication], id: "medication_form",
+      data: { turbo: local_assigns.fetch(:use_turbo, true) } do |form| %>
   <% if medication.errors.any? %>
-    <div role="alert" aria-live="assertive">
+    <div class="field-errors" role="alert" aria-live="assertive">
       <p><%= pluralize(medication.errors.count, "error") %> prevented this medication from being saved:</p>
       <ul>
         <% medication.errors.each do |error| %>
@@ -12,7 +13,11 @@
 
   <div class="field">
     <%= form.label :name, "Medication name" %>
-    <%= form.text_field :name, placeholder: "e.g. Ventolin, Clenil Modulite", required: true %>
+    <%= form.text_field :name, placeholder: "e.g. Ventolin, Clenil Modulite", required: true,
+          "aria-describedby": medication.errors[:name].any? ? "name-error" : nil %>
+    <% if medication.errors[:name].any? %>
+      <p class="field-error" id="name-error"><%= medication.errors[:name].first %></p>
+    <% end %>
   </div>
 
   <div class="field">
@@ -20,18 +25,27 @@
     <%= form.select :medication_type,
           Medication.medication_types.keys.map { |k| [k.humanize, k] },
           { include_blank: "Select a type", selected: medication.medication_type },
-          required: true %>
+          { required: true, "aria-describedby": medication.errors[:medication_type].any? ? "type-error" : nil } %>
+    <% if medication.errors[:medication_type].any? %>
+      <p class="field-error" id="type-error"><%= medication.errors[:medication_type].first %></p>
+    <% end %>
   </div>
 
   <div class="field">
     <%= form.label :standard_dose_puffs, "Standard dose (puffs)" %>
     <%= form.number_field :standard_dose_puffs, min: 1, step: 1, required: true %>
+    <% if medication.errors[:standard_dose_puffs].any? %>
+      <p class="field-error"><%= medication.errors[:standard_dose_puffs].first %></p>
+    <% end %>
   </div>
 
   <div class="field">
     <%= form.label :starting_dose_count, "Starting dose count" %>
-    <p class="field-hint">How many doses are in the inhaler when you start tracking.</p>
     <%= form.number_field :starting_dose_count, min: 0, step: 1, required: true %>
+    <p class="field-hint">Enter the total number of puffs when the inhaler is full. A standard reliever inhaler usually has 200 puffs.</p>
+    <% if medication.errors[:starting_dose_count].any? %>
+      <p class="field-error"><%= medication.errors[:starting_dose_count].first %></p>
+    <% end %>
   </div>
 
   <fieldset class="field-group">
@@ -39,22 +53,28 @@
 
     <div class="field">
       <%= form.label :sick_day_dose_puffs, "Sick-day dose (puffs)" %>
-      <p class="field-hint">Leave blank if not applicable.</p>
       <%= form.number_field :sick_day_dose_puffs, min: 1, step: 1 %>
+      <p class="field-hint">Leave blank if not applicable.</p>
     </div>
 
     <div class="field">
       <%= form.label :doses_per_day, "Doses per day" %>
-      <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
       <%= form.number_field :doses_per_day, min: 1, step: 1 %>
+      <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
     </div>
+
   </fieldset>
 
-  <%= form.submit medication.persisted? ? "Update medication" : "Add medication" %>
+  <div class="form-actions">
+    <%= form.submit medication.persisted? ? "Update medication" : "Add medication", class: "btn-primary" %>
+    <%= link_to "Cancel", settings_medications_path, class: "btn-cancel" %>
+  </div>
 
   <% if medication.persisted? %>
-    <%= link_to "Cancel", settings_medications_path,
-          data: { turbo_frame: dom_id(medication) },
-          class: "btn-cancel" %>
+    <div class="form-delete-zone">
+      <%= button_to "Delete medication", settings_medication_path(medication), method: :delete,
+            class: "btn-delete btn-delete--full",
+            form: { data: { turbo: true, turbo_confirm: "Delete #{medication.name}? All dose history will also be deleted. This can't be undone." } } %>
+    </div>
   <% end %>
 <% end %>

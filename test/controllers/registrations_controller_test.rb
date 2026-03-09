@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "test_helper"
 
 class RegistrationsControllerTest < ActionDispatch::IntegrationTest
@@ -46,5 +47,33 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
         user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" }
       }
     end
+  end
+
+  # --- JSON ---
+
+  test "POST /registration with valid params returns 201 JSON" do
+    assert_difference "User.count", 1 do
+      post registration_path,
+        params: { user: { email_address: "jsonuser@example.com", password: "password123", password_confirmation: "password123" } },
+        as: :json
+    end
+    assert_response :created
+    assert_match "verify", response.parsed_body["message"]
+  end
+
+  test "POST /registration with duplicate email returns 422 JSON with errors" do
+    post registration_path,
+      params: { user: { email_address: users(:verified_user).email_address, password: "password123", password_confirmation: "password123" } },
+      as: :json
+    assert_response :unprocessable_entity
+    assert response.parsed_body["errors"].any?
+  end
+
+  test "POST /registration with short password returns 422 JSON with errors" do
+    post registration_path,
+      params: { user: { email_address: "newuser@example.com", password: "short", password_confirmation: "short" } },
+      as: :json
+    assert_response :unprocessable_entity
+    assert response.parsed_body["errors"].any?
   end
 end

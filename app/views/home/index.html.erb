@@ -1,6 +1,106 @@
-<% content_for :title, "Asthma Buddy" %>
+<% content_for :title, "Asthma Buddy — Breathe easier. Every day." %>
 
-<main class="home">
-  <h1>Asthma Buddy</h1>
-  <p>Track your asthma symptoms and peak flow readings.</p>
-</main>
+<% content_for :head do %>
+  <meta name="description" content="Log symptoms, track peak flow readings, and manage your inhalers — a free daily companion for people with asthma.">
+  <meta property="og:title" content="Asthma Buddy — Breathe easier. Every day.">
+  <meta property="og:description" content="Log symptoms, track peak flow, and manage medications — all in one place built for people with asthma.">
+  <meta property="og:type" content="website">
+<% end %>
+
+<%# ── Hero ─────────────────────────────────────────────────────────── %>
+<div class="home-hero">
+  <div class="home-hero-content">
+    <h1>
+      <span>Breathe easier.</span>
+      <span class="home-hero-h1-accent">Every day.</span>
+    </h1>
+    <p class="home-hero-subtitle">Log symptoms, track your peak flow, and manage your inhalers &mdash; all in one place built for people with asthma.</p>
+    <div class="home-hero-actions">
+      <%= link_to "Create free account", new_registration_path, class: "btn-primary btn-primary--hero" %>
+    </div>
+    <p class="home-hero-signin">Already have an account? <%= link_to "Sign in &rarr;".html_safe, new_session_path %></p>
+    <ul class="home-hero-trust" role="list" aria-label="Why it's safe to sign up">
+      <li>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1.5 6.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Always free
+      </li>
+      <li>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1.5 6.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Private by design
+      </li>
+      <li>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1.5 6.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        No credit card
+      </li>
+    </ul>
+  </div>
+</div>
+
+<%# ── How it works — dark teal band ──────────────────────────────── %>
+<div class="home-how" aria-labelledby="how-it-works-heading">
+  <h2 id="how-it-works-heading" class="home-how-heading">How it works</h2>
+  <ol class="home-how-steps" role="list">
+    <li class="home-how-step">
+      <span class="home-how-number" aria-hidden="true">01</span>
+      <h3>Log a reading or symptom</h3>
+      <p>Takes under 10 seconds. Add severity, notes, and the time — any time of day.</p>
+    </li>
+    <li class="home-how-step">
+      <span class="home-how-number" aria-hidden="true">02</span>
+      <h3>See your breathing zones</h3>
+      <p>Readings colour-code instantly into green, yellow, or red based on your personal best.</p>
+    </li>
+    <li class="home-how-step">
+      <span class="home-how-number" aria-hidden="true">03</span>
+      <h3>Spot your patterns</h3>
+      <p>Your dashboard surfaces trends over weeks &mdash; data worth sharing with your doctor.</p>
+    </li>
+  </ol>
+</div>
+
+<%# ── Features ─────────────────────────────────────────────────────── %>
+<div class="home-features-section">
+  <h2 class="home-features-heading">All your tools, in one place</h2>
+
+  <div class="home-features" role="list">
+    <div class="home-feature" role="listitem">
+      <div class="home-feature-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Track symptoms instantly</h3>
+      <p>Log shortness of breath, wheezing, and chest tightness in seconds &mdash; with severity levels and notes.</p>
+    </div>
+
+    <div class="home-feature" role="listitem">
+      <div class="home-feature-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Monitor your peak flow</h3>
+      <p>Record readings and see your green, yellow, and red zones based on your personal best.</p>
+    </div>
+
+    <div class="home-feature" role="listitem">
+      <div class="home-feature-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Never run out of medication</h3>
+      <p>Track your inhalers, log doses, and get a heads-up when your supply is running low.</p>
+    </div>
+
+    <div class="home-feature" role="listitem">
+      <div class="home-feature-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>See your patterns at a glance</h3>
+      <p>Your dashboard surfaces trends across symptoms, peak flow, and medication adherence.</p>
+    </div>
+  </div>
+</div>

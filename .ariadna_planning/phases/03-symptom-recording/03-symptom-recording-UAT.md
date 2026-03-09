@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 03-symptom-recording
 source: 03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md
 started: 2026-03-07T09:45:00Z
@@ -53,5 +53,10 @@ skipped: 0
   reason: "User reported: It told me to select an item in the list for symptom type"
   severity: minor
   test: 4
-  artifacts: []
-  missing: []
+  root_cause: "HTML required: true attribute on symptom_type and severity selects causes browser native validation to intercept the submit before Rails sees it, preventing the Turbo Stream 422 error path from firing"
+  artifacts:
+    - path: "app/views/symptom_logs/_form.html.erb"
+      issue: "{ required: true } HTML option on both select fields and datetime_local_field"
+  missing:
+    - "Remove required: true HTML attributes from selects (and datetime field) — Rails model validations already enforce presence; browser validation blocks the Turbo Stream error path"
+  debug_session: ""

@@ -21,9 +21,8 @@
     <div class="symptom-log-actions">
       <%= link_to "Edit", edit_symptom_log_path(symptom_log), class: "btn-edit" %>
       <%= button_to "Delete", symptom_log_path(symptom_log), method: :delete,
-            data: { turbo_confirm: "Delete this entry?" },
             class: "btn-delete",
-            form: { data: { turbo: true } } %>
+            form: { data: { turbo: true, turbo_confirm: "Delete this entry?" } } %>
     </div>
   </article>
 <% end %>

@@ -1,3 +1,13 @@
-<%= turbo_frame_tag dom_id(@medication) do %>
-  <%= render "form", medication: @medication %>
-<% end %>
+<% content_for :title, "Edit #{@medication.name} — Settings" %>
+
+<div class="page-header">
+  <h1>Edit <%= @medication.name %></h1>
+  <%= link_to "Cancel", settings_medications_path, class: "btn-secondary" %>
+</div>
+
+<div class="section-card">
+  <%# turbo: false — on the edit page the form posts to HTML so the controller
+      redirects back to the list with flash, rather than trying a turbo-stream
+      replace on an element that doesn't exist here. %>
+  <%= render "form", medication: @medication, use_turbo: false %>
+</div>

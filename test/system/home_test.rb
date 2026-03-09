@@ -7,7 +7,8 @@ class HomeTest < ApplicationSystemTestCase
     visit root_url
 
     assert_selector "h1", text: "Asthma Buddy"
-    assert_selector "header[role=banner]"
-    assert_selector "nav[role=navigation]"
+    assert_selector "header"
+    assert_selector "nav[aria-label='Main navigation']"
+    assert_selector "main#main-content"
   end
 end

@@ -1,0 +1,39 @@
+<% if current_personal_best %>
+  <div class="profile-pb-badge">
+    <span class="profile-pb-badge-value"><%= current_personal_best.value %></span>
+    <span class="profile-pb-badge-unit">L/min</span>
+    <span class="profile-pb-badge-dot" aria-hidden="true">&middot;</span>
+    <span class="profile-pb-badge-date">Last set <%= current_personal_best.recorded_at.strftime("%-d %b %Y") %></span>
+  </div>
+<% end %>
+
+<%= form_with model: personal_best_record,
+              url: profile_personal_best_path,
+              method: :post do |form| %>
+
+  <% if personal_best_record.errors.any? %>
+    <div role="alert" class="form-errors">
+      <ul>
+        <% personal_best_record.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field profile-pb-field">
+    <%= form.label :value, current_personal_best ? "Update your personal best" : "Enter your personal best" %>
+    <div class="profile-pb-input-row">
+      <div class="input-with-unit">
+        <%= form.number_field :value,
+              min: 100, max: 900,
+              placeholder: "e.g. 520",
+              aria: { label: "Personal best peak flow in litres per minute" } %>
+        <span class="input-unit" aria-hidden="true">L/min</span>
+      </div>
+      <%= form.submit current_personal_best ? "Update" : "Set personal best", class: "btn-primary" %>
+    </div>
+    <span class="profile-pb-hint">Highest reading when feeling well &mdash; used for zone calculations.</span>
+  </div>
+
+<% end %>

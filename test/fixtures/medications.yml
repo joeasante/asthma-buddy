@@ -1,4 +1,5 @@
 # Alice's medications
+# created_at is set 90 days in the past so calculator tests can use past dates freely.
 alice_reliever:
   user: verified_user
   name: Ventolin
@@ -7,6 +8,8 @@ alice_reliever:
   starting_dose_count: 200
   sick_day_dose_puffs:
   doses_per_day:
+  created_at: <%= 90.days.ago %>
+  updated_at: <%= 90.days.ago %>
 
 alice_preventer:
   user: verified_user
@@ -16,6 +19,8 @@ alice_preventer:
   starting_dose_count: 120
   sick_day_dose_puffs:
   doses_per_day: 2
+  created_at: <%= 90.days.ago %>
+  updated_at: <%= 90.days.ago %>
 
 alice_combination:
   user: verified_user
@@ -25,6 +30,8 @@ alice_combination:
   starting_dose_count: 120
   sick_day_dose_puffs:
   doses_per_day:
+  created_at: <%= 90.days.ago %>
+  updated_at: <%= 90.days.ago %>
 
 # Bob's medication (cross-user isolation)
 bob_reliever:
@@ -35,3 +42,5 @@ bob_reliever:
   starting_dose_count: 200
   sick_day_dose_puffs:
   doses_per_day:
+  created_at: <%= 90.days.ago %>
+  updated_at: <%= 90.days.ago %>

@@ -7,11 +7,12 @@ Rails.application.routes.draw do
   post "email_verification", to: "email_verifications#create", as: :email_verification_resend
   get "email_verification/:token", to: "email_verifications#show", as: :email_verification
   resources :passwords, param: :token, only: %i[ new create edit update ]
-  resources :symptom_logs, path: "symptom-logs", only: %i[ index create edit update destroy ]
+  resources :symptom_logs, path: "symptom-logs", only: %i[ index new create edit update destroy ]
   resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index edit update destroy ]
 
-  resource :profile, only: %i[show update]
+  resource :profile, only: %i[show update destroy]
   post "profile/personal_best", to: "profiles#update_personal_best", as: :profile_personal_best
+  delete "profile/avatar", to: "profiles#remove_avatar", as: :profile_avatar
 
   get  "settings",               to: "settings#show",                as: :settings
   post "settings/personal_best", to: "settings#update_personal_best", as: :settings_personal_best
@@ -40,6 +41,16 @@ Rails.application.routes.draw do
 
   get "adherence", to: "adherence#index", as: :adherence
   get "dashboard", to: "dashboard#index", as: :dashboard
+
+  scope :onboarding, as: :onboarding do
+    get  "step/:step", to: "onboarding#show",     as: :step,     constraints: { step: /[1-3]/ }
+    post "step_1",     to: "onboarding#submit_1",  as: :submit_1
+    post "step_2",     to: "onboarding#submit_2",  as: :submit_2
+    get  "skip/:step", to: "onboarding#skip",      as: :skip,     constraints: { step: /[1-3]/ }
+  end
+
+  get "privacy", to: "pages#privacy", as: :privacy
+  get "terms",   to: "pages#terms",   as: :terms
 
   # Defines the root path route ("/")
   root "home#index"

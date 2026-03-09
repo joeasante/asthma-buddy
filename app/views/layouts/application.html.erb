@@ -8,23 +8,34 @@
 
     <%= yield :head %>
 
+    <%# Trim to weights actually used — Inter 700 unused (headings use Plus Jakarta Sans) %>
+    <%# Plus Jakarta Sans 600 unused (headings use 700/800 only) %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "lexxy", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "profile", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "charts", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "dashboard", "data-turbo-track": "reload" %>
+    <% if authenticated? %>
+      <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "charts",            "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "dashboard",         "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "peak_flow",         "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "settings",          "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "confirm_dialog",    "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "symptom_timeline",  "data-turbo-track": "reload" %>
+    <% end %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="confirm">
+  <body data-controller="confirm" class="<%= 'has-bottom-nav' if authenticated? %>">
+    <%# Skip link — must be first focusable element for keyboard/screen reader users (WCAG 2.4.1) %>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <dialog class="confirm-dialog"
             data-confirm-target="dialog"
             data-action="click->confirm#backdropClick">
@@ -71,6 +82,8 @@
               </button>
               <div class="nav-dropdown" data-nav-dropdown-target="menu" hidden>
                 <%= link_to "Profile", profile_path, class: "nav-dropdown-item" %>
+                <%= link_to "Medications", settings_medications_path, class: "nav-dropdown-item" %>
+                <%= link_to "Adherence", adherence_path, class: "nav-dropdown-item" %>
                 <%= button_to "Sign out", session_path, method: :delete,
                       class: "nav-dropdown-item nav-dropdown-item--signout",
                       form: { style: "width: 100%" } %>
@@ -78,7 +91,7 @@
             </div>
           <% else %>
             <%= link_to "Sign in", new_session_path, class: "nav-link" %>
-            <%= link_to "Sign up", new_registration_path, class: "nav-link nav-link--cta" %>
+            <%= link_to "Get started", new_registration_path, class: "nav-link nav-link--cta" %>
           <% end %>
         </div>
       </nav>
@@ -94,8 +107,16 @@
       <%= render "layouts/bottom_nav" %>
     <% end %>
 
+    <%# Toast region — toasts are appended here by toast_controller.js %>
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
+
     <footer>
-      <p>Asthma Buddy &mdash; track your breathing, understand your patterns</p>
+      <p class="footer-copy">Asthma Buddy &mdash; track your breathing, understand your patterns</p>
+      <nav class="footer-nav" aria-label="Footer">
+        <%= link_to "Privacy", privacy_path %>
+        <%= link_to "Terms", terms_path %>
+      </nav>
+      <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
     </footer>
   </body>
 </html>

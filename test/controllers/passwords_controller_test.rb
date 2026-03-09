@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "test_helper"
 
 class PasswordsControllerTest < ActionDispatch::IntegrationTest
@@ -41,7 +42,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
   test "update" do
     assert_changes -> { @user.reload.password_digest } do
-      put password_path(@user.password_reset_token), params: { password: "newpassword1", password_confirmation: "newpassword1" }
+      patch password_path(@user.password_reset_token), params: { password: "newpassword1", password_confirmation: "newpassword1" }
       assert_redirected_to new_session_path
     end
 
@@ -52,12 +53,50 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   test "update with non matching passwords" do
     token = @user.password_reset_token
     assert_no_changes -> { @user.reload.password_digest } do
-      put password_path(token), params: { password: "nomatch12", password_confirmation: "match1234" }
+      patch password_path(token), params: { password: "nomatch12", password_confirmation: "match1234" }
       assert_redirected_to edit_password_path(token)
     end
 
     follow_redirect!
     assert_notice "Passwords did not match"
+  end
+
+  # --- JSON ---
+
+  test "POST /passwords with existing email returns 200 JSON" do
+    post passwords_path, params: { email_address: @user.email_address }, as: :json
+    assert_response :ok
+    assert_match "reset instructions sent", response.parsed_body["message"]
+  end
+
+  test "POST /passwords with unknown email returns 200 JSON (no enumeration)" do
+    post passwords_path, params: { email_address: "nobody@example.com" }, as: :json
+    assert_response :ok
+    assert_match "reset instructions sent", response.parsed_body["message"]
+  end
+
+  test "PATCH /passwords/:token with valid token and matching passwords returns 200 JSON" do
+    patch password_path(@user.password_reset_token),
+      params: { password: "newpassword1", password_confirmation: "newpassword1" },
+      as: :json
+    assert_response :ok
+    assert_equal "Password has been reset.", response.parsed_body["message"]
+  end
+
+  test "PATCH /passwords/:token with invalid token returns 404 JSON" do
+    patch password_path("bad-token"),
+      params: { password: "newpassword1", password_confirmation: "newpassword1" },
+      as: :json
+    assert_response :not_found
+    assert_match "invalid or has expired", response.parsed_body["error"]
+  end
+
+  test "PATCH /passwords/:token with mismatched passwords returns 422 JSON" do
+    patch password_path(@user.password_reset_token),
+      params: { password: "newpassword1", password_confirmation: "different456" },
+      as: :json
+    assert_response :unprocessable_entity
+    assert response.parsed_body["errors"].any?
   end
 
   private

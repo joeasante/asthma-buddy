@@ -6,12 +6,15 @@ class AdherenceCalculatorTest < ActiveSupport::TestCase
     @preventer = medications(:alice_preventer)  # doses_per_day: 2
     @reliever  = medications(:alice_reliever)   # doses_per_day: nil
     @today     = Time.current.to_date
+    # Use 2 days ago — the dose_logs fixture only has a preventer dose on 1.day.ago,
+    # so this date is clean for tests that control their own dose data.
+    @past_date = @today - 2.days
   end
 
-  # 1. on_track: preventer with 2 logs today
-  test "returns on_track when all scheduled doses are logged" do
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 9))
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 13))
+  # ── on_track ─────────────────────────────────────────────────────
+  test "returns on_track when all scheduled doses are logged today" do
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @today.beginning_of_day + 8.hours)
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @today.beginning_of_day + 20.hours)
 
     result = AdherenceCalculator.call(@preventer, @today)
 
@@ -20,37 +23,61 @@ class AdherenceCalculatorTest < ActiveSupport::TestCase
     assert_equal :on_track, result.status
   end
 
-  # 2. missed (partial): preventer with 1 log today
-  test "returns missed when fewer than scheduled doses are logged" do
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 9))
+  # ── partial / pending — today only ───────────────────────────────
+  test "returns partial when some but not all doses are logged today" do
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @today.beginning_of_day + 8.hours)
 
     result = AdherenceCalculator.call(@preventer, @today)
+
+    assert_equal 1,        result.taken
+    assert_equal 2,        result.scheduled
+    assert_equal :partial, result.status
+  end
+
+  test "returns pending when no doses are logged yet today" do
+    result = AdherenceCalculator.call(@preventer, @today)
+
+    assert_equal 0,        result.taken
+    assert_equal 2,        result.scheduled
+    assert_equal :pending, result.status
+  end
+
+  # ── missed — past days only ───────────────────────────────────────
+  test "returns missed for a past day with fewer than scheduled doses" do
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @past_date.beginning_of_day + 8.hours)
+
+    result = AdherenceCalculator.call(@preventer, @past_date)
 
     assert_equal 1,       result.taken
     assert_equal 2,       result.scheduled
     assert_equal :missed, result.status
   end
 
-  # 3. missed (none): preventer with 0 logs today
-  test "returns missed when no doses are logged for a scheduled medication" do
-    result = AdherenceCalculator.call(@preventer, @today)
+  test "returns missed for a past day with no doses logged" do
+    result = AdherenceCalculator.call(@preventer, @past_date)
 
     assert_equal 0,       result.taken
     assert_equal 2,       result.scheduled
     assert_equal :missed, result.status
   end
 
-  # 4. no_schedule: reliever with no doses_per_day
-  test "returns no_schedule for a medication without doses_per_day" do
-    DoseLog.create!(user: @user, medication: @reliever, puffs: 2, recorded_at: Time.current)
+  test "returns on_track for a past day where all doses were logged" do
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @past_date.beginning_of_day + 8.hours)
+    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: @past_date.beginning_of_day + 20.hours)
 
+    result = AdherenceCalculator.call(@preventer, @past_date)
+
+    assert_equal :on_track, result.status
+  end
+
+  # ── no_schedule ───────────────────────────────────────────────────
+  test "returns no_schedule for a medication without doses_per_day" do
     result = AdherenceCalculator.call(@reliever, @today)
 
-    assert_nil         result.scheduled
+    assert_nil             result.scheduled
     assert_equal :no_schedule, result.status
   end
 
-  # 5. before medication created_at
   test "returns no_schedule for a date before the medication was created" do
     past_date = @preventer.created_at.to_date - 1.day
 
@@ -61,21 +88,19 @@ class AdherenceCalculatorTest < ActiveSupport::TestCase
     assert_equal :no_schedule, result.status
   end
 
-  # 6. exact boundary: taken == scheduled => on_track, taken == scheduled - 1 => missed
-  test "returns on_track exactly when taken equals scheduled" do
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 9))
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 13))
+  # ── preloaded_logs shortcut ───────────────────────────────────────
+  test "accepts preloaded_logs array and returns on_track when count matches scheduled" do
+    # Two placeholder objects — only their count matters
+    result = AdherenceCalculator.call(@preventer, @today, preloaded_logs: [ :a, :b ])
 
-    result = AdherenceCalculator.call(@preventer, @today)
-
+    assert_equal 2,         result.taken
     assert_equal :on_track, result.status
   end
 
-  test "returns missed when taken is one below scheduled" do
-    DoseLog.create!(user: @user, medication: @preventer, puffs: 2, recorded_at: Time.current.change(hour: 9))
+  test "treats empty preloaded_logs array as zero doses taken on a past day" do
+    result = AdherenceCalculator.call(@preventer, @past_date, preloaded_logs: [])
 
-    result = AdherenceCalculator.call(@preventer, @today)
-
+    assert_equal 0,       result.taken
     assert_equal :missed, result.status
   end
 end

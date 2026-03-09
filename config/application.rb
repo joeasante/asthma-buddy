@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "boot"
 
 require "rails/all"
@@ -15,6 +16,15 @@ module AsthmaBuddy
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
+
+    # Security headers applied globally to all responses.
+    # Referrer-Policy: prevents URL path leakage to external sites (health data in paths).
+    # Permissions-Policy: explicitly denies browser API access (camera, mic, geo) to limit
+    # XSS blast radius in a HIPAA-adjacent health app.
+    config.action_dispatch.default_headers.merge!(
+      "Referrer-Policy" => "strict-origin-when-cross-origin",
+      "Permissions-Policy" => "camera=(), microphone=(), geolocation=(), payment=()"
+    )
 
     # Configuration for the application, engines, and railties goes here.
     #

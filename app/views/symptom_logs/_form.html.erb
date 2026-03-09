@@ -1,7 +1,7 @@
-<%= form_with model: symptom_log, data: { turbo: true } do |form| %>
+<%= form_with model: symptom_log, data: { turbo: true }, id: "symptom_log_form" do |form| %>
   <% if symptom_log.errors.any? %>
-    <div role="alert" aria-live="assertive">
-      <p><%= pluralize(symptom_log.errors.count, "error") %> prevented this entry from being saved:</p>
+    <div class="field-errors" role="alert" aria-live="assertive">
+      <p><strong><%= pluralize(symptom_log.errors.count, "error") %></strong> prevented this entry from being saved:</p>
       <ul>
         <% symptom_log.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -10,33 +10,84 @@
     </div>
   <% end %>
 
-  <div>
+  <div class="field">
     <%= form.label :symptom_type, "Symptom type" %>
     <%= form.select :symptom_type,
           SymptomLog.symptom_types.keys.map { |k| [k.humanize.gsub("_", " "), k] },
           { include_blank: "Select a symptom type", selected: symptom_log.symptom_type } %>
+    <% if symptom_log.errors[:symptom_type].any? %>
+      <p class="field-error" id="symptom_type_error" role="alert"><%= symptom_log.errors[:symptom_type].first %></p>
+    <% end %>
   </div>
 
-  <div>
+  <div class="field">
     <%= form.label :severity, "Severity" %>
-    <%= form.select :severity,
-          SymptomLog.severities.keys.map { |k| [k.capitalize, k] },
-          { include_blank: "Select severity", selected: symptom_log.severity } %>
+    <div class="severity-btn-group" role="group" aria-label="Select severity">
+      <% [["Mild", "mild"], ["Moderate", "moderate"], ["Severe", "severe"]].each do |label, value| %>
+        <label class="severity-btn severity-btn--<%= value %>">
+          <%= form.radio_button :severity, value, class: "severity-btn-input" %>
+          <span class="severity-btn-label"><%= label %></span>
+        </label>
+      <% end %>
+    </div>
+    <% if symptom_log.errors[:severity].any? %>
+      <p class="field-error" id="severity_error" role="alert"><%= symptom_log.errors[:severity].first %></p>
+    <% end %>
   </div>
 
-  <div>
+  <div class="field" data-controller="now">
     <%= form.label :recorded_at, "When did this happen?" %>
-    <%= form.datetime_local_field :recorded_at, step: 60 %>
+    <div class="datetime-with-now">
+      <%= form.datetime_local_field :recorded_at,
+            step: 60,
+            data: { "now-target": "input" } %>
+      <button type="button" class="btn-now" data-action="now#fill">Right now</button>
+    </div>
+    <% if symptom_log.errors[:recorded_at].any? %>
+      <p class="field-error" id="recorded_at_error" role="alert"><%= symptom_log.errors[:recorded_at].first %></p>
+    <% end %>
   </div>
 
-  <div>
-    <%= form.label :notes, "Notes (optional)" %>
-    <%= form.rich_text_area :notes, aria: { label: "Notes" } %>
+  <div class="field" data-controller="triggers">
+    <label id="triggers_label">
+      Triggers <span class="field-optional">(optional)</span>
+    </label>
+    <%# container: JS removes/recreates hidden inputs on every chip toggle.
+        Server-rendered hidden inputs below provide a no-JS fallback for pre-selected triggers. %>
+    <div data-triggers-target="container">
+      <% Array(symptom_log.triggers).each do |t| %>
+        <input type="hidden" name="symptom_log[triggers][]" value="<%= t %>">
+      <% end %>
+    </div>
+    <div class="triggers-grid" role="group" aria-labelledby="triggers_label">
+      <% SymptomLog::COMMON_TRIGGERS.each do |trigger| %>
+        <button type="button"
+                class="trigger-chip <%= "trigger-chip--selected" if Array(symptom_log.triggers).include?(trigger) %>"
+                data-triggers-target="chip"
+                data-value="<%= trigger %>"
+                data-action="click->triggers#toggle"
+                aria-pressed="<%= Array(symptom_log.triggers).include?(trigger) %>">
+          <%= trigger.humanize.gsub("_", " ") %>
+        </button>
+      <% end %>
+    </div>
   </div>
 
-  <%= form.submit symptom_log.persisted? ? "Update symptom" : "Log symptom" %>
+  <div class="field">
+    <%= form.label :notes, "Notes" %>
+    <p class="field-hint" id="notes_hint">Any context, observations, or details about this episode.</p>
+    <%= form.rich_text_area :notes,
+          toolbar: "false",
+          aria: { label: "Notes", describedby: "notes_hint" },
+          placeholder: "e.g. Woke me up at night, had my reliever inhaler…" %>
+  </div>
 
-  <% if symptom_log.persisted? %>
-    <%= link_to "Cancel", symptom_logs_path, data: { turbo: false }, class: "btn-cancel" %>
-  <% end %>
+  <div class="form-actions">
+    <%= form.button symptom_log.persisted? ? "Update symptom" : "Save symptom",
+          type: "submit",
+          class: "btn-primary form-actions-submit" %>
+    <%= link_to "Cancel", symptom_logs_path,
+          data: { turbo: false },
+          class: "btn-cancel" %>
+  </div>
 <% end %>

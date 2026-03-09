@@ -17,26 +17,25 @@ class AdherenceControllerTest < ActionDispatch::IntegrationTest
   test "index renders successfully for authenticated user" do
     get adherence_url
     assert_response :success
-    assert_select "h1", "Preventer Adherence"
+    assert_select "h1", "Adherence History"
   end
 
   test "index defaults to 7-day range" do
     get adherence_url
     assert_response :success
-    # The active toggle button should be 7 days
-    assert_select "a.adherence-toggle-btn--active", text: "7 days"
+    assert_select "a.btn-sm--active", text: "7 days"
   end
 
-  test "index accepts days=30 param" do
-    get adherence_url, params: { days: 30 }
+  test "index accepts period=30 param" do
+    get adherence_url, params: { period: 30 }
     assert_response :success
-    assert_select "a.adherence-toggle-btn--active", text: "30 days"
+    assert_select "a.btn-sm--active", text: "30 days"
   end
 
-  test "index ignores invalid days param and defaults to 7" do
-    get adherence_url, params: { days: 99 }
+  test "index ignores invalid period param and defaults to 7" do
+    get adherence_url, params: { period: 99 }
     assert_response :success
-    assert_select "a.adherence-toggle-btn--active", text: "7 days"
+    assert_select "a.btn-sm--active", text: "7 days"
   end
 
   test "index only shows preventers with doses_per_day (alice_preventer, not alice_reliever or alice_combination)" do

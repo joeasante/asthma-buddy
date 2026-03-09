@@ -125,10 +125,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A user can navigate to an adherence history view and see a day-by-day grid for the last 7 days and last 30 days, where each day is colour-coded: green (all scheduled doses logged), red (fewer than scheduled), grey (no schedule or no data).
   4. The adherence history correctly handles days before the medication was added (shown as grey, not red).
 
-**Plans**:
-- [ ] 14-01: Adherence helper / service object — given a medication and a date, returns `{taken: N, scheduled: N, status: :on_track | :missed | :no_schedule}`; model/unit tests
-- [ ] 14-02: Dashboard adherence card partial; logic to collect today's adherence for all preventer medications scoped to Current.user
-- [ ] 14-03: Adherence history view — 7 / 30 day toggle, calendar grid partial, colour coding; controller action; system test for grid rendering and day status
+**Plans:** 3 plans
+- [ ] 14-01-PLAN.md — AdherenceCalculator service object (app/services/adherence_calculator.rb); TDD with unit tests covering on_track, missed, no_schedule, and pre-creation-date cases
+- [ ] 14-02-PLAN.md — Dashboard adherence section: DashboardController loads @preventer_adherence; _adherence_card partial with N/N taken and on-track/missed colour states; adherence_path route
+- [ ] 14-03-PLAN.md — AdherenceController (GET /adherence), history view with 7/30-day toggle, _history_grid partial with colour-coded cells; controller tests and system tests
 
 ---
 
@@ -203,8 +203,8 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 | 10. Medication Data Layer | 3/3 | Complete ✓ | 2026-03-08 |
 | 11. Medication Management UI | 3/3 | Complete ✓ | 2026-03-08 |
 | 12. Dose Logging | 3/3 | Complete ✓ | 2026-03-08 |
-| 13. Dose Tracking & Low Stock | 0/3 | Planned | - |
-| 14. Adherence Dashboard | 0/3 | Not started | - |
+| 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
+| 14. Adherence Dashboard | 0/3 | Planned | - |
 | 15. Health Events | 0/3 | Not started | - |
 | 16. Account Management & Legal | 0/3 | Not started | - |
 | 17. Onboarding Flow | 0/3 | Not started | - |

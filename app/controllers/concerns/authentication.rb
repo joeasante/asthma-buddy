@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Authentication
   extend ActiveSupport::Concern
 
@@ -22,16 +23,25 @@ module Authentication
     end
 
     def resume_session
-      Current.session ||= find_session_by_cookie
+      Current.session ||= find_session_by_cookie&.tap { |s| refresh_session_cookie(s) }
     end
 
     def find_session_by_cookie
-      Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
+      Session.find_by(id: cookies.signed[:session_id])
+    end
+
+    def refresh_session_cookie(session)
+      cookies.signed[:session_id] = { value: session.id, httponly: true, secure: !Rails.env.local?, same_site: :lax, expires: 2.weeks.from_now }
     end
 
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
+      respond_to do |format|
+        format.html do
+          session[:return_to_after_authenticating] = request.url
+          redirect_to new_session_path
+        end
+        format.json { render json: { error: "Authentication required" }, status: :unauthorized }
+      end
     end
 
     def after_authentication_url
@@ -41,12 +51,12 @@ module Authentication
     def start_new_session_for(user)
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
-        cookies.signed[:session_id] = { value: session.id, httponly: true, same_site: :lax, expires: 2.weeks.from_now }
+        refresh_session_cookie(session)
       end
     end
 
     def terminate_session
-      Current.session.destroy
+      Current.session&.destroy
       cookies.delete(:session_id)
     end
 end
