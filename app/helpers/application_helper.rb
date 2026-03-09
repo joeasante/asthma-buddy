@@ -1,15 +1,25 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  # Returns the CSS class string for a nav link, adding --active when the
-  # current request path matches the given path.
+  # True when the current request is at or within the given path.
+  # Root path uses exact match to avoid matching everything.
+  def nav_active?(path)
+    path == root_path ? current_page?(path) : request.path.start_with?(path)
+  end
+
+  # Returns the CSS class string for a top nav link.
   def nav_link_class(path)
-    current_page?(path) ? "nav-link nav-link--active" : "nav-link"
+    nav_active?(path) ? "nav-link nav-link--active" : "nav-link"
+  end
+
+  # Returns the CSS class string for a bottom nav tab.
+  def nav_tab_class(path)
+    nav_active?(path) ? "bottom-nav-tab bottom-nav-tab--active" : "bottom-nav-tab"
   end
 
   # Returns aria-current="page" value when on the given path, nil otherwise.
   def nav_current(path)
-    current_page?(path) ? "page" : nil
+    nav_active?(path) ? "page" : nil
   end
 
   # Returns a human-friendly label for a dose log timestamp.

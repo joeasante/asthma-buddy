@@ -58,7 +58,14 @@ export default class extends Controller {
     healthEvents: Array
   }
 
+  static targets = ["sessionBtn"]
+
   connect() {
+    // Controller may live on a wrapper div or directly on the canvas.
+    this.canvasEl = this.element.tagName === "CANVAS"
+      ? this.element
+      : this.element.querySelector("canvas")
+
     if (!this.typeValue || !this.dataValue?.length) return
 
     if (this.typeValue === "symptoms") {
@@ -77,7 +84,41 @@ export default class extends Controller {
       this.chart.destroy()
       this.chart = null
     }
-    this.element.parentElement?.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
+    this.canvasEl?.parentElement?.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
+  }
+
+  // Independent toggle: each pill controls its own series.
+  // At least one series must remain visible — toggling the last active one is a no-op.
+  toggleSeries({ params: { series } }) {
+    if (!this.chart) return
+
+    const clickedIndex = series === "morning" ? this.morningIndex : this.eveningIndex
+    const otherIndex   = series === "morning" ? this.eveningIndex : this.morningIndex
+
+    const clickedOn = this.chart.isDatasetVisible(clickedIndex)
+    const otherOn   = this.chart.isDatasetVisible(otherIndex)
+
+    // Prevent hiding the last visible series
+    if (clickedOn && !otherOn) return
+
+    if (clickedOn) {
+      this.chart.hide(clickedIndex)
+    } else {
+      this.chart.show(clickedIndex)
+    }
+
+    this.syncSessionButtons()
+  }
+
+  // Keep aria-pressed on session buttons in sync with dataset visibility.
+  syncSessionButtons() {
+    if (!this.hasSessionBtnTarget) return
+    this.sessionBtnTargets.forEach(btn => {
+      const series  = btn.dataset.chartSeriesParam
+      const index   = series === "morning" ? this.morningIndex : this.eveningIndex
+      const visible = this.chart.isDatasetVisible(index)
+      btn.setAttribute("aria-pressed", visible ? "true" : "false")
+    })
   }
 
   // Stacked bar chart — symptoms by severity per day
@@ -86,7 +127,7 @@ export default class extends Controller {
     const labels = data.map(d => toDayLabel(d.date))
     const zc     = zoneColors()
 
-    this.chart = new Chart(this.element, {
+    this.chart = new Chart(this.canvasEl, {
       type: "bar",
       data: {
         labels,
@@ -119,7 +160,7 @@ export default class extends Controller {
     const zc         = zoneColors()
     const pointColors = data.map(d => (zc[d.zone] || zc.none).bar)
 
-    this.chart = new Chart(this.element, {
+    this.chart = new Chart(this.canvasEl, {
       type: "line",
       data: {
         labels,
@@ -172,6 +213,8 @@ export default class extends Controller {
     const morningColors = data.map(d => (zc[d.morning_zone] || zc.none).bar)
     const eveningColors = data.map(d => (zc[d.evening_zone] || zc.none).bar)
 
+    const eveningColor = cssVar("--teal-600") || "#0d9488"
+
     const datasets = []
 
     if (pb > 0) {
@@ -205,12 +248,12 @@ export default class extends Controller {
     }
 
     // Morning line
-    const morningDatasetIndex = datasets.length
+    this.morningIndex = datasets.length
     datasets.push({
       label:                "Morning",
       data:                 morningValues,
       borderColor:          "#f59e0b",
-      backgroundColor:      "transparent",
+      backgroundColor:      "#f59e0b",
       pointBackgroundColor: pb > 0 ? morningColors : "#f59e0b",
       pointBorderColor:     pb > 0 ? morningColors : "#f59e0b",
       pointRadius:          4,
@@ -222,14 +265,14 @@ export default class extends Controller {
     })
 
     // Evening line
-    const eveningDatasetIndex = datasets.length
+    this.eveningIndex = datasets.length
     datasets.push({
       label:                "Evening",
       data:                 eveningValues,
-      borderColor:          cssVar("--teal-600"),
-      backgroundColor:      "transparent",
-      pointBackgroundColor: pb > 0 ? eveningColors : cssVar("--teal-600"),
-      pointBorderColor:     pb > 0 ? eveningColors : cssVar("--teal-600"),
+      borderColor:          eveningColor,
+      backgroundColor:      eveningColor,
+      pointBackgroundColor: pb > 0 ? eveningColors : eveningColor,
+      pointBorderColor:     pb > 0 ? eveningColors : eveningColor,
       pointRadius:          4,
       pointHoverRadius:     6,
       tension:              0.3,
@@ -286,7 +329,7 @@ export default class extends Controller {
       }
     }
 
-    this.chart = new Chart(this.element, {
+    this.chart = new Chart(this.canvasEl, {
       type: "line",
       data: { labels, datasets },
       plugins: [markerPlugin],
@@ -295,22 +338,12 @@ export default class extends Controller {
         onResize: () => { this.positionEventBadges() },
         layout: {
           // Reserve space above the chart area for event badge labels.
-          // Badges are positioned in this strip, keeping them clear of Y-axis numbers.
           padding: { top: healthEvents.length ? 26 : 4 }
         },
         plugins: {
-          legend: {
-            display: true,
-            position: "bottom",
-            labels: {
-              filter:   item => item.text === "Morning" || item.text === "Evening",
-              boxWidth: 12,
-              padding:  16,
-              font:     { size: 12 }
-            }
-          },
+          legend: { display: false },
           tooltip: {
-            filter:    item => item.datasetIndex === morningDatasetIndex || item.datasetIndex === eveningDatasetIndex,
+            filter:    item => item.datasetIndex === this.morningIndex || item.datasetIndex === this.eveningIndex,
             callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} L/min` }
           }
         },
@@ -339,13 +372,13 @@ export default class extends Controller {
     if (!this.chart) return
 
     const healthEvents = this.healthEventsValue || []
-    const wrapper      = this.element.parentElement
+    const wrapper      = this.canvasEl.parentElement
 
     // Clear stale badges before (re)positioning
     wrapper.querySelectorAll(".chart-event-badge").forEach(el => el.remove())
     if (!healthEvents.length) return
 
-    const canvas = this.element
+    const canvas = this.canvasEl
     const xAxis  = this.chart.scales.x
 
     // Build date → axis label lookup
@@ -376,11 +409,11 @@ export default class extends Controller {
   }
 
   // Two-line chart — morning and evening series for the history page.
-  // Replaces the previous best-per-day bar chart; shows both sessions separately.
   renderPeakFlowZonesChart() {
-    const data   = this.dataValue
-    const labels = data.map(d => toDayLabel(d.date))
-    const zc     = zoneColors()
+    const data         = this.dataValue
+    const labels       = data.map(d => toDayLabel(d.date))
+    const zc           = zoneColors()
+    const eveningColor = cssVar("--teal-600") || "#0d9488"
 
     const morningValues = data.map(d => d.morning ?? null)
     const eveningValues = data.map(d => d.evening ?? null)
@@ -393,7 +426,11 @@ export default class extends Controller {
     const minValue = Math.min(...allValues)
     const yMin     = Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
 
-    this.chart = new Chart(this.element, {
+    // Indices are fixed for this simple two-dataset chart
+    this.morningIndex = 0
+    this.eveningIndex = 1
+
+    this.chart = new Chart(this.canvasEl, {
       type: "line",
       data: {
         labels,
@@ -402,7 +439,7 @@ export default class extends Controller {
             label:                "Morning",
             data:                 morningValues,
             borderColor:          "#f59e0b",
-            backgroundColor:      "transparent",
+            backgroundColor:      "#f59e0b",
             pointBackgroundColor: morningColors,
             pointBorderColor:     morningColors,
             pointRadius:          3,
@@ -415,8 +452,8 @@ export default class extends Controller {
           {
             label:                "Evening",
             data:                 eveningValues,
-            borderColor:          cssVar("--teal-600"),
-            backgroundColor:      "transparent",
+            borderColor:          eveningColor,
+            backgroundColor:      eveningColor,
             pointBackgroundColor: eveningColors,
             pointBorderColor:     eveningColors,
             pointRadius:          3,
@@ -431,11 +468,7 @@ export default class extends Controller {
       options: {
         responsive: true,
         plugins: {
-          legend: {
-            display:  true,
-            position: "bottom",
-            labels:   { boxWidth: 12, padding: 16, font: { size: 12 } }
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} L/min` }
           }

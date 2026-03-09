@@ -120,11 +120,32 @@
       <div class="dash-section-header">
         <h2>Peak Flow history</h2>
       </div>
-      <div class="chart-section" style="margin-bottom: 1rem;">
-        <canvas data-controller="chart"
-                data-chart-type-value="peakflow-zones"
-                data-chart-data-value="<%= @chart_data.to_json %>"
-                class="chart-canvas"
+      <div class="chart-section"
+           style="margin-bottom: 1rem;"
+           data-controller="chart"
+           data-chart-type-value="peakflow-zones"
+           data-chart-data-value="<%= @chart_data.to_json %>">
+        <div class="chart-session-toggle" role="group" aria-label="Toggle session">
+          <button type="button"
+                  class="chart-session-btn chart-session-btn--morning"
+                  data-chart-target="sessionBtn"
+                  data-chart-series-param="morning"
+                  data-action="click->chart#toggleSeries"
+                  aria-pressed="true">
+            <span class="chart-session-btn-dot" aria-hidden="true"></span>
+            Morning
+          </button>
+          <button type="button"
+                  class="chart-session-btn chart-session-btn--evening"
+                  data-chart-target="sessionBtn"
+                  data-chart-series-param="evening"
+                  data-action="click->chart#toggleSeries"
+                  aria-pressed="true">
+            <span class="chart-session-btn-dot" aria-hidden="true"></span>
+            Evening
+          </button>
+        </div>
+        <canvas class="chart-canvas"
                 aria-label="Peak flow readings chart"
                 role="img">
         </canvas>

@@ -61,8 +61,8 @@
   --severity-mild:          #16a34a;
   /* Use --severity-mild-text for body/label text on white backgrounds — needs enough contrast */
   --severity-mild-text:     #14532d;
-  --severity-moderate:      #d97706;
-  /* Use --severity-moderate-text for body/label text — #d97706 fails AA on white */
+  --severity-moderate:      #c2690a; /* #d97706 was 2.95:1 — fails SC 1.4.11 (3:1 non-text). #c2690a = 3.95:1 ✓ */
+  /* Use --severity-moderate-text for body/label text on white — needs 4.5:1 for SC 1.4.3 */
   --severity-moderate-text: #92400e;
   --severity-severe:        #dc2626;
   --severity-mild-bg:       #dcfce7;
@@ -516,6 +516,13 @@ footer p {
   font-size: 0.8125rem;
   color: var(--text-4);
   margin: 0;
+}
+
+/* Authenticated app footer — minimal, just legal links */
+.footer-app {
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  text-align: center;
 }
 
 /* ==========================================================================
@@ -2128,24 +2135,27 @@ button {
     color: var(--brand);
   }
 
-  /* Active indicator — thin top bar above the active tab */
-  .bottom-nav-tab--active::before,
-  .bottom-nav-tab[aria-current="page"]::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    background: var(--brand);
-    border-radius: 0 0 2px 2px;
+  /* Active indicator — pill background behind the icon.
+     box-shadow spreads without affecting layout (no margin/padding needed). */
+  .bottom-nav-tab--active .bottom-nav-icon,
+  .bottom-nav-tab[aria-current="page"] .bottom-nav-icon {
+    background: var(--brand-light);
+    box-shadow: 0 0 0 6px var(--brand-light);
+    border-radius: 8px;
+  }
+
+  /* Bold label for active tab — reinforces selection */
+  .bottom-nav-tab--active span,
+  .bottom-nav-tab[aria-current="page"] span {
+    font-weight: 700;
   }
 
   .bottom-nav-icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
-    transition: none;
+    border-radius: 6px;
+    transition: background 0.15s, box-shadow 0.15s;
   }
 
   /* Hide desktop-only nav links on mobile — they live in the bottom nav */

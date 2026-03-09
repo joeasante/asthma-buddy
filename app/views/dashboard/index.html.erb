@@ -6,121 +6,196 @@
 
 <div class="dashboard">
 
-  <%# ── Personal best missing — persistent warning ──────────────── %>
-  <% if @personal_best.nil? %>
+  <%# ── Personal best missing — callout ────────────────────────── %>
+  <% if @personal_best.nil? && @last_reading %>
     <div class="dash-pb-banner" role="alert">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <p>No personal best set — your zone classifications won't appear until you <%= link_to "set your personal best", profile_path %>.</p>
+      <p>No personal best set — zone classifications won't show until you <%= link_to "set your personal best", profile_path %>.</p>
     </div>
   <% end %>
 
-  <%# ── Status card ──────────────────────────────────────────────── %>
+  <%# ── Status hero ─────────────────────────────────────────────── %>
   <% if @last_reading %>
     <% zone = @last_reading.zone || "none" %>
-    <section class="dash-status" aria-label="Current status">
+    <section class="dash-status dash-status--<%= zone %>" aria-label="Current status">
       <div class="dash-status-left">
         <p class="dash-status-label">Last reading</p>
         <div class="dash-status-reading">
           <span class="dash-status-value"><%= @last_reading.value %></span>
           <span class="dash-status-unit">L/min</span>
+          <% if @last_reading.time_of_day.present? %>
+            <span class="tod-badge tod-badge--<%= @last_reading.time_of_day %>"><%= @last_reading.time_of_day_label %></span>
+          <% end %>
         </div>
         <% if @last_reading.zone && @personal_best %>
-          <p class="dash-status-zone-text">
-            <span class="dash-status-zone-dot dash-status-zone-dot--<%= zone %>" aria-hidden="true"></span>
-            <%= zone.capitalize %> zone &mdash; <%= @last_reading.zone_percentage %>% of your personal best
-          </p>
-        <% elsif @last_reading.zone.nil? && @personal_best.nil? %>
+          <span class="dash-status-zone-pill">
+            <%= zone.capitalize %> zone &bull; <%= @last_reading.zone_percentage %>% of best
+          </span>
+        <% elsif @personal_best.nil? %>
           <p class="dash-status-zone-hint">
-            <%= link_to "Set your personal best", profile_path %> to see zone classification.
+            <%= link_to "Set your personal best", profile_path %> to see zone.
           </p>
         <% end %>
       </div>
-      <div class="dash-status-right">
-        <p class="dash-status-ago">
-          <time datetime="<%= @last_reading.recorded_at.iso8601 %>">
-            <%= time_ago_in_words(@last_reading.recorded_at) %> ago
-          </time>
-        </p>
-        <%= link_to "Log reading", new_peak_flow_reading_path, class: "btn-primary dash-status-log-btn" %>
-      </div>
+      <p class="dash-status-ago">
+        <time datetime="<%= @last_reading.recorded_at.iso8601 %>">
+          <%= time_ago_in_words(@last_reading.recorded_at) %> ago
+        </time>
+      </p>
     </section>
   <% else %>
-    <section class="dash-status dash-status--empty" aria-label="Current status">
+    <section class="dash-status dash-status--empty" aria-label="No readings yet">
       <p class="dash-status-empty-heading">No peak flow readings yet</p>
       <p class="dash-status-empty-sub">Log your first reading to start tracking your zones.</p>
-      <%= link_to "Log your first reading", new_peak_flow_reading_path, class: "btn-primary" %>
     </section>
   <% end %>
 
-  <%# ── Symptom severity summary ─────────────────────────────────── %>
+  <%# Declare here so both This Week and the empty-state check can use it %>
   <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
 
+  <%# ── This Week — summary stats + chart (moved up for priority) ── %>
   <% unless no_data %>
-    <div class="dash-severity-cards" aria-label="Symptom summary this week">
-      <div class="dash-severity-card dash-severity-card--mild">
-        <span class="dash-severity-count"><%= @week_severity_counts[:mild] %></span>
-        <span class="dash-severity-label">mild this week</span>
-      </div>
-      <div class="dash-severity-card dash-severity-card--moderate">
-        <span class="dash-severity-count"><%= @week_severity_counts[:moderate] %></span>
-        <span class="dash-severity-label">moderate this week</span>
-      </div>
-      <div class="dash-severity-card dash-severity-card--severe">
-        <span class="dash-severity-count"><%= @week_severity_counts[:severe] %></span>
-        <span class="dash-severity-label">severe this week</span>
-      </div>
-    </div>
-  <% end %>
-
-  <%# ── Peak flow chart ────────────────────────────────────────────  %>
-  <% if @chart_data.any? %>
-    <section class="dash-chart-section" aria-label="7-day peak flow chart">
+    <section class="dash-week-section" aria-label="This week's data">
       <div class="dash-section-header">
-        <h2>Peak Flow — Last 7 Days</h2>
-        <%= link_to "View all", peak_flow_readings_path, class: "dash-section-link" %>
+        <h2>This Week</h2>
+        <div class="dash-section-links">
+          <%= link_to "Peak Flow", peak_flow_readings_path, class: "dash-section-link" %>
+          <%= link_to "Symptoms", symptom_logs_path, class: "dash-section-link" %>
+        </div>
       </div>
-      <% if @ongoing_health_events.any? %>
-        <div class="chart-ongoing-strip" aria-label="Currently active health events">
-          <span class="chart-ongoing-label">Currently active</span>
-          <% @ongoing_health_events.each do |e| %>
-            <span class="chart-ongoing-event">
-              <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
-              <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
-            </span>
+
+      <%# Summary stats row — readings count, average, symptom count %>
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <span class="dash-stat-label">Readings</span>
+          <% if @week_reading_count > 0 %>
+            <span class="dash-stat-value"><%= @week_reading_count %></span>
+          <% else %>
+            <span class="dash-stat-value dash-stat-value--empty">&mdash;</span>
           <% end %>
         </div>
-      <% end %>
-      <div class="chart-section">
-        <div class="chart-canvas-wrapper">
-          <canvas data-controller="chart"
-                  data-chart-type-value="peakflow-bands"
-                  data-chart-data-value="<%= @chart_data.to_json %>"
-                  data-chart-personal-best-value="<%= @personal_best&.value || 0 %>"
-                  data-chart-health-events-value="<%= @health_event_markers.to_json %>"
-                  class="chart-canvas"
-                  aria-label="Peak flow readings over the last 7 days"
-                  role="img">
-          </canvas>
+        <div class="dash-stat">
+          <span class="dash-stat-label">Avg this week</span>
+          <% if @week_avg %>
+            <span class="dash-stat-value dash-stat-value--zone-<%= @week_avg_zone || "none" %>"><%= @week_avg %><span class="dash-stat-unit"> L/min</span></span>
+          <% else %>
+            <span class="dash-stat-value dash-stat-value--empty">&mdash;</span>
+          <% end %>
+        </div>
+        <div class="dash-stat">
+          <span class="dash-stat-label">Symptoms</span>
+          <% if @week_symptom_count > 0 %>
+            <span class="dash-stat-value dash-stat-value--severe"><%= @week_symptom_count %></span>
+          <% else %>
+            <span class="dash-stat-value dash-stat-value--ok">None</span>
+          <% end %>
         </div>
       </div>
-      <% if @personal_best %>
-        <div class="dash-zone-legend" aria-label="Zone legend">
-          <span class="dash-zone-legend-item dash-zone-legend-item--green">Green zone (&ge;80%)</span>
-          <span class="dash-zone-legend-item dash-zone-legend-item--yellow">Yellow zone (&ge;50%)</span>
-          <span class="dash-zone-legend-item dash-zone-legend-item--red">Red zone (&lt;50%)</span>
+
+      <%# Symptom severity breakdown — only shown when there are symptoms this week %>
+      <% if @week_symptom_count > 0 %>
+      <div class="dash-severity-cards">
+        <div class="dash-severity-card dash-severity-card--mild">
+          <span class="dash-severity-count"><%= @week_severity_counts[:mild] %></span>
+          <span class="dash-severity-label">mild</span>
         </div>
+        <div class="dash-severity-card dash-severity-card--moderate">
+          <span class="dash-severity-count"><%= @week_severity_counts[:moderate] %></span>
+          <span class="dash-severity-label">moderate</span>
+        </div>
+        <div class="dash-severity-card dash-severity-card--severe">
+          <span class="dash-severity-count"><%= @week_severity_counts[:severe] %></span>
+          <span class="dash-severity-label">severe</span>
+        </div>
+      </div>
+      <% end %>
+
+      <%# Peak flow chart %>
+      <% if @chart_data.any? %>
+        <% if @ongoing_health_events.any? %>
+          <div class="chart-ongoing-strip" aria-label="Currently active health events">
+            <span class="chart-ongoing-label">Currently active</span>
+            <% @ongoing_health_events.each do |e| %>
+              <span class="chart-ongoing-event">
+                <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
+                <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="chart-section"
+             data-controller="chart"
+             data-chart-type-value="peakflow-bands"
+             data-chart-data-value="<%= @chart_data.to_json %>"
+             data-chart-personal-best-value="<%= @personal_best&.value || 0 %>"
+             data-chart-health-events-value="<%= @health_event_markers.to_json %>">
+          <div class="chart-session-toggle" role="group" aria-label="Toggle session">
+            <button type="button"
+                    class="chart-session-btn chart-session-btn--morning"
+                    data-chart-target="sessionBtn"
+                    data-chart-series-param="morning"
+                    data-action="click->chart#toggleSeries"
+                    aria-pressed="true">
+              <span class="chart-session-btn-dot" aria-hidden="true"></span>
+              Morning
+            </button>
+            <button type="button"
+                    class="chart-session-btn chart-session-btn--evening"
+                    data-chart-target="sessionBtn"
+                    data-chart-series-param="evening"
+                    data-action="click->chart#toggleSeries"
+                    aria-pressed="true">
+              <span class="chart-session-btn-dot" aria-hidden="true"></span>
+              Evening
+            </button>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas class="chart-canvas"
+                    aria-label="Peak flow readings over the last 7 days"
+                    role="img">
+            </canvas>
+          </div>
+        </div>
+
+        <% if @personal_best %>
+          <div class="dash-zone-legend" aria-label="Zone legend">
+            <span class="dash-zone-legend-item dash-zone-legend-item--green">Green (&ge;80%)</span>
+            <span class="dash-zone-legend-item dash-zone-legend-item--yellow">Yellow (&ge;50%)</span>
+            <span class="dash-zone-legend-item dash-zone-legend-item--red">Red (&lt;50%)</span>
+          </div>
+        <% end %>
       <% end %>
     </section>
   <% end %>
 
-  <%# ── Preventer adherence ──────────────────────────────────────── %>
+  <%# ── Primary CTAs ────────────────────────────────────────────── %>
+  <div class="dash-quick-log" aria-label="Quick log actions">
+    <%= link_to new_peak_flow_reading_path, class: "dash-quick-btn dash-quick-btn--pf" do %>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <span>Log peak flow</span>
+    <% end %>
+    <%= link_to new_symptom_log_path, class: "dash-quick-btn dash-quick-btn--sym" do %>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <line x1="9" y1="12" x2="15" y2="12"/>
+        <line x1="9" y1="16" x2="13" y2="16"/>
+      </svg>
+      <span>Log symptom</span>
+    <% end %>
+  </div>
+
+  <%# ── Preventer adherence ─────────────────────────────────────── %>
   <% if @preventer_adherence.any? %>
     <% all_on_track = @preventer_adherence.all? { |e| e[:result].status == :on_track } %>
     <section class="dash-adherence" aria-label="Preventer adherence today">
       <div class="dash-section-header">
-        <h2>Preventers Today</h2>
+        <h2>Today's Doses</h2>
         <%= link_to "Medication Log", adherence_path, class: "dash-section-link" %>
       </div>
       <ul class="dash-adherence-list">
@@ -144,7 +219,7 @@
     </section>
   <% end %>
 
-  <%# ── Low-stock medications ──────────────────────────────────────── %>
+  <%# ── Low-stock medications ───────────────────────────────────── %>
   <% if @low_stock_medications.any? %>
     <section class="dash-medications" aria-label="Low stock medications">
       <div class="dash-section-header">
@@ -164,13 +239,75 @@
     </section>
   <% end %>
 
-  <%# ── Recent medical history ─────────────────────────────────────── %>
-  <section class="dash-health-events" aria-label="Recent medical history">
-    <div class="dash-section-header">
-      <h2>Medical History</h2>
-      <%= link_to "View all", health_events_path, class: "dash-section-link" %>
+  <%# ── Recent activity ──────────────────────────────────────────── %>
+  <% unless no_data %>
+    <div class="dash-recents">
+
+      <section class="dash-recent-col" aria-label="Recent peak flow readings">
+        <div class="dash-section-header">
+          <h2>Peak Flow</h2>
+          <%= link_to "View all", peak_flow_readings_path, class: "dash-section-link" %>
+        </div>
+        <% if @recent_readings.any? %>
+          <ul class="dash-pf-days">
+            <% @recent_readings.each do |date, readings| %>
+              <% morning = readings.select(&:morning?).max_by(&:value) %>
+              <% evening = readings.select(&:evening?).max_by(&:value) %>
+              <li class="dash-pf-day">
+                <time class="dash-pf-date" datetime="<%= date.iso8601 %>">
+                  <%= date.strftime("%-d %b") %>
+                </time>
+                <div class="dash-pf-chips">
+                  <% [morning, evening].compact.each do |reading| %>
+                    <div class="dash-pf-chip dash-pf-chip--<%= reading.zone_css_modifier %>"
+                         aria-label="<%= reading.time_of_day_label %> reading: <%= reading.value %> L/min<%= ", #{reading.zone.capitalize} zone" if reading.zone %>">
+                      <span class="dash-pf-chip-session" aria-hidden="true"><%= reading.time_of_day_label %></span>
+                      <span class="dash-pf-chip-value"><%= reading.value %></span>
+                      <span class="dash-pf-chip-unit" aria-hidden="true">L/min</span>
+                    </div>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="dash-recent-empty">No readings yet. <%= link_to "Log one now", new_peak_flow_reading_path %>.</p>
+        <% end %>
+      </section>
+
+      <section class="dash-recent-col" aria-label="Recent symptoms">
+        <div class="dash-section-header">
+          <h2>Symptoms</h2>
+          <%= link_to "View all", symptom_logs_path, class: "dash-section-link" %>
+        </div>
+        <% if @recent_symptoms.any? %>
+          <ol class="dash-recent-list">
+            <% @recent_symptoms.each do |log| %>
+              <li class="dash-recent-row dash-recent-row--symptom dash-recent-row--<%= log.severity %>">
+                <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize %></span>
+                <span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span>
+                <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
+                  <%= log.recorded_at.strftime("%-d %b") %>
+                </time>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <p class="dash-recent-empty">No symptoms logged. <%= link_to "Log one now", new_symptom_log_path %>.</p>
+        <% end %>
+      </section>
+
     </div>
-    <% if @recent_health_events.any? %>
+
+  <% end %>
+
+  <%# ── Medical history — outside no_data so it shows even without readings/symptoms ── %>
+  <% if @recent_health_events.any? %>
+    <section class="dash-health-events" aria-label="Recent medical history">
+      <div class="dash-section-header">
+        <h2>Medical History</h2>
+        <%= link_to "View all", health_events_path, class: "dash-section-link" %>
+      </div>
       <ul class="dash-health-events-list">
         <% @recent_health_events.each do |event| %>
           <li class="dash-health-event-row">
@@ -186,34 +323,10 @@
           </li>
         <% end %>
       </ul>
-    <% else %>
-      <p class="dash-health-events-empty">
-        No events recorded yet.
-        <%= link_to "Add one", new_health_event_path %>.
-      </p>
-    <% end %>
-  </section>
+    </section>
+  <% end %>
 
-  <%# ── Quick log CTAs ───────────────────────────────────────────── %>
-  <div class="dash-quick-log" aria-label="Quick log">
-    <%= link_to new_peak_flow_reading_path, class: "dash-quick-btn dash-quick-btn--pf" do %>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      <span>Log peak flow</span>
-    <% end %>
-    <%= link_to symptom_logs_path, class: "dash-quick-btn dash-quick-btn--sym" do %>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-        <rect x="9" y="3" width="6" height="4" rx="1"/>
-        <line x1="9" y1="12" x2="15" y2="12"/>
-        <line x1="9" y1="16" x2="13" y2="16"/>
-      </svg>
-      <span>Log symptom</span>
-    <% end %>
-  </div>
-
-  <%# ── No data — welcome empty state ────────────────────────────── %>
+  <%# ── No data — welcome empty state ─────────────────────────────── %>
   <% if no_data %>
     <div class="section-card empty-state">
       <div class="empty-state-icon" aria-hidden="true">
@@ -223,69 +336,7 @@
       </div>
       <h3>Welcome to Asthma Buddy</h3>
       <p>Start by logging a reading or a symptom — your dashboard fills in as you go.</p>
-      <div class="empty-state-actions">
-        <%= link_to "Record peak flow", new_peak_flow_reading_path, class: "btn-primary" %>
-        <%= link_to "Log a symptom", symptom_logs_path, class: "btn-secondary" %>
-      </div>
     </div>
-  <% else %>
-
-    <%# ── Recent entries ────────────────────────────────────────────── %>
-    <div class="dash-recents">
-
-      <section class="dash-recent-col" aria-label="Recent peak flow readings">
-        <div class="dash-section-header">
-          <h2>Peak Flow</h2>
-          <%= link_to "View all", peak_flow_readings_path, class: "dash-section-link" %>
-        </div>
-        <% if @recent_readings.any? %>
-          <ol class="dash-recent-list">
-            <% @recent_readings.each do |reading| %>
-              <li class="dash-recent-row">
-                <span class="dash-recent-value">
-                  <%= reading.value %><span class="dash-recent-unit"> L/min</span>
-                </span>
-                <span class="zone-badge zone-badge--<%= reading.zone_css_modifier %>" aria-label="Zone: <%= reading.zone&.capitalize || "No zone" %>">
-                  <%= reading.zone&.capitalize || "No zone" %>
-                </span>
-                <% if reading.time_of_day.present? %>
-                  <span class="tod-badge tod-badge--<%= reading.time_of_day %>"><%= reading.time_of_day_label %></span>
-                <% end %>
-                <time class="dash-recent-time" datetime="<%= reading.recorded_at.iso8601 %>">
-                  <%= reading.recorded_at.strftime("%-d %b, %H:%M") %>
-                </time>
-              </li>
-            <% end %>
-          </ol>
-        <% else %>
-          <p class="dash-recent-empty">No readings yet. <%= link_to "Log one now", new_peak_flow_reading_path %>.</p>
-        <% end %>
-      </section>
-
-      <section class="dash-recent-col" aria-label="Recent symptoms">
-        <div class="dash-section-header">
-          <h2>Symptoms</h2>
-          <%= link_to "View all", symptom_logs_path, class: "dash-section-link" %>
-        </div>
-        <% if @recent_symptoms.any? %>
-          <ol class="dash-recent-list">
-            <% @recent_symptoms.each do |log| %>
-              <li class="dash-recent-row dash-recent-row--symptom">
-                <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize.gsub("_", " ") %></span>
-                <span class="severity-label--<%= log.severity %> dash-recent-severity"><%= log.severity.capitalize %></span>
-                <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
-                  <%= log.recorded_at.strftime("%-d %b, %H:%M") %>
-                </time>
-              </li>
-            <% end %>
-          </ol>
-        <% else %>
-          <p class="dash-recent-empty">No symptoms logged yet. <%= link_to "Log one now", new_symptom_log_path %>.</p>
-        <% end %>
-      </section>
-
-    </div>
-
   <% end %>
 
 </div>

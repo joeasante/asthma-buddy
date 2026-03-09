@@ -7,18 +7,20 @@
 <% end %>
 
 <%= form_with model: peak_flow_reading, data: { turbo: true } do |form| %>
-  <%# Morning / Evening toggle — shown prominently as it's the key clinical input %>
+  <%# Morning / Evening toggle — shown prominently as it's the key clinical input.
+      Plain <label> elements (not form.label) so the wrapping label activates the
+      contained radio via DOM containment — no mismatched `for` attribute needed. %>
   <div class="field">
-    <%= form.label :time_of_day, "Session" %>
+    <span class="label">Session</span>
     <div class="tod-toggle" role="group" aria-label="Time of day">
-      <%= form.label :time_of_day, class: "tod-option #{"tod-option--morning" if peak_flow_reading.morning?}" do %>
-        <%= form.radio_button :time_of_day, "morning" %>
+      <label class="tod-option tod-option--morning">
+        <%= form.radio_button :time_of_day, "morning", class: "sr-only" %>
         Morning
-      <% end %>
-      <%= form.label :time_of_day, class: "tod-option #{"tod-option--evening" if peak_flow_reading.evening?}" do %>
-        <%= form.radio_button :time_of_day, "evening" %>
+      </label>
+      <label class="tod-option tod-option--evening">
+        <%= form.radio_button :time_of_day, "evening", class: "sr-only" %>
         Evening
-      <% end %>
+      </label>
     </div>
     <% if peak_flow_reading.errors[:time_of_day].any? %>
       <p class="field-error"><%= peak_flow_reading.errors[:time_of_day].first %></p>

@@ -19,11 +19,25 @@ class DashboardController < ApplicationController
     @week_symptom_count   = recent_symptoms.count
     @week_severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(recent_symptoms.severity_counts)
 
+    # Zone classification for the weekly average — shown on the stat card
+    if @week_avg && @personal_best
+      pct = (@week_avg.to_f / @personal_best.value) * 100
+      @week_avg_zone = if pct >= PeakFlowReading::GREEN_ZONE_THRESHOLD then "green"
+                       elsif pct >= PeakFlowReading::YELLOW_ZONE_THRESHOLD then "yellow"
+                       else "red"
+                       end
+    end
+
     # Last severe episode (any time, not just this week)
     @last_severe = user.symptom_logs.where(severity: :severe).chronological.first
 
-    # Recent entries — 4 each, feeds the "recent" cards
-    @recent_readings = user.peak_flow_readings.chronological.limit(4)
+    # Recent entries — feeds the "recent" cards.
+    # Peak flow grouped by date (up to 4 days) so AM/PM render side-by-side.
+    @recent_readings = user.peak_flow_readings
+      .chronological
+      .limit(10)
+      .group_by { |r| r.recorded_at.to_date }
+      .first(4)
     @recent_symptoms = user.symptom_logs.chronological.includes(:rich_text_notes).limit(4)
 
     # 7-day chart data — one entry per day with separate morning/evening values.

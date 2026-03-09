@@ -72,9 +72,9 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     get dashboard_path
     assert_response :success
 
-    # The canvas should carry the health_events JSON — old_event date must not appear
-    assert_select "canvas[data-chart-health-events-value]" do |canvases|
-      markers_json = canvases.first["data-chart-health-events-value"]
+    # The chart wrapper carries the health_events JSON — old_event date must not appear
+    assert_select "[data-chart-health-events-value]" do |wrappers|
+      markers_json = wrappers.first["data-chart-health-events-value"]
       assert_not_includes markers_json, old_event.recorded_at.to_date.to_s
     end
 
@@ -91,7 +91,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     )
 
     get dashboard_path
-    assert_select "canvas[data-chart-health-events-value]"
+    assert_select "[data-chart-health-events-value]"
 
     reading.destroy
   end
@@ -110,8 +110,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     get dashboard_path
     assert_response :success
 
-    assert_select "canvas[data-chart-health-events-value]" do |canvases|
-      markers_json = canvases.first["data-chart-health-events-value"]
+    assert_select "[data-chart-health-events-value]" do |wrappers|
+      markers_json = wrappers.first["data-chart-health-events-value"]
       parsed = JSON.parse(markers_json)
       # Find the event we just created
       marker = parsed.find { |m| m["date"] == Date.current.to_s }

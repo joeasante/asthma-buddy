@@ -17,6 +17,79 @@
   max-height: 200px;
 }
 
+/* --------------------------------------------------------------------------
+   Session toggle — pill buttons above chart to show/focus Morning or Evening.
+   Uses aria-pressed for state; matches the tod-toggle pill language on the form.
+   -------------------------------------------------------------------------- */
+
+.chart-session-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+}
+
+.chart-session-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.3125rem 0.8125rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-3);
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.chart-session-btn-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+
+/* Active — series is visible */
+.chart-session-btn--morning[aria-pressed="true"] {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.chart-session-btn--evening[aria-pressed="true"] {
+  border-color: var(--teal-600, #0d9488);
+  background: var(--teal-50, #f0fdfa);
+  color: var(--teal-700, #0f766e);
+}
+
+.chart-session-btn[aria-pressed="true"] .chart-session-btn-dot {
+  opacity: 1;
+}
+
+/* Hover */
+.chart-session-btn[aria-pressed="false"]:hover {
+  border-color: var(--border-strong, #94a3b8);
+  color: var(--text-2);
+}
+
+.chart-session-btn--morning[aria-pressed="true"]:hover { border-color: #d97706; }
+.chart-session-btn--evening[aria-pressed="true"]:hover { border-color: var(--teal-700, #0f766e); }
+
+/* Focus */
+.chart-session-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 /* DOM badges positioned over chart canvas for health event markers.
    Positioned by chart_controller.js after Chart.js renders, so x/y values
    are synchronised with the actual axis positions. */

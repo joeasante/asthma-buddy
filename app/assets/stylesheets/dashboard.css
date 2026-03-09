@@ -5,7 +5,7 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -24,6 +24,37 @@
   padding: 1rem 1.125rem;
   box-shadow: var(--shadow-md);
 }
+
+/* Zone-coloured variants — use the app's existing light severity backgrounds.
+   Text must switch from white to dark zone colours to remain legible. */
+.dash-status--green  { background: var(--severity-mild-bg); }
+.dash-status--yellow { background: var(--severity-moderate-bg); }
+.dash-status--red    { background: var(--severity-severe-bg); }
+.dash-status--none   { /* teal brand base */ }
+
+/* Green zone — dark green text throughout */
+.dash-status--green .dash-status-label,
+.dash-status--green .dash-status-unit,
+.dash-status--green .dash-status-ago,
+.dash-status--green .dash-status-zone-hint { color: var(--severity-mild-text); opacity: 0.75; }
+.dash-status--green .dash-status-value     { color: var(--severity-mild-text); opacity: 1; }
+.dash-status--green .dash-status-zone-hint a { color: var(--severity-mild-text); }
+
+/* Yellow zone — dark amber text throughout */
+.dash-status--yellow .dash-status-label,
+.dash-status--yellow .dash-status-unit,
+.dash-status--yellow .dash-status-ago,
+.dash-status--yellow .dash-status-zone-hint { color: var(--severity-moderate-text); opacity: 0.75; }
+.dash-status--yellow .dash-status-value     { color: var(--severity-moderate-text); opacity: 1; }
+.dash-status--yellow .dash-status-zone-hint a { color: var(--severity-moderate-text); }
+
+/* Red zone — dark red text throughout */
+.dash-status--red .dash-status-label,
+.dash-status--red .dash-status-unit,
+.dash-status--red .dash-status-ago,
+.dash-status--red .dash-status-zone-hint { color: #991b1b; opacity: 0.75; }
+.dash-status--red .dash-status-value     { color: var(--severity-severe); opacity: 1; }
+.dash-status--red .dash-status-zone-hint a { color: #991b1b; }
 
 .dash-status--empty {
   flex-direction: column;
@@ -62,26 +93,41 @@
   color: rgba(255,255,255,0.7);
 }
 
-.dash-status-zone-text {
-  display: flex;
+/* Zone pill — uses the same colour system as zone badges elsewhere in the app.
+   Light bg + dark text = proper contrast for all three zones. */
+.dash-status-zone-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  margin: 0;
-  color: rgba(255,255,255,0.9);
+  padding: 0.25rem 0.6875rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  /* Default / no zone */
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
 }
 
-.dash-status-zone-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
+/* Pill on a light zone card — white bg so it lifts off the card surface */
+.dash-status--green .dash-status-zone-pill {
+  background: #fff;
+  border-color: var(--severity-mild);
+  color: var(--severity-mild-text);
 }
 
-.dash-status-zone-dot--green  { background: var(--severity-mild); }
-.dash-status-zone-dot--yellow { background: var(--severity-moderate); }
-.dash-status-zone-dot--red    { background: var(--severity-severe); }
+.dash-status--yellow .dash-status-zone-pill {
+  background: #fff;
+  border-color: var(--severity-moderate);
+  color: var(--severity-moderate-text);
+}
+
+.dash-status--red .dash-status-zone-pill {
+  background: #fff;
+  border-color: var(--severity-severe);
+  color: #991b1b;
+}
 
 .dash-status-zone-hint {
   font-size: 0.8125rem;
@@ -94,37 +140,11 @@
   text-decoration: underline;
 }
 
-.dash-status-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
 .dash-status-ago {
   font-size: 0.75rem;
   color: rgba(255,255,255,0.65);
   margin: 0;
   white-space: nowrap;
-}
-
-.dash-status-log-btn {
-  white-space: nowrap;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-  border-radius: var(--radius-md);
-  background: rgba(255,255,255,0.15);
-  border: 1.5px solid rgba(255,255,255,0.4);
-  color: #fff;
-  box-shadow: none;
-}
-
-.dash-status-log-btn:hover {
-  background: rgba(255,255,255,0.25);
-  border-color: rgba(255,255,255,0.65);
-  color: #fff;
-  text-decoration: none;
 }
 
 /* Empty state */
@@ -267,9 +287,14 @@
   color: var(--text-3);
 }
 
-.dash-stat-value--empty  { color: var(--text-4); font-size: 1.25rem; }
-.dash-stat-value--ok     { font-size: 0.8125rem; font-weight: 700; color: var(--severity-mild); }
-.dash-stat-value--severe { font-size: 1rem; font-weight: 700; color: var(--severity-severe); }
+.dash-stat-value--empty  { color: var(--text-4); }
+.dash-stat-value--ok     { color: var(--severity-mild); }
+.dash-stat-value--severe { color: var(--severity-severe); }
+
+/* Zone-coloured weekly average */
+.dash-stat-value--zone-green  { color: var(--severity-mild-text); }
+.dash-stat-value--zone-yellow { color: var(--severity-moderate-text); }
+.dash-stat-value--zone-red    { color: var(--severity-severe); }
 
 .dash-stat-sub {
   font-size: 0.625rem;
@@ -292,7 +317,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1rem;
+  min-height: 56px;
   border-radius: var(--radius-xl);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -370,8 +396,44 @@
   text-decoration: underline;
 }
 
+.dash-section-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
 .dash-chart-section {
   /* wrapper so header sits outside the chart card */
+}
+
+/* --------------------------------------------------------------------------
+   "This Week" section card — wraps stats + severity cards + chart
+   -------------------------------------------------------------------------- */
+
+.dash-week-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.125rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Strip card-in-card styling when chart sits inside dash-week-section */
+.dash-week-section .chart-section {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+}
+
+.dash-week-section .dash-section-header {
+  margin-bottom: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -403,7 +465,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0 0.5rem 0.625rem;
   border-bottom: 1px solid var(--border);
   flex-wrap: nowrap;
 }
@@ -412,6 +474,11 @@
   border-bottom: none;
   padding-bottom: 0;
 }
+
+/* Severity-coloured left accent + subtle row tint on symptom rows */
+.dash-recent-row--mild     { box-shadow: inset 3px 0 0 var(--severity-mild);     background: rgba(220,252,231,0.35); }
+.dash-recent-row--moderate { box-shadow: inset 3px 0 0 var(--severity-moderate); background: rgba(254,243,199,0.35); }
+.dash-recent-row--severe   { box-shadow: inset 3px 0 0 var(--severity-severe);   background: rgba(254,226,226,0.35); }
 
 .dash-recent-value {
   font-size: 0.9375rem;
@@ -455,6 +522,131 @@
   font-size: 0.875rem;
   margin: 0;
   padding: 0.5rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   Peak flow day-grouped AM/PM chips
+   -------------------------------------------------------------------------- */
+
+.dash-pf-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dash-pf-day {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-pf-day:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dash-pf-date {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+  min-width: 2.25rem;
+  flex-shrink: 0;
+}
+
+.dash-pf-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.dash-pf-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  background: var(--surface-alt);
+  text-align: center;
+}
+
+.dash-pf-chip--green  { background: var(--severity-mild-bg);     border-color: var(--severity-mild); }
+.dash-pf-chip--yellow { background: var(--severity-moderate-bg); border-color: var(--severity-moderate); }
+.dash-pf-chip--red    { background: var(--severity-severe-bg);   border-color: var(--severity-severe); }
+
+.dash-pf-chip-session {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.dash-pf-chip--green  .dash-pf-chip-session { color: var(--severity-mild-text); }
+.dash-pf-chip--yellow .dash-pf-chip-session { color: var(--severity-moderate-text); }
+.dash-pf-chip--red    .dash-pf-chip-session { color: #991b1b; }
+
+.dash-pf-chip-value {
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text);
+}
+
+.dash-pf-chip--green  .dash-pf-chip-value { color: var(--severity-mild-text); }
+.dash-pf-chip--yellow .dash-pf-chip-value { color: var(--severity-moderate-text); }
+.dash-pf-chip--red    .dash-pf-chip-value { color: var(--severity-severe); }
+
+.dash-pf-chip-unit {
+  font-size: 0.5rem;
+  font-weight: 500;
+  color: var(--text-4);
+}
+
+.dash-pf-chip--green  .dash-pf-chip-unit { color: var(--severity-mild-text);     opacity: 0.6; }
+.dash-pf-chip--yellow .dash-pf-chip-unit { color: var(--severity-moderate-text); opacity: 0.6; }
+.dash-pf-chip--red    .dash-pf-chip-unit { color: #991b1b;                       opacity: 0.6; }
+
+/* --------------------------------------------------------------------------
+   Severity badge — used in the symptom recent list
+   -------------------------------------------------------------------------- */
+
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.severity-badge--mild {
+  background: var(--severity-mild-bg);
+  border-color: var(--severity-mild);
+  color: var(--severity-mild-text);
+}
+
+.severity-badge--moderate {
+  background: var(--severity-moderate-bg);
+  border-color: var(--severity-moderate);
+  color: var(--severity-moderate-text);
+}
+
+.severity-badge--severe {
+  background: var(--severity-severe-bg);
+  border-color: var(--severity-severe);
+  color: #991b1b;
 }
 
 /* --------------------------------------------------------------------------
@@ -585,7 +777,6 @@
   justify-content: center;
   gap: 1.25rem;
   flex-wrap: wrap;
-  margin-top: 0.75rem;
   padding: 0 0.5rem;
 }
 

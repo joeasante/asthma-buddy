@@ -115,13 +115,23 @@
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
 
-    <footer>
-      <p class="footer-copy">Asthma Buddy &mdash; track your breathing, understand your patterns</p>
-      <nav class="footer-nav" aria-label="Footer">
-        <%= link_to "Privacy", privacy_path %>
-        <%= link_to "Terms", terms_path %>
-      </nav>
-      <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
-    </footer>
+    <% if authenticated? %>
+      <%# App footer — just legal links, no marketing copy inside the product %>
+      <footer class="footer-app">
+        <nav class="footer-nav" aria-label="Footer">
+          <%= link_to "Privacy", privacy_path %>
+          <%= link_to "Terms", terms_path %>
+        </nav>
+      </footer>
+    <% else %>
+      <footer>
+        <p class="footer-copy">Asthma Buddy &mdash; track your breathing, understand your patterns</p>
+        <nav class="footer-nav" aria-label="Footer">
+          <%= link_to "Privacy", privacy_path %>
+          <%= link_to "Terms", terms_path %>
+        </nav>
+        <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
+      </footer>
+    <% end %>
   </body>
 </html>
