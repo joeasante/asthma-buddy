@@ -262,7 +262,7 @@ export default class extends Controller {
           ctx.fillStyle   = color
           ctx.font        = "bold 10px system-ui, sans-serif"
           ctx.textAlign   = "center"
-          ctx.fillText(event.label, xPos, top - 4)
+          ctx.fillText(event.label, xPos, top + 14)
 
           ctx.restore()
         })

@@ -72,6 +72,6 @@
     <%= form.button peak_flow_reading.persisted? ? "Update reading" : "Save reading",
           type: "submit",
           class: "btn-primary form-actions-submit" %>
-    <%= link_to "Cancel", peak_flow_readings_path, class: "btn-cancel" %>
+    <%= link_to "Cancel", peak_flow_readings_path, class: "btn-cancel", data: { turbo_frame: "_top" } %>
   </div>
 <% end %>
