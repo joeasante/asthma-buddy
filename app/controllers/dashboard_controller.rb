@@ -9,8 +9,8 @@ class DashboardController < ApplicationController
     # Latest single reading — status card
     @last_reading = user.peak_flow_readings.chronological.first
 
-    # 7-day window stats
-    week_start       = 7.days.ago
+    # Current week stats (week starts Monday)
+    week_start       = Date.current.beginning_of_week(:monday)
     recent_readings  = user.peak_flow_readings.in_date_range(week_start, nil)
     recent_symptoms  = user.symptom_logs.in_date_range(week_start, nil)
 
@@ -36,8 +36,28 @@ class DashboardController < ApplicationController
       .map { |_date, readings| readings.max_by { |r| r[:value] } }
       .sort_by { |d| d[:date] }
 
+    # Health event markers for the 7-day chart — one entry per event in window.
+    # Chart window matches recent_readings: week_start..Date.current (Mon–today).
+    chart_start = week_start
+    chart_end   = Date.current
+
+    @health_event_markers = user.health_events
+      .where(recorded_at: chart_start.beginning_of_day..chart_end.end_of_day)
+      .order(recorded_at: :asc)
+      .map do |e|
+        {
+          date:         e.recorded_at.to_date.to_s,   # "YYYY-MM-DD"
+          type:         e.event_type,
+          label:        event_marker_label(e),
+          css_modifier: e.event_type_css_modifier
+        }
+      end
+
     # Low-stock medications — loaded with dose_logs to avoid N+1 in low_stock?
     @low_stock_medications = user.medications.includes(:dose_logs).select(&:low_stock?)
+
+    # Recent health events — 3 most recent, shown in the dashboard card
+    @recent_health_events = user.health_events.recent_first.limit(3)
 
     # Today's preventer adherence — only preventers with a doses_per_day schedule
     today = Date.current
@@ -46,5 +66,19 @@ class DashboardController < ApplicationController
       .includes(:dose_logs)
       .select { |m| m.doses_per_day.present? }
       .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+  end
+
+  private
+
+  MARKER_LABELS = {
+    "hospital_visit"    => "Hosp",
+    "gp_appointment"    => "GP",
+    "illness"           => "Ill",
+    "medication_change" => "Rx",
+    "other"             => "Evt"
+  }.freeze
+
+  def event_marker_label(event)
+    MARKER_LABELS[event.event_type] || "Evt"
   end
 end

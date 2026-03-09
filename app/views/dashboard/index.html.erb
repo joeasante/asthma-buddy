@@ -86,6 +86,7 @@
                 data-chart-type-value="peakflow-bands"
                 data-chart-data-value="<%= @chart_data.to_json %>"
                 data-chart-personal-best-value="<%= @personal_best&.value || 0 %>"
+                data-chart-health-events-value="<%= @health_event_markers.to_json %>"
                 class="chart-canvas"
                 aria-label="Peak flow readings over the last 7 days"
                 role="img">
@@ -107,7 +108,7 @@
     <section class="dash-adherence" aria-label="Preventer adherence today">
       <div class="dash-section-header">
         <h2>Preventers Today</h2>
-        <%= link_to "View history", adherence_path, class: "dash-section-link" %>
+        <%= link_to "Medication Log", adherence_path, class: "dash-section-link" %>
       </div>
       <ul class="dash-adherence-list">
         <% if all_on_track %>
@@ -149,6 +150,36 @@
       </ul>
     </section>
   <% end %>
+
+  <%# ── Recent medical history ─────────────────────────────────────── %>
+  <section class="dash-health-events" aria-label="Recent medical history">
+    <div class="dash-section-header">
+      <h2>Medical History</h2>
+      <%= link_to "View all", health_events_path, class: "dash-section-link" %>
+    </div>
+    <% if @recent_health_events.any? %>
+      <ul class="dash-health-events-list">
+        <% @recent_health_events.each do |event| %>
+          <li class="dash-health-event-row">
+            <span class="event-badge event-badge--<%= event.event_type_css_modifier %>">
+              <%= event.event_type_label %>
+            </span>
+            <time class="dash-health-event-time" datetime="<%= event.recorded_at.iso8601 %>">
+              <%= event.recorded_at.strftime("%-d %b %Y") %>
+            </time>
+            <% if event.ongoing? %>
+              <span class="event-ongoing-badge">Ongoing</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="dash-health-events-empty">
+        No events recorded yet.
+        <%= link_to "Add one", new_health_event_path %>.
+      </p>
+    <% end %>
+  </section>
 
   <%# ── Quick log CTAs ───────────────────────────────────────────── %>
   <div class="dash-quick-log" aria-label="Quick log">
