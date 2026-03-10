@@ -7,6 +7,7 @@
 # See the ActiveSupport::ParameterFilter documentation for supported notations and behaviors.
 Rails.application.config.filter_parameters += [
   :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn, :cvv, :cvc,
+  :confirmation, :authenticity_token,
   # Health data — prevent PHI from appearing in server logs.
   # Pattern-match all subkeys so new fields are automatically filtered.
   /peak_flow_reading\[/, /personal_best_record\[/, /symptom_log\[/, /health_event\[/,
