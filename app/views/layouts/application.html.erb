@@ -19,6 +19,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" %>
     <% if authenticated? %>
       <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
@@ -112,6 +113,8 @@
     <% if authenticated? %>
       <%= render "layouts/bottom_nav" %>
     <% end %>
+
+    <%= render "layouts/cookie_notice" if @show_cookie_notice %>
 
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
