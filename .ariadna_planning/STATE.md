@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 17 (Onboarding Flow) — IN PROGRESS
-Plan: Plan 01 complete (data layer + controller logic). Plan 02 (views) pending.
-Status: Phase 17 Plan 01 complete. 2026-03-10.
-Last activity: 2026-03-10 — Phase 17 Plan 01 complete: onboarding boolean flags migration, OnboardingController 2-step wizard with flag persistence, DashboardController check_onboarding guard. 378 tests passing, no regressions.
+Phase: Phase 17 (Onboarding Flow) — COMPLETE
+Plan: Both plans complete. Plan 01 (data layer + controller logic). Plan 02 (views + tests).
+Status: Phase 17 Plan 02 complete. 2026-03-10.
+Last activity: 2026-03-10 — Phase 17 Plan 02 complete: 2-step progress indicator in show.html.erb, new_user fixture (charlie@example.com), 13 controller tests, 7 system tests (use_transactional_tests=false for reliability). 391 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 17 Plan 02 completed: 2026-03-10 (~45 min, 2 tasks, 2 files created, 3 files modified, 20 new tests — 13 controller + 7 system)
+- Tests at Phase 17-02 close: 391 passing (no regressions)
 - Phase 17 Plan 01 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 4 files modified, 0 new tests — onboarding flags + controller logic)
 - Tests at Phase 17-01 close: 378 passing (no regressions)
 - Phase 16 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 5 files created, 3 files modified, 2 new system tests)
@@ -99,6 +101,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 17 Plan 02 Decisions (2026-03-10)
+
+- **use_transactional_tests = false for OnboardingTest**: Rails lock_threads: true shares the DB connection between test and Puma threads. Multi-redirect sign-in flows (sign-in → root_url → dashboard → onboarding) caused intermittent authentication failures when the connection was contended between Puma threads. Disabling transactional tests (with explicit setup/teardown) eliminates this race condition entirely.
+- **new_user fixture added directly with both flags=false**: Explicit state makes test intent clear rather than relying on defaults.
+- **System test setup uses User.find_by! not users(:new_user) fixture accessor**: Fresh DB query avoids cached AR instance with stale flag values after update_all in setup.
+- **assert_text with wait:10/15 after page transitions**: Turbo Drive navigations are async; default 2s Capybara wait is insufficient under shared-connection load.
+- **No changes to _step_1.html.erb or _step_2.html.erb**: Both partials already had correct skip links and no step-3 references; onboarding layout already includes flash rendering.
 
 ### Phase 17 Plan 01 Decisions (2026-03-10)
 
@@ -303,5 +313,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 17 Plan 01 complete — Onboarding flags migration (onboarding_personal_best_done, onboarding_medication_done, default false), OnboardingController rewritten to 2-step wizard with flag persistence on complete/skip, DashboardController check_onboarding before_action guard. 378 tests passing, no regressions.
+Stopped at: Phase 17 Plan 02 complete — 2-step progress indicator in show.html.erb (aria-valuemax="2"), new_user fixture (charlie@example.com, both flags false), 13 controller tests (all onboarding flows), 7 system tests (use_transactional_tests=false for reliability under shared-connection load). Phase 17 COMPLETE. 391 tests passing, no regressions.
 Resume file: None
