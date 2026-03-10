@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 15.1 (Reliever Usage History) — COMPLETE
-Plan: 15.1-02 complete. All plans in Phase 15.1 delivered.
-Status: Phase 15.1 complete. All 2 plans delivered.
-Last activity: 2026-03-10 — Phase 15.1 Plan 02 complete: RelieverUsageControllerTest (10 tests), 11 weekly reliever dose log fixtures for GINA band testing.
+Plan: 15.1-03 complete. All plans in Phase 15.1 delivered.
+Status: Phase 15.1 complete. All 3 plans delivered.
+Last activity: 2026-03-10 — Phase 15.1 Plan 03 complete: 12-week bar chart mobile overflow fixed with .reliever-bars-scroll wrapper, touch momentum scrolling, 2.25rem column min-width. UAT gap #4 closed. Visual verification approved.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,7 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 15.1 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 0 files created, 2 files modified, 0 new tests — UAT gap #4 closed)
 - Phase 15.1 Plan 02 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 2 files modified, 10 new tests)
 - Tests at Phase 15.1-02 close: 365 passing (no regressions)
 - Phase 15.1 Plan 01 completed: 2026-03-10 (~15 min, 2 tasks, 3 files created, 3 files modified)
@@ -94,6 +95,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 15.1 Plan 03 Decisions (2026-03-10)
+
+- **Scroll wrapper uses negative-margin + padding trick**: `margin: 0 calc(-1 * var(--space-md))` and `padding: 0 var(--space-md)` on `.reliever-bars-scroll` extends the scroll container edge-to-edge within a padded card while keeping inner content aligned with card padding
+- **white-space: nowrap removed from .reliever-bar-label**: Short date labels (e.g. "3 Mar") can wrap gracefully at min-width rather than forcing column overflow
+- **min-width: 2.25rem on .reliever-bar-col**: Minimum legible width for two-word date labels like "12 Mar"; columns still grow via flex: 1 on wider screens
 
 ### Phase 15.1 Plan 02 Decisions (2026-03-10)
 
@@ -260,5 +267,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 15.1 Plan 02 complete — RelieverUsageControllerTest (10 tests: auth, period param, cross-user isolation, 2 empty states, bar chart presence, GINA band CSS classes); 11 dose log fixtures for weekly patterns; medication_test.rb puff count updated.
+Stopped at: Phase 15.1 Plan 03 complete — 12-week bar chart overflow fixed (.reliever-bars-scroll wrapper, touch scrolling, 2.25rem min-width); visual verification approved; UAT gap #4 closed. Phase 15.1 fully complete (3/3 plans).
 Resume file: None
