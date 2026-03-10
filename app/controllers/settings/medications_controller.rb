@@ -6,6 +6,9 @@ module Settings
     before_action :ensure_course_not_archived, only: %i[edit update]
 
     def index
+      # Load all at once (single query + eager-load). Partition in Ruby to avoid
+      # firing two separate queries with includes. The partition logic mirrors the
+      # Medication.active_courses / archived_courses scopes on the model.
       all_medications = Current.user.medications.chronological.includes(:dose_logs)
       @visible_medications = all_medications.reject { |m| m.course? && !m.course_active? }
       @archived_courses    = all_medications.select { |m| m.course? && !m.course_active? }
