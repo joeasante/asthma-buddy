@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Be sure to restart your server when you modify this file.
 
 # Configure parameters to be partially matched (e.g. passw matches password) and filtered from the log file.
@@ -8,5 +9,6 @@ Rails.application.config.filter_parameters += [
   :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn, :cvv, :cvc,
   # Health data — prevent PHI from appearing in server logs.
   # Pattern-match all subkeys so new fields are automatically filtered.
-  /peak_flow_reading\[/, /personal_best_record\[/, /symptom_log\[/, /health_event\[/
+  /peak_flow_reading\[/, /personal_best_record\[/, /symptom_log\[/, /health_event\[/,
+  /dose_log\[/, /medication\[/
 ]

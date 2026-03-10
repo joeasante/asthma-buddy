@@ -47,22 +47,25 @@ class RelieverUsageControllerTest < ActionDispatch::IntegrationTest
   # ── Cross-user isolation ──────────────────────────────────────────────────
 
   test "index does not expose another user's reliever dose logs" do
+    # Dynamically look up Bob's reliever medication names so this test
+    # stays correct if fixtures are renamed.
+    bob_med_names = users(:unverified_user).medications
+                      .where(medication_type: :reliever)
+                      .pluck(:name)
+    assert bob_med_names.any?, "unverified_user must have at least one reliever for this test to be meaningful"
+
     get reliever_usage_url
     assert_response :success
-    # Bob's Salbutamol must never appear in Alice's view.
-    # The page should not contain "Salbutamol" anywhere in the body.
-    assert_no_match(/Salbutamol/i, response.body)
+
+    bob_med_names.each do |name|
+      assert_no_match(/#{Regexp.escape(name)}/i, response.body)
+    end
   end
 
   # ── Empty states ──────────────────────────────────────────────────────────
 
   test "index renders empty state when user has no reliever medications" do
-    # Sign in as a user who has no medications at all.
-    # Use unverified_user's bob account but we need a user with zero relievers.
-    # Create a user inline via a temporary approach: sign in as verified_user
-    # and temporarily destroy their reliever medication.
     @user.medications.where(medication_type: :reliever).destroy_all
-    # Also destroy alice_reliever dose logs so there are none.
     get reliever_usage_url
     assert_response :success
     assert_select "h3", text: "No reliever medications"
@@ -70,7 +73,6 @@ class RelieverUsageControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index renders has-relievers-but-no-logs empty state" do
-    # Destroy all of Alice's reliever dose logs, keeping her alice_reliever medication.
     @user.dose_logs.joins(:medication).where(medications: { medication_type: :reliever }).destroy_all
     get reliever_usage_url
     assert_response :success
@@ -83,20 +85,37 @@ class RelieverUsageControllerTest < ActionDispatch::IntegrationTest
   test "index shows bar chart when reliever logs exist" do
     get reliever_usage_url
     assert_response :success
-    # The bar chart container must be present.
     assert_select ".reliever-bars"
-    # At least one bar column should be rendered.
     assert_select ".reliever-bar-col"
   end
 
-  test "index renders GINA band classes on bar fills" do
+  test "index renders GINA band modifier classes on bar fills" do
     get reliever_usage_url
     assert_response :success
-    # We have fixtures with 4 uses in one week (review band) and 7 in another (urgent band).
-    # At least the controlled band (alice_reliever_dose_1 + _2 = 2 uses this week) must appear.
-    # The view must include at least one reliever-bar-fill element.
+    # Verify that bar fills are rendered with at least one GINA band modifier class.
+    # Specific bands (controlled / review / urgent) depend on which fixtures fall
+    # in which calendar week at time of test; we assert structural correctness here.
     assert_select ".reliever-bar-fill"
-    # Bars must carry one of the three GINA band modifier classes.
     assert_select "[class*='reliever-bar-fill--']"
+  end
+
+  # ── JSON format ───────────────────────────────────────────────────────────
+
+  test "index responds to JSON format" do
+    get reliever_usage_url, as: :json
+    assert_response :success
+    json = response.parsed_body
+    assert json.key?("weekly_data"), "JSON response must include weekly_data"
+    assert json.key?("monthly_uses"), "JSON response must include monthly_uses"
+    assert json.key?("gina_bands"), "JSON response must include gina_bands"
+    assert_equal @user.medications.where(medication_type: :reliever).count > 0,
+                 json["weekly_data"].any?,
+                 "weekly_data must be non-empty when user has reliever logs"
+  end
+
+  test "index JSON unauthenticated returns 401" do
+    sign_out
+    get reliever_usage_url, as: :json
+    assert_response :unauthorized
   end
 end

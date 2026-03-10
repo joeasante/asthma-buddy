@@ -11,12 +11,7 @@
   <div class="page-header-main">
     <div class="page-header-left">
       <div class="page-header-icon" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 2h6l1 4H8L9 2z"/>
-          <rect x="7" y="6" width="10" height="14" rx="2"/>
-          <line x1="12" y1="10" x2="12" y2="16"/>
-          <line x1="9" y1="13" x2="15" y2="13"/>
-        </svg>
+        <%= render "reliever_usage/reliever_icon", size: 24, stroke_width: 2 %>
       </div>
       <div>
         <h1>Reliever Usage</h1>
@@ -30,12 +25,7 @@
   <div class="section-card">
     <div class="empty-state">
       <div class="empty-state-icon" aria-hidden="true">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 2h6l1 4H8L9 2z"/>
-          <rect x="7" y="6" width="10" height="14" rx="2"/>
-          <line x1="12" y1="10" x2="12" y2="16"/>
-          <line x1="9" y1="13" x2="15" y2="13"/>
-        </svg>
+        <%= render "reliever_usage/reliever_icon", size: 48, stroke_width: 1.5 %>
       </div>
       <h3>No reliever medications</h3>
       <p>Add a reliever inhaler in Medications to start tracking your usage here.</p>
@@ -48,12 +38,7 @@
   <div class="section-card">
     <div class="empty-state">
       <div class="empty-state-icon" aria-hidden="true">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 2h6l1 4H8L9 2z"/>
-          <rect x="7" y="6" width="10" height="14" rx="2"/>
-          <line x1="12" y1="10" x2="12" y2="16"/>
-          <line x1="9" y1="13" x2="15" y2="13"/>
-        </svg>
+        <%= render "reliever_usage/reliever_icon", size: 48, stroke_width: 1.5 %>
       </div>
       <h3>No doses logged yet</h3>
       <p>Log your first reliever dose from the Medications page to start seeing your usage history.</p>
@@ -65,7 +50,7 @@
 <% else %>
 
   <turbo-frame id="reliever-frame">
-    <div class="adherence-toggle" role="group" aria-label="Select date range">
+    <div class="reliever-toggle" role="group" aria-label="Select date range">
       <%= link_to "8 weeks", reliever_usage_path(weeks: 8),
             data: { turbo_frame: "reliever-frame", turbo_action: "advance" },
             class: "btn-secondary btn-sm #{"btn-sm--active" if @weeks == 8}",
@@ -90,16 +75,15 @@
       <%# Bar chart %>
       <div class="reliever-bars" role="img" aria-label="Weekly reliever usage bar chart">
         <div class="reliever-threshold" aria-hidden="true"></div>
-        <% max_scale = 6.0 %>
         <% @weekly_data.each do |week| %>
-          <% fill_pct = [(week[:uses] / max_scale * 100).round, 100].min %>
+          <% fill_pct = [(week[:uses] / RelieverUsageController::BAR_MAX_SCALE * 100).round, 100].min %>
           <div class="reliever-bar-col">
             <span class="reliever-bar-count" aria-hidden="true">
               <%= week[:uses] > 0 ? week[:uses] : "" %>
             </span>
             <div class="reliever-bar-track">
               <div class="reliever-bar-fill reliever-bar-fill--<%= week[:band] %>"
-                   style="height: <%= fill_pct %>%;"
+                   style="--bar-fill-height: <%= fill_pct %>%;"
                    aria-label="<%= week[:label] %>: <%= week[:uses] %> use<%= week[:uses] == 1 ? "" : "s" %>">
               </div>
             </div>
@@ -134,7 +118,7 @@
             </span>
           </div>
         </div>
-        <p class="page-header-subtitle" style="margin-top: var(--space-sm);">
+        <p class="section-card-subtitle">
           On weeks with 3 or more reliever uses, your average peak flow was
           <%= @correlation[:high_avg] %> L/min &mdash; compared to <%= @correlation[:low_avg] %> L/min
           on lower-use weeks.

@@ -1,11 +1,15 @@
 /* Reliever Usage — weekly bar chart and correlation panel */
 
+/* Period toggle (8w / 12w) */
+.reliever-toggle { display: flex; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+
 /* Bar chart container */
 .reliever-bars {
+  --bars-height: 160px;
   display: flex;
   align-items: flex-end;
   gap: var(--space-xs);
-  height: 160px;
+  height: var(--bars-height);
   padding: var(--space-md) 0 var(--space-sm);
   position: relative;
 }
@@ -14,7 +18,7 @@
 .reliever-threshold {
   position: absolute;
   left: 0; right: 0;
-  bottom: calc(var(--space-sm) + 160px * (2 / 6));
+  bottom: calc(var(--space-sm) + var(--bars-height) * (2 / 6));
   border-top: 1px dashed var(--gray-400);
   pointer-events: none;
 }
@@ -42,9 +46,10 @@
   background: var(--gray-100);
 }
 
-/* Fill — height set via inline style as a percentage of max=6 */
+/* Fill — height driven by --bar-fill-height CSS custom property set via inline style */
 .reliever-bar-fill {
   width: 100%;
+  height: var(--bar-fill-height, 0%);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   transition: height 200ms var(--ease);
   min-height: 2px;
@@ -79,4 +84,12 @@
   margin-top: var(--space-md);
   font-size: 0.875rem;
   color: var(--text-3);
+}
+
+/* Correlation card insight text */
+.section-card-subtitle {
+  margin-top: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--text-3);
+  line-height: 1.5;
 }
