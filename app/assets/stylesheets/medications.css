@@ -1,0 +1,98 @@
+/* ------------------------------------------------------------------ */
+/* Course medication rows                                              */
+/* ------------------------------------------------------------------ */
+
+.med-row--course {
+  border-left: 3px solid var(--brand);
+}
+
+.medication-badge--course {
+  background-color: var(--brand-light);
+  color: var(--brand);
+}
+
+.medication-badge--archived {
+  opacity: 0.7;
+}
+
+.course-end-date {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+/* ------------------------------------------------------------------ */
+/* Past courses collapsible section                                    */
+/* ------------------------------------------------------------------ */
+
+.past-courses-card {
+  margin-top: var(--space-md);
+}
+
+.past-courses-disclosure {
+  /* No extra styling needed — inherits section-card padding */
+}
+
+.past-courses-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  list-style: none; /* Remove default triangle in Firefox */
+  padding: var(--space-sm) 0;
+  font-weight: 600;
+  color: var(--text);
+  min-height: 44px; /* Touch target */
+}
+
+.past-courses-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.past-courses-toggle::before {
+  content: "▶";
+  display: inline-block;
+  font-size: 0.625rem;
+  transition: transform 0.15s ease;
+  color: var(--text-3);
+}
+
+details[open] .past-courses-toggle::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .past-courses-toggle::before {
+    transition: none;
+  }
+}
+
+.past-courses-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-2);
+  color: var(--text-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 0 var(--space-xs);
+  min-width: 1.5rem;
+  height: 1.25rem;
+}
+
+.past-courses-list {
+  padding-top: var(--space-sm);
+}
+
+.med-row--archived-course {
+  opacity: 0.8;
+}
+
+/* ------------------------------------------------------------------ */
+/* Course date fieldset in form                                        */
+/* ------------------------------------------------------------------ */
+
+.field-group--course {
+  border-left: 3px solid var(--brand);
+  padding-left: var(--space-sm);
+}

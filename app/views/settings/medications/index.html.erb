@@ -35,10 +35,21 @@
 
 <div class="section-card">
   <div class="med-list" id="medications_list">
-    <% if @medications.any? %>
-      <%= render @medications %>
+    <% if @active_medications.any? %>
+      <% @active_medications.each do |medication| %>
+        <% if medication.course? %>
+          <%= render "settings/medications/course_medication", medication: medication %>
+        <% else %>
+          <%= render medication %>
+        <% end %>
+      <% end %>
     <% else %>
       <%= render "medications_empty_state" %>
     <% end %>
   </div>
 </div>
+
+<%# Past courses — hidden entirely when empty (per locked decision) %>
+<% if @archived_courses.any? %>
+  <%= render "settings/medications/past_courses", archived_courses: @archived_courses %>
+<% end %>

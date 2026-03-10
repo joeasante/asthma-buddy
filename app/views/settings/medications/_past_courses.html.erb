@@ -1,0 +1,44 @@
+<div class="section-card past-courses-card" id="past_courses_section">
+  <details class="past-courses-disclosure">
+    <summary class="past-courses-toggle">
+      <span class="past-courses-toggle-label">Past courses</span>
+      <span class="past-courses-count-badge" aria-label="<%= archived_courses.size %> past courses">
+        <%= archived_courses.size %>
+      </span>
+    </summary>
+
+    <div class="past-courses-list med-list">
+      <% archived_courses.each do |medication| %>
+        <%= turbo_frame_tag dom_id(medication) do %>
+          <div class="med-row med-row--archived-course">
+            <div class="med-row-info">
+              <span class="med-row-name"><%= medication.name %></span>
+              <span class="medication-badge medication-badge--course medication-badge--archived">
+                Course &mdash; ended <%= medication.ends_on.strftime("%-d %b %Y") %>
+              </span>
+              <span class="medication-badge medication-badge--<%= medication.medication_type %>">
+                <%= medication.medication_type.humanize %>
+              </span>
+            </div>
+
+            <div class="med-row-stats">
+              <span><%= medication.remaining_doses %> doses remaining</span>
+            </div>
+
+            <%# Archived: no log dose button — dose logging disabled on archived courses %>
+            <div class="med-row-actions">
+              <details class="med-overflow">
+                <summary class="med-overflow-toggle" aria-label="More options for <%= medication.name %>">⋮</summary>
+                <div class="med-overflow-menu">
+                  <%= button_to "Remove", settings_medication_path(medication), method: :delete,
+                        class: "med-overflow-item med-overflow-item--danger",
+                        form: { data: { turbo: true, turbo_confirm: "Remove #{medication.name}? All dose history will also be deleted. This can't be undone." } } %>
+                </div>
+              </details>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </details>
+</div>
