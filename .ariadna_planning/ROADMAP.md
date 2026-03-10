@@ -298,10 +298,12 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
   4. Dose logging for a course works identically to regular medications; remaining units count down as doses are logged.
   5. A user cannot interact with another user's course medications (isolation enforced).
 
-**Plans**:
-- [ ] 18-01: Medication model — add `course` boolean (default false), `starts_on` date, `ends_on` date; `active` and `archived` scopes; validations (ends_on after starts_on when course); update AdherenceCalculator and low_stock? to exclude active courses; model tests
-- [ ] 18-02: Medication form — "This is a temporary course" checkbox (Stimulus controller shows/hides course date fields and hides doses_per_day); controller permits new params; index page splits active vs archived with collapsible "Past courses" section; Turbo Stream responses; CSS
-- [ ] 18-03: Controller tests (create course, archive boundary, cross-user isolation) and system tests (add course, verify excluded from adherence, verify archived after end date, dose logging on course)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 18-01-PLAN.md — Model layer: course columns, active/archived scopes, validations, low_stock? exclusion, adherence query exclusion, model tests
+- [ ] 18-02-PLAN.md — UI layer: course-toggle Stimulus controller, form checkbox/date fields, index split (active + Past courses collapsible), course partials, CSS
+- [ ] 18-03-PLAN.md — Tests: controller integration tests (create, archive boundary, cross-user isolation) and system tests (add course, archived display, dose logging, adherence exclusion)
 
 ---
 
