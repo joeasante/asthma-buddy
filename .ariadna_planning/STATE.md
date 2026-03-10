@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 17 (Onboarding Flow) — COMPLETE (including gap-01 fix)
-Plan: All plans complete. Plan 01, Plan 02, Gap-01.
-Status: Phase 17 Gap-01 complete. 2026-03-10.
-Last activity: 2026-03-10 — Phase 17 Gap-01 complete: fixed OnboardingController#skip step 2 to set both onboarding flags atomically, added 2 tests (skip-step-2 after step-1-done flash present, skip-both-steps both-flags-true flash survives). 396 tests passing, no regressions.
+Phase: Phase 18 (Temporary Medication Courses) — IN PROGRESS
+Plan: Plan 01 complete.
+Status: Phase 18 Plan 01 complete. 2026-03-10.
+Last activity: 2026-03-10 — Phase 18 Plan 01 complete: migration adds course/starts_on/ends_on columns, active_courses/archived_courses/non_courses scopes, course_active? predicate, course validations, low_stock? excludes active courses, DashboardController and AdherenceController both chain .where(course: false). 410 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 18 Plan 01 completed: 2026-03-10 (~3 min, 2 tasks, 1 file created, 5 files modified, 14 new tests)
+- Tests at Phase 18-01 close: 410 passing (no regressions)
 - Phase 17 Gap-01 completed: 2026-03-10 (~5 min, 2 tasks, 0 files created, 2 files modified, 1 net new test — replaced 1, added 2)
 - Tests at Phase 17-gap-01 close: 396 passing (no regressions)
 - Phase 17 Plan 02 completed: 2026-03-10 (~45 min, 2 tasks, 2 files created, 3 files modified, 20 new tests — 13 controller + 7 system)
@@ -103,6 +105,15 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 18 Plan 01 Decisions (2026-03-10)
+
+- **Scope-based auto-archive**: `active_courses` uses `ends_on >= Date.today` SQL comparison — no background job, no `archived` boolean column; the scope dynamically reflects the current date
+- **Course exclusion at query level**: `.where(course: false)` chained in DashboardController and AdherenceController — excludes course records from DB loading entirely, not just relying on `low_stock?` returning false
+- **`with_options if: :course?` for conditional validations**: `starts_on` and `ends_on` presence + `ends_on > starts_on` only validate when `course: true`; non-course medications are unaffected
+- **`ends_on` strictly after `starts_on`**: Equal dates represent a zero-duration course (meaningless); `ends_on <= starts_on` rejected with validation error
+- **`low_stock?` returns false for `course_active?`**: Active courses are short-lived prescriptions; stock level alerts are not applicable while the course is running
+- **Index on `ends_on`**: Added per locked user decision; scope queries filter by `ends_on` frequently
 
 ### Phase 17 Gap-01 Decisions (2026-03-10)
 
@@ -320,5 +331,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 17 Gap-01 complete — one-line fix to OnboardingController#skip (when 2 sets both onboarding flags), two new controller tests (skip-step-2-after-step-1, skip-both-steps flash survives redirect). UAT gap closed. 396 tests passing, no regressions.
+Stopped at: Phase 18 Plan 01 complete — data layer for temporary medication courses: migration (course/starts_on/ends_on), scopes (active_courses/archived_courses/non_courses), course_active?, course validations, low_stock? course exclusion, DashboardController and AdherenceController .where(course: false). 410 tests passing, no regressions.
 Resume file: None
