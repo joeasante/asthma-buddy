@@ -2,3 +2,8 @@ alice_session:
   user: verified_user
   ip_address: "127.0.0.1"
   user_agent: "Rails Test"
+
+new_user_session:
+  user: new_user
+  ip_address: "127.0.0.1"
+  user_agent: "Rails Test"

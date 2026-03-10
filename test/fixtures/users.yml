@@ -9,3 +9,10 @@ unverified_user:
   email_address: bob@example.com
   password_digest: <%= BCrypt::Password.create("password123") %>
   email_verified_at:
+
+new_user:
+  email_address: charlie@example.com
+  password_digest: <%= BCrypt::Password.create("password123") %>
+  email_verified_at: <%= 1.day.ago %>
+  onboarding_personal_best_done: false
+  onboarding_medication_done: false
