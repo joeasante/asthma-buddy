@@ -35,8 +35,8 @@
 
 <div class="section-card">
   <div class="med-list" id="medications_list">
-    <% if @active_medications.any? %>
-      <% @active_medications.each do |medication| %>
+    <% if @visible_medications.any? %>
+      <% @visible_medications.each do |medication| %>
         <%= render medication_partial(medication), medication: medication %>
       <% end %>
     <% else %>

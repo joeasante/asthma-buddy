@@ -7,12 +7,12 @@ module Settings
 
     def index
       all_medications = Current.user.medications.chronological.includes(:dose_logs)
-      @active_medications  = all_medications.reject { |m| m.course? && !m.course_active? }
+      @visible_medications = all_medications.reject { |m| m.course? && !m.course_active? }
       @archived_courses    = all_medications.select { |m| m.course? && !m.course_active? }
 
       # Header eyebrow: active medication count (excludes archived courses) + low stock count
-      @header_medication_count = @active_medications.size
-      @header_low_stock_count  = @active_medications.count(&:low_stock?)
+      @header_medication_count = @visible_medications.size
+      @header_low_stock_count  = @visible_medications.count(&:low_stock?)
     end
 
     def new
