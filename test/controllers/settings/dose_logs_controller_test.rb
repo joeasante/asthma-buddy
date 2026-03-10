@@ -103,4 +103,39 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     delete settings_medication_dose_log_url(@medication, @dose_log)
     assert_redirected_to new_session_url
   end
+
+  # --- JSON: CREATE ---
+
+  test "POST /settings/medications/:medication_id/dose_logs.json returns 201 with dose_log JSON" do
+    assert_difference "DoseLog.count", 1 do
+      post settings_medication_dose_logs_url(@medication, format: :json),
+        params: { dose_log: { puffs: 2, recorded_at: Time.current.to_s } }
+    end
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal @medication.id, body["medication_id"]
+    assert_equal 2, body["puffs"]
+    assert body.key?("id")
+    assert body.key?("recorded_at")
+    assert body.key?("created_at")
+  end
+
+  test "POST /settings/medications/:medication_id/dose_logs.json with invalid params returns 422" do
+    assert_no_difference "DoseLog.count" do
+      post settings_medication_dose_logs_url(@medication, format: :json),
+        params: { dose_log: { puffs: 0, recorded_at: Time.current.to_s } }
+    end
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+    assert body.key?("errors")
+  end
+
+  # --- JSON: DESTROY ---
+
+  test "DELETE /settings/medications/:medication_id/dose_logs/:id.json returns 204 no content" do
+    assert_difference "DoseLog.count", -1 do
+      delete settings_medication_dose_log_url(@medication, @dose_log, format: :json)
+    end
+    assert_response :no_content
+  end
 end

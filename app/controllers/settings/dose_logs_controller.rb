@@ -13,11 +13,13 @@ module Settings
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Dose logged." }
+          format.json { render json: dose_log_json(@dose_log), status: :created }
         end
       else
         respond_to do |format|
           format.turbo_stream { render turbo_stream: turbo_stream.replace("dose_log_form_#{dom_id(@medication)}", partial: "settings/dose_logs/form", locals: { medication: @medication, dose_log: @dose_log }), status: :unprocessable_entity }
           format.html { redirect_to settings_medications_path, alert: "Could not log dose." }
+          format.json { render json: { errors: @dose_log.errors.full_messages }, status: :unprocessable_entity }
         end
       end
     end
@@ -28,6 +30,7 @@ module Settings
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to settings_medications_path, notice: "Dose removed." }
+        format.json { head :no_content }
       end
     end
 
@@ -43,6 +46,16 @@ module Settings
 
     def dose_log_params
       params.require(:dose_log).permit(:puffs, :recorded_at)
+    end
+
+    def dose_log_json(dose_log)
+      {
+        id:            dose_log.id,
+        medication_id: dose_log.medication_id,
+        puffs:         dose_log.puffs,
+        recorded_at:   dose_log.recorded_at,
+        created_at:    dose_log.created_at
+      }
     end
   end
 end
