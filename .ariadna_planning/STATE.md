@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 15.1 (Reliever Usage History) — NOT STARTED
-Plan: None yet. Phase 14 and 15 complete. Phase 15.1 inserted 2026-03-10.
-Status: Ready to plan Phase 15.1.
-Last activity: 2026-03-10 — Phase 14 marked complete (already built), Phase 15.1 added to roadmap, adherence page renamed to "Preventer History", "Medication Log" buttons renamed, show pages added for PeakFlow/SymptomLogs/HealthEvents, 25 code review findings fixed.
+Phase: Phase 15.1 (Reliever Usage History) — IN PROGRESS
+Plan: 15.1-01 complete. Route, controller, CSS, view, and dashboard link delivered.
+Status: Plan 01 complete. Plan 02 (tests) pending.
+Last activity: 2026-03-10 — Phase 15.1 Plan 01 complete: GET /reliever-usage, RelieverUsageController#index with GINA band weekly data + peak flow correlation, reliever_usage.css, full ERB view with Turbo Frame toggle + two empty states, dashboard Reliever Usage link.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,7 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 15.1 Plan 01 completed: 2026-03-10 (~15 min, 2 tasks, 3 files created, 3 files modified)
 - Phase 15 Plan 03 completed: 2026-03-09 (~15 min, 2 tasks, 5 files, 5 new tests)
 - Phase 15 Plan 02 completed: 2026-03-09 (~12 min, 1 task, 1 file, 11 new system tests)
 - Phase 15 Plan 01 completed: 2026-03-09 (~8 min, 3 tasks, 3 files, 39 new tests)
@@ -91,6 +92,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 15.1 Plan 01 Decisions (2026-03-10)
+
+- **CSS loading pattern**: `stylesheet_link_tag "reliever_usage"` inside `authenticated?` block in application layout — same pattern as all other feature CSS files
+- **dash-insight-text does not exist**: Used `page-header-subtitle` class with `style="margin-top: var(--space-sm);"` as the closest existing small-text utility
+- **setup_monthly_stats extracted**: Private method called from all three controller return paths to avoid duplicating month-start query and pill-class computation
 
 ### Phase 15 Plan 02 Decisions (2026-03-09)
 
@@ -244,6 +251,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09
-Stopped at: Phase 15 Plan 03 complete — health event markers on dashboard 7-day peak flow chart (controller @health_event_markers, canvas data attribute, chart_controller.js afterDraw plugin, 4 controller tests + 1 system test). Phase 15 (Health Events) in progress.
+Last session: 2026-03-10
+Stopped at: Phase 15.1 Plan 01 complete — reliever usage history page (route, RelieverUsageController, weekly GINA bands, peak flow correlation, reliever_usage.css, view with Turbo Frame toggle + 2 empty states, dashboard Reliever Usage link).
 Resume file: None
