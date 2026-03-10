@@ -99,6 +99,18 @@ class RelieverUsageControllerTest < ActionDispatch::IntegrationTest
     assert_select "[class*='reliever-bar-fill--']"
   end
 
+  test "index returns exactly 8 bars for 8-week range" do
+    get reliever_usage_url, params: { weeks: 8 }
+    assert_response :success
+    assert_select ".reliever-bar-col", count: 8
+  end
+
+  test "index returns exactly 12 bars for 12-week range" do
+    get reliever_usage_url, params: { weeks: 12 }
+    assert_response :success
+    assert_select ".reliever-bar-col", count: 12
+  end
+
   # ── JSON format ───────────────────────────────────────────────────────────
 
   test "index responds to JSON format" do

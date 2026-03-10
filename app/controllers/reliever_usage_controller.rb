@@ -105,7 +105,7 @@ class RelieverUsageController < ApplicationController
       current += 7
     end
 
-    weeks
+    weeks.last(@weeks)
   end
 
   def gina_band(uses)
