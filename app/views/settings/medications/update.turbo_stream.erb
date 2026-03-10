@@ -1,5 +1,11 @@
-<%# Replace the med row on the list page. No-op on the edit page — element not present there. %>
-<%= turbo_stream.replace dom_id(@medication), partial: "settings/medications/medication", locals: { medication: @medication } %>
+<%# Replace the medication row with the correct partial based on type %>
+<%= turbo_stream.replace dom_id(@medication) do %>
+  <% if @medication.course? %>
+    <%= render "settings/medications/course_medication", medication: @medication %>
+  <% else %>
+    <%= render "settings/medications/medication", medication: @medication %>
+  <% end %>
+<% end %>
 
 <%# Show inline toast on the list page %>
 <%= turbo_stream.replace "flash-messages" do %>
