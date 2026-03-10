@@ -7,11 +7,11 @@
 
   <div class="onboarding-progress"
        role="progressbar"
-       aria-label="Setup progress, step <%= @step %> of 3"
+       aria-label="Setup progress, step <%= @step %> of 2"
        aria-valuenow="<%= @step %>"
        aria-valuemin="1"
-       aria-valuemax="3">
-    <% 3.times do |i| %>
+       aria-valuemax="2">
+    <% 2.times do |i| %>
       <% step_num = i + 1 %>
       <% dot_mod = if step_num < @step then "--complete"
                    elsif step_num == @step then "--active"
