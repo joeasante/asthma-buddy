@@ -417,3 +417,51 @@ a.section-card--nav:hover .settings-nav-chevron {
     width: 100%;
   }
 }
+
+/* ── Danger Zone ─────────────────────────────────────────────────────────── */
+
+.danger-zone {
+  margin-top: var(--space-xl);
+}
+
+.danger-zone-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.danger-zone-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .danger-zone-body {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-xl);
+  }
+}
+
+.danger-zone-description {
+  flex: 1;
+}
+
+.danger-zone-action-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+
+.danger-zone-action-description {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.5;
+}
