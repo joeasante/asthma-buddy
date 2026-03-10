@@ -1,0 +1,66 @@
+/* Cookie notice */
+.cookie-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Push up above bottom nav on mobile */
+@media (max-width: 767px) {
+  .cookie-notice {
+    bottom: 52px;
+  }
+}
+
+.cookie-notice--dismissed {
+  opacity: 0;
+  transform: translateY(100%);
+  pointer-events: none;
+}
+
+.cookie-notice-text {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.cookie-notice-link {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.cookie-notice-dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+}
+
+.cookie-notice-dismiss:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.cookie-notice-dismiss:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}

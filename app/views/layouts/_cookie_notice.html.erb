@@ -1,0 +1,19 @@
+<div class="cookie-notice"
+     id="cookie-notice"
+     role="region"
+     aria-label="Cookie notice"
+     data-controller="cookie-notice">
+  <p class="cookie-notice-text">
+    This site uses a session cookie to keep you signed in. No tracking or advertising cookies are used.
+    <%= link_to "Privacy Policy", privacy_path, class: "cookie-notice-link" %>.
+  </p>
+  <%= button_to cookie_notice_dismiss_path,
+        method: :post,
+        class: "cookie-notice-dismiss",
+        aria: { label: "Dismiss cookie notice" },
+        data: { action: "cookie-notice#dismiss", turbo_submits_with: "" } do %>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  <% end %>
+</div>
