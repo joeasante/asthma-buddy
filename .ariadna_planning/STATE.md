@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 16 (Account Management and Legal) — IN PROGRESS
-Plan: 16-03 complete. Dismissible session cookie notice banner delivered.
-Status: Phase 16 Plans 16-01, 16-02, and 16-03 delivered.
-Last activity: 2026-03-10 — Phase 16 Plan 03 complete: Dismissible session cookie notice banner (ePrivacy LEGAL-03). CookieNoticesController#dismiss (204), ApplicationController before_action, _cookie_notice partial with aria roles, cookie_notice Stimulus controller with CSS transition, system tests (2/2 pass). 374 tests passing, no regressions.
+Phase: Phase 17 (Onboarding Flow) — IN PROGRESS
+Plan: Plan 01 complete (data layer + controller logic). Plan 02 (views) pending.
+Status: Phase 17 Plan 01 complete. 2026-03-10.
+Last activity: 2026-03-10 — Phase 17 Plan 01 complete: onboarding boolean flags migration, OnboardingController 2-step wizard with flag persistence, DashboardController check_onboarding guard. 378 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 17 Plan 01 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 4 files modified, 0 new tests — onboarding flags + controller logic)
+- Tests at Phase 17-01 close: 378 passing (no regressions)
 - Phase 16 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 5 files created, 3 files modified, 2 new system tests)
 - Tests at Phase 16-03 close: 374 passing (no regressions)
 - Phase 15.1 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 0 files created, 2 files modified, 0 new tests — UAT gap #4 closed)
@@ -97,6 +99,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 17 Plan 01 Decisions (2026-03-10)
+
+- **OnboardingController 3-step → 2-step wizard**: Step 3 eliminated; completing or skipping Step 2 redirects to dashboard_path. Skip routes still exist in routes (constraint [1-3]) to avoid route errors.
+- **Both flags checked in DashboardController guard**: check_onboarding before_action requires BOTH onboarding_personal_best_done AND onboarding_medication_done to be true; partial completion sends user back to wizard
+- **verified_user fixture updated with both flags true**: Prevents 378 existing tests from being broken by the new dashboard redirect guard
+- **Medication.new(user: Current.user, ...) in OnboardingController#show**: Not Current.user.medications.new() — avoids association safety issue (MEMORY.md pattern)
+- **redirect_if_onboarding_complete before_action on OnboardingController**: Prevents fully onboarded users from re-entering the wizard
 
 ### Phase 16 Plan 01 Decisions (2026-03-10)
 
@@ -293,5 +303,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 16 Plan 03 complete — Dismissible session cookie notice banner (ePrivacy LEGAL-03). CookieNoticesController#dismiss (204), ApplicationController set_cookie_notice_flag before_action, _cookie_notice partial with aria roles, cookie_notice Stimulus controller with CSS transition + transitionend removal, cookie_notice.css, 2 system tests pass. 374 tests passing, no regressions.
+Stopped at: Phase 17 Plan 01 complete — Onboarding flags migration (onboarding_personal_best_done, onboarding_medication_done, default false), OnboardingController rewritten to 2-step wizard with flag persistence on complete/skip, DashboardController check_onboarding before_action guard. 378 tests passing, no regressions.
 Resume file: None
