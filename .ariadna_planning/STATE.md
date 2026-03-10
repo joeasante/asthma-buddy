@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 17 (Onboarding Flow) — COMPLETE
-Plan: Both plans complete. Plan 01 (data layer + controller logic). Plan 02 (views + tests).
-Status: Phase 17 Plan 02 complete. 2026-03-10.
-Last activity: 2026-03-10 — Phase 17 Plan 02 complete: 2-step progress indicator in show.html.erb, new_user fixture (charlie@example.com), 13 controller tests, 7 system tests (use_transactional_tests=false for reliability). 391 tests passing, no regressions.
+Phase: Phase 17 (Onboarding Flow) — COMPLETE (including gap-01 fix)
+Plan: All plans complete. Plan 01, Plan 02, Gap-01.
+Status: Phase 17 Gap-01 complete. 2026-03-10.
+Last activity: 2026-03-10 — Phase 17 Gap-01 complete: fixed OnboardingController#skip step 2 to set both onboarding flags atomically, added 2 tests (skip-step-2 after step-1-done flash present, skip-both-steps both-flags-true flash survives). 396 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 17 Gap-01 completed: 2026-03-10 (~5 min, 2 tasks, 0 files created, 2 files modified, 1 net new test — replaced 1, added 2)
+- Tests at Phase 17-gap-01 close: 396 passing (no regressions)
 - Phase 17 Plan 02 completed: 2026-03-10 (~45 min, 2 tasks, 2 files created, 3 files modified, 20 new tests — 13 controller + 7 system)
 - Tests at Phase 17-02 close: 391 passing (no regressions)
 - Phase 17 Plan 01 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 4 files modified, 0 new tests — onboarding flags + controller logic)
@@ -101,6 +103,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 17 Gap-01 Decisions (2026-03-10)
+
+- **Skip step 2 sets both flags**: `OnboardingController#skip when 2` must set `onboarding_personal_best_done: true` AND `onboarding_medication_done: true` — skipping the final step implicitly skips all pending steps so `onboarding_complete?` returns true definitively; prevents DashboardController#check_onboarding from issuing a second redirect that discards the flash notice
+- **follow_redirect! then flash[:notice] for integration test flash assertions**: Flash is unconsumed until the next request; assert flash after `follow_redirect!` in `ActionDispatch::IntegrationTest`
 
 ### Phase 17 Plan 02 Decisions (2026-03-10)
 
@@ -313,5 +320,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 17 Plan 02 complete — 2-step progress indicator in show.html.erb (aria-valuemax="2"), new_user fixture (charlie@example.com, both flags false), 13 controller tests (all onboarding flows), 7 system tests (use_transactional_tests=false for reliability under shared-connection load). Phase 17 COMPLETE. 391 tests passing, no regressions.
+Stopped at: Phase 17 Gap-01 complete — one-line fix to OnboardingController#skip (when 2 sets both onboarding flags), two new controller tests (skip-step-2-after-step-1, skip-both-steps flash survives redirect). UAT gap closed. 396 tests passing, no regressions.
 Resume file: None
