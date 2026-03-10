@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 18 (Temporary Medication Courses) — IN PROGRESS
-Plan: Plan 02 complete.
-Status: Phase 18 Plan 02 complete. 2026-03-10.
-Last activity: 2026-03-10 — Phase 18 Plan 02 complete: course_toggle Stimulus controller, updated medication form with course checkbox, index split into @active_medications and @archived_courses sections, _course_medication.html.erb and _past_courses.html.erb partials, medications_controller updated (index split + medication_params permits course fields), medications.css created. 19 tests passing, no regressions.
+Phase: Phase 18 (Temporary Medication Courses) — COMPLETE
+Plan: Plan 03 complete.
+Status: Phase 18 Plan 03 complete. 2026-03-10.
+Last activity: 2026-03-10 — Phase 18 Plan 03 complete: 11 controller integration tests (course create, index split, archive boundary, cross-user isolation, adherence exclusion) + 10 system tests (add course flow, Stimulus toggle, archived display, dose logging, adherence exclusion). 421 unit+integration tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 18 Plan 03 completed: 2026-03-10 (~10 min, 2 tasks, 1 file created, 1 file modified, 21 new tests — 11 controller + 10 system)
+- Tests at Phase 18-03 close: 421 passing (no regressions); 10 additional system tests in test/system/medications_test.rb
 - Phase 18 Plan 02 completed: 2026-03-10 (~8 min, 2 tasks, 4 files created, 5 files modified, 0 new tests — UI-only plan)
 - Phase 18 Plan 01 completed: 2026-03-10 (~3 min, 2 tasks, 1 file created, 5 files modified, 14 new tests)
 - Tests at Phase 18-01 close: 410 passing (no regressions)
@@ -106,6 +108,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 18 Plan 03 Decisions (2026-03-10)
+
+- **`visible: :hidden` for Capybara `[hidden]` attribute assertions**: `assert_selector "[...]"` with default visible filter excludes hidden elements; must use `visible: :hidden` to assert element has the `hidden` attribute
+- **Date inputs use `.set()` in headless Chrome system tests**: `fill_in` concatenates to existing date field value producing nonsense dates (e.g. year 60317); `find("input[name='...']").set("YYYY-MM-DD")` replaces value correctly
+- **Open `<details>` before asserting text**: Native `<details>/<summary>` collapsed by default; text inside is in DOM but not visible to Capybara; call `.click` on summary before text assertions
+- **`assert_text /course/i` for CSS text-transform:uppercase badges**: Capybara headless Chrome reports CSS-transformed text ("COURSE" not "Course"); use case-insensitive regex
+- **Partial text match for "X doses"**: View renders "X doses remaining" but assert `"#{n} doses"` (partial match) consistent with existing dose_logging_test.rb pattern
 
 ### Phase 18 Plan 02 Decisions (2026-03-10)
 
@@ -341,5 +351,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 18 Plan 01 complete — data layer for temporary medication courses: migration (course/starts_on/ends_on), scopes (active_courses/archived_courses/non_courses), course_active?, course validations, low_stock? course exclusion, DashboardController and AdherenceController .where(course: false). 410 tests passing, no regressions.
+Stopped at: Phase 18 Plan 03 complete — full test suite for temporary medication courses: 11 controller integration tests (course create, index split, archive boundary, cross-user isolation, adherence exclusion) and 10 system tests (add-course flow, Stimulus toggle, archived display, dose logging, adherence exclusion). 421 unit+integration tests passing, 0 regressions.
 Resume file: None
