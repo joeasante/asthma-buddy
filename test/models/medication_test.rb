@@ -150,8 +150,11 @@ class MedicationTest < ActiveSupport::TestCase
 
   test "remaining_doses subtracts all logged puffs" do
     med = medications(:alice_reliever)
-    # alice_reliever_dose_1 (2 puffs) + alice_reliever_dose_2 (2 puffs) = 4 puffs total
-    expected = med.starting_dose_count - 4
+    # alice_reliever_dose_1 (2) + alice_reliever_dose_2 (2) = 4
+    # alice_reliever_weekly_3w_1..3w_4 (4 × 2 = 8)
+    # alice_reliever_weekly_5w_1..5w_7 (7 × 2 = 14)
+    # total = 26 puffs
+    expected = med.starting_dose_count - 26
     assert_equal expected, med.remaining_doses
   end
 
