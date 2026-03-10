@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DashboardController < ApplicationController
+  before_action :check_onboarding
+
   def index
     user = Current.user
 
@@ -91,4 +93,10 @@ class DashboardController < ApplicationController
       .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
   end
 
+  private
+
+    def check_onboarding
+      return if Current.user.onboarding_personal_best_done? && Current.user.onboarding_medication_done?
+      redirect_to onboarding_step_path(1)
+    end
 end

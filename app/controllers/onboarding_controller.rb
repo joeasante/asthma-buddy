@@ -2,13 +2,16 @@
 
 class OnboardingController < ApplicationController
   layout "onboarding"
+  before_action :redirect_if_onboarding_complete
 
   def show
-    @step = params[:step].to_i
-    redirect_to onboarding_step_path(1) unless @step.between?(1, 3)
-
-    if @step == 2
-      @medication = Current.user.medications.new(
+    @step = current_step
+    case @step
+    when 1
+      # nothing — Step 1 only needs the personal best value field
+    when 2
+      @medication = Medication.new(
+        user: Current.user,
         medication_type: :reliever,
         standard_dose_puffs: 2,
         sick_day_dose_puffs: 4,
@@ -24,6 +27,7 @@ class OnboardingController < ApplicationController
         value: value,
         recorded_at: Time.current.change(sec: 0)
       )
+      Current.user.update!(onboarding_personal_best_done: true)
       redirect_to onboarding_step_path(2)
     else
       @step = 1
@@ -33,9 +37,10 @@ class OnboardingController < ApplicationController
   end
 
   def submit_2
-    @medication = Current.user.medications.new(medication_params)
+    @medication = Medication.new(medication_params.merge(user: Current.user))
     if @medication.save
-      redirect_to onboarding_step_path(3)
+      Current.user.update!(onboarding_medication_done: true)
+      redirect_to dashboard_path, notice: "Welcome to Asthma Buddy! You're all set."
     else
       @step = 2
       render :show, status: :unprocessable_entity
@@ -44,14 +49,34 @@ class OnboardingController < ApplicationController
 
   def skip
     step = params[:step].to_i
-    if step >= 3
-      redirect_to dashboard_path, notice: "Welcome to Asthma Buddy! You're all set."
+    case step
+    when 1
+      Current.user.update!(onboarding_personal_best_done: true)
+      redirect_to onboarding_step_path(2)
+    when 2
+      Current.user.update!(onboarding_medication_done: true)
+      redirect_to dashboard_path, notice: "You can complete setup any time from Settings."
     else
-      redirect_to onboarding_step_path(step + 1)
+      redirect_to dashboard_path
     end
   end
 
   private
+
+    def redirect_if_onboarding_complete
+      if Current.user.onboarding_personal_best_done? && Current.user.onboarding_medication_done?
+        redirect_to dashboard_path
+      end
+    end
+
+    def current_step
+      step = params[:step].to_i
+      # If Step 1 already done, go to step 2; if both done, redirect_if_onboarding_complete handles it
+      if step == 1 && Current.user.onboarding_personal_best_done?
+        redirect_to onboarding_step_path(2) and return 2
+      end
+      step.between?(1, 2) ? step : (redirect_to(onboarding_step_path(1)) and return 1)
+    end
 
     def medication_params
       params.require(:medication).permit(
