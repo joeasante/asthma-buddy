@@ -362,6 +362,20 @@ class Settings::MedicationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "medication-badge--course", response.body
   end
 
+  # --- COURSE: ARCHIVED GUARD ---
+
+  test "cannot edit an archived course" do
+    get edit_settings_medication_url(medications(:alice_archived_course))
+    assert_redirected_to settings_medications_path
+  end
+
+  test "cannot update an archived course" do
+    patch settings_medication_url(medications(:alice_archived_course)),
+      params: { medication: { name: "New Name" } }
+    assert_redirected_to settings_medications_path
+    assert_equal "Prednisolone Old Course", medications(:alice_archived_course).reload.name
+  end
+
   # --- COURSE: CROSS-USER ISOLATION ---
 
   test "cannot access another user's course medication edit page" do

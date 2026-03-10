@@ -3,6 +3,7 @@
 module Settings
   class MedicationsController < ApplicationController
     before_action :set_medication, only: %i[edit update destroy refill]
+    before_action :ensure_course_not_archived, only: %i[edit update]
 
     def index
       all_medications = Current.user.medications.chronological.includes(:dose_logs)
@@ -80,6 +81,11 @@ module Settings
 
     def set_medication
       @medication = Current.user.medications.find(params[:id])
+    end
+
+    def ensure_course_not_archived
+      return unless @medication.course? && !@medication.course_active?
+      redirect_to settings_medications_path, notice: "Archived courses cannot be edited."
     end
 
     def medication_params
