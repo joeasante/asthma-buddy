@@ -21,31 +21,7 @@
     </div>
 
     <div class="med-row-actions">
-      <%# Log dose — identical to regular medication (active courses have full log button) %>
-      <details class="med-log-details" data-med-overflow-target="logPanel"
-               data-action="toggle->med-overflow#logPanelToggle">
-        <summary class="btn-edit btn-sm" aria-label="Log a dose of <%= medication.name %>">Log dose</summary>
-        <div class="med-log-panel">
-          <section class="dose-log-section">
-            <h3 class="dose-log-section-title">Log a dose</h3>
-            <%= render "settings/dose_logs/form",
-                  medication: medication,
-                  dose_log: DoseLog.new(medication: medication, recorded_at: Time.current) %>
-          </section>
-
-          <section class="dose-history-section" id="dose_history_<%= dom_id(medication) %>">
-            <h3 class="dose-history-title">Last 7 days</h3>
-            <% recent_logs = medication.dose_logs.chronological.limit(7) %>
-            <% if recent_logs.any? %>
-              <ul class="dose-history-list">
-                <%= render recent_logs, medication: medication %>
-              </ul>
-            <% else %>
-              <p class="dose-history-empty">No doses logged yet.</p>
-            <% end %>
-          </section>
-        </div>
-      </details>
+      <%= render "settings/medications/dose_log_panel", medication: medication %>
 
       <details class="med-overflow" data-med-overflow-target="overflow"
                data-action="toggle->med-overflow#overflowToggle">
