@@ -19,15 +19,9 @@ class ApplicationController < ActionController::Base
   # PHI / HIPAA: prevent health data from being retained in browser or proxy caches.
   before_action :set_no_store_cache_for_authenticated_users
 
-  before_action :set_cookie_notice_flag
-
   private
 
   def set_no_store_cache_for_authenticated_users
     response.headers["Cache-Control"] = "no-store" if authenticated?
-  end
-
-  def set_cookie_notice_flag
-    @show_cookie_notice = !session[:cookie_notice_shown]
   end
 end
