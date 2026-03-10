@@ -340,6 +340,28 @@ class Settings::MedicationsControllerTest < ActionDispatch::IntegrationTest
     preventer_course&.destroy
   end
 
+  # --- COURSE: UPDATE ---
+
+  test "update course medication responds with course_medication partial" do
+    course_med = medications(:alice_active_course)
+    patch settings_medication_url(course_med),
+      params: { medication: { name: "Updated Prednisolone" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_match "medication-badge--course", response.body
+    assert_equal "Updated Prednisolone", course_med.reload.name
+  end
+
+  test "update non-course medication responds with medication partial" do
+    patch settings_medication_url(@medication),
+      params: { medication: { name: "Updated Ventolin" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_no_match "medication-badge--course", response.body
+  end
+
   # --- COURSE: CROSS-USER ISOLATION ---
 
   test "cannot access another user's course medication edit page" do
