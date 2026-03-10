@@ -36,29 +36,3 @@
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
 </div>
-
-<section class="danger-zone" aria-labelledby="danger-zone-heading">
-  <h2 id="danger-zone-heading" class="danger-zone-heading">Danger Zone</h2>
-  <div class="section-card section-card--danger">
-    <div class="danger-zone-body">
-      <div class="danger-zone-description">
-        <h3 class="danger-zone-action-title">Delete account</h3>
-        <p class="danger-zone-action-description">
-          Permanently delete your account and all health data — symptom logs, peak flow readings,
-          medications, dose logs, and health events. <strong>This cannot be undone.</strong>
-        </p>
-      </div>
-      <%= form_with url: settings_account_path, method: :delete, data: { turbo: false } do |f| %>
-        <div class="field">
-          <%= f.label :confirmation, 'Type "DELETE" to confirm', class: "field-label" %>
-          <%= f.text_field :confirmation,
-                class: "field-input field-input--error",
-                placeholder: "DELETE",
-                autocomplete: "off",
-                spellcheck: "false" %>
-        </div>
-        <%= f.submit "Permanently delete my account", class: "btn-delete" %>
-      <% end %>
-    </div>
-  </div>
-</section>
