@@ -2,6 +2,8 @@ verified_user:
   email_address: alice@example.com
   password_digest: <%= BCrypt::Password.create("password123") %>
   email_verified_at: <%= 1.day.ago %>
+  onboarding_personal_best_done: true
+  onboarding_medication_done: true
 
 unverified_user:
   email_address: bob@example.com
