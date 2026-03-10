@@ -23,9 +23,23 @@ class Medication < ApplicationRecord
             numericality: { only_integer: true, greater_than: 0 },
             allow_nil: true
 
+  with_options if: :course? do
+    validates :starts_on, presence: true
+    validates :ends_on,   presence: true
+    validate  :ends_on_must_be_after_starts_on
+  end
+
   LOW_STOCK_DAYS = 14
 
-  scope :chronological, -> { order(created_at: :desc) }
+  scope :chronological,    -> { order(created_at: :desc) }
+  scope :active_courses,   -> { where(course: true).where("ends_on >= ?", Date.today) }
+  scope :archived_courses, -> { where(course: true).where("ends_on < ?", Date.today) }
+  scope :non_courses,      -> { where(course: false) }
+
+  # Returns true when this is a course medication that hasn't ended yet.
+  def course_active?
+    course? && ends_on.present? && ends_on >= Date.today
+  end
 
   # Returns how many doses remain in the current inhaler.
   # Formula: starting count minus every puff ever logged for this medication.
@@ -46,10 +60,21 @@ class Medication < ApplicationRecord
   end
 
   # Returns true when a days-of-supply estimate is available AND fewer than
-  # LOW_STOCK_DAYS remain. Returns false when doses_per_day is nil (relievers
+  # LOW_STOCK_DAYS remain. Returns false for active courses (they are excluded
+  # from stock alerts — COURSE-03) and when doses_per_day is nil (relievers
   # with no schedule must never trigger the low-stock warning).
   def low_stock?
+    return false if course_active?
     days = days_of_supply_remaining
     days.present? && days < LOW_STOCK_DAYS
   end
+
+  private
+
+    def ends_on_must_be_after_starts_on
+      return unless starts_on.present? && ends_on.present?
+      if ends_on <= starts_on
+        errors.add(:ends_on, "must be after the start date")
+      end
+    end
 end
