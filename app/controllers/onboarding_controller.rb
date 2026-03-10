@@ -87,10 +87,10 @@ class OnboardingController < ApplicationController
         format.json { render json: { onboarding_personal_best_done: true, next_step: 2 }, status: :ok }
       end
     when 2
-      Current.user.update!(onboarding_medication_done: true)
+      Current.user.update!(onboarding_personal_best_done: true, onboarding_medication_done: true)
       respond_to do |format|
         format.html { redirect_to dashboard_path, notice: "You can complete setup any time from Settings." }
-        format.json { render json: { onboarding_medication_done: true }, status: :ok }
+        format.json { render json: { onboarding_personal_best_done: true, onboarding_medication_done: true }, status: :ok }
       end
     end
   end
