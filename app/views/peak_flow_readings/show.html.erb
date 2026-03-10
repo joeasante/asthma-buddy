@@ -15,7 +15,7 @@
       <%= link_to "Edit", edit_peak_flow_reading_path(@peak_flow_reading), class: "btn-secondary" %>
       <%= button_to "Delete", peak_flow_reading_path(@peak_flow_reading),
             method: :delete,
-            class: "btn-danger",
+            class: "btn-delete",
             form: { data: { turbo: false, turbo_confirm: "Delete this reading? This cannot be undone." } } %>
     </div>
   </div>

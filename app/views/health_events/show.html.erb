@@ -15,7 +15,7 @@
       <%= link_to "Edit", edit_health_event_path(@health_event), class: "btn-secondary" %>
       <%= button_to "Delete", health_event_path(@health_event),
             method: :delete,
-            class: "btn-danger",
+            class: "btn-delete",
             form: { data: { turbo: false, turbo_confirm: "Delete this medical event? This cannot be undone." } } %>
     </div>
   </div>

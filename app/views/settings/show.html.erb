@@ -48,18 +48,16 @@
           medications, dose logs, and health events. <strong>This cannot be undone.</strong>
         </p>
       </div>
-      <%= form_with url: account_path, method: :delete, data: { turbo: false } do |f| %>
+      <%= form_with url: settings_account_path, method: :delete, data: { turbo: false } do |f| %>
         <div class="field">
           <%= f.label :confirmation, 'Type "DELETE" to confirm', class: "field-label" %>
           <%= f.text_field :confirmation,
-                class: "field-input field-input--danger",
+                class: "field-input field-input--error",
                 placeholder: "DELETE",
                 autocomplete: "off",
                 spellcheck: "false" %>
         </div>
-        <%= f.submit "Permanently delete my account",
-              class: "btn-danger",
-              data: { confirm: false } %>
+        <%= f.submit "Permanently delete my account", class: "btn-delete" %>
       <% end %>
     </div>
   </div>
