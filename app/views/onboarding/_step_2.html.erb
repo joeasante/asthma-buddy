@@ -52,7 +52,7 @@
       </div>
     </div>
 
-    <%= form.hidden_field :starting_dose_count, value: 200 %>
+    <%= form.hidden_field :starting_dose_count %>
     <%= form.hidden_field :sick_day_dose_puffs, value: 4 %>
 
     <%= form.submit "Save and continue" %>
@@ -61,5 +61,5 @@
 
 <div class="onboarding-nav">
   <%= link_to "\u2190 Back", onboarding_step_path(1) %>
-  <%= link_to "Skip this step", onboarding_skip_path(2), class: "btn-cancel" %>
+  <%= button_to "Skip this step", onboarding_skip_path(2), method: :patch, class: "btn-cancel" %>
 </div>

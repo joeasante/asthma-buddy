@@ -48,4 +48,26 @@ class UserTest < ActiveSupport::TestCase
     user = User.new(email_address: "newuser@example.com", password: "exactly8")
     assert user.valid?
   end
+
+  # -- onboarding_complete? --
+
+  test "onboarding_complete? returns false when neither flag is set" do
+    assert_not users(:new_user).onboarding_complete?
+  end
+
+  test "onboarding_complete? returns false when only personal_best_done is true" do
+    user = users(:new_user)
+    user.update!(onboarding_personal_best_done: true)
+    assert_not user.onboarding_complete?
+  end
+
+  test "onboarding_complete? returns false when only medication_done is true" do
+    user = users(:new_user)
+    user.update!(onboarding_medication_done: true)
+    assert_not user.onboarding_complete?
+  end
+
+  test "onboarding_complete? returns true when both flags are true" do
+    assert users(:verified_user).onboarding_complete?
+  end
 end

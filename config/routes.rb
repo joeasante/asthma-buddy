@@ -45,10 +45,10 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#index", as: :dashboard
 
   scope :onboarding, as: :onboarding do
-    get  "step/:step", to: "onboarding#show",     as: :step,     constraints: { step: /[1-3]/ }
-    post "step_1",     to: "onboarding#submit_1",  as: :submit_1
-    post "step_2",     to: "onboarding#submit_2",  as: :submit_2
-    get  "skip/:step", to: "onboarding#skip",      as: :skip,     constraints: { step: /[1-3]/ }
+    get   "step/:step", to: "onboarding#show",    as: :step,  constraints: { step: /[12]/ }
+    post  "step_1",    to: "onboarding#submit_1", as: :submit_1
+    post  "step_2",    to: "onboarding#submit_2", as: :submit_2
+    patch "skip/:step", to: "onboarding#skip",    as: :skip,  constraints: { step: /[12]/ }
   end
 
   post "cookie-notice/dismiss", to: "cookie_notices#dismiss", as: :cookie_notice_dismiss

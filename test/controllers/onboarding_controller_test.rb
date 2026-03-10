@@ -87,16 +87,16 @@ class OnboardingControllerTest < ActionDispatch::IntegrationTest
 
   # -- Skip step 1 --
 
-  test "GET skip step 1 sets personal_best_done flag and redirects to step 2" do
-    get onboarding_skip_path(1)
+  test "PATCH skip step 1 sets personal_best_done flag and redirects to step 2" do
+    patch onboarding_skip_path(1)
     assert_redirected_to onboarding_step_path(2)
     assert @new_user.reload.onboarding_personal_best_done?
   end
 
   # -- Skip step 2 --
 
-  test "GET skip step 2 sets medication_done flag and redirects to dashboard" do
-    get onboarding_skip_path(2)
+  test "PATCH skip step 2 sets medication_done flag and redirects to dashboard" do
+    patch onboarding_skip_path(2)
     assert_redirected_to dashboard_path
     assert @new_user.reload.onboarding_medication_done?
   end

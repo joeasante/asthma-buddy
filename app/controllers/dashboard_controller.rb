@@ -95,8 +95,16 @@ class DashboardController < ApplicationController
 
   private
 
+    # Soft gate — only the dashboard is guarded. Users can navigate directly to
+    # data-entry screens (peak flow, symptoms, etc.) without completing onboarding;
+    # those controllers handle a missing personal best gracefully. If a hard gate
+    # is ever needed, move this to ApplicationController with skip_before_action
+    # on OnboardingController, SessionsController, and RegistrationsController.
     def check_onboarding
-      return if Current.user.onboarding_personal_best_done? && Current.user.onboarding_medication_done?
-      redirect_to onboarding_step_path(1)
+      return if Current.user.onboarding_complete?
+      respond_to do |format|
+        format.html { redirect_to onboarding_step_path(1) }
+        format.json { render json: { error: "onboarding_required", next_step: 1 }, status: :forbidden }
+      end
     end
 end

@@ -27,5 +27,5 @@
 </div>
 
 <div class="onboarding-skip">
-  <%= link_to "Skip this step", onboarding_skip_path(1), class: "btn-cancel" %>
+  <%= button_to "Skip this step", onboarding_skip_path(1), method: :patch, class: "btn-cancel" %>
 </div>

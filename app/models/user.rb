@@ -31,6 +31,10 @@ class User < ApplicationRecord
     password_salt.last(10)
   end
 
+  def onboarding_complete?
+    onboarding_personal_best_done? && onboarding_medication_done?
+  end
+
   private
 
   def purge_avatar_attachment
