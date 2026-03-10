@@ -59,7 +59,7 @@
       <div class="dash-section-header">
         <h2>Today's Doses</h2>
         <%= link_to "Preventer History", adherence_path, class: "dash-section-link" %>
-        <%# TODO Phase 15.1: add Reliever Usage link here (reliever_usage_path, class: "dash-section-link") %>
+        <%= link_to "Reliever Usage", reliever_usage_path, class: "dash-section-link" %>
       </div>
       <ul class="dash-adherence-list">
         <% if all_on_track %>

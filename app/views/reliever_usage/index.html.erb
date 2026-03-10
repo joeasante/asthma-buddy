@@ -1,0 +1,150 @@
+<% content_for :title, "Reliever Usage" %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-stat">
+      This month &middot; <strong><%= @monthly_uses %></strong> uses
+    </span>
+    <span class="eyebrow-pill <%= @monthly_pill_class %>"><%= @monthly_pill_label %></span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2h6l1 4H8L9 2z"/>
+          <rect x="7" y="6" width="10" height="14" rx="2"/>
+          <line x1="12" y1="10" x2="12" y2="16"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Reliever Usage</h1>
+        <p class="page-header-subtitle">Your reliever dose history</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @relievers.empty? %>
+  <div class="section-card">
+    <div class="empty-state">
+      <div class="empty-state-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2h6l1 4H8L9 2z"/>
+          <rect x="7" y="6" width="10" height="14" rx="2"/>
+          <line x1="12" y1="10" x2="12" y2="16"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <h3>No reliever medications</h3>
+      <p>Add a reliever inhaler in Medications to start tracking your usage here.</p>
+      <div class="empty-state-actions">
+        <%= link_to "Add reliever inhaler", settings_medications_path, class: "btn-primary" %>
+      </div>
+    </div>
+  </div>
+<% elsif !@has_logs %>
+  <div class="section-card">
+    <div class="empty-state">
+      <div class="empty-state-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2h6l1 4H8L9 2z"/>
+          <rect x="7" y="6" width="10" height="14" rx="2"/>
+          <line x1="12" y1="10" x2="12" y2="16"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <h3>No doses logged yet</h3>
+      <p>Log your first reliever dose from the Medications page to start seeing your usage history.</p>
+      <div class="empty-state-actions">
+        <%= link_to "Go to Medications", settings_medications_path, class: "btn-secondary" %>
+      </div>
+    </div>
+  </div>
+<% else %>
+
+  <turbo-frame id="reliever-frame">
+    <div class="adherence-toggle" role="group" aria-label="Select date range">
+      <%= link_to "8 weeks", reliever_usage_path(weeks: 8),
+            data: { turbo_frame: "reliever-frame", turbo_action: "advance" },
+            class: "btn-secondary btn-sm #{"btn-sm--active" if @weeks == 8}",
+            aria: { current: @weeks == 8 ? "true" : nil } %>
+      <%= link_to "12 weeks", reliever_usage_path(weeks: 12),
+            data: { turbo_frame: "reliever-frame", turbo_action: "advance" },
+            class: "btn-secondary btn-sm #{"btn-sm--active" if @weeks == 12}",
+            aria: { current: @weeks == 12 ? "true" : nil } %>
+    </div>
+
+    <div class="section-card">
+      <%# Tracking row: only if 2+ relievers %>
+      <% if @relievers.size >= 2 %>
+        <div class="reliever-tracking-row">
+          <span>Tracking:</span>
+          <% @relievers.each do |med| %>
+            <span class="medication-badge medication-badge--reliever"><%= med.name %></span>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# Bar chart %>
+      <div class="reliever-bars" role="img" aria-label="Weekly reliever usage bar chart">
+        <div class="reliever-threshold" aria-hidden="true"></div>
+        <% max_scale = 6.0 %>
+        <% @weekly_data.each do |week| %>
+          <% fill_pct = [(week[:uses] / max_scale * 100).round, 100].min %>
+          <div class="reliever-bar-col">
+            <span class="reliever-bar-count" aria-hidden="true">
+              <%= week[:uses] > 0 ? week[:uses] : "" %>
+            </span>
+            <div class="reliever-bar-track">
+              <div class="reliever-bar-fill reliever-bar-fill--<%= week[:band] %>"
+                   style="height: <%= fill_pct %>%;"
+                   aria-label="<%= week[:label] %>: <%= week[:uses] %> use<%= week[:uses] == 1 ? "" : "s" %>">
+              </div>
+            </div>
+            <span class="reliever-bar-label"><%= week[:label] %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <%# GINA legend %>
+      <div class="dash-zone-legend" aria-label="GINA usage bands">
+        <span class="dash-zone-legend-item dash-zone-legend-item--green">0&ndash;2 Controlled</span>
+        <span class="dash-zone-legend-item dash-zone-legend-item--yellow">3&ndash;5 Review</span>
+        <span class="dash-zone-legend-item dash-zone-legend-item--red">6+ Speak to GP</span>
+      </div>
+    </div>
+
+    <%# Peak flow correlation — only when @correlation is present %>
+    <% if @correlation %>
+      <div class="section-card">
+        <h2 class="section-card-title">Peak Flow Correlation</h2>
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <span class="dash-stat-label">High-use weeks avg</span>
+            <span class="dash-stat-value dash-stat-value--zone-red">
+              <%= @correlation[:high_avg] %><span class="dash-stat-unit"> L/min</span>
+            </span>
+          </div>
+          <div class="dash-stat">
+            <span class="dash-stat-label">Low-use weeks avg</span>
+            <span class="dash-stat-value dash-stat-value--zone-green">
+              <%= @correlation[:low_avg] %><span class="dash-stat-unit"> L/min</span>
+            </span>
+          </div>
+        </div>
+        <p class="page-header-subtitle" style="margin-top: var(--space-sm);">
+          On weeks with 3 or more reliever uses, your average peak flow was
+          <%= @correlation[:high_avg] %> L/min &mdash; compared to <%= @correlation[:low_avg] %> L/min
+          on lower-use weeks.
+        </p>
+      </div>
+    <% end %>
+
+  </turbo-frame>
+<% end %>
+
+<p class="page-back-link">
+  <%= link_to "← Back to Dashboard", dashboard_path %>
+</p>
