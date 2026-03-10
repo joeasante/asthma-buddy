@@ -1,5 +1,5 @@
 <%= form_with model: [:settings, medication], id: "medication_form",
-      data: { turbo: local_assigns.fetch(:use_turbo, true) } do |form| %>
+      data: { turbo: local_assigns.fetch(:use_turbo, true), controller: "course-toggle" } do |form| %>
   <% if medication.errors.any? %>
     <div class="field-errors" role="alert" aria-live="assertive">
       <p><%= pluralize(medication.errors.count, "error") %> prevented this medication from being saved:</p>
@@ -48,6 +48,12 @@
     <% end %>
   </div>
 
+  <%# Course toggle checkbox — placed before Optional fieldset so DOM order matches visual order %>
+  <div class="field field--checkbox">
+    <%= form.check_box :course, data: { "course-toggle-target": "checkbox", action: "change->course-toggle#toggle" } %>
+    <%= form.label :course, "This is a temporary course (e.g. prednisolone)" %>
+  </div>
+
   <fieldset class="field-group">
     <legend>Optional</legend>
 
@@ -57,13 +63,39 @@
       <p class="field-hint">Leave blank if not applicable.</p>
     </div>
 
-    <div class="field">
-      <%= form.label :doses_per_day, "Doses per day" %>
-      <%= form.number_field :doses_per_day, min: 1, step: 1 %>
-      <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
+    <div data-course-toggle-target="dosesPerDayField">
+      <div class="field">
+        <%= form.label :doses_per_day, "Doses per day" %>
+        <%= form.number_field :doses_per_day, min: 1, step: 1 %>
+        <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
+      </div>
     </div>
 
   </fieldset>
+
+  <%# Course date fields — shown only when checkbox is checked %>
+  <div data-course-toggle-target="courseFields" hidden>
+    <fieldset class="field-group field-group--course">
+      <legend>Course dates</legend>
+
+      <div class="field">
+        <%= form.label :starts_on, "Start date" %>
+        <%= form.date_field :starts_on, required: medication.course %>
+        <% if medication.errors[:starts_on].any? %>
+          <p class="field-error"><%= medication.errors[:starts_on].first %></p>
+        <% end %>
+      </div>
+
+      <div class="field">
+        <%= form.label :ends_on, "End date" %>
+        <%= form.date_field :ends_on, required: medication.course %>
+        <% if medication.errors[:ends_on].any? %>
+          <p class="field-error"><%= medication.errors[:ends_on].first %></p>
+        <% end %>
+      </div>
+
+    </fieldset>
+  </div>
 
   <div class="form-actions">
     <%= form.submit medication.persisted? ? "Update medication" : "Add medication", class: "btn-primary" %>
