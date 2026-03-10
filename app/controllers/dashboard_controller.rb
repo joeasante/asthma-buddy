@@ -79,15 +79,22 @@ class DashboardController < ApplicationController
       .order(recorded_at: :asc)
 
     # Low-stock medications — loaded with dose_logs to avoid N+1 in low_stock?
-    @low_stock_medications = user.medications.includes(:dose_logs).select(&:low_stock?)
+    # Exclude course medications at query level (low_stock? also returns false for course_active?,
+    # but excluding at the DB level avoids loading unnecessary course records).
+    @low_stock_medications = user.medications
+      .where(course: false)
+      .includes(:dose_logs)
+      .select(&:low_stock?)
 
     # Recent health events — 3 most recent, shown in the dashboard card
     @recent_health_events = user.health_events.recent_first.limit(3)
 
-    # Today's preventer adherence — only preventers with a doses_per_day schedule
+    # Today's preventer adherence — only preventers with a doses_per_day schedule.
+    # Excludes course medications (COURSE-03): temporary courses are not preventer adherence targets.
     today = Date.current
     @preventer_adherence = user.medications
       .where(medication_type: :preventer)
+      .where(course: false)
       .includes(:dose_logs)
       .select { |m| m.doses_per_day.present? }
       .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }

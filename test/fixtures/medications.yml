@@ -44,3 +44,33 @@ bob_reliever:
   doses_per_day:
   created_at: <%= 90.days.ago %>
   updated_at: <%= 90.days.ago %>
+
+# Alice's active course (ends_on in the future — today + 7 days)
+alice_active_course:
+  user: verified_user
+  name: Prednisolone
+  medication_type: 3
+  standard_dose_puffs: 5
+  starting_dose_count: 40
+  sick_day_dose_puffs:
+  doses_per_day:
+  course: true
+  starts_on: <%= Date.today.to_s %>
+  ends_on: <%= 7.days.from_now.to_date.to_s %>
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+# Alice's archived course (ends_on in the past — yesterday)
+alice_archived_course:
+  user: verified_user
+  name: Prednisolone Old Course
+  medication_type: 3
+  standard_dose_puffs: 5
+  starting_dose_count: 40
+  sick_day_dose_puffs:
+  doses_per_day:
+  course: true
+  starts_on: <%= 14.days.ago.to_date.to_s %>
+  ends_on: <%= 1.day.ago.to_date.to_s %>
+  created_at: <%= 15.days.ago %>
+  updated_at: <%= 15.days.ago %>

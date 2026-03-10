@@ -287,4 +287,136 @@ class MedicationTest < ActiveSupport::TestCase
     DoseLog.create!(user: @user, medication: med, puffs: 6, recorded_at: Time.current)
     assert med.low_stock?
   end
+
+  # --- Course scopes ---
+
+  test "active_courses scope returns only course medications with ends_on >= today" do
+    active     = medications(:alice_active_course)
+    archived   = medications(:alice_archived_course)
+    non_course = medications(:alice_reliever)
+
+    result = Medication.active_courses
+    assert_includes result, active
+    assert_not_includes result, archived
+    assert_not_includes result, non_course
+  end
+
+  test "archived_courses scope returns only course medications with ends_on < today" do
+    active     = medications(:alice_active_course)
+    archived   = medications(:alice_archived_course)
+    non_course = medications(:alice_reliever)
+
+    result = Medication.archived_courses
+    assert_includes result, archived
+    assert_not_includes result, active
+    assert_not_includes result, non_course
+  end
+
+  test "non_courses scope excludes all course medications" do
+    active     = medications(:alice_active_course)
+    archived   = medications(:alice_archived_course)
+    non_course = medications(:alice_reliever)
+
+    result = Medication.non_courses
+    assert_includes result, non_course
+    assert_not_includes result, active
+    assert_not_includes result, archived
+  end
+
+  # --- Course validations ---
+
+  test "course medication valid with starts_on and ends_on set" do
+    med = Medication.new(
+      user: @user, name: "Pred Course", medication_type: :other,
+      standard_dose_puffs: 5, starting_dose_count: 40,
+      course: true, starts_on: Date.today, ends_on: 7.days.from_now.to_date
+    )
+    assert med.valid?, med.errors.full_messages.inspect
+  end
+
+  test "course medication invalid without starts_on" do
+    med = Medication.new(
+      user: @user, name: "Pred Course", medication_type: :other,
+      standard_dose_puffs: 5, starting_dose_count: 40,
+      course: true, starts_on: nil, ends_on: 7.days.from_now.to_date
+    )
+    assert_not med.valid?
+    assert med.errors[:starts_on].any?
+  end
+
+  test "course medication invalid without ends_on" do
+    med = Medication.new(
+      user: @user, name: "Pred Course", medication_type: :other,
+      standard_dose_puffs: 5, starting_dose_count: 40,
+      course: true, starts_on: Date.today, ends_on: nil
+    )
+    assert_not med.valid?
+    assert med.errors[:ends_on].any?
+  end
+
+  test "course medication invalid when ends_on is before starts_on" do
+    med = Medication.new(
+      user: @user, name: "Pred Course", medication_type: :other,
+      standard_dose_puffs: 5, starting_dose_count: 40,
+      course: true, starts_on: Date.today, ends_on: 1.day.ago.to_date
+    )
+    assert_not med.valid?
+    assert med.errors[:ends_on].any?
+  end
+
+  test "course medication invalid when ends_on equals starts_on" do
+    med = Medication.new(
+      user: @user, name: "Pred Course", medication_type: :other,
+      standard_dose_puffs: 5, starting_dose_count: 40,
+      course: true, starts_on: Date.today, ends_on: Date.today
+    )
+    assert_not med.valid?
+    assert med.errors[:ends_on].any?
+  end
+
+  test "non-course medication does not require starts_on or ends_on" do
+    med = Medication.new(
+      user: @user, name: "Regular Med", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 200,
+      course: false, starts_on: nil, ends_on: nil
+    )
+    assert med.valid?, med.errors.full_messages.inspect
+  end
+
+  # --- course_active? predicate ---
+
+  test "course_active? returns true when course: true and ends_on >= today" do
+    assert medications(:alice_active_course).course_active?
+  end
+
+  test "course_active? returns false when course: true and ends_on < today" do
+    assert_not medications(:alice_archived_course).course_active?
+  end
+
+  test "course_active? returns false when course: false" do
+    assert_not medications(:alice_reliever).course_active?
+  end
+
+  # --- low_stock? excludes active courses ---
+
+  test "low_stock? returns false for an active course regardless of supply level" do
+    # 10 units / 2 per day = 5 days — would normally be low stock
+    med = Medication.create!(
+      user: @user, name: "Active Course Low", medication_type: :other,
+      standard_dose_puffs: 1, starting_dose_count: 10, doses_per_day: 2,
+      course: true, starts_on: Date.today, ends_on: 5.days.from_now.to_date
+    )
+    assert_not med.low_stock?
+  end
+
+  test "low_stock? applies normally to archived courses" do
+    # An archived course may still have supply math — we don't suppress the flag there
+    med = Medication.create!(
+      user: @user, name: "Archived Course Low", medication_type: :other,
+      standard_dose_puffs: 1, starting_dose_count: 10, doses_per_day: 2,
+      course: true, starts_on: 14.days.ago.to_date, ends_on: 1.day.ago.to_date
+    )
+    # 10 / 2 = 5 days < 14 — low_stock? is true for archived courses
+    assert med.low_stock?
+  end
 end

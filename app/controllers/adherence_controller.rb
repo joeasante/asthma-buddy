@@ -7,9 +7,11 @@ class AdherenceController < ApplicationController
 
     date_range = (@period - 1).days.ago.to_date..Date.current
 
-    # Only preventers with a doses_per_day schedule — same rule as dashboard
+    # Only preventers with a doses_per_day schedule — same rule as dashboard.
+    # Excludes course medications (COURSE-03): temporary courses are not adherence history targets.
     preventers = user.medications
       .where(medication_type: :preventer)
+      .where(course: false)
       .where.not(doses_per_day: nil)
       .chronological
 
