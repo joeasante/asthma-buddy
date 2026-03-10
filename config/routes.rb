@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   delete "profile/avatar", to: "profiles#remove_avatar", as: :profile_avatar
 
   get "settings", to: "settings#show", as: :settings
+  resource :account, only: [:destroy]
 
   scope "/settings", module: :settings, as: :settings do
     resources :medications, only: %i[index new create edit update destroy] do
@@ -49,6 +50,8 @@ Rails.application.routes.draw do
     post "step_2",     to: "onboarding#submit_2",  as: :submit_2
     get  "skip/:step", to: "onboarding#skip",      as: :skip,     constraints: { step: /[1-3]/ }
   end
+
+  post "cookie-notice/dismiss", to: "cookie_notices#dismiss", as: :cookie_notice_dismiss
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms
