@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 15.1 (Reliever Usage History) — COMPLETE
-Plan: 15.1-03 complete. All plans in Phase 15.1 delivered.
-Status: Phase 15.1 complete. All 3 plans delivered.
-Last activity: 2026-03-10 — Phase 15.1 Plan 03 complete: 12-week bar chart mobile overflow fixed with .reliever-bars-scroll wrapper, touch momentum scrolling, 2.25rem column min-width. UAT gap #4 closed. Visual verification approved.
+Phase: Phase 16 (Account Management and Legal) — IN PROGRESS
+Plan: 16-03 complete. Dismissible session cookie notice banner delivered.
+Status: Phase 16 Plans 16-01, 16-02, and 16-03 delivered.
+Last activity: 2026-03-10 — Phase 16 Plan 03 complete: Dismissible session cookie notice banner (ePrivacy LEGAL-03). CookieNoticesController#dismiss (204), ApplicationController before_action, _cookie_notice partial with aria roles, cookie_notice Stimulus controller with CSS transition, system tests (2/2 pass). 374 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -95,6 +95,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 16 Plan 02 Decisions (2026-03-10)
+
+- **Legal page pattern**: `content_for :title` → `page-header` div → `section-card` div → back link — established by 16-01 stub, enriched by 16-02
+- **Session cookie references PECR**: UK PECR (Privacy and Electronic Communications Regulations) is the correct legal basis for cookie exemptions, not just GDPR — ICO guidance requires this distinction for essential cookies
+- **ICO contact details verbatim**: Phone number (0303 123 1113) and ico.org.uk URL included in Privacy Policy — gives users a genuine, actionable complaints path required by UK GDPR Art. 13
+- **14-day advance notice for material changes**: Explicitly stated in both Terms and Privacy — creates a concrete, enforceable commitment before public launch
+- **Special category data framing**: UK GDPR Art. 9 and Art. 9(2)(a) cited explicitly; explicit consent stated as lawful basis for health data processing
 
 ### Phase 15.1 Plan 03 Decisions (2026-03-10)
 
@@ -267,5 +275,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 15.1 Plan 03 complete — 12-week bar chart overflow fixed (.reliever-bars-scroll wrapper, touch scrolling, 2.25rem min-width); visual verification approved; UAT gap #4 closed. Phase 15.1 fully complete (3/3 plans).
+Stopped at: Phase 16 Plan 02 complete — Terms of Service and Privacy Policy enriched with UK GDPR-compliant content (10 sections each). Special category health data (Art. 9), all 7 UK GDPR rights, ICO complaints route, PECR cookie exemption. Both pages accessible unauthenticated. Footer links already present on all layouts.
 Resume file: None
