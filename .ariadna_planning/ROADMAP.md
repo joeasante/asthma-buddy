@@ -155,6 +155,25 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ---
 
+### Phase 15.1: Reliever Usage History (INSERTED)
+
+**Goal**: A user can view their reliever usage history — showing dose frequency over time with a 2×/week threshold indicator — and see how their reliever usage correlates with their peak flow trend.
+**Why this matters**: Using a reliever more than twice a week is a clinical marker of poorly controlled asthma. This dedicated view surfaces that pattern clearly so the user has concrete evidence to discuss with their GP — turning raw dose logs into a meaningful safety signal.
+**Depends on**: Phase 15
+**Requirements**: REL-01, REL-02
+
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user can navigate to the Reliever Usage page and see a daily breakdown of reliever puffs logged over the past 7 or 30 days, with a period toggle.
+  2. Weeks where reliever usage exceeded 2 times are clearly highlighted, making it easy to spot poorly-controlled periods.
+  3. The view includes a correlation view or summary showing reliever usage alongside peak flow readings over the same period.
+  4. Only the current user's data is shown; a user cannot access another user's reliever usage history.
+
+**Plans:** 2 plans
+- [ ] 15.1-01-PLAN.md — Route, RelieverUsageController (inline weekly queries, GINA bands, correlation), index view (CSS bar chart, eyebrow pill, turbo-frame toggle, empty states), reliever_usage.css, dashboard link
+- [ ] 15.1-02-PLAN.md — Controller integration tests and dose_log fixtures for weekly reliever patterns
+
+---
+
 ### Phase 16: Account Management & Legal
 
 **Goal**: A user can permanently delete their account and all associated data; deletion requires typing "DELETE" as confirmation; and the app has publicly accessible Terms of Service, Privacy Policy, and a first-visit cookie notice.
@@ -209,6 +228,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
 | 14. Adherence Dashboard | 3/3 | Complete ✓ | 2026-03-10 |
 | 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
+| 15.1. Reliever Usage History | 0/2 | Not started | - |
 | 16. Account Management & Legal | 0/3 | Not started | - |
 | 17. Onboarding Flow | 0/3 | Not started | - |
 | 18. Temporary Medication Courses | 0/3 | Not started | - |
