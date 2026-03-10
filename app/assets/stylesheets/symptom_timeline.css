@@ -186,11 +186,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes skeleton-sweep {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
   .timeline-skeleton-row {
     background: linear-gradient(
       90deg,
@@ -751,4 +746,13 @@ turbo-frame[busy] .timeline-list     { display: none; }
   .trend-segment {
     transition: none;
   }
+}
+
+/* Embedded variant — used in single-record context (show page) where the
+   standalone card chrome (border, shadow) should not appear */
+.timeline-row--embedded {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
 }

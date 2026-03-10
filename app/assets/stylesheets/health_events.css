@@ -205,3 +205,10 @@
     opacity: 0.7;
   }
 }
+
+/* Flat variant — used in single-record context (show page) where the list
+   card chrome (border, padding) should not appear */
+.event-row--flat {
+  border-bottom: none;
+  padding: 0;
+}

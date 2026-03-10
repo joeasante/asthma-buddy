@@ -1,6 +1,6 @@
-<%# Replace the table row with updated data %>
+<%# Replace the card with updated data %>
 <%= turbo_stream.replace dom_id(@peak_flow_reading),
-      partial: "reading_row",
+      partial: "reading_card",
       locals: { reading: @peak_flow_reading } %>
 
 <%# Toast notification %>

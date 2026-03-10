@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 15 (Health Events) — COMPLETE
-Plan: 15-03 complete — chart_controller.js afterDraw marker plugin, DashboardController @health_event_markers, system test
-Status: 3/3 plans done. 329+ tests passing (no regressions). Phase 15 complete.
-Last activity: 2026-03-09 — Phase 15: HealthEvent model/fixtures/tests (15-01), Medical History system tests (15-02), chart marker integration (15-03).
+Phase: Phase 15.1 (Reliever Usage History) — NOT STARTED
+Plan: None yet. Phase 14 and 15 complete. Phase 15.1 inserted 2026-03-10.
+Status: Ready to plan Phase 15.1.
+Last activity: 2026-03-10 — Phase 14 marked complete (already built), Phase 15.1 added to roadmap, adherence page renamed to "Preventer History", "Medication Log" buttons renamed, show pages added for PeakFlow/SymptomLogs/HealthEvents, 25 code review findings fixed.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -229,6 +229,7 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 
 ### Roadmap Evolution
 
+- Phase 15.1 inserted after Phase 15: Reliever Usage History — dedicated view showing reliever dose frequency over time, 2x/week threshold indicator, correlation with peak flow trends (INSERTED)
 - Phase 18 added: Temporary Medication Courses — short-duration prescriptions with start/end date, auto-archive, excluded from adherence/low-stock
 - Phase 19 added: Notifications — in-app feed for low stock, missed doses, peak flow reminders; unread nav badge; Turbo Stream mark-read
 - Phase 20 added: Legal Pages, Cookie Banner & Error Pages — Terms/Privacy/Cookies pages, dismissible cookie consent banner, branded 404/500/maintenance error pages

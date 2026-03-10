@@ -10,6 +10,39 @@ class SymptomLogsControllerTest < ActionDispatch::IntegrationTest
     @symptom_log = symptom_logs(:alice_wheezing)
   end
 
+  # --- SHOW ---
+
+  test "show renders for owner" do
+    get symptom_log_url(@symptom_log)
+    assert_response :success
+  end
+
+  test "show returns 404 for another user's entry" do
+    get symptom_log_url(symptom_logs(:bob_coughing))
+    assert_response :not_found
+  end
+
+  test "show redirects unauthenticated user to sign in" do
+    sign_out
+    get symptom_log_url(@symptom_log)
+    assert_redirected_to new_session_url
+  end
+
+  test "GET /symptom_logs/:id.json returns log fields" do
+    get symptom_log_url(@symptom_log), as: :json
+    assert_response :ok
+    json = response.parsed_body
+    assert json.key?("id")
+    assert json.key?("symptom_type")
+    assert json.key?("severity")
+    assert json.key?("triggers")
+  end
+
+  test "GET /symptom_logs/:id.json returns 404 for another user's entry" do
+    get symptom_log_url(symptom_logs(:bob_coughing)), as: :json
+    assert_response :not_found
+  end
+
   # --- INDEX ---
 
   test "index redirects unauthenticated user to sign in" do

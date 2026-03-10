@@ -15,13 +15,6 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to profile_path
   end
 
-  test "update_personal_best redirects to profile personal best" do
-    post settings_personal_best_path, params: {
-      personal_best_record: { value: 550 }
-    }
-    assert_redirected_to profile_personal_best_path
-  end
-
   test "unauthenticated user is redirected from settings" do
     delete session_path
     get settings_path

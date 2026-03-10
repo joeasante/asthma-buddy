@@ -16,7 +16,14 @@ class SymptomLogsController < ApplicationController
     end
   }
 
-  before_action :set_symptom_log, only: %i[ edit update destroy ]
+  before_action :set_symptom_log, only: %i[ show edit update destroy ]
+
+  def show
+    respond_to do |format|
+      format.html
+      format.json { render json: symptom_log_json(@symptom_log) }
+    end
+  end
 
   def index
     # Resolve date bounds from preset or custom params

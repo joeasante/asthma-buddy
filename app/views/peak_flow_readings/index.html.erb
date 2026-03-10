@@ -75,53 +75,45 @@
   </div>
 <% end %>
 
-<%# Period summary stats %>
-<div class="dash-stats" style="margin-bottom: 1.25rem;">
-  <div class="dash-stat">
-    <span class="dash-stat-label">Readings</span>
-    <% if @period_count.to_i > 0 %>
-      <span class="dash-stat-value"><%= @period_count %></span>
-      <span class="dash-stat-sub">in this period</span>
-    <% else %>
-      <span class="dash-stat-value dash-stat-value--empty">&mdash;</span>
-      <span class="dash-stat-sub">No readings</span>
-    <% end %>
-  </div>
-  <div class="dash-stat">
-    <span class="dash-stat-label">Average</span>
-    <% if @period_avg %>
-      <span class="dash-stat-value"><%= @period_avg %><span class="dash-stat-unit"> L/min</span></span>
-      <% if @current_personal_best %>
-        <span class="dash-stat-sub"><%= ((@period_avg.to_f / @current_personal_best.value) * 100).round %>% of personal best</span>
-      <% end %>
-    <% else %>
-      <span class="dash-stat-value dash-stat-value--empty">&mdash;</span>
-      <span class="dash-stat-sub">No data</span>
-    <% end %>
-  </div>
-  <div class="dash-stat">
-    <span class="dash-stat-label">Best this period</span>
-    <% if @period_best %>
-      <span class="dash-stat-value"><%= @period_best %><span class="dash-stat-unit"> L/min</span></span>
-      <% if @current_personal_best %>
-        <span class="dash-stat-sub"><%= ((@period_best.to_f / @current_personal_best.value) * 100).round %>% of personal best</span>
-      <% end %>
-    <% else %>
-      <span class="dash-stat-value dash-stat-value--empty">&mdash;</span>
-      <span class="dash-stat-sub">No data</span>
-    <% end %>
-  </div>
-</div>
-
-<%# Readings history — wrapped in Turbo Frame for filter navigation %>
+<%# Everything below lives inside the Turbo Frame so filters, stats, and chart
+    all update together on every filter/page change. %>
 <section aria-label="Peak flow reading history">
   <%= turbo_frame_tag "readings_content" do %>
+
+    <%# 1. Filters — always at the top so the user sets context before seeing results %>
+    <%= render "filter_bar",
+          active_preset: @active_preset,
+          start_date: @start_date,
+          end_date: @end_date,
+          active_zone: @active_zone %>
+
+    <%# 2. Period stats — compact strip so it reads as context, not content %>
+    <div class="pf-stat-strip" aria-label="Period summary">
+      <% if @period_count.to_i > 0 %>
+        <span class="pf-stat-strip-item">
+          <strong><%= @period_count %></strong> <%= "reading".pluralize(@period_count) %>
+        </span>
+        <% if @period_avg %>
+          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
+          <span class="pf-stat-strip-item">
+            avg <strong><%= @period_avg %></strong> L/min<% if @period_avg_pct %> <span class="pf-stat-strip-sub">(<%= @period_avg_pct %>%)</span><% end %>
+          </span>
+        <% end %>
+        <% if @period_best %>
+          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
+          <span class="pf-stat-strip-item">
+            best <strong><%= @period_best %></strong> L/min<% if @period_best_pct %> <span class="pf-stat-strip-sub">(<%= @period_best_pct %>%)</span><% end %>
+          </span>
+        <% end %>
+      <% else %>
+        <span class="pf-stat-strip-item pf-stat-strip-item--empty">No readings in this period</span>
+      <% end %>
+    </div>
+
+    <%# 3. Chart — comes after filters so the user understands what they're looking at %>
     <% if @chart_data&.any? %>
-      <div class="dash-section-header">
-        <h2>Peak Flow history</h2>
-      </div>
       <div class="chart-section"
-           style="margin-bottom: 1rem;"
+           style="margin-bottom: 1.25rem;"
            data-controller="chart"
            data-chart-type-value="peakflow-zones"
            data-chart-data-value="<%= @chart_data.to_json %>">
@@ -152,12 +144,7 @@
       </div>
     <% end %>
 
-    <%= render "filter_bar",
-          active_preset: @active_preset,
-          start_date: @start_date,
-          end_date: @end_date,
-          active_zone: @active_zone %>
-
+    <%# 4. Reading list or empty state %>
     <% if @peak_flow_readings.empty? %>
       <div class="empty-state">
         <div class="empty-state-icon" aria-hidden="true">
@@ -167,10 +154,10 @@
             <path d="M20 20C20 20 21.5 22 24 22C26.5 22 28 20 28 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <% if @active_zone || @active_preset || @start_date || @end_date %>
+        <% if @active_zone || @active_preset == "custom" || @start_date || @end_date %>
           <p class="empty-state-heading">No readings match this filter</p>
           <p class="empty-state-body">Try clearing the zone or date filter to see all your readings.</p>
-          <%= link_to "Clear filters", peak_flow_readings_path, class: "btn-primary" %>
+          <%= link_to "Clear filters", peak_flow_readings_path, class: "btn-primary", data: { turbo_frame: "readings_content" } %>
         <% else %>
           <p class="empty-state-heading">No readings yet</p>
           <p class="empty-state-body">Record your peak flow each morning to track trends over time.</p>
@@ -178,50 +165,37 @@
         <% end %>
       </div>
     <% else %>
-      <%# Skeleton rows — visible only when turbo-frame is loading (CSS-driven) %>
+      <%# Skeleton — shown by CSS while turbo-frame[busy], mimics card shape %>
       <div class="pf-skeleton-block" aria-hidden="true">
         <% 3.times do %>
-          <div class="pf-skeleton-row">
-            <div class="skeleton pf-skeleton-cell pf-skeleton-cell--date"></div>
-            <div class="skeleton pf-skeleton-cell pf-skeleton-cell--value"></div>
-            <div class="skeleton pf-skeleton-cell pf-skeleton-cell--badge"></div>
-            <div class="skeleton pf-skeleton-cell pf-skeleton-cell--actions"></div>
+          <div class="pf-skeleton-day-group">
+            <div class="skeleton pf-skeleton-date-label"></div>
+            <div class="skeleton pf-skeleton-card"></div>
+            <div class="skeleton pf-skeleton-card pf-skeleton-card--short"></div>
           </div>
         <% end %>
       </div>
 
-      <div class="table-wrap">
-        <table class="data-table pf-readings-table" aria-label="Peak flow readings">
-          <thead>
-            <tr>
-              <th scope="col">Date &amp; Time</th>
-              <th scope="col">Reading</th>
-              <th scope="col">Zone</th>
-              <th scope="col"><span class="sr-only">Actions</span></th>
-            </tr>
-          </thead>
-          <tbody id="readings_tbody">
-            <% @peak_flow_readings.each do |reading| %>
-              <%= render "reading_row", reading: reading %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-
-      <%# Zone legend %>
-      <div class="pf-zone-legend" aria-label="Zone key">
-        <span class="pf-zone-legend-item">
-          <span class="pf-zone-legend-dot pf-zone-legend-dot--green" aria-hidden="true"></span>
-          Green zone (&ge;80% of personal best)
-        </span>
-        <span class="pf-zone-legend-item">
-          <span class="pf-zone-legend-dot pf-zone-legend-dot--yellow" aria-hidden="true"></span>
-          Yellow zone (50–79%)
-        </span>
-        <span class="pf-zone-legend-item">
-          <span class="pf-zone-legend-dot pf-zone-legend-dot--red" aria-hidden="true"></span>
-          Red zone (&lt;50%)
-        </span>
+      <%# Grouped-by-date card list %>
+      <div class="pf-day-list">
+        <% @grouped_readings.each do |date, readings| %>
+          <div class="pf-day-group">
+            <time class="pf-day-date" datetime="<%= date.iso8601 %>">
+              <% if date == Date.current %>
+                Today &middot; <%= date.strftime("%-d %b %Y") %>
+              <% elsif date == Date.yesterday %>
+                Yesterday &middot; <%= date.strftime("%-d %b %Y") %>
+              <% else %>
+                <%= date.strftime("%A, %-d %B %Y") %>
+              <% end %>
+            </time>
+            <div class="pf-day-readings">
+              <% readings.sort_by { |r| r.time_of_day == "morning" ? 0 : 1 }.each do |reading| %>
+                <%= render "reading_card", reading: reading %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
 
       <%= render "pagination",
@@ -232,5 +206,6 @@
             end_date: @end_date,
             active_zone: @active_zone %>
     <% end %>
+
   <% end %>
 </section>

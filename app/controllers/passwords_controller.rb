@@ -19,7 +19,7 @@ class PasswordsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to new_password_path, notice: "sent" }
+      format.html { redirect_to new_session_path, notice: "Password reset instructions sent (if user with that email address exists)." }
       format.json { render json: { message: "Password reset instructions sent (if user with that email address exists)." }, status: :ok }
     end
   end

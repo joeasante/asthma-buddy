@@ -98,7 +98,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
   test "health_event_markers JSON includes expected keys for events in window" do
     # Create an event within the chart window
-    event = HealthEvent.create!(user: @user, event_type: :illness, recorded_at: Date.current.to_datetime + 10.hours)
+    event = HealthEvent.create!(user: @user, event_type: :illness, recorded_at: Time.current - 1.hour)
 
     # Force chart to render
     reading = PeakFlowReading.create!(time_of_day: :morning, 

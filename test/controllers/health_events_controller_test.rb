@@ -9,6 +9,40 @@ class HealthEventsControllerTest < ActionDispatch::IntegrationTest
     @health_event = health_events(:alice_gp_appointment)
   end
 
+  # --- SHOW ---
+
+  test "show renders for owner" do
+    get health_event_url(@health_event)
+    assert_response :success
+  end
+
+  test "show returns 404 for another user's event" do
+    get health_event_url(health_events(:bob_hospital))
+    assert_response :not_found
+  end
+
+  test "show redirects unauthenticated user to sign in" do
+    sign_out
+    get health_event_url(@health_event)
+    assert_redirected_to new_session_url
+  end
+
+  test "GET /medical-history/:id.json returns event fields" do
+    get health_event_url(@health_event), as: :json
+    assert_response :ok
+    json = response.parsed_body
+    assert json.key?("id")
+    assert json.key?("event_type")
+    assert json.key?("event_type_label")
+    assert json.key?("ongoing")
+    assert json.key?("recorded_at")
+  end
+
+  test "GET /medical-history/:id.json returns 404 for another user's event" do
+    get health_event_url(health_events(:bob_hospital)), as: :json
+    assert_response :not_found
+  end
+
   # --- INDEX ---
 
   test "index renders for authenticated user" do

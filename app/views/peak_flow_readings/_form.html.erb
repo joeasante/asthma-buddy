@@ -6,7 +6,7 @@
   </div>
 <% end %>
 
-<%= form_with model: peak_flow_reading, data: { turbo: true } do |form| %>
+<%= form_with model: peak_flow_reading, data: { turbo: true, controller: "tod-sync" } do |form| %>
   <%# Morning / Evening toggle — shown prominently as it's the key clinical input.
       Plain <label> elements (not form.label) so the wrapping label activates the
       contained radio via DOM containment — no mismatched `for` attribute needed. %>
@@ -14,11 +14,11 @@
     <span class="label">Session</span>
     <div class="tod-toggle" role="group" aria-label="Time of day">
       <label class="tod-option tod-option--morning">
-        <%= form.radio_button :time_of_day, "morning", class: "sr-only" %>
+        <%= form.radio_button :time_of_day, "morning", class: "sr-only", data: { "tod-sync-target": "morning" } %>
         Morning
       </label>
       <label class="tod-option tod-option--evening">
-        <%= form.radio_button :time_of_day, "evening", class: "sr-only" %>
+        <%= form.radio_button :time_of_day, "evening", class: "sr-only", data: { "tod-sync-target": "evening" } %>
         Evening
       </label>
     </div>
@@ -79,7 +79,7 @@
       <%= form.datetime_local_field :recorded_at,
             step: 60,
             class: "#{"field-input--error" if peak_flow_reading.errors[:recorded_at].any?}",
-            data: { "now-target": "input" } %>
+            data: { "now-target": "input", "tod-sync-target": "datetime", action: "change->tod-sync#sync" } %>
       <button type="button" class="btn-now" data-action="now#fill">Right now</button>
     </div>
     <% if peak_flow_reading.errors[:recorded_at].any? %>

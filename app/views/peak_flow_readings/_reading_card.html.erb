@@ -1,0 +1,24 @@
+<%= link_to peak_flow_reading_path(reading),
+      id: dom_id(reading),
+      class: "pf-reading-card pf-reading-card--#{reading.zone_css_modifier}",
+      aria: { label: "#{reading.time_of_day_label} reading: #{reading.value} L/min#{", #{reading.zone.capitalize} zone" if reading.zone}" } do %>
+  <span class="pf-reading-card-body">
+    <span class="tod-badge tod-badge--<%= reading.time_of_day %>"><%= reading.time_of_day_label %></span>
+    <span class="pf-reading-value"><%= reading.value %></span>
+    <span class="pf-reading-unit">L/min</span>
+    <span class="zone-badge zone-badge--<%= reading.zone_css_modifier %>">
+      <%= reading.zone&.capitalize || "—" %>
+    </span>
+  </span>
+  <span class="pf-reading-card-aside">
+    <time class="pf-reading-time" datetime="<%= reading.recorded_at.iso8601 %>">
+      <%= reading.recorded_at.strftime("%H:%M") %>
+    </time>
+    <% if reading.zone && reading.zone_percentage %>
+      <span class="pf-reading-pct"><%= reading.zone_percentage %>%</span>
+    <% end %>
+    <svg class="pf-reading-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+<% end %>

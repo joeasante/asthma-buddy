@@ -142,100 +142,337 @@
 }
 
 /* --------------------------------------------------------------------------
-   Readings table
+   Period stat strip — compact inline summary between filter bar and chart.
+   Intentionally frameless: context, not content.
    -------------------------------------------------------------------------- */
 
-.pf-readings-table {
-  width: 100%;
-}
-
-.pf-td-datetime {
-  white-space: nowrap;
-}
-
-.pf-td-date {
-  display: block;
-  font-weight: 500;
+.pf-stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.9rem;
   color: var(--text-2);
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
 }
 
-.pf-td-time {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--text-3);
-  margin-top: 0.125rem;
-}
-
-.pf-td-value {
-  white-space: nowrap;
-}
-
-.pf-row-value {
+.pf-stat-strip-item strong {
+  color: var(--text);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pf-stat-strip-sep {
+  color: var(--text-4);
+  font-size: 0.75rem;
+}
+
+.pf-stat-strip-sub {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+.pf-stat-strip-item--empty {
+  color: var(--text-3);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Filter card — white card container for all filter controls.
+   Sits flush in the same visual stack as the chart and reading cards.
+   -------------------------------------------------------------------------- */
+
+.pf-filter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.875rem;
+}
+
+.pf-filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pf-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3125rem;
+}
+
+/* Thin vertical rule between period and zone groups */
+.pf-filter-sep {
+  width: 1px;
+  height: 1.125rem;
+  background: var(--border-mid);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Compact chips — smaller than the symptom timeline's filter-chip */
+.pf-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  min-height: 28px;
+  padding: 0.1875rem 0.6875rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text-2);
+  background: var(--surface);
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.pf-filter-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.pf-filter-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.pf-filter-chip--active {
+  background: var(--gray-900);
+  color: var(--surface);
+  border-color: var(--gray-900);
+}
+
+.pf-filter-chip--active:hover {
+  background: var(--gray-900);
+  color: var(--surface);
+  border-color: var(--gray-900);
+}
+
+/* Zone-coloured active states */
+.pf-filter-chip--zone-green.pf-filter-chip--active  {
+  background: var(--severity-mild-bg);
+  color: var(--severity-mild-text);
+  border-color: var(--severity-mild);
+}
+
+.pf-filter-chip--zone-yellow.pf-filter-chip--active {
+  background: var(--severity-moderate-bg);
+  color: var(--severity-moderate-text);
+  border-color: var(--severity-moderate);
+}
+
+.pf-filter-chip--zone-red.pf-filter-chip--active {
+  background: var(--severity-severe-bg);
+  color: var(--severity-severe);
+  border-color: var(--severity-severe);
+}
+
+/* Date range row — revealed only when Custom is active */
+.pf-filter-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.5rem;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border);
+}
+
+.pf-filter-date-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-3);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.date-input--sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  height: 28px;
+}
+
+.btn-apply-dates--sm {
+  min-height: 28px;
+  padding: 0.1875rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+/* --------------------------------------------------------------------------
+   Day-grouped reading list
+   -------------------------------------------------------------------------- */
+
+.pf-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: 1.25rem;
+}
+
+.pf-day-group { }
+
+.pf-day-date {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: var(--space-sm);
+}
+
+.pf-day-readings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* --------------------------------------------------------------------------
+   Reading card — clickable row linking to show page
+   -------------------------------------------------------------------------- */
+
+.pf-reading-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0.875rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-mid);
+  border-radius: var(--radius-xl);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.pf-reading-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-mid);
+  text-decoration: none;
+  color: inherit;
+}
+
+.pf-reading-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.pf-reading-card--green  { border-left-color: var(--severity-mild); }
+.pf-reading-card--yellow { border-left-color: var(--severity-moderate); }
+.pf-reading-card--red    { border-left-color: var(--severity-severe); }
+.pf-reading-card--none   { border-left-color: var(--border-mid); }
+
+.pf-reading-card-body {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.pf-reading-card-aside {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.pf-reading-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
-.pf-row-unit {
-  font-size: 0.8rem;
+.pf-reading-unit {
+  font-size: 0.8125rem;
   color: var(--text-4);
   font-weight: 400;
-  margin-left: 0.125rem;
 }
 
-.pf-td-zone {
-  white-space: nowrap;
+.pf-reading-time {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
 }
 
-.pf-td-actions {
-  white-space: nowrap;
-  text-align: right;
+.pf-reading-pct {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  font-weight: 500;
 }
 
-.pf-td-actions .btn-edit,
-.pf-td-actions .btn-delete {
-  font-size: 0.875rem;
-}
-
-/* Dim the table during turbo-frame loading */
-turbo-frame[busy] .pf-readings-table {
-  opacity: 0.5;
-  pointer-events: none;
+.pf-reading-chevron {
+  color: var(--text-4);
+  flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------
-   Skeleton rows — visible only when frame is busy
+   Filter chip coloured dots — inline legend on zone chips
+   -------------------------------------------------------------------------- */
+
+.pf-filter-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-filter-chip-dot--green  { background: var(--severity-mild); }
+.pf-filter-chip-dot--yellow { background: var(--severity-moderate); }
+.pf-filter-chip-dot--red    { background: var(--severity-severe); }
+
+/* --------------------------------------------------------------------------
+   Skeleton — card-shaped placeholders shown while turbo-frame[busy]
    -------------------------------------------------------------------------- */
 
 .pf-skeleton-block {
   display: none;
 }
 
-.pf-skeleton-row {
+.pf-skeleton-day-group {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: var(--space-lg);
 }
 
-.pf-skeleton-cell {
-  border-radius: var(--radius-md);
-  height: 1rem;
+.pf-skeleton-date-label {
+  height: 0.625rem;
+  width: 6rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-xs);
 }
 
-.pf-skeleton-cell--date    { width: 7rem; }
-.pf-skeleton-cell--value   { width: 4rem; }
-.pf-skeleton-cell--badge   { width: 5rem; border-radius: var(--radius-pill); }
-.pf-skeleton-cell--actions { width: 6rem; margin-left: auto; }
+.pf-skeleton-card {
+  height: 3.25rem;
+  border-radius: var(--radius-xl);
+}
+
+.pf-skeleton-card--short {
+  width: 75%;
+}
 
 turbo-frame[busy] .pf-skeleton-block {
   display: block;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  margin-bottom: 1rem;
+}
+
+/* Dim the list while loading so the skeleton reads as a replacement, not an addition */
+turbo-frame[busy] .pf-day-list {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -288,28 +525,6 @@ turbo-frame[busy] .pf-skeleton-block {
 .pf-zone-legend-dot--green  { background: var(--severity-mild); }
 .pf-zone-legend-dot--yellow { background: var(--severity-moderate); }
 .pf-zone-legend-dot--red    { background: var(--severity-severe); }
-
-/* --------------------------------------------------------------------------
-   Zone filter chips (zone-specific colour accents)
-   -------------------------------------------------------------------------- */
-
-.filter-chip--zone-green.filter-chip--active  {
-  background: var(--severity-mild-bg);
-  color: var(--severity-mild-text);
-  border-color: var(--severity-mild);
-}
-
-.filter-chip--zone-yellow.filter-chip--active {
-  background: var(--severity-moderate-bg);
-  color: var(--severity-moderate-text);
-  border-color: var(--severity-moderate);
-}
-
-.filter-chip--zone-red.filter-chip--active {
-  background: var(--severity-severe-bg);
-  color: var(--severity-severe);
-  border-color: var(--severity-severe);
-}
 
 /* --------------------------------------------------------------------------
    Peak flow value input — centred big number entry widget
@@ -443,75 +658,10 @@ turbo-frame[busy] .pf-skeleton-block {
 }
 
 /* --------------------------------------------------------------------------
-   Mobile responsive — card-style rows for the table (≤ 640px)
+   Mobile responsive
    -------------------------------------------------------------------------- */
 
 @media (max-width: 640px) {
-  .table-wrap {
-    border: none;
-    box-shadow: none;
-  }
-
-  .pf-readings-table thead {
-    display: none;
-  }
-
-  .pf-readings-table tbody,
-  .pf-readings-table tr {
-    display: block;
-  }
-
-  .pf-table-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 0.625rem;
-  }
-
-  /* Reset td to block in card layout — override data-table defaults */
-  .pf-table-row td,
-  .pf-table-row td:last-child {
-    display: block;
-    padding: 0;
-    border-bottom: none;
-    text-align: left;
-  }
-
-  .pf-td-datetime {
-    order: 2;
-  }
-
-  .pf-td-value {
-    order: 1;
-  }
-
-  .pf-td-zone {
-    order: 3;
-  }
-
-  .pf-td-actions {
-    order: 4;
-    text-align: left;
-    margin-top: 0.25rem;
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .pf-td-date {
-    display: inline;
-  }
-
-  .pf-td-time {
-    display: inline;
-    margin-top: 0;
-    margin-left: 0.25rem;
-  }
-
   .pf-pb-hero {
     flex-direction: column;
     align-items: flex-start;
@@ -536,11 +686,6 @@ turbo-frame[busy] .pf-skeleton-block {
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes skeleton-sweep {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
   .skeleton {
     background: linear-gradient(
       90deg,
@@ -557,10 +702,6 @@ turbo-frame[busy] .pf-skeleton-block {
   .skeleton {
     background: var(--surface-alt);
     animation: none;
-  }
-
-  turbo-frame[busy] .pf-readings-table {
-    opacity: 0.45;
   }
 }
 

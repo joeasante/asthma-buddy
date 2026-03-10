@@ -52,10 +52,59 @@
     </section>
   <% end %>
 
+  <%# ── Today's Doses ───────────────────────────────────────────── %>
+  <% if @preventer_adherence.any? %>
+    <% all_on_track = @preventer_adherence.all? { |e| e[:result].status == :on_track } %>
+    <section class="dash-adherence" aria-label="Preventer adherence today">
+      <div class="dash-section-header">
+        <h2>Today's Doses</h2>
+        <%= link_to "Preventer History", adherence_path, class: "dash-section-link" %>
+        <%# TODO Phase 15.1: add Reliever Usage link here (reliever_usage_path, class: "dash-section-link") %>
+      </div>
+      <ul class="dash-adherence-list">
+        <% if all_on_track %>
+          <li class="dash-adherence-item dash-adherence-item--on_track dash-adherence-item--all-on-track">
+            <span class="dash-adherence-all-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2 6l2.5 2.5 5.5-5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span>All medications taken today</span>
+          </li>
+        <% else %>
+          <% @preventer_adherence.each do |entry| %>
+            <%= render "dashboard/adherence_card",
+                  medication: entry[:medication],
+                  result: entry[:result] %>
+          <% end %>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <%# ── Primary CTAs ────────────────────────────────────────────── %>
+  <div class="dash-quick-log" aria-label="Quick log actions">
+    <%= link_to new_peak_flow_reading_path, class: "dash-quick-btn dash-quick-btn--pf" do %>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <span>Log peak flow</span>
+    <% end %>
+    <%= link_to new_symptom_log_path, class: "dash-quick-btn dash-quick-btn--sym" do %>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <line x1="9" y1="12" x2="15" y2="12"/>
+        <line x1="9" y1="16" x2="13" y2="16"/>
+      </svg>
+      <span>Log symptom</span>
+    <% end %>
+  </div>
+
   <%# Declare here so both This Week and the empty-state check can use it %>
   <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
 
-  <%# ── This Week — summary stats + chart (moved up for priority) ── %>
+  <%# ── This Week — summary stats + chart ───────────────────────── %>
   <% unless no_data %>
     <section class="dash-week-section" aria-label="This week's data">
       <div class="dash-section-header">
@@ -171,54 +220,6 @@
     </section>
   <% end %>
 
-  <%# ── Primary CTAs ────────────────────────────────────────────── %>
-  <div class="dash-quick-log" aria-label="Quick log actions">
-    <%= link_to new_peak_flow_reading_path, class: "dash-quick-btn dash-quick-btn--pf" do %>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      <span>Log peak flow</span>
-    <% end %>
-    <%= link_to new_symptom_log_path, class: "dash-quick-btn dash-quick-btn--sym" do %>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-        <rect x="9" y="3" width="6" height="4" rx="1"/>
-        <line x1="9" y1="12" x2="15" y2="12"/>
-        <line x1="9" y1="16" x2="13" y2="16"/>
-      </svg>
-      <span>Log symptom</span>
-    <% end %>
-  </div>
-
-  <%# ── Preventer adherence ─────────────────────────────────────── %>
-  <% if @preventer_adherence.any? %>
-    <% all_on_track = @preventer_adherence.all? { |e| e[:result].status == :on_track } %>
-    <section class="dash-adherence" aria-label="Preventer adherence today">
-      <div class="dash-section-header">
-        <h2>Today's Doses</h2>
-        <%= link_to "Medication Log", adherence_path, class: "dash-section-link" %>
-      </div>
-      <ul class="dash-adherence-list">
-        <% if all_on_track %>
-          <li class="dash-adherence-item dash-adherence-item--on_track dash-adherence-item--all-on-track">
-            <span class="dash-adherence-all-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M2 6l2.5 2.5 5.5-5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span>All medications taken today</span>
-          </li>
-        <% else %>
-          <% @preventer_adherence.each do |entry| %>
-            <%= render "dashboard/adherence_card",
-                  medication: entry[:medication],
-                  result: entry[:result] %>
-          <% end %>
-        <% end %>
-      </ul>
-    </section>
-  <% end %>
-
   <%# ── Low-stock medications ───────────────────────────────────── %>
   <% if @low_stock_medications.any? %>
     <section class="dash-medications" aria-label="Low stock medications">
@@ -229,10 +230,12 @@
       <ul class="dash-low-stock-list">
         <% @low_stock_medications.each do |medication| %>
           <li class="dash-low-stock-item">
-            <span class="low-stock-badge">Low stock</span>
-            <span class="dash-low-stock-name"><%= medication.name %></span>
-            <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left</span>
-            <%= link_to "Refill", settings_medications_path, class: "dash-low-stock-refill-link" %>
+            <%= link_to edit_settings_medication_path(medication), class: "dash-recent-row-link" do %>
+              <span class="low-stock-badge">Low stock</span>
+              <span class="dash-low-stock-name"><%= medication.name %></span>
+              <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left</span>
+            <% end %>
+            <%= link_to "Refill", edit_settings_medication_path(medication), class: "dash-low-stock-refill-link" %>
           </li>
         <% end %>
       </ul>
@@ -259,12 +262,13 @@
                 </time>
                 <div class="dash-pf-chips">
                   <% [morning, evening].compact.each do |reading| %>
-                    <div class="dash-pf-chip dash-pf-chip--<%= reading.zone_css_modifier %>"
-                         aria-label="<%= reading.time_of_day_label %> reading: <%= reading.value %> L/min<%= ", #{reading.zone.capitalize} zone" if reading.zone %>">
+                    <%= link_to peak_flow_reading_path(reading),
+                          class: "dash-pf-chip dash-pf-chip--#{reading.zone_css_modifier}",
+                          aria: { label: "#{reading.time_of_day_label} reading: #{reading.value} L/min#{", #{reading.zone.capitalize} zone" if reading.zone}" } do %>
                       <span class="dash-pf-chip-session" aria-hidden="true"><%= reading.time_of_day_label %></span>
                       <span class="dash-pf-chip-value"><%= reading.value %></span>
                       <span class="dash-pf-chip-unit" aria-hidden="true">L/min</span>
-                    </div>
+                    <% end %>
                   <% end %>
                 </div>
               </li>
@@ -283,12 +287,14 @@
         <% if @recent_symptoms.any? %>
           <ol class="dash-recent-list">
             <% @recent_symptoms.each do |log| %>
-              <li class="dash-recent-row dash-recent-row--symptom dash-recent-row--<%= log.severity %>">
-                <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize %></span>
-                <span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span>
-                <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
-                  <%= log.recorded_at.strftime("%-d %b") %>
-                </time>
+              <li class="dash-recent-row dash-recent-row--<%= log.severity %>">
+                <%= link_to symptom_log_path(log), class: "dash-recent-row-link" do %>
+                  <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize %></span>
+                  <span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span>
+                  <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
+                    <%= log.recorded_at.strftime("%-d %b") %>
+                  </time>
+                <% end %>
               </li>
             <% end %>
           </ol>
@@ -311,14 +317,16 @@
       <ul class="dash-health-events-list">
         <% @recent_health_events.each do |event| %>
           <li class="dash-health-event-row">
-            <span class="event-badge event-badge--<%= event.event_type_css_modifier %>">
-              <%= event.event_type_label %>
-            </span>
-            <time class="dash-health-event-time" datetime="<%= event.recorded_at.iso8601 %>">
-              <%= event.recorded_at.strftime("%-d %b %Y") %>
-            </time>
-            <% if event.ongoing? %>
-              <span class="event-ongoing-badge">Ongoing</span>
+            <%= link_to health_event_path(event), class: "dash-recent-row-link" do %>
+              <span class="event-badge event-badge--<%= event.event_type_css_modifier %>">
+                <%= event.event_type_label %>
+              </span>
+              <time class="dash-health-event-time" datetime="<%= event.recorded_at.iso8601 %>">
+                <%= event.recorded_at.strftime("%-d %b %Y") %>
+              </time>
+              <% if event.ongoing? %>
+                <span class="event-ongoing-badge">Ongoing</span>
+              <% end %>
             <% end %>
           </li>
         <% end %>

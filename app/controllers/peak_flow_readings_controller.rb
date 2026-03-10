@@ -19,7 +19,17 @@ class PeakFlowReadingsController < ApplicationController
   }
 
   before_action :set_has_personal_best, only: %i[new create edit]
-  before_action :set_peak_flow_reading, only: %i[edit update destroy]
+  before_action :set_peak_flow_reading, only: %i[show edit update destroy]
+
+  def show
+    @personal_best = PersonalBestRecord.current_for(Current.user)
+    pb_value = @personal_best&.value
+    @zone_percentage = pb_value && @peak_flow_reading.zone ? ((@peak_flow_reading.value.to_f / pb_value) * 100).round : nil
+    respond_to do |format|
+      format.html
+      format.json { render json: peak_flow_reading_json(@peak_flow_reading) }
+    end
+  end
 
   def new
     @peak_flow_reading = Current.user.peak_flow_readings.new(
@@ -52,20 +62,19 @@ class PeakFlowReadingsController < ApplicationController
     base_relation = base_relation.where(zone: @active_zone) if @active_zone.present?
     @current_personal_best = PersonalBestRecord.current_for(Current.user)
 
-    # Cache COUNT via Solid Cache to avoid re-querying on every filter/page navigation.
-    # 1-minute TTL: a newly logged reading appears on the next natural page refresh.
-    cache_key    = [ "pfr_count", Current.user.id, @active_preset, @start_date, @end_date, @active_zone ]
-    cached_total = Rails.cache.fetch(cache_key, expires_in: 1.minute) { base_relation.count }
-
+    total = base_relation.count
     @peak_flow_readings, @total_pages, @current_page = base_relation.paginate(
-      page: params[:page], total: cached_total
+      page: params[:page], total: total
     )
 
-    # Header eyebrow: most recent reading (all-time) + this month's count
-    @header_last_reading = Current.user.peak_flow_readings.chronological.first
-    @header_month_count  = Current.user.peak_flow_readings
-                                   .where(recorded_at: Date.current.beginning_of_month..)
-                                   .count
+    # Header eyebrow queries — skipped on turbo-frame requests since the header
+    # sits outside the frame and its content is discarded anyway.
+    unless turbo_frame_request?
+      @header_last_reading = Current.user.peak_flow_readings.chronological.first
+      @header_month_count  = Current.user.peak_flow_readings
+                                     .where(recorded_at: Date.current.beginning_of_month..)
+                                     .count
+    end
 
     respond_to do |format|
       format.html do
@@ -83,9 +92,16 @@ class PeakFlowReadingsController < ApplicationController
           end
           .sort_by { |d| d[:date] }
 
-        @period_count = cached_total
+        @period_count = total
         @period_avg   = base_relation.average(:value)&.round
         @period_best  = base_relation.maximum(:value)
+
+        pb_value = @current_personal_best&.value
+        @period_avg_pct  = pb_value && @period_avg  ? ((@period_avg.to_f  / pb_value) * 100).round : nil
+        @period_best_pct = pb_value && @period_best ? ((@period_best.to_f / pb_value) * 100).round : nil
+
+        @grouped_readings = @peak_flow_readings
+          .group_by { |r| r.recorded_at.to_date }
       end
       format.json do
         render json: {
@@ -129,7 +145,7 @@ class PeakFlowReadingsController < ApplicationController
     if @peak_flow_reading.update(peak_flow_reading_params)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to peak_flow_readings_path, notice: "Reading updated." }
+        format.html { redirect_to peak_flow_reading_path(@peak_flow_reading), notice: "Reading updated." }
         format.json { render json: peak_flow_reading_json(@peak_flow_reading) }
       end
     else

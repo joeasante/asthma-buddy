@@ -1,0 +1,56 @@
+<% content_for :title, "Symptom Log" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Symptoms", symptom_logs_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep" aria-hidden="true">›</span>
+  <span class="breadcrumb-current">Symptom Log</span>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <h1>Symptom Log</h1>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "Edit", edit_symptom_log_path(@symptom_log), class: "btn-secondary" %>
+      <%= button_to "Delete", symptom_log_path(@symptom_log),
+            method: :delete,
+            class: "btn-danger",
+            form: { data: { turbo: false, turbo_confirm: "Delete this symptom log? This cannot be undone." } } %>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div style="padding: var(--space-lg);">
+    <div class="timeline-row timeline-row--embedded">
+      <div class="severity-indicator severity-indicator--<%= @symptom_log.severity %>"></div>
+      <div class="timeline-row-body">
+        <div class="timeline-row-meta">
+          <span class="timeline-type"><%= @symptom_log.symptom_type.humanize %></span>
+          <span class="severity-badge severity-badge--<%= @symptom_log.severity %>">
+            <%= @symptom_log.severity.capitalize %>
+          </span>
+        </div>
+
+        <time class="timeline-timestamp" datetime="<%= @symptom_log.recorded_at.iso8601 %>">
+          <%= @symptom_log.recorded_at.strftime("%-d %B %Y at %H:%M") %>
+        </time>
+
+        <% if @symptom_log.triggers.any? %>
+          <div class="timeline-triggers" style="margin-top: var(--space-sm);">
+            <% @symptom_log.triggers.each do |trigger| %>
+              <span class="trigger-tag"><%= trigger.humanize %></span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @symptom_log.notes.body.present? %>
+          <div class="timeline-notes" style="margin-top: var(--space-sm);">
+            <%= @symptom_log.notes.body %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

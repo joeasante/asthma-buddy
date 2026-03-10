@@ -17,7 +17,7 @@ class AdherenceControllerTest < ActionDispatch::IntegrationTest
   test "index renders successfully for authenticated user" do
     get adherence_url
     assert_response :success
-    assert_select "h1", "Adherence History"
+    assert_select "h1", "Preventer History"
   end
 
   test "index defaults to 7-day range" do

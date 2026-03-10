@@ -1,23 +1,9 @@
-<%# Prepend the new row to the index table (no-op if user is on /new page) %>
-<%= turbo_stream.prepend "readings_tbody",
-      partial: "reading_row",
-      locals: { reading: @peak_flow_reading } %>
-
-<%# Reset the form for another entry %>
-<%= turbo_stream.replace "peak_flow_reading_form" do %>
-  <%= turbo_frame_tag "peak_flow_reading_form" do %>
-    <%= render "form",
-          peak_flow_reading: PeakFlowReading.new(user: Current.user, recorded_at: Time.current.change(sec: 0)),
-          has_personal_best: @has_personal_best,
-          personal_best_value: @personal_best_value %>
-  <% end %>
-<% end %>
-
-<%# Toast notification %>
+<%# Toast notification — the index is a separate page so we just confirm and let
+    the user navigate back to see their new reading in the grouped list. %>
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages"
        data-controller="toast"
-       data-toast-message="Reading recorded."
+       data-toast-message="<%= zone_flash_message_text(@peak_flow_reading) %>"
        data-toast-variant="success">
   </div>
 <% end %>

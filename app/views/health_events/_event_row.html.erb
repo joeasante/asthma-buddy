@@ -1,50 +1,35 @@
-<%= turbo_frame_tag dom_id(health_event) do %>
-  <article class="event-row"
-           aria-label="<%= health_event.event_type_label %> on <%= health_event.recorded_at.strftime("%-d %b %Y") %>">
+<%= link_to health_event_path(health_event),
+      id: dom_id(health_event),
+      class: "event-row",
+      aria: { label: "#{health_event.event_type_label} on #{health_event.recorded_at.strftime("%-d %b %Y")}" } do %>
 
-    <div class="event-row-body">
-      <div class="event-row-meta">
-        <span class="event-badge event-badge--<%= health_event.event_type_css_modifier %>">
-          <%= health_event.event_type_label %>
+  <div class="event-row-body">
+    <div class="event-row-meta">
+      <span class="event-badge event-badge--<%= health_event.event_type_css_modifier %>">
+        <%= health_event.event_type_label %>
+      </span>
+      <% if health_event.point_in_time? %>
+        <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
+          <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+        </time>
+      <% elsif health_event.ended_at.present? %>
+        <span class="event-row-time">
+          <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %></time>
+          <span aria-hidden="true">–</span>
+          <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y, %H:%M") %></time>
+          <span class="event-row-duration"><%= health_event.formatted_duration %></span>
         </span>
-        <% if health_event.point_in_time? %>
-          <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
-            <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
-          </time>
-        <% elsif health_event.ended_at.present? %>
-          <span class="event-row-time">
-            <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %></time>
-            <span aria-hidden="true">–</span>
-            <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y, %H:%M") %></time>
-            <span class="event-row-duration"><%= health_event.formatted_duration %></span>
-          </span>
-        <% else %>
-          <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
-            <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
-          </time>
-          <span class="event-ongoing-badge">Ongoing</span>
-        <% end %>
-      </div>
-
-      <% if health_event.notes.body.present? %>
-        <p class="event-row-notes"><%= health_event.notes.to_plain_text %></p>
+      <% else %>
+        <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
+          <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+        </time>
+        <span class="event-ongoing-badge">Ongoing</span>
       <% end %>
     </div>
 
-    <div class="event-row-actions">
-      <%= link_to edit_health_event_path(health_event),
-            class: "btn-edit",
-            data: { turbo_frame: "_top" },
-            aria: { label: "Edit #{health_event.event_type_label} event" } do %>
-        Edit
-      <% end %>
-      <%= button_to "Delete",
-            health_event_path(health_event),
-            method: :delete,
-            class: "btn-delete",
-            form: { data: { turbo: true, turbo_confirm: "Delete this medical event? This can't be undone." } },
-            aria: { label: "Delete #{health_event.event_type_label} event" } %>
-    </div>
+    <% if health_event.notes.body.present? %>
+      <p class="event-row-notes"><%= health_event.notes.to_plain_text %></p>
+    <% end %>
+  </div>
 
-  </article>
 <% end %>

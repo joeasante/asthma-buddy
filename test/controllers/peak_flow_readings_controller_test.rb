@@ -11,6 +11,46 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
+  # GET /peak_flow_readings/:id
+  test "show renders for owner" do
+    reading = peak_flow_readings(:alice_green_reading)
+    get peak_flow_reading_path(reading)
+    assert_response :success
+  end
+
+  test "show returns 404 for another user's reading" do
+    get peak_flow_reading_path(peak_flow_readings(:bob_reading))
+    assert_response :not_found
+  end
+
+  test "show redirects unauthenticated user to sign in" do
+    sign_out
+    get peak_flow_reading_path(peak_flow_readings(:alice_green_reading))
+    assert_redirected_to new_session_url
+  end
+
+  test "show renders without personal best" do
+    PersonalBestRecord.where(user: @user).delete_all
+    get peak_flow_reading_path(peak_flow_readings(:alice_green_reading))
+    assert_response :success
+  end
+
+  test "GET /peak_flow_readings/:id.json returns reading fields" do
+    reading = peak_flow_readings(:alice_green_reading)
+    get peak_flow_reading_path(reading), as: :json
+    assert_response :ok
+    json = response.parsed_body
+    assert json.key?("id")
+    assert json.key?("value")
+    assert json.key?("zone")
+    assert json.key?("recorded_at")
+  end
+
+  test "GET /peak_flow_readings/:id.json returns 404 for another user's reading" do
+    get peak_flow_reading_path(peak_flow_readings(:bob_reading)), as: :json
+    assert_response :not_found
+  end
+
   # GET /peak_flow_readings/new
   test "new renders form for authenticated user" do
     get new_peak_flow_reading_path
@@ -269,7 +309,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
   # DELETE /peak_flow_readings/:id (destroy)
   # -------------------------------------------------------------------------
 
-  test "destroy removes reading and returns Turbo Stream remove" do
+  test "destroy removes reading and returns Turbo Stream toast" do
     reading = peak_flow_readings(:alice_green_reading)
     assert_difference "PeakFlowReading.count", -1 do
       delete peak_flow_reading_path(reading),
@@ -278,7 +318,7 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html", response.media_type
     assert_match "turbo-stream", response.body
-    assert_match "remove", response.body
+    assert_match "Reading deleted", response.body
   end
 
   test "destroy returns 404 for another user's reading" do

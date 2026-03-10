@@ -2819,3 +2819,15 @@ button.med-overflow-item--danger:hover {
     transform: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Shared skeleton animation — keyframe used by peak_flow.css (.skeleton)
+   and symptom_timeline.css (.timeline-skeleton-row)
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes skeleton-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}

@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Medication Management UI** — CRUD interface to add, edit, and remove medications from settings
 - [x] **Phase 12: Dose Logging** (complete 2026-03-08) — Log a dose taken and delete accidental entries
 - [x] **Phase 13: Dose Tracking & Low Stock** (complete 2026-03-08) — Remaining dose display, low-stock warning, refill action
-- [ ] **Phase 14: Adherence Dashboard** — Today's preventer adherence indicator and 7/30-day history grid
+- [x] **Phase 14: Adherence Dashboard** (complete 2026-03-10) — Today's preventer adherence indicator and 7/30-day history grid
 - [x] **Phase 15: Health Events** — Log, edit, delete health events; show as chart markers on peak flow trends
 - [ ] **Phase 16: Account Management & Legal** — Account deletion with confirmation; Terms, Privacy, cookie notice
 - [ ] **Phase 17: Onboarding Flow** — Post-signup wizard prompting personal best and first medication
@@ -207,7 +207,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 11. Medication Management UI | 3/3 | Complete ✓ | 2026-03-08 |
 | 12. Dose Logging | 3/3 | Complete ✓ | 2026-03-08 |
 | 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
-| 14. Adherence Dashboard | 0/3 | Planned | - |
+| 14. Adherence Dashboard | 3/3 | Complete ✓ | 2026-03-10 |
 | 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
 | 16. Account Management & Legal | 0/3 | Not started | - |
 | 17. Onboarding Flow | 0/3 | Not started | - |

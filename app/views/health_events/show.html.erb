@@ -1,0 +1,80 @@
+<% content_for :title, "Medical History Entry" %>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <%= link_to "Medical History", health_events_path, class: "breadcrumb-link" %>
+  <span class="breadcrumb-sep" aria-hidden="true">›</span>
+  <span class="breadcrumb-current">Entry</span>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <h1>Medical History Entry</h1>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "Edit", edit_health_event_path(@health_event), class: "btn-secondary" %>
+      <%= button_to "Delete", health_event_path(@health_event),
+            method: :delete,
+            class: "btn-danger",
+            form: { data: { turbo: false, turbo_confirm: "Delete this medical event? This cannot be undone." } } %>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div style="padding: var(--space-lg);">
+    <div class="event-row event-row--flat">
+      <div class="event-row-body">
+        <div class="event-row-meta">
+          <span class="event-badge event-badge--<%= @health_event.event_type_css_modifier %>">
+            <%= @health_event.event_type_label %>
+          </span>
+          <% if @health_event.ongoing? %>
+            <span class="event-ongoing-badge">Ongoing</span>
+          <% end %>
+        </div>
+
+        <dl style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md);">
+          <div style="display: flex; gap: var(--space-md);">
+            <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Started</dt>
+            <dd style="color: var(--text); font-weight: 500;">
+              <time datetime="<%= @health_event.recorded_at.iso8601 %>">
+                <%= @health_event.recorded_at.strftime("%-d %B %Y") %>
+              </time>
+            </dd>
+          </div>
+
+          <% unless @health_event.point_in_time? %>
+            <div style="display: flex; gap: var(--space-md);">
+              <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Ended</dt>
+              <dd style="color: var(--text); font-weight: 500;">
+                <% if @health_event.ended_at.present? %>
+                  <time datetime="<%= @health_event.ended_at.iso8601 %>">
+                    <%= @health_event.ended_at.strftime("%-d %B %Y") %>
+                  </time>
+                <% else %>
+                  <span style="color: var(--text-3);">Ongoing</span>
+                <% end %>
+              </dd>
+            </div>
+
+            <% if @health_event.formatted_duration.present? %>
+              <div style="display: flex; gap: var(--space-md);">
+                <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Duration</dt>
+                <dd>
+                  <span class="event-row-duration"><%= @health_event.formatted_duration %></span>
+                </dd>
+              </div>
+            <% end %>
+          <% end %>
+        </dl>
+
+        <% if @health_event.notes.body.present? %>
+          <div class="event-row-notes" style="margin-top: var(--space-md);">
+            <%= @health_event.notes.body %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

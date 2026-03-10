@@ -7,9 +7,9 @@ Rails.application.routes.draw do
   post "email_verification", to: "email_verifications#create", as: :email_verification_resend
   get "email_verification/:token", to: "email_verifications#show", as: :email_verification
   resources :passwords, param: :token, only: %i[ new create edit update ]
-  resources :symptom_logs, path: "symptom-logs", only: %i[ index new create edit update destroy ]
-  resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index edit update destroy ]
-  resources :health_events, path: "medical-history", only: %i[ index new create edit update destroy ]
+  resources :symptom_logs, path: "symptom-logs", only: %i[ index new create show edit update destroy ]
+  resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index show edit update destroy ]
+  resources :health_events, path: "medical-history", only: %i[ index new create show edit update destroy ]
 
   resource :profile, only: %i[show update destroy]
   post "profile/personal_best", to: "profiles#update_personal_best", as: :profile_personal_best
