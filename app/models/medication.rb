@@ -29,16 +29,18 @@ class Medication < ApplicationRecord
     validate  :ends_on_must_be_after_starts_on
   end
 
+  before_validation :clear_course_dates_unless_course
+
   LOW_STOCK_DAYS = 14
 
   scope :chronological,    -> { order(created_at: :desc) }
-  scope :active_courses,   -> { where(course: true).where("ends_on >= ?", Date.today) }
-  scope :archived_courses, -> { where(course: true).where("ends_on < ?", Date.today) }
+  scope :active_courses,   -> { where(course: true).where("ends_on >= ?", Date.current) }
+  scope :archived_courses, -> { where(course: true).where("ends_on < ?", Date.current) }
   scope :non_courses,      -> { where(course: false) }
 
   # Returns true when this is a course medication that hasn't ended yet.
   def course_active?
-    course? && ends_on.present? && ends_on >= Date.today
+    course? && ends_on >= Date.current
   end
 
   # Returns how many doses remain in the current inhaler.
@@ -70,6 +72,13 @@ class Medication < ApplicationRecord
   end
 
   private
+
+    def clear_course_dates_unless_course
+      unless course?
+        self.starts_on = nil
+        self.ends_on   = nil
+      end
+    end
 
     def ends_on_must_be_after_starts_on
       return unless starts_on.present? && ends_on.present?

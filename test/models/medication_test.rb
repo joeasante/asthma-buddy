@@ -374,6 +374,16 @@ class MedicationTest < ActiveSupport::TestCase
     assert med.errors[:ends_on].any?
   end
 
+  test "non-course medication created with course dates does not persist starts_on or ends_on" do
+    med = Medication.create!(
+      user: @user, name: "Regular", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 200,
+      course: false, starts_on: Date.today, ends_on: 7.days.from_now.to_date
+    )
+    assert_nil med.starts_on
+    assert_nil med.ends_on
+  end
+
   test "non-course medication does not require starts_on or ends_on" do
     med = Medication.new(
       user: @user, name: "Regular Med", medication_type: :reliever,
