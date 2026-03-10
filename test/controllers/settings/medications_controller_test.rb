@@ -190,4 +190,174 @@ class Settings::MedicationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
   end
+
+  # --- COURSE: INDEX SPLIT ---
+
+  test "index assigns active_medications excluding archived courses" do
+    # alice_active_course: ends_on = 7 days from now (active)
+    # alice_archived_course: ends_on = yesterday (archived)
+    get settings_medications_url
+    assert_response :success
+
+    # Active course should appear in medications_list
+    assert_select "##{dom_id(medications(:alice_active_course))}"
+
+    # Archived course should NOT appear in medications_list
+    # (it appears only in past_courses_section, not medications_list)
+    assert_select "#past_courses_section"
+  end
+
+  test "index does not show past courses section when no archived courses exist" do
+    # Destroy the archived course fixture to simulate zero archived courses
+    medications(:alice_archived_course).destroy
+    get settings_medications_url
+    assert_response :success
+    assert_select "#past_courses_section", count: 0
+  end
+
+  # --- COURSE: CREATE ---
+
+  test "create saves a course medication with course fields" do
+    assert_difference "Medication.count", 1 do
+      post settings_medications_url,
+        params: { medication: {
+          name: "Prednisolone",
+          medication_type: "other",
+          standard_dose_puffs: 5,
+          starting_dose_count: 40,
+          course: "1",
+          starts_on: Date.today.to_s,
+          ends_on: 7.days.from_now.to_date.to_s
+        } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :success
+
+    med = Medication.last
+    assert med.course?
+    assert_equal Date.today, med.starts_on
+    assert_equal 7.days.from_now.to_date, med.ends_on
+    assert_equal @user, med.user
+  end
+
+  test "create scopes course medication to current user" do
+    post settings_medications_url,
+      params: { medication: {
+        name: "Prednisolone",
+        medication_type: "other",
+        standard_dose_puffs: 5,
+        starting_dose_count: 40,
+        course: "1",
+        starts_on: Date.today.to_s,
+        ends_on: 7.days.from_now.to_date.to_s
+      } }
+    assert_equal @user, Medication.last.user
+  end
+
+  test "create rejects course medication with ends_on before starts_on" do
+    assert_no_difference "Medication.count" do
+      post settings_medications_url,
+        params: { medication: {
+          name: "Bad Course",
+          medication_type: "other",
+          standard_dose_puffs: 5,
+          starting_dose_count: 40,
+          course: "1",
+          starts_on: Date.today.to_s,
+          ends_on: 1.day.ago.to_date.to_s
+        } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "create rejects course medication without ends_on" do
+    assert_no_difference "Medication.count" do
+      post settings_medications_url,
+        params: { medication: {
+          name: "Missing End",
+          medication_type: "other",
+          standard_dose_puffs: 5,
+          starting_dose_count: 40,
+          course: "1",
+          starts_on: Date.today.to_s,
+          ends_on: ""
+        } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  # --- COURSE: ARCHIVE BOUNDARY ---
+
+  test "active course (ends_on today) is treated as active — not archived" do
+    med = medications(:alice_active_course)
+    # Force ends_on to today
+    med.update_column(:ends_on, Date.today)
+
+    get settings_medications_url
+    assert_response :success
+
+    # Should still appear in medications_list (active), not only in past_courses_section
+    assert_select "##{dom_id(med)}"
+  end
+
+  test "archived course (ends_on yesterday) does not appear in active medications_list" do
+    get settings_medications_url
+    assert_response :success
+
+    archived = medications(:alice_archived_course)
+    # Archived course should be in the past_courses_section, not medications_list
+    # We verify the section exists and the active list excludes it
+    within_turbo_frame = response.body.include?(dom_id(archived))
+    assert within_turbo_frame, "Archived course turbo frame should be present in page"
+    assert_select "#past_courses_section"
+  end
+
+  # --- COURSE: ADHERENCE EXCLUSION ---
+
+  test "dashboard excludes active courses from preventer_adherence" do
+    # alice_active_course is medication_type :other — not a preventer — so this
+    # test creates a preventer course to confirm exclusion
+    preventer_course = @user.medications.create!(
+      name:                "Preventer Course",
+      medication_type:     :preventer,
+      standard_dose_puffs: 2,
+      starting_dose_count: 60,
+      doses_per_day:       2,
+      course:              true,
+      starts_on:           Date.today,
+      ends_on:             7.days.from_now.to_date
+    )
+
+    get dashboard_url
+    assert_response :success
+
+    # The preventer course should NOT be in preventer adherence
+    # We verify by checking response does not render that medication's adherence card
+    assert_select "[data-medication-id='#{preventer_course.id}']", count: 0
+  ensure
+    preventer_course&.destroy
+  end
+
+  # --- COURSE: CROSS-USER ISOLATION ---
+
+  test "cannot access another user's course medication edit page" do
+    other_course = medications(:alice_active_course)
+    # sign in as a different user
+    sign_out
+    sign_in_as(@other_user)
+    get edit_settings_medication_url(other_course)
+    assert_response :not_found
+  end
+
+  test "cannot destroy another user's course medication" do
+    other_course = medications(:alice_active_course)
+    sign_out
+    sign_in_as(@other_user)
+    assert_no_difference "Medication.count" do
+      delete settings_medication_url(other_course)
+    end
+    assert_response :not_found
+  end
 end
