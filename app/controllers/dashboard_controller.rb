@@ -25,9 +25,9 @@ class DashboardController < ApplicationController
     if @week_avg && @personal_best
       pct = (@week_avg.to_f / @personal_best.value) * 100
       @week_avg_zone = if pct >= PeakFlowReading::GREEN_ZONE_THRESHOLD then "green"
-                       elsif pct >= PeakFlowReading::YELLOW_ZONE_THRESHOLD then "yellow"
-                       else "red"
-                       end
+      elsif pct >= PeakFlowReading::YELLOW_ZONE_THRESHOLD then "yellow"
+      else "red"
+      end
     end
 
     # Last severe episode (any time, not just this week)

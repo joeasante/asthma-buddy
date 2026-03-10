@@ -37,11 +37,11 @@ class SymptomLogsController < ApplicationController
     else
       @end_date = nil
       @start_date = case @active_preset
-                    when "7"  then Date.current - 7.days
-                    when "30" then Date.current - 30.days
-                    when "90" then Date.current - 90.days
-                    else nil
-                    end
+      when "7"  then Date.current - 7.days
+      when "30" then Date.current - 30.days
+      when "90" then Date.current - 90.days
+      else nil
+      end
     end
 
     base_relation = Current.user.symptom_logs

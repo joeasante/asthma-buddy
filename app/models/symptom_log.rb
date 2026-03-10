@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class SymptomLog < ApplicationRecord
   belongs_to :user
 
@@ -55,12 +56,12 @@ class SymptomLog < ApplicationRecord
   # Manual pagination: returns [records, total_pages, current_page]
   # Keeps it simple — no gem, just offset/limit arithmetic
   def self.paginate(page:, per_page: 25)
-    page = [page.to_i, 1].max
+    page = [ page.to_i, 1 ].max
     total = count
-    total_pages = [(total.to_f / per_page).ceil, 1].max
-    page = [page, total_pages].min
+    total_pages = [ (total.to_f / per_page).ceil, 1 ].max
+    page = [ page, total_pages ].min
     records = offset((page - 1) * per_page).limit(per_page)
-    [records, total_pages, page]
+    [ records, total_pages, page ]
   end
 
   private

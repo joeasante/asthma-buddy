@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class SymptomLogTest < ActiveSupport::TestCase
@@ -80,7 +81,7 @@ class SymptomLogTest < ActiveSupport::TestCase
   test "chronological scope orders by recorded_at descending" do
     older = SymptomLog.create!(valid_attributes.merge(recorded_at: 3.hours.ago))
     newer = SymptomLog.create!(valid_attributes.merge(recorded_at: 1.hour.ago))
-    results = SymptomLog.where(id: [older.id, newer.id]).chronological
+    results = SymptomLog.where(id: [ older.id, newer.id ]).chronological
     assert_equal newer.id, results.first.id
   end
 

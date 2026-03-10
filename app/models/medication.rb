@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Medication < ApplicationRecord
   belongs_to :user
   has_many :dose_logs, dependent: :destroy

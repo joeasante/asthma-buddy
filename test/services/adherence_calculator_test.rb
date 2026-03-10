@@ -74,7 +74,7 @@ class AdherenceCalculatorTest < ActiveSupport::TestCase
   test "returns no_schedule for a medication without doses_per_day" do
     result = AdherenceCalculator.call(@reliever, @today)
 
-    assert_nil             result.scheduled
+    assert_nil result.scheduled
     assert_equal :no_schedule, result.status
   end
 

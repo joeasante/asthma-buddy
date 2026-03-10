@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   get "settings", to: "settings#show", as: :settings
 
   scope "/settings", module: :settings, as: :settings do
-    resource :account, only: [:destroy]
+    resource :account, only: [ :destroy ]
     resources :medications, only: %i[index new create edit update destroy] do
       member do
         patch :refill

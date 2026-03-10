@@ -3,7 +3,7 @@
 class AdherenceController < ApplicationController
   def index
     user = Current.user
-    @period = params[:period].to_i.in?([7, 30]) ? params[:period].to_i : 7
+    @period = params[:period].to_i.in?([ 7, 30 ]) ? params[:period].to_i : 7
 
     date_range = (@period - 1).days.ago.to_date..Date.current
 
@@ -39,7 +39,7 @@ class AdherenceController < ApplicationController
 
     @adherence_history = preventers.map do |medication|
       days_data = date_range.map do |date|
-        logs   = all_logs[ [ medication.id, date ] ]
+        logs   = all_logs[[ medication.id, date ]]
         result = AdherenceCalculator.call(medication, date, preloaded_logs: logs)
         { date: date, result: result }
       end

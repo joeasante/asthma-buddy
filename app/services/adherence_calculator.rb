@@ -20,24 +20,24 @@ class AdherenceCalculator
     scheduled = @medication.doses_per_day
     taken     = if @preloaded_logs
                   @preloaded_logs.length
-                else
+    else
                   @medication.dose_logs
                              .where(recorded_at: @date.beginning_of_day..@date.end_of_day)
                              .count
-                end
+    end
 
     status = if scheduled.nil?
                :no_schedule
-             elsif taken >= scheduled
+    elsif taken >= scheduled
                :on_track
-             elsif @date == Date.current
+    elsif @date == Date.current
                # The day is not over — never penalise for a partially completed day.
                # :partial  → at least one dose logged, still waiting on the rest
                # :pending  → nothing logged yet today
                taken > 0 ? :partial : :pending
-             else
+    else
                :missed
-             end
+    end
 
     Result.new(taken, scheduled, status)
   end
