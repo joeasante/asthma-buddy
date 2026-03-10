@@ -376,6 +376,122 @@ class Settings::MedicationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Prednisolone Old Course", medications(:alice_archived_course).reload.name
   end
 
+  # --- JSON: INDEX ---
+
+  test "GET /settings/medications.json returns 200 with active_medications and archived_courses arrays" do
+    get settings_medications_url(format: :json)
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body.key?("active_medications"), "response must have active_medications key"
+    assert body.key?("archived_courses"), "response must have archived_courses key"
+    assert_instance_of Array, body["active_medications"]
+    assert_instance_of Array, body["archived_courses"]
+  end
+
+  test "GET /settings/medications.json places active course in active_medications not archived_courses" do
+    get settings_medications_url(format: :json)
+    body = JSON.parse(response.body)
+    active_ids   = body["active_medications"].map { |m| m["id"] }
+    archived_ids = body["archived_courses"].map { |m| m["id"] }
+    assert_includes active_ids,     medications(:alice_active_course).id
+    assert_not_includes archived_ids, medications(:alice_active_course).id
+  end
+
+  test "GET /settings/medications.json places archived course in archived_courses not active_medications" do
+    get settings_medications_url(format: :json)
+    body = JSON.parse(response.body)
+    active_ids   = body["active_medications"].map { |m| m["id"] }
+    archived_ids = body["archived_courses"].map { |m| m["id"] }
+    assert_includes archived_ids, medications(:alice_archived_course).id
+    assert_not_includes active_ids, medications(:alice_archived_course).id
+  end
+
+  test "unauthenticated GET /settings/medications.json returns 401" do
+    sign_out
+    get settings_medications_url(format: :json)
+    assert_response :unauthorized
+    body = JSON.parse(response.body)
+    assert body.key?("error")
+  end
+
+  # --- JSON: CREATE (non-course) ---
+
+  test "POST /settings/medications.json with valid non-course params returns 201 with course false" do
+    assert_difference "Medication.count", 1 do
+      post settings_medications_url(format: :json),
+        params: { medication: {
+          name: "Spiriva JSON",
+          medication_type: "preventer",
+          standard_dose_puffs: 1,
+          starting_dose_count: 30
+        } }
+    end
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal "Spiriva JSON", body["name"]
+    assert_equal false, body["course"]
+  end
+
+  # --- JSON: CREATE (course) ---
+
+  test "POST /settings/medications.json with course params returns 201 with course true and dates" do
+    assert_difference "Medication.count", 1 do
+      post settings_medications_url(format: :json),
+        params: { medication: {
+          name: "Prednisolone JSON",
+          medication_type: "other",
+          standard_dose_puffs: 5,
+          starting_dose_count: 40,
+          course: "1",
+          starts_on: Date.today.to_s,
+          ends_on: 7.days.from_now.to_date.to_s
+        } }
+    end
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal true, body["course"]
+    assert body["starts_on"].present?, "starts_on must be present"
+    assert body["ends_on"].present?, "ends_on must be present"
+  end
+
+  test "POST /settings/medications.json with invalid params returns 422 with errors" do
+    assert_no_difference "Medication.count" do
+      post settings_medications_url(format: :json),
+        params: { medication: { name: "", medication_type: "", standard_dose_puffs: "", starting_dose_count: "" } }
+    end
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+    assert body.key?("errors")
+  end
+
+  # --- JSON: UPDATE ---
+
+  test "PATCH /settings/medications/:id.json returns 200 with updated medication" do
+    patch settings_medication_url(@medication, format: :json),
+      params: { medication: { name: "Updated Ventolin JSON" } }
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal "Updated Ventolin JSON", body["name"]
+    assert_equal @medication.id, body["id"]
+  end
+
+  test "PATCH /settings/medications/:id.json with invalid params returns 422" do
+    patch settings_medication_url(@medication, format: :json),
+      params: { medication: { name: "", standard_dose_puffs: "" } }
+    assert_response :unprocessable_entity
+    body = JSON.parse(response.body)
+    assert body.key?("errors")
+  end
+
+  # --- JSON: DESTROY ---
+
+  test "DELETE /settings/medications/:id.json returns 204 no content" do
+    assert_difference "Medication.count", -1 do
+      delete settings_medication_url(@medication, format: :json)
+    end
+    assert_response :no_content
+  end
+
   # --- COURSE: CROSS-USER ISOLATION ---
 
   test "cannot access another user's course medication edit page" do

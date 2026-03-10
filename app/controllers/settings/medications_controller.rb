@@ -16,6 +16,16 @@ module Settings
       # Header eyebrow: active medication count (excludes archived courses) + low stock count
       @header_medication_count = @visible_medications.size
       @header_low_stock_count  = @visible_medications.count(&:low_stock?)
+
+      respond_to do |format|
+        format.html
+        format.json do
+          render json: {
+            active_medications: @visible_medications.map { |m| medication_json(m) },
+            archived_courses:   @archived_courses.map { |m| medication_json(m) }
+          }
+        end
+      end
     end
 
     def new
@@ -28,11 +38,13 @@ module Settings
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Medication added." }
+          format.json { render json: medication_json(@medication), status: :created }
         end
       else
         respond_to do |format|
           format.turbo_stream { render turbo_stream: turbo_stream.replace("medication_form", partial: "settings/medications/form", locals: { medication: @medication }), status: :unprocessable_entity }
           format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: { errors: @medication.errors.full_messages }, status: :unprocessable_entity }
         end
       end
     end
@@ -46,11 +58,13 @@ module Settings
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Medication updated." }
+          format.json { render json: medication_json(@medication) }
         end
       else
         respond_to do |format|
           format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@medication), partial: "settings/medications/form", locals: { medication: @medication }), status: :unprocessable_entity }
           format.html { render :edit, status: :unprocessable_entity }
+          format.json { render json: { errors: @medication.errors.full_messages }, status: :unprocessable_entity }
         end
       end
     end
@@ -60,6 +74,7 @@ module Settings
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to settings_medications_path, notice: "Medication removed." }
+        format.json { head :no_content }
       end
     end
 
@@ -107,6 +122,24 @@ module Settings
 
     def refill_params
       params.require(:medication).permit(:starting_dose_count)
+    end
+
+    def medication_json(med)
+      {
+        id:                  med.id,
+        name:                med.name,
+        medication_type:     med.medication_type,
+        standard_dose_puffs: med.standard_dose_puffs,
+        starting_dose_count: med.starting_dose_count,
+        doses_per_day:       med.doses_per_day,
+        course:              med.course?,
+        starts_on:           med.starts_on,
+        ends_on:             med.ends_on,
+        course_active:       med.course? ? med.course_active? : nil,
+        remaining_doses:     med.remaining_doses,
+        low_stock:           med.low_stock?,
+        created_at:          med.created_at
+      }
     end
   end
 end
