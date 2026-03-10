@@ -77,13 +77,6 @@ class ProfilesController < ApplicationController
     end
   end
 
-  def destroy
-    user = Current.user
-    reset_session
-    user.destroy
-    redirect_to root_path, notice: "Your account has been permanently deleted."
-  end
-
   private
 
   def set_profile_data

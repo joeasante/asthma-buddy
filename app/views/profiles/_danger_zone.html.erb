@@ -56,9 +56,10 @@
       </div>
 
       <div class="profile-delete-dialog-actions">
-        <form action="<%= profile_path %>" method="post" class="profile-delete-form">
+        <form action="<%= settings_account_path %>" method="post" class="profile-delete-form">
           <%= hidden_field_tag :_method, :delete %>
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <%= hidden_field_tag :confirmation, "DELETE" %>
           <button type="submit"
                   class="profile-delete-submit"
                   disabled
