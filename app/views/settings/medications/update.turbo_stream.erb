@@ -1,10 +1,6 @@
 <%# Replace the medication row with the correct partial based on type %>
 <%= turbo_stream.replace dom_id(@medication) do %>
-  <% if @medication.course? %>
-    <%= render "settings/medications/course_medication", medication: @medication %>
-  <% else %>
-    <%= render "settings/medications/medication", medication: @medication %>
-  <% end %>
+  <%= render medication_partial(@medication), medication: @medication %>
 <% end %>
 
 <%# Show inline toast on the list page %>

@@ -37,11 +37,7 @@
   <div class="med-list" id="medications_list">
     <% if @active_medications.any? %>
       <% @active_medications.each do |medication| %>
-        <% if medication.course? %>
-          <%= render "settings/medications/course_medication", medication: medication %>
-        <% else %>
-          <%= render medication %>
-        <% end %>
+        <%= render medication_partial(medication), medication: medication %>
       <% end %>
     <% else %>
       <%= render "medications_empty_state" %>
