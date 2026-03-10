@@ -188,10 +188,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `/terms` and `/privacy` pages are accessible without being logged in and are linked from the app footer on every page.
   4. A first-time visitor sees a dismissible cookie notice banner; once dismissed it does not reappear for that session (stored in the Rails session — no JavaScript cookie consent library required).
 
-**Plans**:
-- [ ] 16-01: Account deletion — `DELETE /account` route and AccountsController#destroy; User model `dependent: :destroy` audit across all associations; confirmation form requiring typed "DELETE"; redirect + flash on completion; controller tests
-- [ ] 16-02: Static legal pages — TermsController and PrivacyController (or PagesController), `/terms` and `/privacy` routes accessible without authentication, ERB content for ToS and Privacy Policy (UK GDPR); footer partial with links
-- [ ] 16-03: Session cookie notice — ApplicationController before_action sets `session[:cookie_notice_shown]`; dismissible banner partial rendered in layout when flag absent; dismiss action sets flag; system test for show-once behaviour
+**Plans:** 3 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Account deletion (AccountsController#destroy, Danger Zone form, controller tests)
+- [ ] 16-02-PLAN.md — Legal pages content (UK GDPR terms and privacy policy, footer links)
+- [ ] 16-03-PLAN.md — Session cookie notice (ApplicationController before_action, banner partial, system test)
 
 ---
 
