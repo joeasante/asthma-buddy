@@ -211,10 +211,9 @@ Plans:
   4. Each step has a visible skip link; skipping advances to the next step (or to the dashboard if skipping Step 2); a skipped step does not re-appear on subsequent logins once either step has been completed or explicitly skipped in that session.
   5. A returning user who already has a personal best and at least one medication is never shown the onboarding wizard.
 
-**Plans**:
-- [ ] 17-01: OnboardingController with steps (:personal_best, :medication); before_action guard redirects to dashboard if user already has personal best and medication; step routing logic
-- [ ] 17-02: Onboarding views — Step 1 (personal best form, skip link), Step 2 (medication form, skip link), progress indicator; reuse existing form partials
-- [ ] 17-03: After-login redirect hook — check onboarding conditions in SessionsController or ApplicationController after_sign_in; system tests for full wizard completion, skip step 1, skip step 2, skip both, returning user bypass
+**Plans:** 2 plans
+- [ ] 17-01-PLAN.md — Migration (onboarding_personal_best_done + onboarding_medication_done boolean flags on users); OnboardingController refactor (flag persistence on complete/skip, 2-step wizard guard); DashboardController before_action :check_onboarding
+- [ ] 17-02-PLAN.md — Update onboarding views (2-step progress indicator); controller tests and system tests (full wizard, skip step 1, skip step 2, skip both, returning user bypass)
 
 ---
 
@@ -233,7 +232,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
 | 15.1. Reliever Usage History | 0/2 | Not started | - |
 | 16. Account Management & Legal | 0/3 | Not started | - |
-| 17. Onboarding Flow | 0/3 | Not started | - |
+| 17. Onboarding Flow | 0/2 | Not started | - |
 | 18. Temporary Medication Courses | 0/3 | Not started | - |
 | 19. Notifications | 0/3 | Not started | - |
 | 20. Legal Pages & Cookie Banner | 0/3 | Not started | - |
