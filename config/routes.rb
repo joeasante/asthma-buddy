@@ -11,14 +11,14 @@ Rails.application.routes.draw do
   resources :peak_flow_readings, path: "peak-flow-readings", only: %i[ new create index show edit update destroy ]
   resources :health_events, path: "medical-history", only: %i[ index new create show edit update destroy ]
 
-  resource :profile, only: %i[show update destroy]
+  resource :profile, only: %i[show update]
   post "profile/personal_best", to: "profiles#update_personal_best", as: :profile_personal_best
   delete "profile/avatar", to: "profiles#remove_avatar", as: :profile_avatar
 
   get "settings", to: "settings#show", as: :settings
-  resource :account, only: [:destroy]
 
   scope "/settings", module: :settings, as: :settings do
+    resource :account, only: [:destroy]
     resources :medications, only: %i[index new create edit update destroy] do
       member do
         patch :refill
