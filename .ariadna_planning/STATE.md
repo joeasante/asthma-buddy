@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 15.1 (Reliever Usage History) — IN PROGRESS
-Plan: 15.1-01 complete. Route, controller, CSS, view, and dashboard link delivered.
-Status: Plan 01 complete. Plan 02 (tests) pending.
-Last activity: 2026-03-10 — Phase 15.1 Plan 01 complete: GET /reliever-usage, RelieverUsageController#index with GINA band weekly data + peak flow correlation, reliever_usage.css, full ERB view with Turbo Frame toggle + two empty states, dashboard Reliever Usage link.
+Phase: Phase 15.1 (Reliever Usage History) — COMPLETE
+Plan: 15.1-02 complete. All plans in Phase 15.1 delivered.
+Status: Phase 15.1 complete. All 2 plans delivered.
+Last activity: 2026-03-10 — Phase 15.1 Plan 02 complete: RelieverUsageControllerTest (10 tests), 11 weekly reliever dose log fixtures for GINA band testing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 15.1 Plan 02 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 2 files modified, 10 new tests)
+- Tests at Phase 15.1-02 close: 365 passing (no regressions)
 - Phase 15.1 Plan 01 completed: 2026-03-10 (~15 min, 2 tasks, 3 files created, 3 files modified)
 - Phase 15 Plan 03 completed: 2026-03-09 (~15 min, 2 tasks, 5 files, 5 new tests)
 - Phase 15 Plan 02 completed: 2026-03-09 (~12 min, 1 task, 1 file, 11 new system tests)
@@ -92,6 +94,12 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 15.1 Plan 02 Decisions (2026-03-10)
+
+- **New fixtures broke existing puff-count test**: Adding 11 alice_reliever dose log fixtures increased total puffs from 4 to 26; updated MedicationTest expected value accordingly — this is expected maintenance when fixture counts change
+- **destroy_all in empty-state tests is safe**: Minitest wraps each test in a transaction; destroy_all changes are rolled back after each test, so fixtures are not permanently altered
+- **assert_no_match on response.body for cross-user isolation**: Simple, robust isolation check — does not rely on CSS selectors for Bob's data; works even if page structure changes
 
 ### Phase 15.1 Plan 01 Decisions (2026-03-10)
 
@@ -252,5 +260,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 15.1 Plan 01 complete — reliever usage history page (route, RelieverUsageController, weekly GINA bands, peak flow correlation, reliever_usage.css, view with Turbo Frame toggle + 2 empty states, dashboard Reliever Usage link).
+Stopped at: Phase 15.1 Plan 02 complete — RelieverUsageControllerTest (10 tests: auth, period param, cross-user isolation, 2 empty states, bar chart presence, GINA band CSS classes); 11 dose log fixtures for weekly patterns; medication_test.rb puff count updated.
 Resume file: None
