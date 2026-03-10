@@ -95,10 +95,22 @@ class OnboardingControllerTest < ActionDispatch::IntegrationTest
 
   # -- Skip step 2 --
 
-  test "PATCH skip step 2 sets medication_done flag and redirects to dashboard" do
+  test "PATCH skip step 2 after completing step 1 — flash notice present" do
+    @new_user.update!(onboarding_personal_best_done: true)
     patch onboarding_skip_path(2)
     assert_redirected_to dashboard_path
+    follow_redirect!
+    assert_equal "You can complete setup any time from Settings.", flash[:notice]
     assert @new_user.reload.onboarding_medication_done?
+  end
+
+  test "PATCH skip both steps — both flags true and flash notice survives to dashboard" do
+    patch onboarding_skip_path(2)
+    assert_redirected_to dashboard_path
+    assert @new_user.reload.onboarding_personal_best_done?
+    assert @new_user.reload.onboarding_medication_done?
+    follow_redirect!
+    assert_equal "You can complete setup any time from Settings.", flash[:notice]
   end
 
   # -- Auth guard --
