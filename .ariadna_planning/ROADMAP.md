@@ -168,9 +168,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The view includes a correlation view or summary showing reliever usage alongside peak flow readings over the same period.
   4. Only the current user's data is shown; a user cannot access another user's reliever usage history.
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 - [ ] 15.1-01-PLAN.md — Route, RelieverUsageController (inline weekly queries, GINA bands, correlation), index view (CSS bar chart, eyebrow pill, turbo-frame toggle, empty states), reliever_usage.css, dashboard link
 - [ ] 15.1-02-PLAN.md — Controller integration tests and dose_log fixtures for weekly reliever patterns
+- [ ] 15.1-03-PLAN.md — Gap closure: fix 12-week bar chart mobile overflow (scroll wrapper + min-width columns)
 
 ---
 
