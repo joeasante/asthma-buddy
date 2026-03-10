@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 16 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 5 files created, 3 files modified, 2 new system tests)
+- Tests at Phase 16-03 close: 374 passing (no regressions)
 - Phase 15.1 Plan 03 completed: 2026-03-10 (~5 min, 2 tasks, 0 files created, 2 files modified, 0 new tests — UAT gap #4 closed)
 - Phase 15.1 Plan 02 completed: 2026-03-10 (~2 min, 2 tasks, 1 file created, 2 files modified, 10 new tests)
 - Tests at Phase 15.1-02 close: 365 passing (no regressions)
@@ -95,6 +97,22 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 16 Plan 01 Decisions (2026-03-10)
+
+- **SessionsController returns 302 redirect on bad credentials**: `SessionsController#create` returns `redirect_to new_session_path, alert:` when authentication fails — not 422. Tests for deleted user sign-in must assert redirect, not unprocessable_entity
+- **SettingsController#show now renders settings page**: Removed redirect to `profile_path`; settings page serves as a hub (profile nav card + Danger Zone section)
+- **data: { turbo: false } on danger zone form**: Required so post-deletion `redirect_to root_path` is handled as full page navigation, not intercepted by Turbo
+- **reset_session after Current.user.destroy**: Invalidates session cookie immediately after user record deletion; no separate session destroy call needed
+- **Typed confirmation guard pattern**: `params[:confirmation] == "DELETE"` — case-sensitive exact match before any destructive account action
+
+### Phase 16 Plan 03 Decisions (2026-03-10)
+
+- **head :no_content (204) for dismiss response**: Stimulus controller handles client-side hide/remove; no redirect or Turbo Stream needed for the dismiss action
+- **eagerLoadControllersFrom auto-registers Stimulus controllers**: No manual entry in index.js required — cookie_notice_controller.js is picked up automatically
+- **cookie_notice.css loaded unconditionally**: Placed outside authenticated? block — banner shown to unauthenticated visitors as well as authenticated ones
+- **Show-once session banner pattern**: `before_action :set_cookie_notice_flag` sets `@show_cookie_notice = !session[:cookie_notice_shown]`; dismiss action sets `session[:cookie_notice_shown] = true`
+- **CSS transition + transitionend for element removal**: `opacity`/`translateY` transition with `{ once: true }` listener removes element after animation; no setTimeout needed
 
 ### Phase 16 Plan 02 Decisions (2026-03-10)
 
@@ -275,5 +293,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Phase 16 Plan 02 complete — Terms of Service and Privacy Policy enriched with UK GDPR-compliant content (10 sections each). Special category health data (Art. 9), all 7 UK GDPR rights, ICO complaints route, PECR cookie exemption. Both pages accessible unauthenticated. Footer links already present on all layouts.
+Stopped at: Phase 16 Plan 03 complete — Dismissible session cookie notice banner (ePrivacy LEGAL-03). CookieNoticesController#dismiss (204), ApplicationController set_cookie_notice_flag before_action, _cookie_notice partial with aria roles, cookie_notice Stimulus controller with CSS transition + transitionend removal, cookie_notice.css, 2 system tests pass. 374 tests passing, no regressions.
 Resume file: None
