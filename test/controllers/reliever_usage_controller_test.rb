@@ -123,6 +123,38 @@ class RelieverUsageControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user.medications.where(medication_type: :reliever).count > 0,
                  json["weekly_data"].any?,
                  "weekly_data must be non-empty when user has reliever logs"
+
+    # Structural assertions: weekly_data items
+    if json["weekly_data"].any?
+      item = json["weekly_data"].first
+      assert item.key?("week_start"), "weekly_data item must have week_start"
+      assert item.key?("week_end"),   "weekly_data item must have week_end"
+      assert item.key?("uses"),       "weekly_data item must have uses"
+      assert item.key?("band"),       "weekly_data item must have band"
+      assert item.key?("label"),      "weekly_data item must have label"
+      valid_bands = %w[controlled review urgent]
+      assert_includes valid_bands, item["band"], "band must be one of #{valid_bands}"
+    end
+
+    # gina_bands structure
+    gina = json["gina_bands"]
+    assert gina.key?("controlled"), "gina_bands must have controlled key"
+    assert gina.key?("review"),     "gina_bands must have review key"
+    assert gina.key?("urgent"),     "gina_bands must have urgent key"
+
+    # monthly_window structure
+    assert json.key?("monthly_window"), "JSON response must include monthly_window"
+    mw = json["monthly_window"]
+    assert mw.key?("start"), "monthly_window must have start key"
+    assert mw.key?("end"),   "monthly_window must have end key"
+
+    # correlation structure (if present)
+    if json["correlation"]
+      corr = json["correlation"]
+      assert corr.key?("high_use_week_avg_peak_flow"), "correlation must have high_use_week_avg_peak_flow"
+      assert corr.key?("low_use_week_avg_peak_flow"),  "correlation must have low_use_week_avg_peak_flow"
+      assert corr.key?("threshold_uses"),              "correlation must have threshold_uses"
+    end
   end
 
   test "index JSON unauthenticated returns 401" do

@@ -5,13 +5,11 @@ export default class extends Controller {
 
   connect() {
     this.scheduleMidnightReload()
-    this.startSafetyCheck()
     document.addEventListener("visibilitychange", this.handleVisibilityChange)
   }
 
   disconnect() {
     clearTimeout(this.midnightTimeout)
-    clearInterval(this.safetyInterval)
     document.removeEventListener("visibilitychange", this.handleVisibilityChange)
   }
 
@@ -28,10 +26,6 @@ export default class extends Controller {
     ))
     const msUntilMidnight = nextMidnight - now
     this.midnightTimeout = setTimeout(() => this.reload(), msUntilMidnight)
-  }
-
-  startSafetyCheck() {
-    this.safetyInterval = setInterval(() => this.checkDate(), 60_000)
   }
 
   checkDate() {

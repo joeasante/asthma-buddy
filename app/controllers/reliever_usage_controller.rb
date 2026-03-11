@@ -1,22 +1,20 @@
 # frozen_string_literal: true
 
 class RelieverUsageController < ApplicationController
-  GINA_REVIEW_THRESHOLD  = 3
-  GINA_URGENT_THRESHOLD  = 6
-  BAR_MAX_SCALE          = GINA_URGENT_THRESHOLD.to_f
-
   MONTHLY_CONTROL_TIERS = [
     { max: 8,              css: "eyebrow-pill--green", label: "Well controlled"    },
     { max: 15,             css: "eyebrow-pill--amber", label: "Review recommended" },
     { max: Float::INFINITY, css: "eyebrow-pill--red",  label: "Speak to your GP"  }
   ].freeze
 
-  rate_limit to: 60, within: 1.minute, with: -> {
-    respond_to do |format|
-      format.html { render plain: "Too many requests", status: :too_many_requests }
-      format.json { render json: { error: "Too many requests" }, status: :too_many_requests }
-    end
-  }
+  rate_limit to: 30, within: 1.minute,
+             by: -> { Current.session&.id || request.remote_ip },
+             with: -> {
+               respond_to do |format|
+                 format.html { redirect_to reliever_usage_path, alert: "Too many requests. Please slow down.", status: :see_other }
+                 format.json { render json: { error: "Too many requests" }, status: :too_many_requests }
+               end
+             }
 
   def index
     @weeks       = params[:weeks].to_i.in?([ 8, 12 ]) ? params[:weeks].to_i : 8
@@ -34,15 +32,22 @@ class RelieverUsageController < ApplicationController
       @monthly_uses       = 0
       @monthly_pill_class = tier[:css]
       @monthly_pill_label = tier[:label]
-    else
-      setup_monthly_stats
     end
 
     unless @relievers.empty?
-      loaded_logs = Current.user.dose_logs
-        .where(medication: @relievers)
+      reliever_ids = @relievers.map(&:id)
+      loaded_logs = DoseLog
+        .where(user_id: Current.user.id, medication_id: reliever_ids)
         .where(recorded_at: period_start.beginning_of_day..Date.current.end_of_day)
         .to_a
+
+      unless turbo_frame_request?
+        month_start = Date.current.beginning_of_month.beginning_of_day
+        @monthly_uses = loaded_logs.count { |l| l.recorded_at >= month_start }
+        tier = monthly_control_tier(@monthly_uses)
+        @monthly_pill_class = tier[:css]
+        @monthly_pill_label = tier[:label]
+      end
 
       @has_logs = loaded_logs.any?
 
@@ -55,6 +60,13 @@ class RelieverUsageController < ApplicationController
 
         @correlation = build_correlation(@weekly_data, pf_readings)
       end
+    else
+      unless turbo_frame_request?
+        @monthly_uses = 0
+        tier = monthly_control_tier(@monthly_uses)
+        @monthly_pill_class = tier[:css]
+        @monthly_pill_label = tier[:label]
+      end
     end
 
     respond_to do |format|
@@ -64,20 +76,6 @@ class RelieverUsageController < ApplicationController
   end
 
   private
-
-  def setup_monthly_stats
-    if @relievers.empty?
-      @monthly_uses = 0
-    else
-      @monthly_uses = Current.user.dose_logs
-        .where(medication: @relievers)
-        .where(recorded_at: Date.current.beginning_of_month.beginning_of_day..)
-        .count
-    end
-    tier = monthly_control_tier(@monthly_uses)
-    @monthly_pill_class = tier[:css]
-    @monthly_pill_label = tier[:label]
-  end
 
   def build_weekly_data(logs, period_start)
     # Group logs by date once — O(n) — then look up per week rather than scanning the array
@@ -98,8 +96,9 @@ class RelieverUsageController < ApplicationController
         week_start: week_start,
         week_end:   week_end,
         uses:       uses,
-        band:       gina_band(uses),
-        label:      week_start.strftime("%-d %b")
+        band:       DoseLog.gina_band(uses),
+        label:      week_start.strftime("%-d %b"),
+        fill_pct:   [ (uses / DoseLog::GINA_URGENT_THRESHOLD.to_f * 100).round, 100 ].min
       }
 
       current += 7
@@ -108,37 +107,30 @@ class RelieverUsageController < ApplicationController
     weeks.last(@weeks)
   end
 
-  def gina_band(uses)
-    if uses >= GINA_URGENT_THRESHOLD
-      :urgent
-    elsif uses >= GINA_REVIEW_THRESHOLD
-      :review
-    else
-      :controlled
-    end
-  end
-
   def build_correlation(weekly_data, pf_readings)
     return nil if pf_readings.size < 2
 
-    high_use_weeks = weekly_data.select { |w| w[:uses] >= GINA_REVIEW_THRESHOLD }
-    low_use_weeks  = weekly_data.select { |w| w[:uses] <  GINA_REVIEW_THRESHOLD }
+    pf_by_date = pf_readings.group_by { |r| r.recorded_at.to_date }
+
+    high_use_weeks = weekly_data.select { |w| w[:uses] >= DoseLog::GINA_REVIEW_THRESHOLD }
+    low_use_weeks  = weekly_data.select { |w| w[:uses] <  DoseLog::GINA_REVIEW_THRESHOLD }
 
     return nil if high_use_weeks.empty? || low_use_weeks.empty?
 
-    high_values = high_use_weeks.flat_map { |w|
-      pf_readings.select { |r| r.recorded_at.to_date.between?(w[:week_start], w[:week_end]) }.map(&:value)
+    values_for = ->(weeks) {
+      weeks.flat_map { |w|
+        (w[:week_start]..w[:week_end]).flat_map { |d| pf_by_date.fetch(d, []).map(&:value) }
+      }
     }
-    low_values = low_use_weeks.flat_map { |w|
-      pf_readings.select { |r| r.recorded_at.to_date.between?(w[:week_start], w[:week_end]) }.map(&:value)
-    }
+
+    high_values = values_for.(high_use_weeks)
+    low_values  = values_for.(low_use_weeks)
 
     return nil if high_values.empty? || low_values.empty?
 
-    high_avg = high_values.sum.to_f / high_values.size
-    low_avg  = low_values.sum.to_f  / low_values.size
-
-    { high_avg: high_avg.round, low_avg: low_avg.round }
+    { high_use_week_avg_peak_flow: (high_values.sum.to_f / high_values.size).round,
+      low_use_week_avg_peak_flow:  (low_values.sum.to_f  / low_values.size).round,
+      threshold_uses:              DoseLog::GINA_REVIEW_THRESHOLD }
   end
 
   def monthly_control_tier(uses)
@@ -154,11 +146,15 @@ class RelieverUsageController < ApplicationController
       },
       monthly_uses:   @monthly_uses,
       monthly_status: @monthly_pill_label,
+      monthly_window: {
+        start: Date.current.beginning_of_month.iso8601,
+        end:   Date.current.iso8601
+      },
       correlation:    @correlation,
       gina_bands: {
-        controlled: "0-#{GINA_REVIEW_THRESHOLD - 1} uses/week",
-        review:     "#{GINA_REVIEW_THRESHOLD}-#{GINA_URGENT_THRESHOLD - 1} uses/week",
-        urgent:     "#{GINA_URGENT_THRESHOLD}+ uses/week"
+        controlled: "0-#{DoseLog::GINA_REVIEW_THRESHOLD - 1} uses/week",
+        review:     "#{DoseLog::GINA_REVIEW_THRESHOLD}-#{DoseLog::GINA_URGENT_THRESHOLD - 1} uses/week",
+        urgent:     "#{DoseLog::GINA_URGENT_THRESHOLD}+ uses/week"
       }
     }
   end

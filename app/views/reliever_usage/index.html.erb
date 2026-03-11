@@ -50,15 +50,17 @@
 <% else %>
 
   <turbo-frame id="reliever-frame">
-    <div class="reliever-toggle" role="group" aria-label="Select date range">
+    <div class="reliever-toggle" role="tablist" aria-label="Select date range">
       <%= link_to "8 weeks", reliever_usage_path(weeks: 8),
             data: { turbo_frame: "reliever-frame", turbo_action: "advance" },
             class: "btn-secondary btn-sm #{"btn-sm--active" if @weeks == 8}",
-            aria: { current: @weeks == 8 ? "true" : nil } %>
+            role: "tab",
+            aria: { selected: @weeks == 8 } %>
       <%= link_to "12 weeks", reliever_usage_path(weeks: 12),
             data: { turbo_frame: "reliever-frame", turbo_action: "advance" },
             class: "btn-secondary btn-sm #{"btn-sm--active" if @weeks == 12}",
-            aria: { current: @weeks == 12 ? "true" : nil } %>
+            role: "tab",
+            aria: { selected: @weeks == 12 } %>
     </div>
 
     <div class="section-card">
@@ -77,14 +79,13 @@
         <div class="reliever-bars" role="img" aria-label="Weekly reliever usage bar chart">
           <div class="reliever-threshold" aria-hidden="true"></div>
           <% @weekly_data.each do |week| %>
-            <% fill_pct = [(week[:uses] / RelieverUsageController::BAR_MAX_SCALE * 100).round, 100].min %>
             <div class="reliever-bar-col">
               <span class="reliever-bar-count" aria-hidden="true">
                 <%= week[:uses] > 0 ? week[:uses] : "" %>
               </span>
               <div class="reliever-bar-track">
                 <div class="reliever-bar-fill reliever-bar-fill--<%= week[:band] %>"
-                     style="--bar-fill-height: <%= fill_pct %>%;"
+                     style="--bar-fill-height: <%= week[:fill_pct] %>%;"
                      aria-label="<%= week[:label] %>: <%= week[:uses] %> use<%= week[:uses] == 1 ? "" : "s" %>">
                 </div>
               </div>
@@ -96,9 +97,9 @@
 
       <%# GINA legend %>
       <div class="dash-zone-legend" aria-label="GINA usage bands">
-        <span class="dash-zone-legend-item dash-zone-legend-item--green">0&ndash;2 Controlled</span>
-        <span class="dash-zone-legend-item dash-zone-legend-item--yellow">3&ndash;5 Review</span>
-        <span class="dash-zone-legend-item dash-zone-legend-item--red">6+ Speak to GP</span>
+        <span class="dash-zone-legend-item dash-zone-legend-item--green">0&ndash;<%= DoseLog::GINA_REVIEW_THRESHOLD - 1 %> Controlled</span>
+        <span class="dash-zone-legend-item dash-zone-legend-item--yellow"><%= DoseLog::GINA_REVIEW_THRESHOLD %>&ndash;<%= DoseLog::GINA_URGENT_THRESHOLD - 1 %> Review</span>
+        <span class="dash-zone-legend-item dash-zone-legend-item--red"><%= DoseLog::GINA_URGENT_THRESHOLD %>+ Speak to GP</span>
       </div>
     </div>
 
@@ -110,19 +111,19 @@
           <div class="dash-stat">
             <span class="dash-stat-label">High-use weeks avg</span>
             <span class="dash-stat-value dash-stat-value--zone-red">
-              <%= @correlation[:high_avg] %><span class="dash-stat-unit"> L/min</span>
+              <%= @correlation[:high_use_week_avg_peak_flow] %><span class="dash-stat-unit"> L/min</span>
             </span>
           </div>
           <div class="dash-stat">
             <span class="dash-stat-label">Low-use weeks avg</span>
             <span class="dash-stat-value dash-stat-value--zone-green">
-              <%= @correlation[:low_avg] %><span class="dash-stat-unit"> L/min</span>
+              <%= @correlation[:low_use_week_avg_peak_flow] %><span class="dash-stat-unit"> L/min</span>
             </span>
           </div>
         </div>
         <p class="section-card-subtitle">
-          On weeks with 3 or more reliever uses, your average peak flow was
-          <%= @correlation[:high_avg] %> L/min &mdash; compared to <%= @correlation[:low_avg] %> L/min
+          On weeks with <%= DoseLog::GINA_REVIEW_THRESHOLD %> or more reliever uses, your average peak flow was
+          <%= @correlation[:high_use_week_avg_peak_flow] %> L/min &mdash; compared to <%= @correlation[:low_use_week_avg_peak_flow] %> L/min
           on lower-use weeks.
         </p>
       </div>
