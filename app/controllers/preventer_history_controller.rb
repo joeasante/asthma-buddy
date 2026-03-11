@@ -47,5 +47,39 @@ class PreventerHistoryController < ApplicationController
       end
       { medication: medication, days_data: days_data }
     end
+
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: {
+          period:            @period,
+          days_taken:        @header_days_taken,
+          days_elapsed:      @header_days_elapsed,
+          adherence_history: @adherence_history.map { |entry| adherence_history_json(entry) }
+        }
+      end
+    end
+  end
+
+  private
+
+  def adherence_history_json(entry)
+    medication = entry[:medication]
+    {
+      medication_id:   medication.id,
+      medication_name: medication.name,
+      doses_per_day:   medication.doses_per_day,
+      days_data:       entry[:days_data].map { |day| adherence_day_json(day) }
+    }
+  end
+
+  def adherence_day_json(day)
+    result = day[:result]
+    {
+      date:      day[:date].to_s,
+      taken:     result.taken,
+      scheduled: result.scheduled,
+      status:    result.status
+    }
   end
 end
