@@ -96,6 +96,9 @@ class SymptomLogsController < ApplicationController
       @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
         Current.user.symptom_logs.severity_counts
       )
+      all_logs = Current.user.symptom_logs.chronological
+      @header_last_log    = all_logs.first
+      @header_month_count = all_logs.where(recorded_at: Date.current.beginning_of_month..).count
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to symptom_logs_path, notice: "Symptom logged." }
@@ -119,6 +122,9 @@ class SymptomLogsController < ApplicationController
       @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
         Current.user.symptom_logs.severity_counts
       )
+      all_logs = Current.user.symptom_logs.chronological
+      @header_last_log    = all_logs.first
+      @header_month_count = all_logs.where(recorded_at: Date.current.beginning_of_month..).count
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to symptom_logs_path, notice: "Symptom updated." }
@@ -138,6 +144,9 @@ class SymptomLogsController < ApplicationController
     @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
       Current.user.symptom_logs.severity_counts
     )
+    all_logs = Current.user.symptom_logs.chronological
+    @header_last_log    = all_logs.first
+    @header_month_count = all_logs.where(recorded_at: Date.current.beginning_of_month..).count
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to symptom_logs_path, notice: "Symptom deleted." }

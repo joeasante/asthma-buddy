@@ -20,6 +20,10 @@
       ) %>
 <% end %>
 
+<%= turbo_stream.replace "symptom-logs-page-header" do %>
+  <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
+<% end %>
+
 <%# Success feedback.
     When a toast_controller.js is added, it should read data-toast-message / data-toast-variant
     and render an in-app toast. Until then this flash paragraph is shown as a standard notice. %>

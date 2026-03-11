@@ -8,6 +8,10 @@
       partial: "timeline_row",
       locals: { symptom_log: @symptom_log } %>
 
+<%= turbo_stream.replace "symptom-logs-page-header" do %>
+  <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
+<% end %>
+
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages"
        data-controller="toast"

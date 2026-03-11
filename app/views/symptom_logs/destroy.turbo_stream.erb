@@ -6,6 +6,10 @@
 
 <%= turbo_stream.remove dom_id(@symptom_log) %>
 
+<%= turbo_stream.replace "symptom-logs-page-header" do %>
+  <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
+<% end %>
+
 <%# Show success feedback — see create.turbo_stream.erb comment about toast system. %>
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages"
