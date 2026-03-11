@@ -32,6 +32,7 @@
       <%= stylesheet_link_tag "health_events",     "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "reliever_usage",    "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "medications",       "data-turbo-track": "reload" %>
+      <%= stylesheet_link_tag "notifications",    "data-turbo-track": "reload" %>
     <% end %>
     <%= javascript_importmap_tags %>
   </head>
@@ -69,6 +70,8 @@
             <%= link_to "Medical History", health_events_path,
                   class: nav_link_class(health_events_path),
                   aria: { current: nav_current(health_events_path) } %>
+            <% unread_count = Current.user.notifications.unread.count %>
+            <%= render "layouts/nav_bell", unread_count: unread_count %>
             <div class="nav-user" data-controller="nav-dropdown">
               <button class="nav-avatar-btn"
                       data-action="click->nav-dropdown#toggle"
@@ -115,7 +118,7 @@
       <%= render "layouts/bottom_nav" %>
     <% end %>
 
-    <%= render "layouts/cookie_notice" unless session[:cookie_notice_shown] %>
+    <%= render "layouts/cookie_notice" unless authenticated? || session[:cookie_notice_shown] %>
 
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
