@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 19 (Notifications) — IN PROGRESS
-Plan: Plan 02 complete.
-Status: Phase 19 Plan 02 complete. 2026-03-11.
-Last activity: 2026-03-11 — Phase 19 Plan 02 complete: NotificationsController (index, mark_read, mark_all_read), /notifications feed, _notification partial, Turbo Stream mark-read/mark-all-read, _nav_bell layout partial, notifications.css, relative_time_controller.js, bell in desktop header, Alerts tab in bottom nav. 451 tests passing, no regressions.
+Phase: Phase 19 (Notifications) — COMPLETE
+Plan: Plan 03 complete.
+Status: Phase 19 all plans complete. 2026-03-11.
+Last activity: 2026-03-11 — Phase 19 Plan 03 complete: NotificationsControllerTest (11 integration tests: index scoping, mark_read Turbo Stream + cross-user 404, mark_all_read + isolation, unauthenticated redirects), NotificationsTest system tests (7 tests: badge visibility, mark single inline, mark all read, empty states x2, regression check). 462 integration tests passing, 0 regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 19 Plan 03 completed: 2026-03-11 (~3 min, 2 tasks, 2 files created, 0 files modified, 18 new tests — 11 controller + 7 system)
+- Tests at Phase 19-03 close: 462 integration passing, 7 system passing (no regressions)
 - Phase 19 Plan 02 completed: 2026-03-11 (~3 min, 2 tasks, 8 files created, 3 files modified, 0 new tests — UI-only plan)
 - Tests at Phase 19-02 close: 451 passing (no regressions)
 - Phase 19 Plan 01 completed: 2026-03-11 (~3 min, 2 tasks, 6 files created, 3 files modified, 12 new tests — model tests)
@@ -112,6 +114,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 19 Plan 03 Decisions (2026-03-11)
+
+- **Inline notification creates in system setup**: `@low_stock_notif` and `@missed_dose_notif` created inline in setup (not fixtures-only) to get real AR IDs for `within("##{dom_id(@low_stock_notif)}")` selectors — fixtures have known names but system tests need actual database IDs
+- **`[data-unread-count]:not([data-unread-count='0'])` badge selector**: Catches either desktop nav-bell or mobile Alerts tab without needing viewport-specific selectors — both elements carry `data-unread-count` and the same has-unread-badge class
+- **`assert_text "You're all caught up."` covers both empty states**: View renders it in empty-state div (`@notifications.empty?`) and in notifications-all-read paragraph (`@notifications.all?(&:read)`) — single assertion works for both test cases
+- **`wait: 5` on all Turbo Stream assertions**: Default 2s Capybara wait insufficient for Turbo Stream DOM updates under transactional test load; consistent `wait: 5` across all post-interaction assertions
 
 ### Phase 19 Plan 02 Decisions (2026-03-11)
 
@@ -371,5 +380,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Phase 19 Plan 02 complete — NotificationsController, /notifications feed, Turbo Stream mark-read/mark-all-read, _nav_bell partial, notifications.css, relative_time_controller.js, bell in desktop header, Alerts tab in bottom nav. 451 tests passing, 0 regressions.
+Stopped at: Phase 19 Plan 03 complete — NotificationsControllerTest (11 integration tests) and NotificationsTest system tests (7 tests). 462 integration tests passing, 7 system tests passing, 0 regressions. Phase 19 fully complete.
 Resume file: None
