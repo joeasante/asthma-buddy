@@ -337,10 +337,12 @@ Plans:
   5. The nav bell icon shows an unread count badge when there are unread notifications; the badge disappears when count reaches zero.
   6. The empty state ("You're all caught up.") displays when all notifications are read or none exist.
 
-**Plans**:
-- [ ] 19-01: Notification model — user association, `notification_type` enum (low_stock/missed_dose/peak_flow_reminder/system), `read` boolean (default false), `body` string, `target_path` string, `created_at`; `unread` scope; migration; model tests; background job or ActiveSupport::Notifications hook to create low-stock notifications
-- [ ] 19-02: NotificationsController (index, update for mark-read, `mark_all_read` action); routes; `_notification.html.erb` partial; `mark_read.turbo_stream.erb`; `mark_all_read.turbo_stream.erb`; `notifications.css`; `relative_time_controller.js`; nav bell icon with unread badge via layout change
-- [ ] 19-03: Controller tests (index, mark read, mark all read, cross-user isolation) and system tests (badge appears, mark single read, mark all read, empty state)
+**Plans**: 3 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Notification model (polymorphic notifiable, enum low_stock/missed_dose/system, read bool, body, unread scope); migration; fixtures; model tests; DoseLog after_create_commit low-stock trigger; MissedDoseCheckJob (9pm daily via recurring.yml); PruneNotificationsJob (daily, read notifications >90 days)
+- [ ] 19-02-PLAN.md — NotificationsController (index, mark_read PATCH, mark_all_read POST); routes; _notification.html.erb partial; mark_read.turbo_stream.erb; mark_all_read.turbo_stream.erb; notifications.css; relative_time_controller.js Stimulus controller; bell icon in desktop nav with unread badge (data-unread-count + ::after); bottom nav Notifications tab replacing Medications tab
+- [ ] 19-03-PLAN.md — Controller tests (index scoping, mark_read, mark_all_read, cross-user 404, unauthenticated redirects) and system tests (badge visible, mark single read inline, mark all read, empty state)
 
 ---
 
