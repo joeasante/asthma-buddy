@@ -10,4 +10,12 @@ class DoseLog < ApplicationRecord
 
   scope :chronological, -> { order(recorded_at: :desc) }
   scope :for_medication, ->(medication) { where(medication: medication) }
+
+  after_create_commit :check_low_stock
+
+  private
+
+    def check_low_stock
+      Notification.create_low_stock_for(medication)
+    end
 end

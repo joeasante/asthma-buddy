@@ -13,3 +13,13 @@ production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+
+  missed_dose_check:
+    class: MissedDoseCheckJob
+    queue: default
+    schedule: every day at 9pm
+
+  prune_notifications:
+    class: PruneNotificationsJob
+    queue: default
+    schedule: every day at 3am

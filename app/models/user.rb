@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :medications,          dependent: :destroy       # cascades to dose_logs via its own dependent: :destroy
   has_many :dose_logs,            dependent: :delete_all    # no destroy callbacks; medications cascade first
   has_many :health_events,        dependent: :destroy       # has_rich_text :notes — needs callbacks for ActionText cleanup
+  has_many :notifications,        dependent: :delete_all    # no destroy callbacks — bulk DELETE is safe
   has_one_attached :avatar
   before_destroy :purge_avatar_attachment
 
