@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 19 (Notifications) — IN PROGRESS
-Plan: Plan 01 complete.
-Status: Phase 19 Plan 01 complete. 2026-03-11.
-Last activity: 2026-03-11 — Phase 19 Plan 01 complete: Notification model, migration, fixtures, 12 model tests, DoseLog after_create_commit low-stock trigger, MissedDoseCheckJob, PruneNotificationsJob, recurring.yml schedule. 451 tests passing, no regressions.
+Plan: Plan 02 complete.
+Status: Phase 19 Plan 02 complete. 2026-03-11.
+Last activity: 2026-03-11 — Phase 19 Plan 02 complete: NotificationsController (index, mark_read, mark_all_read), /notifications feed, _notification partial, Turbo Stream mark-read/mark-all-read, _nav_bell layout partial, notifications.css, relative_time_controller.js, bell in desktop header, Alerts tab in bottom nav. 451 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 19 Plan 02 completed: 2026-03-11 (~3 min, 2 tasks, 8 files created, 3 files modified, 0 new tests — UI-only plan)
+- Tests at Phase 19-02 close: 451 passing (no regressions)
 - Phase 19 Plan 01 completed: 2026-03-11 (~3 min, 2 tasks, 6 files created, 3 files modified, 12 new tests — model tests)
 - Tests at Phase 19-01 close: 451 passing (no regressions)
 - Phase 18 Plan 03 completed: 2026-03-10 (~10 min, 2 tasks, 1 file created, 1 file modified, 21 new tests — 11 controller + 10 system)
@@ -110,6 +112,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 19 Plan 02 Decisions (2026-03-11)
+
+- **_nav_bell extracted as layout partial**: Turbo Stream `replace "nav-bell"` requires an isolated renderable partial. `layouts/_nav_bell.html.erb` is rendered both in the initial layout (application.html.erb) and in mark_read/mark_all_read stream views, ensuring consistent HTML on update
+- **data-unread-count CSS badge strategy**: `data-unread-count` integer attribute on link elements; `.has-unread-badge[data-unread-count]:not([data-unread-count="0"])::after` renders red dot when count > 0 — no JS for badge rendering, works for both desktop bell (.nav-bell.has-unread-badge) and mobile bottom nav (.bottom-nav a.has-unread-badge) via separate CSS rules
+- **Bottom nav Medications tab replaced with Alerts tab**: Medications remains in desktop header nav; mobile Alerts tab uses same bell SVG as desktop bell for visual consistency
+- **resolve_notification_path with per-type rescue**: Each notification_type has its own begin/rescue block — explicit fallback per type, future notification_type additions declare their own fallback without a catch-all masking errors
+- **relative_time_controller.js pure JS**: No external library (no moment.js, no date-fns); simple threshold-based format() covers the practical range (just now → N weeks ago); 60s setInterval refreshes all visible timestamps
 
 ### Phase 19 Plan 01 Decisions (2026-03-11)
 
@@ -361,5 +371,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Phase 19 Plan 01 complete — Notification model, migration, fixtures, 12 model tests, DoseLog after_create_commit, MissedDoseCheckJob, PruneNotificationsJob, recurring.yml schedule. 451 tests passing, 0 regressions.
+Stopped at: Phase 19 Plan 02 complete — NotificationsController, /notifications feed, Turbo Stream mark-read/mark-all-read, _nav_bell partial, notifications.css, relative_time_controller.js, bell in desktop header, Alerts tab in bottom nav. 451 tests passing, 0 regressions.
 Resume file: None
