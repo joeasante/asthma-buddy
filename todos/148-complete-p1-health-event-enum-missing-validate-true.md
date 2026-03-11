@@ -1,5 +1,5 @@
 ---
-status: pending
+status: complete
 priority: p1
 issue_id: "148"
 tags: [code-review, rails, validation, security, health-events]
