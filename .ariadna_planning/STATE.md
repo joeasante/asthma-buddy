@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 18 (Temporary Medication Courses) — COMPLETE
-Plan: Plan 03 complete.
-Status: Phase 18 Plan 03 complete. 2026-03-10.
-Last activity: 2026-03-10 — Phase 18 Plan 03 complete: 11 controller integration tests (course create, index split, archive boundary, cross-user isolation, adherence exclusion) + 10 system tests (add course flow, Stimulus toggle, archived display, dose logging, adherence exclusion). 421 unit+integration tests passing, no regressions.
+Phase: Phase 19 (Notifications) — IN PROGRESS
+Plan: Plan 01 complete.
+Status: Phase 19 Plan 01 complete. 2026-03-11.
+Last activity: 2026-03-11 — Phase 19 Plan 01 complete: Notification model, migration, fixtures, 12 model tests, DoseLog after_create_commit low-stock trigger, MissedDoseCheckJob, PruneNotificationsJob, recurring.yml schedule. 451 tests passing, no regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 19 Plan 01 completed: 2026-03-11 (~3 min, 2 tasks, 6 files created, 3 files modified, 12 new tests — model tests)
+- Tests at Phase 19-01 close: 451 passing (no regressions)
 - Phase 18 Plan 03 completed: 2026-03-10 (~10 min, 2 tasks, 1 file created, 1 file modified, 21 new tests — 11 controller + 10 system)
 - Tests at Phase 18-03 close: 421 passing (no regressions); 10 additional system tests in test/system/medications_test.rb
 - Phase 18 Plan 02 completed: 2026-03-10 (~8 min, 2 tasks, 4 files created, 5 files modified, 0 new tests — UI-only plan)
@@ -108,6 +110,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 19 Plan 01 Decisions (2026-03-11)
+
+- **notifiable columns nullable**: `notifiable_type` and `notifiable_id` are nullable in the DB even though the plan spec said `null: false`. `optional: true` on belongs_to requires nullable columns so that (a) system notifications with no notifiable can be created and (b) FK constraint doesn't fire after the polymorphic target is deleted
+- **validate: true enum behavior**: Rails enum with `validate: true` routes unknown values to validation errors, not ArgumentError. Test assertions updated to check `errors[:notification_type].any?` rather than expecting an exception
+- **has_many :notifications, dependent: :delete_all on User**: Added to prevent FOREIGN KEY constraint failure on user account deletion. Follows delete_all pattern for associations with no destroy callbacks
+- **find_each in MissedDoseCheckJob**: Processes preventer medications in batches of 1000 to avoid loading all AR objects at once in production
+- **MissedDoseCheckJob deduplication via created_at range**: `Notification.exists?` scoped to `created_at: today.beginning_of_day..today.end_of_day` — one missed_dose notification per calendar day per medication; job is idempotent
 
 ### Phase 18 Plan 03 Decisions (2026-03-10)
 
@@ -350,6 +360,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10
-Stopped at: Phase 18 Plan 03 complete — full test suite for temporary medication courses: 11 controller integration tests (course create, index split, archive boundary, cross-user isolation, adherence exclusion) and 10 system tests (add-course flow, Stimulus toggle, archived display, dose logging, adherence exclusion). 421 unit+integration tests passing, 0 regressions.
+Last session: 2026-03-11
+Stopped at: Phase 19 Plan 01 complete — Notification model, migration, fixtures, 12 model tests, DoseLog after_create_commit, MissedDoseCheckJob, PruneNotificationsJob, recurring.yml schedule. 451 tests passing, 0 regressions.
 Resume file: None
