@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_10_191313) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_11_093356) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -84,14 +84,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_191313) do
     t.string "name", null: false
     t.datetime "refilled_at"
     t.integer "sick_day_dose_puffs"
-    t.integer "standard_dose_puffs", null: false
-    t.integer "starting_dose_count", null: false
+    t.integer "standard_dose_puffs"
+    t.integer "starting_dose_count"
     t.date "starts_on"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["ends_on"], name: "index_medications_on_ends_on"
     t.index ["medication_type"], name: "index_medications_on_medication_type"
     t.index ["user_id"], name: "index_medications_on_user_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "notifiable_id"
+    t.string "notifiable_type"
+    t.integer "notification_type", null: false
+    t.boolean "read", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index ["user_id", "read"], name: "index_notifications_on_user_id_and_read"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "peak_flow_readings", force: :cascade do |t|
@@ -157,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_10_191313) do
   add_foreign_key "dose_logs", "users"
   add_foreign_key "health_events", "users"
   add_foreign_key "medications", "users"
+  add_foreign_key "notifications", "users"
   add_foreign_key "peak_flow_readings", "users"
   add_foreign_key "personal_best_records", "users"
   add_foreign_key "sessions", "users"

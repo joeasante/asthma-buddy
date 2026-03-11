@@ -1,0 +1,33 @@
+alice_low_stock:
+  user: verified_user
+  notifiable_type: Medication
+  notifiable_id: <%= ActiveRecord::FixtureSet.identify(:alice_preventer) %>
+  notification_type: 0
+  body: "Clenil Modulite has fewer than 14 days of supply remaining. Consider requesting a refill."
+  read: false
+
+alice_missed_dose:
+  user: verified_user
+  notifiable_type: Medication
+  notifiable_id: <%= ActiveRecord::FixtureSet.identify(:alice_preventer) %>
+  notification_type: 1
+  body: "You haven't logged your Clenil Modulite dose today."
+  read: false
+  created_at: <%= Time.current %>
+
+alice_read_old:
+  user: verified_user
+  notifiable_type: User
+  notifiable_id: <%= ActiveRecord::FixtureSet.identify(:verified_user) %>
+  notification_type: 2
+  body: "System notification from 91 days ago."
+  read: true
+  created_at: <%= 91.days.ago %>
+
+bob_notification:
+  user: unverified_user
+  notifiable_type: Medication
+  notifiable_id: <%= ActiveRecord::FixtureSet.identify(:bob_reliever) %>
+  notification_type: 0
+  body: "Salbutamol has fewer than 14 days of supply remaining. Consider requesting a refill."
+  read: false
