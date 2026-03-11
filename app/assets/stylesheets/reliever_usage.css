@@ -94,10 +94,3 @@
   color: var(--text-3);
 }
 
-/* Correlation card insight text */
-.section-card-subtitle {
-  margin-top: var(--space-sm);
-  font-size: 0.875rem;
-  color: var(--text-3);
-  line-height: 1.5;
-}
