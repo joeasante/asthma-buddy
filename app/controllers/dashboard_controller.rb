@@ -71,16 +71,7 @@ class DashboardController < ApplicationController
     @health_event_markers = user.health_events
       .where(recorded_at: week_start.beginning_of_day..Date.current.end_of_day)
       .order(recorded_at: :asc)
-      .map do |e|
-        marker = {
-          date:         e.recorded_at.to_date.to_s,
-          type:         e.event_type,
-          label:        e.chart_label,
-          css_modifier: e.event_type_css_modifier
-        }
-        marker[:end_date] = e.ended_at.to_date.to_s if !e.point_in_time? && e.ended_at.present?
-        marker
-      end
+      .map(&:to_chart_marker)
 
     # Duration events that started before this week and are still ongoing.
     # These have no valid x-axis position so they can't be chart markers,
@@ -127,6 +118,31 @@ class DashboardController < ApplicationController
       .where(ended_at: nil)
       .order(recorded_at: :desc)
       .first
+
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: {
+          todays_best_reading: @todays_best_reading && {
+            value: @todays_best_reading.value,
+            zone:  @todays_best_reading.zone
+          },
+          week_avg:            @week_avg,
+          week_avg_zone:       @week_avg_zone,
+          week_reading_count:  @week_reading_count,
+          week_symptom_count:  @week_symptom_count,
+          active_illness:      @active_illness && {
+            id:          @active_illness.id,
+            recorded_at: @active_illness.recorded_at.iso8601,
+            ended_at:    @active_illness.ended_at&.iso8601
+          },
+          low_stock_medications: @low_stock_medications.map { |m| { id: m.id, name: m.name } },
+          preventer_adherence:   @preventer_adherence.map { |entry|
+            { medication_id: entry[:medication].id, name: entry[:medication].name, result: entry[:result] }
+          }
+        }
+      end
+    end
   end
 
   private

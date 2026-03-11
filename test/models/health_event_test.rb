@@ -24,6 +24,12 @@ class HealthEventTest < ActiveSupport::TestCase
     assert event.errors[:event_type].any?
   end
 
+  test "invalid with unrecognized event_type" do
+    event = HealthEvent.new(valid_attributes.merge(event_type: "hacked"))
+    assert_not event.valid?
+    assert event.errors[:event_type].any?
+  end
+
   test "invalid without recorded_at" do
     event = HealthEvent.new(valid_attributes.except(:recorded_at))
     assert_not event.valid?

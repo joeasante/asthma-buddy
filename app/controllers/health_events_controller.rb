@@ -87,11 +87,22 @@ class HealthEventsController < ApplicationController
   end
 
   def health_event_json(event)
-    event.as_json(only: %i[id event_type recorded_at ended_at created_at]).merge(
+    data = event.as_json(only: %i[id event_type recorded_at ended_at created_at]).merge(
       event_type_label: event.event_type_label,
       ongoing: event.ongoing?,
       formatted_duration: event.formatted_duration,
       notes: event.notes.to_plain_text
     )
+    if event.illness?
+      illness_end = event.ended_at || Time.current
+      symptom_logs = Current.user.symptom_logs
+        .where(recorded_at: event.recorded_at.beginning_of_day..illness_end.end_of_day)
+        .order(recorded_at: :desc)
+      data[:illness_symptom_logs] = symptom_logs.map do |sl|
+        { id: sl.id, recorded_at: sl.recorded_at.iso8601, severity: sl.severity,
+          notes: sl.notes&.to_plain_text }
+      end
+    end
+    data
   end
 end

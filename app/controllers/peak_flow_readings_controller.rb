@@ -108,16 +108,7 @@ class PeakFlowReadingsController < ApplicationController
           .where(recorded_at: ..chart_end.end_of_day)
           .where.not(event_type: HealthEvent::POINT_IN_TIME_TYPES)
         events_rel = events_rel.where(recorded_at: @start_date.beginning_of_day..) if @start_date
-        @health_event_markers = events_rel.order(recorded_at: :asc).map do |e|
-          marker = {
-            date:         e.recorded_at.to_date.to_s,
-            type:         e.event_type,
-            label:        e.chart_label,
-            css_modifier: e.event_type_css_modifier
-          }
-          marker[:end_date] = e.ended_at.to_date.to_s if e.ended_at.present?
-          marker
-        end
+        @health_event_markers = events_rel.order(recorded_at: :asc).map(&:to_chart_marker)
       end
       format.json do
         render json: {
@@ -149,7 +140,13 @@ class PeakFlowReadingsController < ApplicationController
       respond_to do |format|
         format.turbo_stream { render :form_error, status: :unprocessable_entity }
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: { errors: @peak_flow_reading.errors.full_messages }, status: :unprocessable_entity }
+        format.json do
+          json_response = { errors: @peak_flow_reading.errors.full_messages }
+          if @peak_flow_reading.duplicate_session_reading.present?
+            json_response[:duplicate_reading] = peak_flow_reading_json(@peak_flow_reading.duplicate_session_reading)
+          end
+          render json: json_response, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -172,16 +169,25 @@ class PeakFlowReadingsController < ApplicationController
         format.json { render json: { errors: @peak_flow_reading.errors.full_messages }, status: :unprocessable_entity }
       end
     end
+  rescue ActiveRecord::RecordNotUnique
+    @peak_flow_reading.errors.add(:base, "You already have a #{@peak_flow_reading.time_of_day} reading for that date")
+    respond_to do |format|
+      format.turbo_stream { render :update_error, status: :unprocessable_entity }
+      format.html { render :edit, status: :unprocessable_entity }
+      format.json { render json: { errors: @peak_flow_reading.errors.full_messages }, status: :unprocessable_entity }
+    end
   end
 
   def destroy
     @peak_flow_reading.destroy
-    @header_last_reading = Current.user.peak_flow_readings.chronological.first
-    @header_month_count  = Current.user.peak_flow_readings
-                                   .where(recorded_at: Date.current.beginning_of_month..)
-                                   .count
     respond_to do |format|
-      format.turbo_stream
+      format.turbo_stream do
+        @header_last_reading = Current.user.peak_flow_readings.chronological.first
+        @header_month_count  = Current.user.peak_flow_readings
+                                       .where(recorded_at: Date.current.beginning_of_month..)
+                                       .count
+        render :destroy
+      end
       format.html { redirect_to peak_flow_readings_path, notice: "Reading deleted." }
       format.json { head :no_content }
     end

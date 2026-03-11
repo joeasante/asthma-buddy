@@ -77,9 +77,7 @@ class PeakFlowReading < ApplicationRecord
     zone_pct&.round
   end
 
-  def duplicate_session_reading
-    @duplicate_session_reading
-  end
+  attr_reader :duplicate_session_reading
 
   private
 
