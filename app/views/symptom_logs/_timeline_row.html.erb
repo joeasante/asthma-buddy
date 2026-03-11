@@ -1,13 +1,15 @@
+<% symptom_label = symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %>
+
 <%= link_to symptom_log_path(symptom_log),
       id: dom_id(symptom_log),
-      class: "timeline-row",
-      aria: { label: "#{symptom_log.symptom_type.humanize.gsub("_", " ").capitalize} on #{symptom_log.recorded_at.strftime("%-d %b %Y")}" } do %>
+      class: "timeline-card",
+      aria: { label: "#{symptom_label}, #{symptom_log.severity} on #{symptom_log.recorded_at.strftime("%-d %b %Y")}" } do %>
 
   <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
 
   <div class="timeline-row-body">
     <div class="timeline-row-meta">
-      <span class="timeline-type"><%= symptom_log.symptom_type.humanize.gsub("_", " ").capitalize %></span>
+      <span class="timeline-type"><%= symptom_label %></span>
       <span class="timeline-severity severity-label--<%= symptom_log.severity %>">
         <%= symptom_log.severity.capitalize %>
       </span>

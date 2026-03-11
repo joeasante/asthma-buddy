@@ -107,11 +107,46 @@ class PeakFlowReadingTest < ActiveSupport::TestCase
     assert_not reading.valid?
   end
 
+  # Duplicate session validation
+
+  test "duplicate morning session on same day is invalid" do
+    PeakFlowReading.create!(valid_attributes.merge(recorded_at: 5.days.ago.change(hour: 7), time_of_day: :morning))
+    duplicate = PeakFlowReading.new(valid_attributes.merge(recorded_at: 5.days.ago.change(hour: 8), time_of_day: :morning))
+    assert_not duplicate.valid?
+    assert duplicate.errors[:base].any?
+    assert_match(/morning/, duplicate.errors[:base].first)
+  end
+
+  test "duplicate morning session exposes the existing reading via duplicate_session_reading" do
+    existing = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 6.days.ago, time_of_day: :morning))
+    duplicate = PeakFlowReading.new(valid_attributes.merge(recorded_at: 6.days.ago.change(hour: 9), time_of_day: :morning))
+    duplicate.valid?
+    assert_equal existing, duplicate.duplicate_session_reading
+  end
+
+  test "morning and evening sessions on same day are both valid" do
+    PeakFlowReading.create!(valid_attributes.merge(recorded_at: 7.days.ago.change(hour: 8),  time_of_day: :morning))
+    evening = PeakFlowReading.new(valid_attributes.merge(recorded_at: 7.days.ago.change(hour: 20), time_of_day: :evening))
+    assert evening.valid?, evening.errors.full_messages.inspect
+  end
+
+  test "same session on different days is valid" do
+    PeakFlowReading.create!(valid_attributes.merge(recorded_at: 8.days.ago, time_of_day: :morning))
+    different_day = PeakFlowReading.new(valid_attributes.merge(recorded_at: 9.days.ago, time_of_day: :morning))
+    assert different_day.valid?, different_day.errors.full_messages.inspect
+  end
+
+  test "duplicate session validation skipped on update" do
+    reading = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 11.days.ago, time_of_day: :morning))
+    reading.value = 450
+    assert reading.valid?, reading.errors.full_messages.inspect
+  end
+
   # Scope
 
   test "chronological scope orders by recorded_at descending" do
-    older = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 3.hours.ago))
-    newer = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 1.hour.ago))
+    older = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 10.days.ago, time_of_day: :morning))
+    newer = PeakFlowReading.create!(valid_attributes.merge(recorded_at: 9.days.ago,  time_of_day: :morning))
     results = PeakFlowReading.where(id: [ older.id, newer.id ]).chronological
     assert_equal newer.id, results.first.id
   end

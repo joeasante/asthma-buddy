@@ -4,8 +4,9 @@ class NotificationsController < ApplicationController
   before_action :set_notification, only: %i[mark_read]
 
   def index
-    @notifications = Current.user.notifications.newest_first
-    @unread_count  = Current.user.notifications.unread.count
+    @notifications       = Current.user.notifications.newest_first
+    @unread_count        = Current.user.notifications.unread.count
+    @last_notification   = @notifications.first
 
     respond_to do |format|
       format.html
@@ -21,7 +22,8 @@ class NotificationsController < ApplicationController
   def mark_read
     destination = resolve_notification_path(@notification)
     @notification.update!(read: true)
-    @unread_count = Current.user.notifications.unread.count
+    @unread_count      = Current.user.notifications.unread.count
+    @last_notification = Current.user.notifications.newest_first.first
 
     respond_to do |format|
       format.turbo_stream
@@ -31,10 +33,11 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_read
-    @notifications = Current.user.notifications.unread.to_a
+    @notifications     = Current.user.notifications.unread.to_a
     @notifications.each { |n| n.read = true }
     Current.user.notifications.unread.update_all(read: true)
-    @unread_count = 0
+    @unread_count      = 0
+    @last_notification = Current.user.notifications.newest_first.first
 
     respond_to do |format|
       format.turbo_stream

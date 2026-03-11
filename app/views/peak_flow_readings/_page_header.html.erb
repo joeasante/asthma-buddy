@@ -1,0 +1,33 @@
+<div id="peak-flow-page-header" class="page-header">
+  <div class="page-header-eyebrow">
+    <% if last_reading %>
+      <span class="eyebrow-stat">Last: <strong><%= last_reading.value %> L/min</strong></span>
+      <% if last_reading.zone %>
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        <span class="eyebrow-pill eyebrow-pill--<%= last_reading.zone_css_modifier %>">
+          <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3"/></svg>
+          <%= last_reading.zone.capitalize %> zone
+        </span>
+      <% end %>
+      <span class="eyebrow-dot" aria-hidden="true"></span>
+    <% end %>
+    <span class="eyebrow-stat"><strong><%= month_count %></strong> <%= "reading".pluralize(month_count) %> this month</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Peak Flow</h1>
+        <p class="page-header-subtitle">Your breathing measurements over time</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "+ Record reading", new_peak_flow_reading_path, class: "btn-primary" %>
+    </div>
+  </div>
+</div>

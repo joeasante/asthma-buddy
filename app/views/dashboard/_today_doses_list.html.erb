@@ -1,0 +1,28 @@
+<%# Local variables: preventer_adherence, reliever_medications, active_illness %>
+<% all_on_track = preventer_adherence.all? { |e| e[:result].status == :on_track } %>
+
+<ul class="dash-adherence-list" id="today-doses-list">
+  <% if all_on_track && reliever_medications.empty? && !active_illness %>
+    <li class="dash-adherence-item dash-adherence-item--on_track dash-adherence-item--all-on-track">
+      <span class="dash-adherence-all-icon" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6l2.5 2.5 5.5-5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>All medications taken today</span>
+    </li>
+  <% else %>
+    <% preventer_adherence.each do |entry| %>
+      <%= render "dashboard/preventer_history_card",
+            medication: entry[:medication],
+            result: entry[:result],
+            active_illness: active_illness %>
+    <% end %>
+  <% end %>
+
+  <% reliever_medications.each do |medication| %>
+    <%= render "dashboard/reliever_item",
+          medication: medication,
+          active_illness: active_illness %>
+  <% end %>
+</ul>

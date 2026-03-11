@@ -164,6 +164,31 @@ class PeakFlowReadingsControllerTest < ActionDispatch::IntegrationTest
     assert JSON.parse(response.body)["errors"].any?
   end
 
+  test "create returns 422 with duplicate session error when session already exists" do
+    # alice_green_reading fixture is a morning reading 2 days ago — use that date to force a clash
+    existing = peak_flow_readings(:alice_green_reading)
+    post peak_flow_readings_path,
+         params: { peak_flow_reading: {
+           value:       350,
+           recorded_at: existing.recorded_at.change(hour: 9).iso8601,
+           time_of_day: existing.time_of_day
+         } },
+         headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :unprocessable_entity
+  end
+
+  test "create turbo stream for duplicate session includes edit link to existing reading" do
+    existing = peak_flow_readings(:alice_green_reading)
+    post peak_flow_readings_path,
+         params: { peak_flow_reading: {
+           value:       350,
+           recorded_at: existing.recorded_at.change(hour: 9).iso8601,
+           time_of_day: existing.time_of_day
+         } },
+         headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_match edit_peak_flow_reading_path(existing), response.body
+  end
+
   test "unauthenticated JSON create returns 401" do
     delete session_path
     post peak_flow_readings_path,

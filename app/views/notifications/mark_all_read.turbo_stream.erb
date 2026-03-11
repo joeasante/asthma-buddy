@@ -5,6 +5,11 @@
   <% end %>
 <% end %>
 
+<%# Update the page header eyebrow and hide the Mark all read button %>
+<%= turbo_stream.replace "notifications-page-header" do %>
+  <%= render "page_header", unread_count: 0, last_notification: @last_notification %>
+<% end %>
+
 <%# Update the nav bell badge to zero (removes badge) %>
 <%= turbo_stream.replace "nav-bell" do %>
   <%= render "layouts/nav_bell", unread_count: 0 %>

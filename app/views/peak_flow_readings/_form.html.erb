@@ -26,8 +26,17 @@
       <p class="field-error"><%= peak_flow_reading.errors[:time_of_day].first %></p>
     <% end %>
   </div>
-  <%# Field error summary %>
-  <% if peak_flow_reading.errors.any? %>
+  <%# Error summary — duplicate session gets a targeted prompt; all other errors use the standard list %>
+  <% duplicate_reading = local_assigns.fetch(:duplicate_reading, nil) %>
+  <% if duplicate_reading %>
+    <div class="field-errors field-errors--duplicate" role="alert" aria-live="assertive">
+      <p><%= peak_flow_reading.errors[:base].first %></p>
+      <%= link_to "Update the existing reading instead →",
+            edit_peak_flow_reading_path(duplicate_reading),
+            class: "btn-secondary",
+            data: { turbo_frame: "_top" } %>
+    </div>
+  <% elsif peak_flow_reading.errors.any? %>
     <div class="field-errors" role="alert" aria-live="assertive">
       <p><%= pluralize(peak_flow_reading.errors.count, "error") %> prevented this reading from being saved:</p>
       <ul>

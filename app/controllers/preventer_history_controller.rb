@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AdherenceController < ApplicationController
+class PreventerHistoryController < ApplicationController
   def index
     user = Current.user
     @period = params[:period].to_i.in?([ 7, 30 ]) ? params[:period].to_i : 7

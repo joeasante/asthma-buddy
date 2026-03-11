@@ -63,10 +63,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     )
 
     # Force chart data to exist so canvas renders, by creating a reading this week
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path
@@ -84,10 +84,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
   test "canvas element includes data-chart-health-events-value attribute when chart renders" do
     # Canvas only renders when @chart_data.any? — ensure a reading exists this week.
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path
@@ -101,10 +101,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     event = HealthEvent.create!(user: @user, event_type: :illness, recorded_at: Time.current - 1.hour)
 
     # Force chart to render
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path

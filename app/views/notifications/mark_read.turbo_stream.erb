@@ -3,6 +3,11 @@
   <%= render "notification", notification: @notification %>
 <% end %>
 
+<%# Update the page header eyebrow count and Mark all read button %>
+<%= turbo_stream.replace "notifications-page-header" do %>
+  <%= render "page_header", unread_count: @unread_count, last_notification: @last_notification %>
+<% end %>
+
 <%# Update the nav bell badge count %>
 <%= turbo_stream.replace "nav-bell" do %>
   <%= render "layouts/nav_bell", unread_count: @unread_count %>

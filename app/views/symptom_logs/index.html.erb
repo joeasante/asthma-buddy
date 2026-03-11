@@ -2,7 +2,7 @@
 
 <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
 
-<div class="section-card">
+<div id="symptoms-graph" class="section-card" data-controller="hash-scroll">
   <div class="section-card-header">
     <h2 class="section-card-title">History</h2>
   </div>
@@ -23,14 +23,17 @@
     </div>
 
     <% if @chart_data&.any? %>
-      <div class="chart-section">
-        <canvas data-controller="chart"
-                data-chart-type-value="symptoms"
-                data-chart-data-value="<%= @chart_data.to_json %>"
-                class="chart-canvas"
-                aria-label="Symptom severity over time"
-                role="img">
-        </canvas>
+      <div class="chart-section"
+           data-controller="chart"
+           data-chart-type-value="symptoms"
+           data-chart-data-value="<%= @chart_data.to_json %>">
+        <div class="chart-canvas-wrapper">
+          <canvas class="chart-canvas"
+                  style="max-height: 220px;"
+                  aria-label="Symptom severity over time"
+                  role="img">
+          </canvas>
+        </div>
       </div>
     <% end %>
 

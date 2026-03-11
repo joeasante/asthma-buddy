@@ -5,6 +5,15 @@ class HealthEventsController < ApplicationController
   rate_limit to: 10, within: 1.minute, only: %i[create update destroy]
 
   def show
+    if @health_event.illness?
+      illness_start = @health_event.recorded_at.beginning_of_day
+      illness_end   = (@health_event.ended_at || Time.current).end_of_day
+      @illness_symptom_logs = Current.user.symptom_logs
+        .in_date_range(illness_start, illness_end)
+        .chronological
+        .includes(:rich_text_notes)
+    end
+
     respond_to do |format|
       format.html
       format.json { render json: health_event_json(@health_event) }

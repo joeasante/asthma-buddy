@@ -11,6 +11,12 @@ class DashboardController < ApplicationController
     # Latest single reading — status card
     @last_reading = user.peak_flow_readings.chronological.first
 
+    # Best reading recorded today — used in the page header eyebrow
+    @todays_best_reading = user.peak_flow_readings
+      .where(recorded_at: Date.current.beginning_of_day..Date.current.end_of_day)
+      .order(value: :desc)
+      .first
+
     # Current week stats (week starts Monday)
     week_start       = Date.current.beginning_of_week(:monday)
     recent_readings  = user.peak_flow_readings.in_date_range(week_start, nil)
@@ -37,10 +43,15 @@ class DashboardController < ApplicationController
     # Peak flow grouped by date (up to 4 days) so AM/PM render side-by-side.
     @recent_readings = user.peak_flow_readings
       .chronological
-      .limit(10)
+      .limit(9)
       .group_by { |r| r.recorded_at.to_date }
-      .first(4)
+      .first(3)
     @recent_symptoms = user.symptom_logs.chronological.includes(:rich_text_notes).limit(4)
+
+    # Totals for "View all N" section footers — cheap indexed COUNT queries.
+    @total_reading_count   = user.peak_flow_readings.count
+    @total_symptom_count   = user.symptom_logs.count
+    @total_health_event_count = user.health_events.count
 
     # 7-day chart data — one entry per day with separate morning/evening values.
     @chart_data = recent_readings
@@ -61,12 +72,14 @@ class DashboardController < ApplicationController
       .where(recorded_at: week_start.beginning_of_day..Date.current.end_of_day)
       .order(recorded_at: :asc)
       .map do |e|
-        {
-          date:         e.recorded_at.to_date.to_s,   # "YYYY-MM-DD"
+        marker = {
+          date:         e.recorded_at.to_date.to_s,
           type:         e.event_type,
           label:        e.chart_label,
           css_modifier: e.event_type_css_modifier
         }
+        marker[:end_date] = e.ended_at.to_date.to_s if !e.point_in_time? && e.ended_at.present?
+        marker
       end
 
     # Duration events that started before this week and are still ongoing.
@@ -98,6 +111,22 @@ class DashboardController < ApplicationController
       .includes(:dose_logs)
       .select { |m| m.doses_per_day.present? }
       .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+
+    # Reliever medications — shown on dashboard for quick dose logging.
+    @reliever_medications = user.medications
+      .where(medication_type: :reliever)
+      .where(course: false)
+      .includes(:dose_logs)
+      .chronological
+      .to_a
+
+    # Active illness event — most recently started ongoing illness, or nil.
+    # Drives the eyebrow pill, the dashboard banner, and the sick-day dose buttons.
+    @active_illness = user.health_events
+      .where(event_type: :illness)
+      .where(ended_at: nil)
+      .order(recorded_at: :desc)
+      .first
   end
 
   private

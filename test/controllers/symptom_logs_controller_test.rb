@@ -278,16 +278,16 @@ class SymptomLogsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:verified_user)
     get symptom_logs_url(preset: "7")
     assert_response :success
-    assert_select ".timeline-row"  # at least one row visible
+    assert_select "a.timeline-card"  # at least one row visible
     # alice_coughing_old is 40 days ago — should not appear
-    assert_select ".timeline-row", text: /coughing/i, count: 0
+    assert_select "a.timeline-card", text: /coughing/i, count: 0
   end
 
   test "index with custom start_date filters correctly" do
     sign_in_as users(:verified_user)
     get symptom_logs_url(start_date: 10.days.ago.to_date.to_s, end_date: Date.current.to_s)
     assert_response :success
-    assert_select ".timeline-row"
+    assert_select "a.timeline-card"
   end
 
   test "index scopes to current user — does not show other user entries" do

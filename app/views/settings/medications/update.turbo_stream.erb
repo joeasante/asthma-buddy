@@ -4,6 +4,10 @@
 <% end %>
 
 <%# Show inline toast on the list page %>
+<%= turbo_stream.replace "medications-page-header" do %>
+  <%= render "settings/medications/page_header", medication_count: @header_medication_count, low_stock_count: @header_low_stock_count %>
+<% end %>
+
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages" data-controller="toast" data-toast-message="<%= @medication.name %> updated." data-toast-variant="success"></div>
 <% end %>

@@ -35,6 +35,7 @@ module Settings
     def create
       @medication = Current.user.medications.new(medication_params)
       if @medication.save
+        set_header_eyebrow_vars
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Medication added." }
@@ -55,6 +56,7 @@ module Settings
 
     def update
       if @medication.update(medication_params)
+        set_header_eyebrow_vars
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Medication updated." }
@@ -71,6 +73,7 @@ module Settings
 
     def destroy
       @medication.destroy
+      set_header_eyebrow_vars
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to settings_medications_path, notice: "Medication removed." }
@@ -82,6 +85,7 @@ module Settings
       new_count = refill_params[:starting_dose_count].to_i
       if new_count >= 0 && @medication.update(starting_dose_count: new_count, refilled_at: Time.current)
         flash.now[:notice] = "#{@medication.name} refilled. #{new_count} doses recorded."
+        set_header_eyebrow_vars
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: flash.now[:notice] }
@@ -96,6 +100,13 @@ module Settings
     end
 
     private
+
+    def set_header_eyebrow_vars
+      all_meds = Current.user.medications.chronological.includes(:dose_logs)
+      visible  = all_meds.reject { |m| m.course? && !m.course_active? }
+      @header_medication_count = visible.size
+      @header_low_stock_count  = visible.count(&:low_stock?)
+    end
 
     def set_medication
       @medication = Current.user.medications.find(params[:id])

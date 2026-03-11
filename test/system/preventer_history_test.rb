@@ -2,7 +2,7 @@
 
 require "application_system_test_case"
 
-class AdherenceTest < ApplicationSystemTestCase
+class PreventerHistoryTest < ApplicationSystemTestCase
   setup do
     @user = users(:verified_user)
     sign_in_as @user
@@ -34,13 +34,13 @@ class AdherenceTest < ApplicationSystemTestCase
     within ".dash-adherence" do
       click_link "View history"
     end
-    assert_current_path adherence_path
+    assert_current_path preventer_history_path
   end
 
-  # ── Adherence history page ──
+  # ── Preventer history page ──
 
-  test "adherence history page renders with 7-day grid by default" do
-    visit adherence_path
+  test "preventer history page renders with 7-day grid by default" do
+    visit preventer_history_path
     assert_selector "h1", text: "Preventer Adherence"
     assert_selector ".adherence-toggle-btn--active", text: "7 days"
     assert_selector ".adherence-grid"
@@ -48,7 +48,7 @@ class AdherenceTest < ApplicationSystemTestCase
   end
 
   test "switching to 30-day view shows 30 cells" do
-    visit adherence_path
+    visit preventer_history_path
     click_link "30 days"
     assert_selector ".adherence-toggle-btn--active", text: "30 days"
     assert_selector ".adherence-cell", minimum: 30
@@ -65,7 +65,7 @@ class AdherenceTest < ApplicationSystemTestCase
       doses_per_day: 2
     )
 
-    visit adherence_path(days: 7)
+    visit preventer_history_path(days: 7)
     within ".adherence-medication-section", text: "BrandNewPreventer" do
       # The medication was created today — the 6 days before today should all be grey (no_schedule)
       # Today itself should be red (missed, 0 taken) or on_track if logged
@@ -83,7 +83,7 @@ class AdherenceTest < ApplicationSystemTestCase
     DoseLog.create!(user: @user, medication: preventer, puffs: 2, recorded_at: Time.current.change(hour: 8))
     DoseLog.create!(user: @user, medication: preventer, puffs: 2, recorded_at: Time.current.change(hour: 20))
 
-    visit adherence_path
+    visit preventer_history_path
     within ".adherence-medication-section", text: "Clenil Modulite" do
       # Today's cell (last in the grid) should be on_track (green)
       assert_selector ".adherence-cell--on_track", minimum: 1

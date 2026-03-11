@@ -19,11 +19,14 @@ function zoneColors() {
   const mild     = cssVar("--severity-mild")
   const moderate = cssVar("--severity-moderate")
   const severe   = cssVar("--severity-severe")
+  const mildBg   = cssVar("--severity-mild-bg")
+  const modBg    = cssVar("--severity-moderate-bg")
+  const sevBg    = cssVar("--severity-severe-bg")
   return {
-    green:  { bar: mild,     barAlpha: toRgba(mild,     0.85) },
-    yellow: { bar: moderate, barAlpha: toRgba(moderate, 0.85) },
-    red:    { bar: severe,   barAlpha: toRgba(severe,   0.85) },
-    none:   { bar: "#94a3b8", barAlpha: "rgba(148, 163, 184, 0.85)" }
+    green:  { bar: mild,      bg: mildBg, bandFill: toRgba(mildBg, 0.7) },
+    yellow: { bar: moderate,  bg: modBg,  bandFill: toRgba(modBg,  0.7) },
+    red:    { bar: severe,    bg: sevBg,  bandFill: toRgba(sevBg,  0.7) },
+    none:   { bar: "#94a3b8", bg: "#f1f5f9", bandFill: "rgba(241,245,249,0.7)" }
   }
 }
 
@@ -50,6 +53,110 @@ function eventMarkerColor(cssModifier) {
   return map[cssModifier] || "#64748b"
 }
 
+// Build a Chart.js inline plugin that draws illness shaded bands (beforeDraw)
+// and vertical dashed lines (afterDraw) for all health event types.
+function buildMarkerPlugin(healthEvents, dateLabelMap) {
+  return {
+    id: "healthEventMarkers",
+
+    beforeDraw(chart) {
+      const bandEvents = healthEvents.filter(e => !["gp_appointment", "medication_change"].includes(e.type) && e.end_date)
+      if (!bandEvents.length) return
+
+      const ctx   = chart.ctx
+      const xAxis = chart.scales.x
+      const yAxis = chart.scales.y
+
+      bandEvents.forEach(event => {
+        const startLabel = dateLabelMap[event.date]
+        const endLabel   = dateLabelMap[event.end_date]
+        if (!startLabel && !endLabel) return
+
+        const xStart = startLabel ? xAxis.getPixelForValue(startLabel) : xAxis.left
+        const xEnd   = endLabel   ? xAxis.getPixelForValue(endLabel)   : xAxis.right
+        if (isNaN(xStart) || isNaN(xEnd)) return
+
+        const halfTick = xAxis.ticks.length > 1
+          ? (xAxis.right - xAxis.left) / (xAxis.ticks.length * 2)
+          : 0
+
+        ctx.save()
+        ctx.fillStyle = "rgba(217, 119, 6, 0.10)"
+        ctx.fillRect(xStart - halfTick, yAxis.top, (xEnd + halfTick) - (xStart - halfTick), yAxis.bottom - yAxis.top)
+        ctx.restore()
+      })
+    },
+
+    afterDraw(chart) {
+      if (!healthEvents.length) return
+
+      const ctx   = chart.ctx
+      const xAxis = chart.scales.x
+      const yAxis = chart.scales.y
+
+      healthEvents.forEach(event => {
+        const label = dateLabelMap[event.date]
+        if (!label) return
+
+        const xPos = xAxis.getPixelForValue(label)
+        if (xPos === undefined || isNaN(xPos)) return
+
+        const color = eventMarkerColor(event.css_modifier)
+        ctx.save()
+        ctx.beginPath()
+        ctx.setLineDash([4, 3])
+        ctx.strokeStyle = color
+        ctx.lineWidth   = 1.5
+        ctx.globalAlpha = 0.75
+        ctx.moveTo(xPos, yAxis.top)
+        ctx.lineTo(xPos, yAxis.bottom)
+        ctx.stroke()
+        ctx.restore()
+      })
+    }
+  }
+}
+
+// Draw a horizontal dashed reference line at the personal best value.
+// Renders a small "PB NNN" label at the right edge, above the line.
+function buildPBLinePlugin(pb) {
+  return {
+    id: "pbLine",
+    afterDraw(chart) {
+      if (!pb || pb <= 0) return
+
+      const ctx   = chart.ctx
+      const xAxis = chart.scales.x
+      const yAxis = chart.scales.y
+      const y     = yAxis.getPixelForValue(pb)
+
+      // Skip if the PB sits outside the visible chart area
+      if (isNaN(y) || y < yAxis.top || y > yAxis.bottom) return
+
+      ctx.save()
+
+      // Dashed line spanning the full chart width
+      ctx.beginPath()
+      ctx.setLineDash([4, 3])
+      ctx.strokeStyle = "rgba(100, 116, 139, 0.65)"
+      ctx.lineWidth   = 1.5
+      ctx.moveTo(xAxis.left, y)
+      ctx.lineTo(xAxis.right, y)
+      ctx.stroke()
+
+      // Label: "PB NNN" just above the right end of the line
+      ctx.setLineDash([])
+      ctx.font         = "600 10px system-ui, -apple-system, sans-serif"
+      ctx.fillStyle    = "rgba(71, 85, 105, 0.9)"
+      ctx.textAlign    = "right"
+      ctx.textBaseline = "bottom"
+      ctx.fillText(`PB ${pb}`, xAxis.right, y - 3)
+
+      ctx.restore()
+    }
+  }
+}
+
 export default class extends Controller {
   static values = {
     type: String,
@@ -72,8 +179,6 @@ export default class extends Controller {
       this.renderSymptomsChart()
     } else if (this.typeValue === "peakflow") {
       this.renderPeakFlowChart()
-    } else if (this.typeValue === "peakflow-zones") {
-      this.renderPeakFlowZonesChart()
     } else if (this.typeValue === "peakflow-bands") {
       this.renderPeakFlowBandsChart()
     }
@@ -121,33 +226,75 @@ export default class extends Controller {
     })
   }
 
-  // Stacked bar chart — symptoms by severity per day
+  // Bubble chart — each severity level is a horizontal swim lane.
+  // x = date index, y = severity row (0 Mild / 1 Moderate / 2 Severe),
+  // r scales with the day's count so denser days show a larger dot.
   renderSymptomsChart() {
     const data   = this.dataValue
     const labels = data.map(d => toDayLabel(d.date))
     const zc     = zoneColors()
 
+    const rows = [
+      { key: "mild",     y: 0, bg: zc.green.bg,  border: zc.green.bar  },
+      { key: "moderate", y: 1, bg: zc.yellow.bg, border: zc.yellow.bar },
+      { key: "severe",   y: 2, bg: zc.red.bg,    border: zc.red.bar    }
+    ]
+
+    const datasets = rows.map(({ key, y, bg, border }) => ({
+      label:           key.charAt(0).toUpperCase() + key.slice(1),
+      data:            data.reduce((acc, d, i) => {
+        const count = d[key] || 0
+        if (count > 0) acc.push({ x: i, y, r: Math.min(5 + count * 2, 14), count })
+        return acc
+      }, []),
+      backgroundColor: bg,
+      borderColor:     border,
+      borderWidth:     1.5
+    }))
+
+    const yLabels = ["Mild", "Moderate", "Severe"]
+
     this.chart = new Chart(this.canvasEl, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [
-          { label: "Mild",     data: data.map(d => d.mild     || 0), backgroundColor: zc.green.barAlpha,  borderColor: zc.green.bar,  borderWidth: 1.5 },
-          { label: "Moderate", data: data.map(d => d.moderate || 0), backgroundColor: zc.yellow.barAlpha, borderColor: zc.yellow.bar, borderWidth: 1.5 },
-          { label: "Severe",   data: data.map(d => d.severe   || 0), backgroundColor: zc.red.barAlpha,    borderColor: zc.red.bar,    borderWidth: 1.5 }
-        ]
-      },
+      type: "bubble",
+      data: { datasets },
       options: {
         responsive: true,
+        layout: { padding: { top: 4, bottom: 4 } },
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: { boxWidth: 12, padding: 16, font: { size: 12 } }
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => labels[ctx[0].raw.x] || "",
+              label: ctx => {
+                const { count } = ctx.raw
+                return `${ctx.dataset.label}: ${count} log${count !== 1 ? "s" : ""}`
+              }
+            }
           }
         },
         scales: {
-          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 12 } } },
-          y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 12 } }, grid: { color: "rgba(0,0,0,0.05)" } }
+          x: {
+            type:  "linear",
+            min:   -0.5,
+            max:   labels.length - 0.5,
+            grid:  { display: false },
+            ticks: {
+              stepSize: 1,
+              font:     { size: 12 },
+              maxTicksLimit: 14,
+              callback: val => Number.isInteger(val) ? (labels[val] || "") : ""
+            }
+          },
+          y: {
+            min:   -0.6,
+            max:   2.6,
+            grid:  { color: "rgba(0,0,0,0.05)" },
+            ticks: {
+              stepSize: 1,
+              font:     { size: 12 },
+              callback: val => yLabels[val] || ""
+            }
+          }
         }
       }
     })
@@ -222,7 +369,7 @@ export default class extends Controller {
       datasets.push({
         data:            labels.map(() => redTop),
         fill:            "origin",
-        backgroundColor: "rgba(220, 38, 38, 0.08)",
+        backgroundColor: zc.red.bandFill,
         borderWidth:     0,
         pointRadius:     0,
         tension:         0
@@ -231,7 +378,7 @@ export default class extends Controller {
       datasets.push({
         data:            labels.map(() => yellowTop),
         fill:            "-1",
-        backgroundColor: "rgba(217, 119, 6, 0.08)",
+        backgroundColor: zc.yellow.bandFill,
         borderWidth:     0,
         pointRadius:     0,
         tension:         0
@@ -240,7 +387,7 @@ export default class extends Controller {
       datasets.push({
         data:            labels.map(() => ceiling),
         fill:            "-1",
-        backgroundColor: "rgba(22, 163, 74, 0.08)",
+        backgroundColor: zc.green.bandFill,
         borderWidth:     0,
         pointRadius:     0,
         tension:         0
@@ -292,47 +439,13 @@ export default class extends Controller {
     const dateLabelMap = {}
     data.forEach(d => { dateLabelMap[d.date] = toDayLabel(d.date) })
 
-    const markerPlugin = {
-      id: "healthEventMarkers",
-      afterDraw(chart) {
-        if (!healthEvents.length) return
-
-        const ctx    = chart.ctx
-        const xAxis  = chart.scales.x
-        const yAxis  = chart.scales.y
-        const top    = yAxis.top
-        const bottom = yAxis.bottom
-
-        healthEvents.forEach(event => {
-          const label = dateLabelMap[event.date]
-          if (!label) return  // event date not in current chart window
-
-          const xPos = xAxis.getPixelForValue(label)
-          if (xPos === undefined || isNaN(xPos)) return
-
-          const color = eventMarkerColor(event.css_modifier)
-
-          ctx.save()
-
-          // Vertical dashed line only — label is rendered as a DOM badge
-          ctx.beginPath()
-          ctx.setLineDash([4, 3])
-          ctx.strokeStyle = color
-          ctx.lineWidth   = 1.5
-          ctx.globalAlpha = 0.75
-          ctx.moveTo(xPos, top)
-          ctx.lineTo(xPos, bottom)
-          ctx.stroke()
-
-          ctx.restore()
-        })
-      }
-    }
+    const markerPlugin = buildMarkerPlugin(healthEvents, dateLabelMap)
+    const pbPlugin     = buildPBLinePlugin(pb)
 
     this.chart = new Chart(this.canvasEl, {
       type: "line",
       data: { labels, datasets },
-      plugins: [markerPlugin],
+      plugins: [markerPlugin, pbPlugin],
       options: {
         responsive: true,
         onResize: () => { this.positionEventBadges() },
@@ -408,80 +521,4 @@ export default class extends Controller {
     })
   }
 
-  // Two-line chart — morning and evening series for the history page.
-  renderPeakFlowZonesChart() {
-    const data         = this.dataValue
-    const labels       = data.map(d => toDayLabel(d.date))
-    const zc           = zoneColors()
-    const eveningColor = cssVar("--teal-600") || "#0d9488"
-
-    const morningValues = data.map(d => d.morning ?? null)
-    const eveningValues = data.map(d => d.evening ?? null)
-    const allValues     = [...morningValues, ...eveningValues].filter(v => v !== null)
-    if (!allValues.length) return
-
-    const morningColors = data.map(d => (zc[d.morning_zone] || zc.none).bar)
-    const eveningColors = data.map(d => (zc[d.evening_zone] || zc.none).bar)
-
-    const minValue = Math.min(...allValues)
-    const yMin     = Math.max(0, Math.floor(minValue * 0.85 / 50) * 50)
-
-    // Indices are fixed for this simple two-dataset chart
-    this.morningIndex = 0
-    this.eveningIndex = 1
-
-    this.chart = new Chart(this.canvasEl, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label:                "Morning",
-            data:                 morningValues,
-            borderColor:          "#f59e0b",
-            backgroundColor:      "#f59e0b",
-            pointBackgroundColor: morningColors,
-            pointBorderColor:     morningColors,
-            pointRadius:          3,
-            pointHoverRadius:     5,
-            tension:              0.3,
-            fill:                 false,
-            borderWidth:          2,
-            spanGaps:             false
-          },
-          {
-            label:                "Evening",
-            data:                 eveningValues,
-            borderColor:          eveningColor,
-            backgroundColor:      eveningColor,
-            pointBackgroundColor: eveningColors,
-            pointBorderColor:     eveningColors,
-            pointRadius:          3,
-            pointHoverRadius:     5,
-            tension:              0.3,
-            fill:                 false,
-            borderWidth:          2,
-            spanGaps:             false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw} L/min` }
-          }
-        },
-        scales: {
-          y: {
-            min:   yMin,
-            ticks: { callback: v => `${v}`, font: { size: 12 } },
-            grid:  { color: "rgba(0,0,0,0.05)" }
-          },
-          x: { grid: { display: false }, ticks: { font: { size: 12 } } }
-        }
-      }
-    })
-  }
 }

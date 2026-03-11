@@ -1,0 +1,31 @@
+<div id="notifications-page-header" class="page-header">
+  <% if last_notification %>
+    <div class="page-header-eyebrow">
+      <% if unread_count > 0 %>
+        <span class="eyebrow-stat"><strong><%= unread_count %></strong> unread</span>
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+      <% end %>
+      <span class="eyebrow-stat">Last alert: <strong><%= time_ago_in_words(last_notification.created_at) %> ago</strong></span>
+      <div class="eyebrow-rule" aria-hidden="true"></div>
+    </div>
+  <% end %>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Notifications</h1>
+        <p class="page-header-subtitle">Stay on top of your medication reminders and alerts.</p>
+      </div>
+    </div>
+    <% if unread_count > 0 %>
+      <div class="page-header-actions">
+        <%= button_to "Mark all read", mark_all_read_notifications_path, method: :post, class: "btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

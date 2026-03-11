@@ -15,7 +15,6 @@ class OnboardingController < ApplicationController
     end
   }
   before_action :redirect_if_onboarding_complete
-  before_action :redirect_if_step1_done, only: :show
 
   def show
     @step = current_step
@@ -99,10 +98,6 @@ class OnboardingController < ApplicationController
 
     def redirect_if_onboarding_complete
       redirect_to dashboard_path if Current.user.onboarding_complete?
-    end
-
-    def redirect_if_step1_done
-      redirect_to onboarding_step_path(2) if params[:step].to_i == 1 && Current.user.onboarding_personal_best_done?
     end
 
     def current_step

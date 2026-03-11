@@ -10,6 +10,8 @@ module Settings
       @dose_log.user = Current.user
       if @dose_log.save
         flash.now[:notice] = "Dose logged."
+        set_header_eyebrow_vars
+        set_dashboard_vars
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: "Dose logged." }
@@ -27,6 +29,7 @@ module Settings
     def destroy
       @dose_log.destroy
       flash.now[:notice] = "Dose removed."
+      set_header_eyebrow_vars
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to settings_medications_path, notice: "Dose removed." }
@@ -35,6 +38,35 @@ module Settings
     end
 
     private
+
+    def set_header_eyebrow_vars
+      all_meds = Current.user.medications.chronological.includes(:dose_logs)
+      visible  = all_meds.reject { |m| m.course? && !m.course_active? }
+      @header_medication_count = visible.size
+      @header_low_stock_count  = visible.count(&:low_stock?)
+    end
+
+    def set_dashboard_vars
+      user  = Current.user
+      today = Date.current
+      @preventer_adherence = user.medications
+        .where(medication_type: :preventer)
+        .where(course: false)
+        .includes(:dose_logs)
+        .select { |m| m.doses_per_day.present? }
+        .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+      @reliever_medications = user.medications
+        .where(medication_type: :reliever)
+        .where(course: false)
+        .includes(:dose_logs)
+        .chronological
+        .to_a
+      @active_illness = user.health_events
+        .where(event_type: :illness)
+        .where(ended_at: nil)
+        .order(recorded_at: :desc)
+        .first
+    end
 
     def set_medication
       @medication = Current.user.medications.find(params[:medication_id])
@@ -45,7 +77,9 @@ module Settings
     end
 
     def dose_log_params
-      params.require(:dose_log).permit(:puffs, :recorded_at)
+      permitted = params.require(:dose_log).permit(:puffs, :recorded_at)
+      permitted[:recorded_at] = Time.current if permitted[:recorded_at].blank?
+      permitted
     end
 
     def dose_log_json(dose_log)

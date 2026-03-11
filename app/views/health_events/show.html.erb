@@ -34,10 +34,10 @@
           <% end %>
         </div>
 
-        <dl style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md);">
-          <div style="display: flex; gap: var(--space-md);">
-            <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Started</dt>
-            <dd style="color: var(--text); font-weight: 500;">
+        <dl style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md); font-size: 0.875rem;">
+          <div style="display: flex; align-items: baseline; gap: 0.375rem;">
+            <dt style="color: var(--text-2); font-weight: 600;"><%= @health_event.point_in_time? ? "Date" : "Started" %></dt>
+            <dd style="margin: 0; color: var(--text);">
               <time datetime="<%= @health_event.recorded_at.iso8601 %>">
                 <%= @health_event.recorded_at.strftime("%-d %B %Y") %>
               </time>
@@ -45,9 +45,9 @@
           </div>
 
           <% unless @health_event.point_in_time? %>
-            <div style="display: flex; gap: var(--space-md);">
-              <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Ended</dt>
-              <dd style="color: var(--text); font-weight: 500;">
+            <div style="display: flex; align-items: baseline; gap: 0.375rem;">
+              <dt style="color: var(--text-2); font-weight: 600;">Ended</dt>
+              <dd style="margin: 0; color: var(--text);">
                 <% if @health_event.ended_at.present? %>
                   <time datetime="<%= @health_event.ended_at.iso8601 %>">
                     <%= @health_event.ended_at.strftime("%-d %B %Y") %>
@@ -59,9 +59,9 @@
             </div>
 
             <% if @health_event.formatted_duration.present? %>
-              <div style="display: flex; gap: var(--space-md);">
-                <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Duration</dt>
-                <dd>
+              <div style="display: flex; align-items: baseline; gap: 0.375rem;">
+                <dt style="color: var(--text-2); font-weight: 600;">Duration</dt>
+                <dd style="margin: 0;">
                   <span class="event-row-duration"><%= @health_event.formatted_duration %></span>
                 </dd>
               </div>
@@ -78,3 +78,25 @@
     </div>
   </div>
 </div>
+
+<% if @illness_symptom_logs %>
+  <div class="section-card illness-symptoms-card">
+    <div class="illness-symptoms-header">
+      <h2 class="illness-symptoms-title">
+        Symptoms during this illness
+        <% if @illness_symptom_logs.any? %>
+          <span class="illness-symptoms-count">(<%= pluralize(@illness_symptom_logs.count, "entry") %>)</span>
+        <% end %>
+      </h2>
+    </div>
+    <% if @illness_symptom_logs.any? %>
+      <div class="illness-symptom-cards">
+        <% @illness_symptom_logs.each do |log| %>
+          <%= render "symptom_logs/timeline_row", symptom_log: log %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="illness-symptoms-empty">No symptoms were logged during this period.</p>
+    <% end %>
+  </div>
+<% end %>

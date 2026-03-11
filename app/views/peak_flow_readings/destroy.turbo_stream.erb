@@ -1,3 +1,7 @@
+<%= turbo_stream.replace "peak-flow-page-header" do %>
+  <%= render "page_header", last_reading: @header_last_reading, month_count: @header_month_count %>
+<% end %>
+
 <%# Toast notification %>
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages"

@@ -9,39 +9,7 @@
   </div>
 <% end %>
 
-<div class="page-header">
-  <div class="page-header-eyebrow">
-    <% if @header_last_reading %>
-      <span class="eyebrow-stat">Last: <strong><%= @header_last_reading.value %> L/min</strong></span>
-      <% if @header_last_reading.zone %>
-        <span class="eyebrow-dot" aria-hidden="true"></span>
-        <span class="eyebrow-pill eyebrow-pill--<%= @header_last_reading.zone_css_modifier %>">
-          <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3"/></svg>
-          <%= @header_last_reading.zone.capitalize %> zone
-        </span>
-      <% end %>
-      <span class="eyebrow-dot" aria-hidden="true"></span>
-    <% end %>
-    <span class="eyebrow-stat"><strong><%= @header_month_count %></strong> <%= "reading".pluralize(@header_month_count) %> this month</span>
-    <div class="eyebrow-rule" aria-hidden="true"></div>
-  </div>
-  <div class="page-header-main">
-    <div class="page-header-left">
-      <div class="page-header-icon" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
-      </div>
-      <div>
-        <h1>Peak Flow</h1>
-        <p class="page-header-subtitle">Your breathing measurements over time</p>
-      </div>
-    </div>
-    <div class="page-header-actions">
-      <%= link_to "+ Record reading", new_peak_flow_reading_path, class: "btn-primary" %>
-    </div>
-  </div>
-</div>
+<%= render "page_header", last_reading: @header_last_reading, month_count: @header_month_count %>
 
 <%# Personal best hero card — shown only when PB is set %>
 <% if @current_personal_best %>
@@ -77,7 +45,7 @@
 
 <%# Everything below lives inside the Turbo Frame so filters, stats, and chart
     all update together on every filter/page change. %>
-<section aria-label="Peak flow reading history">
+<section id="peak-flow-graph" aria-label="Peak flow reading history" data-controller="hash-scroll">
   <%= turbo_frame_tag "readings_content" do %>
 
     <%# 1. Filters — always at the top so the user sets context before seeing results %>
@@ -115,8 +83,10 @@
       <div class="chart-section"
            style="margin-bottom: 1.25rem;"
            data-controller="chart"
-           data-chart-type-value="peakflow-zones"
-           data-chart-data-value="<%= @chart_data.to_json %>">
+           data-chart-type-value="peakflow-bands"
+           data-chart-personal-best-value="<%= @current_personal_best&.value || 0 %>"
+           data-chart-data-value="<%= @chart_data.to_json %>"
+           data-chart-health-events-value="<%= @health_event_markers.to_json %>">
         <div class="chart-session-toggle" role="group" aria-label="Toggle session">
           <button type="button"
                   class="chart-session-btn chart-session-btn--morning"
@@ -137,11 +107,20 @@
             Evening
           </button>
         </div>
-        <canvas class="chart-canvas"
-                aria-label="Peak flow readings chart"
-                role="img">
-        </canvas>
+        <div class="chart-canvas-wrapper">
+          <canvas class="chart-canvas"
+                  style="max-height: 260px;"
+                  aria-label="Peak flow readings chart"
+                  role="img">
+          </canvas>
+        </div>
       </div>
+      <% if @health_event_markers&.any? { |m| m["type"] == "illness" } %>
+        <div class="pf-illness-legend">
+          <span class="pf-illness-legend-swatch" aria-hidden="true"></span>
+          Illness period
+        </div>
+      <% end %>
     <% end %>
 
     <%# 4. Reading list or empty state %>

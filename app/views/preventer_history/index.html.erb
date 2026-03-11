@@ -26,18 +26,18 @@
 <turbo-frame id="adherence-grid">
   <%# Toggle lives inside the frame so it re-renders with the correct active state on every navigation %>
   <div class="adherence-toggle" role="group" aria-label="Select date range">
-    <%= link_to "7 days", adherence_path(period: 7),
+    <%= link_to "7 days", preventer_history_path(period: 7),
           data: { turbo_frame: "adherence-grid", turbo_action: "advance" },
           class: "btn-secondary btn-sm #{"btn-sm--active" if @period == 7}",
           aria: { current: @period == 7 ? "true" : nil } %>
-    <%= link_to "30 days", adherence_path(period: 30),
+    <%= link_to "30 days", preventer_history_path(period: 30),
           data: { turbo_frame: "adherence-grid", turbo_action: "advance" },
           class: "btn-secondary btn-sm #{"btn-sm--active" if @period == 30}",
           aria: { current: @period == 30 ? "true" : nil } %>
   </div>
   <% if @adherence_history.any? %>
     <% @adherence_history.each do |entry| %>
-      <%= render "adherence/history_grid",
+      <%= render "preventer_history/history_grid",
             medication:    entry[:medication],
             days_data:     entry[:days_data],
             period:        @period,
@@ -67,5 +67,5 @@
 </turbo-frame>
 
 <p class="page-back-link">
-  <%= link_to "← Back to Medications", settings_medications_path %>
+  <%= link_to "← Back to Medications", settings_medications_path(anchor: "medications-page-header") %>
 </p>

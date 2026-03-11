@@ -106,3 +106,96 @@
   opacity: 0.92;
   z-index: 1;
 }
+
+/* --------------------------------------------------------------------------
+   Severity legend pills — above the symptoms chart; same rhythm as the
+   session toggle buttons used on peak flow charts.
+   -------------------------------------------------------------------------- */
+
+.chart-severity-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.chart-severity-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  padding: 0.3125rem 0.8125rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
+.chart-severity-pill-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid currentColor;
+}
+
+.chart-severity-pill--mild {
+  border-color: var(--severity-mild);
+  background: var(--severity-mild-bg);
+  color: var(--severity-mild-text);
+}
+.chart-severity-pill--mild .chart-severity-pill-dot {
+  background: var(--severity-mild-bg);
+  border-color: var(--severity-mild);
+}
+
+.chart-severity-pill--moderate {
+  border-color: var(--severity-moderate);
+  background: var(--severity-moderate-bg);
+  color: var(--severity-moderate-text);
+}
+.chart-severity-pill--moderate .chart-severity-pill-dot {
+  background: var(--severity-moderate-bg);
+  border-color: var(--severity-moderate);
+}
+
+.chart-severity-pill--severe {
+  border-color: var(--severity-severe);
+  background: var(--severity-severe-bg);
+  color: var(--error-text-dark, #991b1b);
+}
+.chart-severity-pill--severe .chart-severity-pill-dot {
+  background: var(--severity-severe-bg);
+  border-color: var(--severity-severe);
+}
+
+.chart-severity-total {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+/* Illness period legend — shown below the peak flow chart when illness
+   markers are present in the current date window. */
+.pf-illness-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8rem;
+  color: var(--text-3);
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.pf-illness-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  background: rgba(217, 119, 6, 0.14);
+  border: 1.5px solid rgba(217, 119, 6, 0.45);
+  flex-shrink: 0;
+}

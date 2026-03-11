@@ -4,6 +4,18 @@
       locals: { medication: @medication } %>
 
 <%# Toast — picked up by toast_controller.js %>
+<%= turbo_stream.replace "medications-page-header" do %>
+  <%= render "settings/medications/page_header", medication_count: @header_medication_count, low_stock_count: @header_low_stock_count %>
+<% end %>
+
+<%# Dashboard — refresh Today's Doses list so counts update immediately %>
+<%= turbo_stream.replace "today-doses-list" do %>
+  <%= render "dashboard/today_doses_list",
+        preventer_adherence: @preventer_adherence,
+        reliever_medications: @reliever_medications,
+        active_illness: @active_illness %>
+<% end %>
+
 <%= turbo_stream.replace "flash-messages" do %>
   <div id="flash-messages" data-controller="toast" data-toast-message="Dose logged." data-toast-variant="success"></div>
 <% end %>
