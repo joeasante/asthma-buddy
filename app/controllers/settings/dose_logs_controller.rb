@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Settings
-  class DoseLogsController < ApplicationController
+  class DoseLogsController < Settings::BaseController
     before_action :set_medication
     before_action :set_dose_log, only: :destroy
 
@@ -38,35 +38,6 @@ module Settings
     end
 
     private
-
-    def set_header_eyebrow_vars
-      all_meds = Current.user.medications.chronological.includes(:dose_logs)
-      visible  = all_meds.reject { |m| m.course? && !m.course_active? }
-      @header_medication_count = visible.size
-      @header_low_stock_count  = visible.count(&:low_stock?)
-    end
-
-    def set_dashboard_vars
-      user  = Current.user
-      today = Date.current
-      @preventer_adherence = user.medications
-        .where(medication_type: :preventer)
-        .where(course: false)
-        .includes(:dose_logs)
-        .select { |m| m.doses_per_day.present? }
-        .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
-      @reliever_medications = user.medications
-        .where(medication_type: :reliever)
-        .where(course: false)
-        .includes(:dose_logs)
-        .chronological
-        .to_a
-      @active_illness = user.health_events
-        .where(event_type: :illness)
-        .where(ended_at: nil)
-        .order(recorded_at: :desc)
-        .first
-    end
 
     def set_medication
       @medication = Current.user.medications.find(params[:medication_id])

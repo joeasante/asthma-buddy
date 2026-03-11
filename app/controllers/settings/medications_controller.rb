@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Settings
-  class MedicationsController < ApplicationController
+  class MedicationsController < Settings::BaseController
     before_action :set_medication, only: %i[edit update destroy refill]
     before_action :ensure_course_not_archived, only: %i[edit update]
 
@@ -89,24 +89,19 @@ module Settings
         respond_to do |format|
           format.turbo_stream
           format.html { redirect_to settings_medications_path, notice: flash.now[:notice] }
+          format.json { render json: medication_json(@medication) }
         end
       else
         flash.now[:alert] = "Refill count must be 0 or greater."
         respond_to do |format|
           format.turbo_stream { render turbo_stream: turbo_stream.replace("flash-messages", partial: "layouts/flash"), status: :unprocessable_entity }
           format.html { redirect_to settings_medications_path, alert: flash.now[:alert] }
+          format.json { render json: { errors: @medication.errors.full_messages }, status: :unprocessable_entity }
         end
       end
     end
 
     private
-
-    def set_header_eyebrow_vars
-      all_meds = Current.user.medications.chronological.includes(:dose_logs)
-      visible  = all_meds.reject { |m| m.course? && !m.course_active? }
-      @header_medication_count = visible.size
-      @header_low_stock_count  = visible.count(&:low_stock?)
-    end
 
     def set_medication
       @medication = Current.user.medications.find(params[:id])
