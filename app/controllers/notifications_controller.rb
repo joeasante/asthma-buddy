@@ -33,11 +33,11 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_read
-    @notifications     = Current.user.notifications.unread.to_a
+    @notifications     = Current.user.notifications.unread.newest_first.to_a
     @notifications.each { |n| n.read = true }
     Current.user.notifications.unread.update_all(read: true)
     @unread_count      = 0
-    @last_notification = Current.user.notifications.newest_first.first
+    @last_notification = @notifications.first
 
     respond_to do |format|
       format.turbo_stream
