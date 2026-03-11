@@ -38,7 +38,7 @@ module Authentication
     def request_authentication
       respond_to do |format|
         format.html do
-          session[:return_to_after_authenticating] = request.url
+          session[:return_to_after_authenticating] = url_from(request.url) || root_url
           redirect_to new_session_path
         end
         format.json { render json: { error: "Authentication required" }, status: :unauthorized }
