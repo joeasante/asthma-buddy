@@ -1,0 +1,50 @@
+<%= turbo_frame_tag dom_id(notification) do %>
+  <div class="notification-row <%= notification.read ? 'notification-row--read' : 'notification-row--unread' %>">
+    <div class="notification-icon notification-icon--<%= notification.notification_type %>">
+      <% if notification.low_stock? %>
+        <%# Low stock: warning triangle %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      <% elsif notification.missed_dose? %>
+        <%# Missed dose: clock icon %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      <% else %>
+        <%# System: info circle %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      <% end %>
+    </div>
+
+    <div class="notification-content">
+      <p class="notification-body <%= 'notification-body--unread' unless notification.read %>">
+        <%= notification.body %>
+      </p>
+      <time class="notification-time"
+            data-controller="relative-time"
+            data-relative-time-datetime-value="<%= notification.created_at.iso8601 %>">
+        <%= time_ago_in_words(notification.created_at) %> ago
+      </time>
+    </div>
+
+    <div class="notification-actions">
+      <% unless notification.read %>
+        <span class="notification-unread-dot" aria-label="Unread"></span>
+      <% end %>
+      <%= button_to "Mark read",
+            mark_read_notification_path(notification),
+            method: :patch,
+            class: "btn-mark-read #{'visually-hidden' if notification.read}",
+            aria: { label: "Mark notification as read" },
+            form: { data: { turbo_frame: dom_id(notification) } } %>
+    </div>
+  </div>
+<% end %>

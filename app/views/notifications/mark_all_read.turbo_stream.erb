@@ -1,0 +1,11 @@
+<%# Replace each notification row %>
+<% @notifications.each do |notification| %>
+  <%= turbo_stream.replace dom_id(notification) do %>
+    <%= render "notification", notification: notification %>
+  <% end %>
+<% end %>
+
+<%# Update the nav bell badge to zero (removes badge) %>
+<%= turbo_stream.replace "nav-bell" do %>
+  <%= render "layouts/nav_bell", unread_count: 0 %>
+<% end %>

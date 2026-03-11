@@ -51,6 +51,15 @@ Rails.application.routes.draw do
     patch "skip/:step", to: "onboarding#skip",    as: :skip,  constraints: { step: /[12]/ }
   end
 
+  resources :notifications, only: [:index] do
+    member do
+      patch :mark_read
+    end
+    collection do
+      post :mark_all_read
+    end
+  end
+
   post "cookie-notice/dismiss", to: "cookie_notices#dismiss", as: :cookie_notice_dismiss
 
   get "privacy", to: "pages#privacy", as: :privacy
