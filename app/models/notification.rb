@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Notification < ApplicationRecord
+  NOTIFIABLE_TYPES = %w[Medication].freeze
+
   belongs_to :user
   belongs_to :notifiable, polymorphic: true, optional: true
 
@@ -11,24 +13,24 @@ class Notification < ApplicationRecord
   }, validate: true
 
   validates :body, presence: true
+  validates :notifiable_type, inclusion: { in: NOTIFIABLE_TYPES }, allow_nil: true
 
   scope :unread,       -> { where(read: false) }
   scope :newest_first, -> { order(created_at: :desc) }
   scope :pruneable,    -> { where(read: true).where("created_at < ?", 90.days.ago) }
 
-  # Creates a low_stock notification for a medication if none exists unread for it.
+  # Creates a low_stock notification for a medication if none already exists.
   # Called after a DoseLog is saved; safe to call frequently — deduplication is inside.
   def self.create_low_stock_for(medication)
     user = medication.user
     return unless medication.low_stock?
-    return if exists?(user: user, notification_type: :low_stock, notifiable: medication, read: false)
+    return if exists?(user: user, notification_type: :low_stock, notifiable: medication)
 
     create!(
       user:              user,
       notification_type: :low_stock,
       notifiable:        medication,
-      body:              "#{medication.name} has fewer than 14 days of supply remaining. Consider requesting a refill.",
-      read:              false
+      body:              "#{medication.name} has fewer than #{Medication::LOW_STOCK_DAYS} days of supply remaining. Consider requesting a refill."
     )
   end
 end

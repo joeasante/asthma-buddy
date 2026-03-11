@@ -28,7 +28,6 @@ class MissedDoseCheckJob < ApplicationJob
         user:              medication.user,
         notification_type: :missed_dose,
         notifiable:        medication,
-        read:              false,
         created_at:        today.beginning_of_day..today.end_of_day
       )
 
@@ -36,8 +35,7 @@ class MissedDoseCheckJob < ApplicationJob
         user:              medication.user,
         notification_type: :missed_dose,
         notifiable:        medication,
-        body:              "You haven't logged your #{medication.name} dose today.",
-        read:              false
+        body:              "You haven't logged your #{medication.name} dose today."
       )
     end
   end

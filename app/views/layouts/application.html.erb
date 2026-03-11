@@ -70,8 +70,7 @@
             <%= link_to "Medical History", health_events_path,
                   class: nav_link_class(health_events_path),
                   aria: { current: nav_current(health_events_path) } %>
-            <% unread_count = Current.user.notifications.unread.count %>
-            <%= render "layouts/nav_bell", unread_count: unread_count %>
+            <%= render "layouts/nav_bell", unread_count: @unread_notification_count %>
             <div class="nav-user" data-controller="nav-dropdown">
               <button class="nav-avatar-btn"
                       data-action="click->nav-dropdown#toggle"

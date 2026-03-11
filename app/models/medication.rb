@@ -8,14 +8,17 @@ class Medication < ApplicationRecord
     reliever:    0,
     preventer:   1,
     combination: 2,
-    other:       3
+    other:       3,
+    tablet:      4
   }, validate: true
 
   validates :name,               presence: true, length: { maximum: 100 }
   validates :standard_dose_puffs, presence: true,
-            numericality: { only_integer: true, greater_than: 0 }
+            numericality: { only_integer: true, greater_than: 0 },
+            unless: :course?
   validates :starting_dose_count, presence: true,
-            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+            numericality: { only_integer: true, greater_than_or_equal_to: 0 },
+            unless: :course?
   validates :sick_day_dose_puffs,
             numericality: { only_integer: true, greater_than: 0 },
             allow_nil: true
@@ -49,6 +52,7 @@ class Medication < ApplicationRecord
   # and records refilled_at. This method will then correctly reflect the
   # post-refill count because starting_dose_count itself is updated on refill.
   def remaining_doses
+    return nil if starting_dose_count.nil?
     starting_dose_count - dose_logs.sum(:puffs)
   end
 

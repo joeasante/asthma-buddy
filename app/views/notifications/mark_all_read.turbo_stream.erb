@@ -1,4 +1,4 @@
-<%# Replace each notification row %>
+<%# Replace each previously-unread notification row %>
 <% @notifications.each do |notification| %>
   <%= turbo_stream.replace dom_id(notification) do %>
     <%= render "notification", notification: notification %>
@@ -8,4 +8,9 @@
 <%# Update the nav bell badge to zero (removes badge) %>
 <%= turbo_stream.replace "nav-bell" do %>
   <%= render "layouts/nav_bell", unread_count: 0 %>
+<% end %>
+
+<%# Toast feedback %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages" data-controller="toast" data-toast-message="All notifications marked as read." data-toast-variant="success"></div>
 <% end %>

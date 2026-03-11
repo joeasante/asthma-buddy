@@ -47,11 +47,11 @@
   height: 100%;
 }
 
-.notification-icon--low_stock {
+.notification-icon--low-stock {
   color: var(--severity-moderate-text, var(--severity-moderate));
 }
 
-.notification-icon--missed_dose {
+.notification-icon--missed-dose {
   color: var(--severity-severe);
 }
 

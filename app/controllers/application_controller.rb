@@ -19,9 +19,16 @@ class ApplicationController < ActionController::Base
   # PHI / HIPAA: prevent health data from being retained in browser or proxy caches.
   before_action :set_no_store_cache_for_authenticated_users
 
+  # Precompute unread badge count once per request; views use @unread_notification_count.
+  before_action :set_notification_badge_count, if: :authenticated?
+
   private
 
   def set_no_store_cache_for_authenticated_users
     response.headers["Cache-Control"] = "no-store" if authenticated?
+  end
+
+  def set_notification_badge_count
+    @unread_notification_count = Current.user.notifications.unread.count
   end
 end

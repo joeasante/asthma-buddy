@@ -17,8 +17,6 @@ alice_missed_dose:
 
 alice_read_old:
   user: verified_user
-  notifiable_type: User
-  notifiable_id: <%= ActiveRecord::FixtureSet.identify(:verified_user) %>
   notification_type: 2
   body: "System notification from 91 days ago."
   read: true

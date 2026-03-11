@@ -67,6 +67,11 @@
 - [x] **EVT-02**: User can edit or delete a health event — *user controls their own data*
 - [x] **EVT-03**: Health events appear as vertical markers on the peak flow trend chart — *visually correlates events (illness, steroids) with changes in peak flow readings*
 
+### Reliever Usage History
+
+- [ ] **REL-01**: User can view their reliever usage history showing daily puffs logged over the past 7 or 30 days, with a period toggle — *enables pattern recognition; lets user and GP see how frequently reliever is being used*
+- [ ] **REL-02**: Weeks where reliever usage exceeded 2 times are highlighted on the view, and a correlation panel shows reliever frequency alongside peak flow readings for the same period — *surfaces the clinical 2×/week threshold as a clear warning; connects reliever overuse to peak flow dips*
+
 ### Account Management
 
 - [x] **ACC-01**: User can delete their account — all data (readings, logs, medications, events) is permanently erased (GDPR right to erasure) — *legal requirement; builds trust that the app is not a data trap*
@@ -173,6 +178,8 @@
 | EVT-01 | Phase 15 — Health Events | Pending |
 | EVT-02 | Phase 15 — Health Events | Pending |
 | EVT-03 | Phase 15 — Health Events | Pending |
+| REL-01 | Phase 15.1 — Reliever Usage History | Pending |
+| REL-02 | Phase 15.1 — Reliever Usage History | Pending |
 | ACC-01 | Phase 16 — Account Management | Pending |
 | ACC-02 | Phase 16 — Account Management | Pending |
 | ONBD-01 | Phase 17 — Onboarding | Pending |

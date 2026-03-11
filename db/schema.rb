@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_11_093356) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_11_101948) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -104,6 +104,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_093356) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index ["user_id", "notifiable_type", "notifiable_id", "notification_type"], name: "index_notifications_unique_unread_per_notifiable", unique: true, where: "read = 0"
+    t.index ["user_id", "notification_type", "notifiable_type", "notifiable_id"], name: "index_notifications_deduplication"
     t.index ["user_id", "read"], name: "index_notifications_on_user_id_and_read"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end

@@ -1,6 +1,6 @@
 <%= turbo_frame_tag dom_id(notification) do %>
   <div class="notification-row <%= notification.read ? 'notification-row--read' : 'notification-row--unread' %>">
-    <div class="notification-icon notification-icon--<%= notification.notification_type %>">
+    <div class="notification-icon notification-icon--<%= notification.notification_type.dasherize %>">
       <% if notification.low_stock? %>
         <%# Low stock: warning triangle %>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

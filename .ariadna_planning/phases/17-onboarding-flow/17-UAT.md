@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 17-onboarding-flow
 source: [17-01-SUMMARY.md, 17-02-SUMMARY.md]
 started: 2026-03-10T18:00:00Z
@@ -61,5 +61,12 @@ skipped: 1
   reason: "User reported: No notice appeared"
   severity: minor
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "When the user skipped step 1, onboarding_personal_best_done remains false. After skip-step-2 redirects to dashboard_path with a notice, DashboardController#check_onboarding fires and issues a SECOND redirect (to onboarding_step_path(1)) discarding the unconsumed flash. Fix: in skip action for step 2, also set onboarding_personal_best_done: true so onboarding_complete? is true and check_onboarding returns early."
+  artifacts:
+    - path: "app/controllers/onboarding_controller.rb"
+      issue: "skip action for step 2 only sets onboarding_medication_done; if step 1 was also skipped, onboarding_personal_best_done is still false"
+    - path: "app/controllers/dashboard_controller.rb"
+      issue: "check_onboarding redirects a second time (no flash forwarding) when onboarding_complete? is false, discarding the notice from the prior redirect"
+  missing:
+    - "In OnboardingController#skip when step==2, update both onboarding_personal_best_done: true and onboarding_medication_done: true so dashboard guard returns early"
+  debug_session: ".ariadna_planning/debug/onboarding-skip-flash-missing.md"

@@ -9,10 +9,8 @@ class NotificationTest < ActiveSupport::TestCase
   test "valid notification saves with all required fields" do
     notification = Notification.new(
       user:              users(:verified_user),
-      notification_type: :low_stock,
-      notifiable:        medications(:alice_preventer),
-      body:              "Test body",
-      read:              false
+      notification_type: :system,
+      body:              "Test body"
     )
     assert notification.valid?, notification.errors.full_messages.inspect
     assert notification.save
@@ -157,7 +155,7 @@ class NotificationTest < ActiveSupport::TestCase
   end
 
   # -------------------------------------------------------------------------
-  # 9. create_low_stock_for is a no-op when unread low_stock already exists (deduplication)
+  # 9. create_low_stock_for deduplication — no-op when any low_stock exists (read or unread)
   # -------------------------------------------------------------------------
   test "create_low_stock_for is a no-op when unread low_stock already exists" do
     medication = Medication.create!(
@@ -174,6 +172,32 @@ class NotificationTest < ActiveSupport::TestCase
     Notification.create_low_stock_for(medication)
 
     # Second call — should be a no-op (unread low_stock already exists)
+    assert_no_difference "Notification.count" do
+      Notification.create_low_stock_for(medication)
+    end
+  end
+
+  test "create_low_stock_for is a no-op when a read low_stock notification already exists" do
+    medication = Medication.create!(
+      user:                users(:verified_user),
+      name:                "Already Acked Med",
+      medication_type:     :preventer,
+      standard_dose_puffs: 1,
+      starting_dose_count: 20,
+      doses_per_day:       2
+    )
+    assert medication.low_stock?
+
+    # Pre-existing read notification (user already acknowledged this alert)
+    Notification.create!(
+      user:              users(:verified_user),
+      notification_type: :low_stock,
+      notifiable:        medication,
+      body:              "Pre-existing read alert.",
+      read:              true
+    )
+
+    # create_low_stock_for should not create a duplicate — deduplication is read-state agnostic
     assert_no_difference "Notification.count" do
       Notification.create_low_stock_for(medication)
     end

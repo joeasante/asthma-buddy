@@ -16,9 +16,11 @@
       </span>
     </div>
 
-    <div class="med-row-stats" id="remaining_count_<%= dom_id(medication) %>">
-      <span><%= medication.remaining_doses %> doses remaining</span>
-    </div>
+    <% if medication.remaining_doses %>
+      <div class="med-row-stats" id="remaining_count_<%= dom_id(medication) %>">
+        <span><%= medication.remaining_doses %> doses remaining</span>
+      </div>
+    <% end %>
 
     <div class="med-row-actions">
       <%= render "settings/medications/dose_log_panel", medication: medication %>

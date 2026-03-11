@@ -35,6 +35,16 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
+  test "index returns JSON with notifications and unread_count" do
+    get notifications_path, as: :json
+    assert_response :success
+    body = response.parsed_body
+    assert body.key?("notifications")
+    assert body.key?("unread_count")
+    assert_kind_of Array, body["notifications"]
+    assert_kind_of Integer, body["unread_count"]
+  end
+
   # ---------------------------------------------------------------
   # PATCH /notifications/:id/mark_read
   # ---------------------------------------------------------------
@@ -64,6 +74,15 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     sign_out
     patch mark_read_notification_path(@alice_unread)
     assert_redirected_to new_session_path
+  end
+
+  test "mark_read returns JSON with read status and unread_count" do
+    patch mark_read_notification_path(@alice_unread), as: :json
+    assert_response :success
+    body = response.parsed_body
+    assert_equal @alice_unread.id, body["id"]
+    assert_equal true, body["read"]
+    assert body.key?("unread_count")
   end
 
   # ---------------------------------------------------------------
@@ -99,5 +118,12 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     sign_out
     post mark_all_read_notifications_path
     assert_redirected_to new_session_path
+  end
+
+  test "mark_all_read returns JSON with unread_count zero" do
+    post mark_all_read_notifications_path, as: :json
+    assert_response :success
+    body = response.parsed_body
+    assert_equal 0, body["unread_count"]
   end
 end

@@ -618,33 +618,6 @@ turbo-frame[busy] .timeline-list     { display: none; }
   flex: none;
 }
 
-/* --------------------------------------------------------------------------
-   Field errors — inline validation feedback
-   -------------------------------------------------------------------------- */
-
-.field-errors {
-  background: var(--severity-severe-bg);
-  border: 1px solid var(--error-border);
-  border-radius: var(--radius-lg);
-  padding: 0.875rem 1rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.9375rem;
-  color: var(--error-text-dark);
-}
-
-.field-errors p {
-  margin-bottom: 0.375rem;
-  font-weight: 500;
-}
-
-.field-errors ul {
-  margin: 0;
-  padding-left: 1.25rem;
-}
-
-.field-errors li {
-  margin-bottom: 0.125rem;
-}
 
 /* --------------------------------------------------------------------------
    Responsive overrides

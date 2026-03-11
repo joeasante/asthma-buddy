@@ -40,10 +40,9 @@
     <span>History</span>
   <% end %>
 
-  <% notification_unread_count = Current.user.notifications.unread.count %>
   <%= link_to notifications_path,
         class: "#{nav_tab_class(notifications_path)} has-unread-badge",
-        "data-unread-count": notification_unread_count,
+        "data-unread-count": @unread_notification_count,
         aria: { current: nav_current(notifications_path), label: "Notifications" } do %>
     <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>

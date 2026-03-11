@@ -23,7 +23,7 @@
   <div class="field">
     <%= form.label :medication_type, "Type" %>
     <%= form.select :medication_type,
-          Medication.medication_types.keys.map { |k| [k.humanize, k] },
+          Medication.medication_types.keys.sort.map { |k| [k.humanize, k] },
           { include_blank: "Select a type", selected: medication.medication_type },
           { required: true, "aria-describedby": medication.errors[:medication_type].any? ? "type-error" : nil } %>
     <% if medication.errors[:medication_type].any? %>
@@ -31,47 +31,52 @@
     <% end %>
   </div>
 
-  <div class="field">
-    <%= form.label :standard_dose_puffs, "Standard dose (puffs)" %>
-    <%= form.number_field :standard_dose_puffs, min: 1, step: 1, required: true %>
-    <% if medication.errors[:standard_dose_puffs].any? %>
-      <p class="field-error"><%= medication.errors[:standard_dose_puffs].first %></p>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <%= form.label :starting_dose_count, "Starting dose count" %>
-    <%= form.number_field :starting_dose_count, min: 0, step: 1, required: true %>
-    <p class="field-hint">Enter the total number of puffs when the inhaler is full. A standard reliever inhaler usually has 200 puffs.</p>
-    <% if medication.errors[:starting_dose_count].any? %>
-      <p class="field-error"><%= medication.errors[:starting_dose_count].first %></p>
-    <% end %>
-  </div>
-
-  <%# Course toggle checkbox — placed before Optional fieldset so DOM order matches visual order %>
+  <%# Course toggle checkbox %>
   <div class="field field--checkbox">
     <%= form.check_box :course, data: { "course-toggle-target": "checkbox", action: "change->course-toggle#toggle" } %>
-    <%= form.label :course, "This is a temporary course (e.g. prednisolone)" %>
+    <%= form.label :course, "This is a temporary course (e.g. prednisolone tablets)" %>
   </div>
 
-  <fieldset class="field-group">
-    <legend>Optional</legend>
+  <%# Inhaler-specific fields — hidden when "course" is checked %>
+  <div data-course-toggle-target="inhalerFields">
 
     <div class="field">
-      <%= form.label :sick_day_dose_puffs, "Sick-day dose (puffs)" %>
-      <%= form.number_field :sick_day_dose_puffs, min: 1, step: 1 %>
-      <p class="field-hint">Leave blank if not applicable.</p>
+      <%= form.label :standard_dose_puffs, "Standard dose (puffs)" %>
+      <%= form.number_field :standard_dose_puffs, min: 1, step: 1 %>
+      <% if medication.errors[:standard_dose_puffs].any? %>
+        <p class="field-error"><%= medication.errors[:standard_dose_puffs].first %></p>
+      <% end %>
     </div>
 
-    <div data-course-toggle-target="dosesPerDayField">
+    <div class="field">
+      <%= form.label :starting_dose_count, "Starting dose count" %>
+      <%= form.number_field :starting_dose_count, min: 0, step: 1 %>
+      <p class="field-hint">Enter the total number of puffs when the inhaler is full. A standard reliever inhaler usually has 200 puffs.</p>
+      <% if medication.errors[:starting_dose_count].any? %>
+        <p class="field-error"><%= medication.errors[:starting_dose_count].first %></p>
+      <% end %>
+    </div>
+
+    <fieldset class="field-group">
+      <legend>Optional</legend>
+
       <div class="field">
-        <%= form.label :doses_per_day, "Doses per day" %>
-        <%= form.number_field :doses_per_day, min: 1, step: 1 %>
-        <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
+        <%= form.label :sick_day_dose_puffs, "Sick-day dose (puffs)" %>
+        <%= form.number_field :sick_day_dose_puffs, min: 1, step: 1 %>
+        <p class="field-hint">Leave blank if not applicable.</p>
       </div>
-    </div>
 
-  </fieldset>
+      <div data-course-toggle-target="dosesPerDayField">
+        <div class="field">
+          <%= form.label :doses_per_day, "Doses per day" %>
+          <%= form.number_field :doses_per_day, min: 1, step: 1 %>
+          <p class="field-hint">Required for preventer adherence tracking. Leave blank for relievers.</p>
+        </div>
+      </div>
+
+    </fieldset>
+
+  </div>
 
   <%# Course date fields — shown only when checkbox is checked %>
   <div data-course-toggle-target="courseFields" hidden>
@@ -102,11 +107,12 @@
     <%= link_to "Cancel", settings_medications_path, class: "btn-cancel" %>
   </div>
 
-  <% if medication.persisted? %>
-    <div class="form-delete-zone">
-      <%= button_to "Delete medication", settings_medication_path(medication), method: :delete,
-            class: "btn-delete btn-delete--full",
-            form: { data: { turbo: true, turbo_confirm: "Delete #{medication.name}? All dose history will also be deleted. This can't be undone." } } %>
-    </div>
-  <% end %>
+<% end %>
+
+<% if medication.persisted? %>
+  <div class="form-delete-zone">
+    <%= button_to "Delete medication", settings_medication_path(medication), method: :delete,
+          class: "btn-delete btn-delete--full",
+          form: { data: { turbo: true, turbo_confirm: "Delete #{medication.name}? All dose history will also be deleted. This can't be undone." } } %>
+  </div>
 <% end %>

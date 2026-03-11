@@ -25,9 +25,9 @@ class BackfillNilZonePeakFlowReadings < ActiveRecord::Migration[8.1]
 
         pct = (reading.value.to_f / pb_value) * 100
         zone = if pct >= green_zone_threshold then "green"
-               elsif pct >= yellow_zone_threshold then "yellow"
-               else "red"
-               end
+        elsif pct >= yellow_zone_threshold then "yellow"
+        else "red"
+        end
         reading.update_column(:zone, zone_map[zone])
       end
     end

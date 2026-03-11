@@ -7,3 +7,8 @@
 <%= turbo_stream.replace "nav-bell" do %>
   <%= render "layouts/nav_bell", unread_count: @unread_count %>
 <% end %>
+
+<%# Toast feedback %>
+<%= turbo_stream.replace "flash-messages" do %>
+  <div id="flash-messages" data-controller="toast" data-toast-message="Notification marked as read." data-toast-variant="success"></div>
+<% end %>

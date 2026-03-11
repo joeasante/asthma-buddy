@@ -28,4 +28,16 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  activerecord:
+    attributes:
+      medication:
+        starts_on: "Start date"
+        ends_on: "End date"
+    errors:
+      models:
+        medication:
+          attributes:
+            starts_on:
+              blank: "must be filled in"
+            ends_on:
+              blank: "must be filled in"

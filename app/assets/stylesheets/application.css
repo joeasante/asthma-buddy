@@ -665,6 +665,30 @@ button {
   font-family: inherit;
 }
 
+/* Field errors summary block — top of form, lists all validation errors */
+.field-errors {
+  border-left: 3px solid var(--severity-severe);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-lg);
+  font-size: 0.9375rem;
+}
+
+.field-errors p {
+  font-weight: 600;
+  color: var(--severity-severe);
+  margin-bottom: 0.375rem;
+}
+
+.field-errors ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-2);
+}
+
+.field-errors li {
+  margin-bottom: 0.125rem;
+}
+
 /* Inline field error — appears immediately after the input, inside .field */
 .field-error {
   display: block;
