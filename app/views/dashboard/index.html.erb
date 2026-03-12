@@ -45,6 +45,22 @@
      data-controller="day-reset"
      data-day-reset-date-value="<%= Date.current %>">
 
+  <%# Declare early so all sections below can use it %>
+  <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
+
+  <%# ── No data — welcome empty state ─────────────────────────────── %>
+  <% if no_data %>
+    <div class="section-card empty-state">
+      <div class="empty-state-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Welcome to Asthma Buddy</h3>
+      <p>Start by logging a reading or a symptom — your dashboard fills in as you go.</p>
+    </div>
+  <% end %>
+
   <%# ── Active illness banner ────────────────────────────────────── %>
   <% if @active_illness %>
     <div class="dash-illness-banner" role="status">
@@ -151,9 +167,6 @@
       <span>Log symptom</span>
     <% end %>
   </div>
-
-  <%# Declare here so both This Week and the empty-state check can use it %>
-  <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
 
   <%# ── This Week — summary stats + chart ───────────────────────── %>
   <% unless no_data %>
@@ -399,17 +412,5 @@
     </section>
   <% end %>
 
-  <%# ── No data — welcome empty state ─────────────────────────────── %>
-  <% if no_data %>
-    <div class="section-card empty-state">
-      <div class="empty-state-icon" aria-hidden="true">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h3>Welcome to Asthma Buddy</h3>
-      <p>Start by logging a reading or a symptom — your dashboard fills in as you go.</p>
-    </div>
-  <% end %>
 
 </div>
