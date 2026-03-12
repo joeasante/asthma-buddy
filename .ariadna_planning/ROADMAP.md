@@ -219,8 +219,12 @@ Plans:
 
 ## Progress
 
+- [ ] **Phase 21: SEO & Meta Tags** — Fix all page titles to follow "Page Name — Asthma Buddy" consistently; add `content_for :meta_description` infrastructure to both layouts; write meta descriptions for all public and authenticated pages.
+
+---
+
 **Execution Order:**
-Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
+Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20 -> 21
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -236,6 +240,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 18. Temporary Medication Courses | 0/3 | Not started | - |
 | 19. Notifications | 0/3 | Not started | - |
 | 20. Legal Pages & Cookie Banner | 0/3 | Not started | - |
+| 21. SEO & Meta Tags | 0/3 | Not started | - |
 
 ---
 
@@ -372,5 +377,18 @@ Plans:
 - [ ] 20-01: PagesController (`terms`, `privacy`, `cookies` actions, no auth); routes; ERB content (UK GDPR-appropriate); `legal.css`; footer partial with links rendered in application layout; `main--narrow` modifier for 680px content width
 - [ ] 20-02: Cookie consent banner — `_cookie_banner.html.erb` partial; `cookie_banner_controller.js` Stimulus controller (sets persistent cookie, CSS transition to hide); ApplicationController `before_action` sets `@show_cookie_banner`; `cookie_banner.css`
 - [ ] 20-03: Error pages — ErrorsController (`not_found`, `internal_server_error`); routes (`match '/404'`, `match '/500'`); `config.exceptions_app = self.routes` in application.rb; `errors.css`; `public/maintenance.html` standalone file; controller tests
+
+---
+
+### Phase 21: SEO & Meta Tags
+
+**Goal**: Every page has a correct, consistently formatted title ("Page Name — Asthma Buddy") and a unique meta description; the meta description infrastructure exists in both layouts via a `content_for :meta_description` slot.
+**Why this matters**: Consistent page titles improve browser tab readability and search engine indexing. Meta descriptions give search engines and social preview tools accurate summaries of each page. This is a one-time polish pass with no runtime dependencies.
+**Depends on**: Phase 20 (all pages exist before descriptions are written)
+
+**Plans**: 3 plans
+- [ ] 21-01-PLAN.md — Add `yield(:meta_description) if content_for?(:meta_description)` slot to application.html.erb and onboarding.html.erb
+- [ ] 21-02-PLAN.md — Fix titles for all 21 authenticated pages; add meta descriptions for all 21 authenticated pages
+- [ ] 21-03-PLAN.md — Add meta descriptions for 7 public auth/legal pages and the onboarding wizard page
 
 ---
