@@ -393,3 +393,15 @@ Plans:
 - [ ] 21-04-PLAN.md — Gap closure: add Medications nav card to Settings hub (settings-nav-grid)
 
 ---
+
+### Phase 22: Request-Path Caching
+
+**Goal**: The two highest-frequency database reads on every authenticated request are served from Solid Cache rather than hitting the primary database on every page load: (1) the unread notification badge count, which fires on every authenticated request via `ApplicationController#set_notification_badge_count`; (2) the dashboard aggregate variables (`@preventer_adherence`, `@reliever_medications`, `@active_illness`), which fire on every dashboard load and on every Turbo Stream response after dose log actions in Settings.
+**Why this matters**: At current scale these queries are fast, but they are unbounded in frequency — every page load for every user hits the DB regardless of whether the underlying data has changed. Solid Cache is already running on `production_cache.sqlite3` with no additional infrastructure. Invalidation is write-triggered (model callbacks), so cached data is always consistent with DB state.
+**Depends on**: Phase 21
+
+**Plans**:
+- [ ] 22-01-PLAN.md — Notification badge count: `Rails.cache.fetch` in `set_notification_badge_count`; `after_create_commit`/`after_update_commit` invalidation callbacks on `Notification` model; tests
+- [ ] 22-02-PLAN.md — Dashboard variables: `Rails.cache.fetch` in `DashboardVariables#set_dashboard_vars`; `after_create_commit`/`after_destroy_commit` invalidation on `DoseLog` and `HealthEvent` models; tests
+
+---
