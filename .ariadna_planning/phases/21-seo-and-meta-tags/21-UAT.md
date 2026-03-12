@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 21-seo-and-meta-tags
 source: 21-01-SUMMARY.md, 21-02-SUMMARY.md, 21-03-SUMMARY.md
 started: 2026-03-12T16:30:00Z
@@ -60,13 +60,23 @@ skipped: 1
   reason: "User reported: It actually says Symptoms and not Symptom Logs"
   severity: minor
   test: 3
-  artifacts: []
-  missing: []
+  root_cause: "content_for :title in index.html.erb line 1 was set to 'Symptoms — Asthma Buddy' instead of 'Symptom Logs — Asthma Buddy'"
+  artifacts:
+    - path: "app/views/symptom_logs/index.html.erb"
+      issue: "Title string was 'Symptoms' — corrected to 'Symptom Logs'"
+  missing:
+    - "Fixed in commit 3a777ad"
+  debug_session: "ariadna-debugger a216ffbd24949019f"
 
 - truth: "Symptom log show page displays entry content and title reads 'Symptom Entry — Asthma Buddy'"
   status: failed
   reason: "User reported: It doesn't display the content of the entry. It says content missing. The browser tab reads Symptoms - Asthma Buddy"
   severity: major
   test: 5
-  artifacts: []
-  missing: []
+  root_cause: "show.html.erb line 51 rendered @symptom_log.notes.body (ActionText::Content) instead of @symptom_log.notes (ActionText::RichText), bypassing the rendering pipeline and outputting 'content missing' for attachments. Title was actually correct in the view — browser showed a cached Turbo snapshot."
+  artifacts:
+    - path: "app/views/symptom_logs/show.html.erb"
+      issue: "notes.body → notes to use ActionText rendering pipeline"
+  missing:
+    - "Fixed in commit 3a777ad"
+  debug_session: "ariadna-debugger a216ffbd24949019f"
