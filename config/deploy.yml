@@ -13,9 +13,7 @@ proxy:
     path: /up
     interval: 3
   run:
-    http_port: 3000       # kamal-proxy binds to 127.0.0.1:3000 (CloudPanel proxies here)
-    bind_ips:
-      - 127.0.0.1         # loopback only — not exposed publicly
+    http_port: 3000       # kamal-proxy listens on :3000 — CloudPanel proxies here
 
 registry:
   server: ghcr.io
