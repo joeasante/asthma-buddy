@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms
-  get "cookies", to: "pages#cookies", as: :cookies
+  get "cookies", to: "pages#cookie_policy", as: :cookies
 
   # Defines the root path route ("/")
   root "home#index"
