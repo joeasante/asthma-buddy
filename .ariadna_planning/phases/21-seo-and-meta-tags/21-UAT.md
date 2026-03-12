@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 21-seo-and-meta-tags
 source: 21-01-SUMMARY.md, 21-02-SUMMARY.md, 21-03-SUMMARY.md
-started: 2026-03-12T16:30:00Z
-updated: 2026-03-12T16:30:00Z
+started: 2026-03-12T17:36:46Z
+updated: 2026-03-12T17:40:00Z
 ---
 
 ## Current Test
@@ -13,70 +13,49 @@ updated: 2026-03-12T16:30:00Z
 ## Tests
 
 ### 1. Dashboard meta description in page source
-expected: Open Dashboard, view source. A `<meta name="description" content="...">` tag appears in the `<head>` after the `<title>` tag.
+expected: Open the Dashboard (/dashboard) while logged in. View the page source (Cmd+U or right-click → View Source). A `<meta name="description" content="...">` tag appears in the `<head>` section, after the `<title>` tag.
 result: pass
 
 ### 2. Dashboard browser tab title
-expected: Browser tab reads "Dashboard — Asthma Buddy" (em-dash, not hyphen).
+expected: Browser tab reads "Dashboard — Asthma Buddy" (em-dash —, not a hyphen -).
 result: pass
 
-### 3. Authenticated page titles — Asthma Buddy suffix
-expected: Navigate to Symptom Logs, Peak Flow, and Notifications. Each browser tab shows "Page Name — Asthma Buddy" (e.g. "Symptom Logs — Asthma Buddy", "Peak Flow — Asthma Buddy", "Notifications — Asthma Buddy").
-result: issue
-reported: "It actually says Symptoms and not Symptom Logs"
-severity: minor
-
-### 4. Medications page title corrected
-expected: Go to Settings → Medications → Add Medication. Browser tab shows "Add Medication — Asthma Buddy" — NOT "Add Medication — Settings".
+### 3. Symptom Logs index page title
+expected: Navigate to Symptom Logs (/symptom_logs). Browser tab reads "Symptom Logs — Asthma Buddy" (NOT "Symptoms — Asthma Buddy"). This was previously broken and should now be fixed.
 result: pass
 
-### 5. Symptom Entry show page title corrected
-expected: Open an existing symptom log entry (click any entry in the Symptom Logs list). Browser tab shows "Symptom Entry — Asthma Buddy" — NOT "Symptoms Log — Asthma Buddy".
+### 4. Symptom Entry show page — content and title
+expected: Open an existing symptom log entry (click any entry in the Symptom Logs list). The entry's full text content is visible on the page (not "content missing"). Browser tab reads "Symptom Entry — Asthma Buddy". Both the content rendering and the title were previously broken and should now be fixed.
+result: pass
+
+### 5. Medications settings page title
+expected: Go to Settings → Medications. Browser tab reads "Medications — Asthma Buddy" — NOT "Medications — Settings" (old incorrect format).
 result: issue
-reported: "It doesn't display the content of the entry. It says content missing. The browser tab reads Symptoms - Asthma Buddy"
+reported: "The browser tab reads correct, but you cannot access the medications from settings. You have to just click on medications."
 severity: major
 
 ### 6. Sign-in page meta description
-expected: Visit the sign-in page (/sessions/new) logged out or in incognito. View source shows a `<meta name="description">` tag in the head with a description about signing in to Asthma Buddy.
+expected: Visit the sign-in page (/sessions/new) logged out or in incognito. View source shows a `<meta name="description" content="...">` tag in the `<head>` with a description about signing in to Asthma Buddy.
 result: pass
 
-### 7. Onboarding page meta description
-expected: View source of the onboarding wizard page (/onboarding). A `<meta name="description">` tag is present in the `<head>` with a description about setting up the account.
-result: skipped
-reason: Route is /onboarding/step/1 — not accessible to an already-onboarded user without a fresh account
+### 7. Peak Flow page title
+expected: Navigate to Peak Flow (/peak_flow_readings). Browser tab reads "Peak Flow — Asthma Buddy" (em-dash, not hyphen).
+result: pass
 
 ## Summary
 
 total: 7
-passed: 4
-issues: 2
+passed: 6
+issues: 1
 pending: 0
-skipped: 1
+skipped: 0
 
 ## Gaps
 
-- truth: "Symptom Logs index page title reads 'Symptom Logs — Asthma Buddy'"
+- truth: "Medications page is accessible from Settings"
   status: failed
-  reason: "User reported: It actually says Symptoms and not Symptom Logs"
-  severity: minor
-  test: 3
-  root_cause: "content_for :title in index.html.erb line 1 was set to 'Symptoms — Asthma Buddy' instead of 'Symptom Logs — Asthma Buddy'"
-  artifacts:
-    - path: "app/views/symptom_logs/index.html.erb"
-      issue: "Title string was 'Symptoms' — corrected to 'Symptom Logs'"
-  missing:
-    - "Fixed in commit 3a777ad"
-  debug_session: "ariadna-debugger a216ffbd24949019f"
-
-- truth: "Symptom log show page displays entry content and title reads 'Symptom Entry — Asthma Buddy'"
-  status: failed
-  reason: "User reported: It doesn't display the content of the entry. It says content missing. The browser tab reads Symptoms - Asthma Buddy"
+  reason: "User reported: The browser tab reads correct, but you cannot access the medications from settings. You have to just click on medications."
   severity: major
   test: 5
-  root_cause: "show.html.erb line 51 rendered @symptom_log.notes.body (ActionText::Content) instead of @symptom_log.notes (ActionText::RichText), bypassing the rendering pipeline and outputting 'content missing' for attachments. Title was actually correct in the view — browser showed a cached Turbo snapshot."
-  artifacts:
-    - path: "app/views/symptom_logs/show.html.erb"
-      issue: "notes.body → notes to use ActionText rendering pipeline"
-  missing:
-    - "Fixed in commit 3a777ad"
-  debug_session: "ariadna-debugger a216ffbd24949019f"
+  artifacts: []
+  missing: []
