@@ -14,7 +14,7 @@
           class: "dash-dose-btn",
           form: { style: "display: contents" },
           aria: { label: "Log #{medication.standard_dose_puffs} standard puffs of #{medication.name}" } do %>
-      +<%= medication.standard_dose_puffs %>
+      +<%= medication.standard_dose_puffs %> puffs
     <% end %>
     <% if active_illness && medication.sick_day_dose_puffs.present? %>
       <%= button_to settings_medication_dose_logs_path(medication),
@@ -25,7 +25,7 @@
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
         </svg>
-        +<%= medication.sick_day_dose_puffs %>
+        +<%= medication.sick_day_dose_puffs %> puffs
       <% end %>
     <% end %>
   </div>
