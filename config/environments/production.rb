@@ -64,6 +64,10 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: app_host }
 
+  # Required for Active Storage redirect URLs to use the correct host/protocol
+  # when the signed disk-service URL is generated outside a request context.
+  config.active_storage.default_url_options = { host: app_host, protocol: "https" }
+
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {
   #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
