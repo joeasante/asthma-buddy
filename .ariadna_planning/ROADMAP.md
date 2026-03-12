@@ -386,9 +386,10 @@ Plans:
 **Why this matters**: Consistent page titles improve browser tab readability and search engine indexing. Meta descriptions give search engines and social preview tools accurate summaries of each page. This is a one-time polish pass with no runtime dependencies.
 **Depends on**: Phase 20 (all pages exist before descriptions are written)
 
-**Plans**: 3 plans
+**Plans**: 4 plans
 - [ ] 21-01-PLAN.md — Add `yield(:meta_description) if content_for?(:meta_description)` slot to application.html.erb and onboarding.html.erb
 - [ ] 21-02-PLAN.md — Fix titles for all 21 authenticated pages; add meta descriptions for all 21 authenticated pages
 - [ ] 21-03-PLAN.md — Add meta descriptions for 7 public auth/legal pages and the onboarding wizard page
+- [ ] 21-04-PLAN.md — Gap closure: add Medications nav card to Settings hub (settings-nav-grid)
 
 ---
