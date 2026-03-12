@@ -25,6 +25,14 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "text/vnd.turbo-stream.html", response.media_type
   end
 
+  test "create turbo stream includes today-doses-list" do
+    post settings_medication_dose_logs_path(@medication),
+      params: { dose_log: { puffs: 2, recorded_at: Time.current } },
+      as: :turbo_stream
+    assert_response :success
+    assert_match "today-doses-list", response.body
+  end
+
   test "create scopes new dose log to current user" do
     post settings_medication_dose_logs_url(@medication),
       params: { dose_log: { puffs: 2, recorded_at: Time.current.to_s } }

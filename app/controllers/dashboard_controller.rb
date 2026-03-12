@@ -119,30 +119,6 @@ class DashboardController < ApplicationController
       .order(recorded_at: :desc)
       .first
 
-    respond_to do |format|
-      format.html
-      format.json do
-        render json: {
-          todays_best_reading: @todays_best_reading && {
-            value: @todays_best_reading.value,
-            zone:  @todays_best_reading.zone
-          },
-          week_avg:            @week_avg,
-          week_avg_zone:       @week_avg_zone,
-          week_reading_count:  @week_reading_count,
-          week_symptom_count:  @week_symptom_count,
-          active_illness:      @active_illness && {
-            id:          @active_illness.id,
-            recorded_at: @active_illness.recorded_at.iso8601,
-            ended_at:    @active_illness.ended_at&.iso8601
-          },
-          low_stock_medications: @low_stock_medications.map { |m| { id: m.id, name: m.name } },
-          preventer_adherence:   @preventer_adherence.map { |entry|
-            { medication_id: entry[:medication].id, name: entry[:medication].name, result: entry[:result] }
-          }
-        }
-      end
-    end
   end
 
   private
