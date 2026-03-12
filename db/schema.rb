@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_12_232012) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -60,7 +60,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
     t.index ["medication_id", "recorded_at"], name: "index_dose_logs_on_medication_id_and_recorded_at"
     t.index ["recorded_at"], name: "index_dose_logs_on_recorded_at"
     t.index ["user_id", "medication_id", "recorded_at"], name: "index_dose_logs_on_user_medication_recorded_at"
-    t.index ["user_id"], name: "index_dose_logs_on_user_id"
   end
 
   create_table "health_events", force: :cascade do |t|
@@ -91,7 +90,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
     t.integer "user_id", null: false
     t.index ["medication_type"], name: "index_medications_on_medication_type"
     t.index ["user_id", "course", "ends_on"], name: "index_medications_covering_course_queries"
-    t.index ["user_id"], name: "index_medications_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -104,6 +102,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index ["read", "created_at"], name: "index_notifications_on_read_and_created_at"
     t.index ["user_id", "notifiable_type", "notifiable_id", "notification_type"], name: "index_notifications_unique_unread_per_notifiable", unique: true, where: "read = 0"
     t.index ["user_id", "notification_type", "notifiable_type", "notifiable_id"], name: "index_notifications_deduplication"
     t.index ["user_id", "read"], name: "index_notifications_on_user_id_and_read"
@@ -130,7 +129,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
     t.integer "value", null: false
     t.index ["user_id", "recorded_at", "value"], name: "index_personal_best_records_covering"
     t.index ["user_id", "recorded_at"], name: "index_personal_best_records_on_user_id_and_recorded_at"
-    t.index ["user_id"], name: "index_personal_best_records_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -153,7 +151,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
     t.integer "user_id", null: false
     t.index ["user_id", "recorded_at"], name: "index_symptom_logs_on_user_id_and_recorded_at"
     t.index ["user_id", "severity", "recorded_at"], name: "index_symptom_logs_covering_severity"
-    t.index ["user_id"], name: "index_symptom_logs_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|

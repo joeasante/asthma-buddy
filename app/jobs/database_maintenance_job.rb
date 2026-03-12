@@ -8,10 +8,14 @@
 # planner uses these statistics to choose the best index. Without periodic
 # updates, it may silently choose a suboptimal scan plan as the dataset grows.
 #
-# PRAGMA wal_checkpoint(PASSIVE): merges committed WAL pages back into the main
-# database file without blocking active readers or writers. This keeps the WAL
-# file from growing unboundedly between the autocheckpoint thresholds and keeps
-# read performance sharp (fewer WAL pages to scan on each read).
+# Checkpoint strategy is role-differentiated:
+#   queue DB → RESTART: Solid Queue workers run 24/7, so TRUNCATE cannot guarantee
+#     a full checkpoint (active readers block it). RESTART waits for current readers
+#     to finish their transactions before checkpointing, then resets the WAL write
+#     position — more thorough than PASSIVE without permanently blocking new readers.
+#   all other DBs → TRUNCATE: at 4am with near-zero traffic, no active readers.
+#     TRUNCATE checkpoints all WAL pages and resets the WAL file to zero bytes,
+#     fully freeing disk space and eliminating WAL scan overhead for the next day.
 class DatabaseMaintenanceJob < ApplicationJob
   queue_as :default
 
@@ -23,7 +27,16 @@ class DatabaseMaintenanceJob < ApplicationJob
         # default for periodic maintenance; increases accuracy vs. a full ANALYZE.
         db.execute("PRAGMA analysis_limit=400;")
         db.execute("PRAGMA optimize;")
-        db.execute("PRAGMA wal_checkpoint(PASSIVE);")
+
+        checkpoint_mode = path.include?("_queue") ? "RESTART" : "TRUNCATE"
+        db.execute("PRAGMA wal_checkpoint(#{checkpoint_mode});")
+
+        # Log checkpoint result: [busy_pages, log_pages, checkpointed_pages]
+        # busy_pages > 0 means active readers prevented a full checkpoint.
+        result = db.execute("PRAGMA wal_checkpoint;")
+        busy, log, checkpointed = result.first
+        Rails.logger.info "[DatabaseMaintenance] #{File.basename(path)} — " \
+          "#{checkpoint_mode} checkpoint: #{checkpointed}/#{log} pages, busy=#{busy}"
       end
       Rails.logger.info "[DatabaseMaintenance] Optimized #{File.basename(path)}"
     rescue => e

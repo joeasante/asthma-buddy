@@ -24,6 +24,11 @@ production:
     queue: default
     schedule: every day at 3am
 
+  prune_sessions:
+    class: PruneSessionsJob
+    queue: default
+    schedule: every day at 2am
+
   database_maintenance:
     class: DatabaseMaintenanceJob
     queue: default

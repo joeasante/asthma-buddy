@@ -34,20 +34,23 @@ module AsthmaBuddy
 
       # Size cache, mmap, autocheckpoint and journal_size_limit by database role.
       # Primary needs larger caches for health data range scans and chart queries.
-      # Queue/cache/cable are high-churn, small-row workloads that benefit from a higher
-      # autocheckpoint threshold (fewer checkpoint interruptions per write burst).
+      # Queue/cache/cable are high-churn, small-row workloads that benefit from a lower
+      # autocheckpoint threshold — production data showed the queue WAL reaching 4 MB
+      # (20× the main file) between nightly maintenance runs at wal_autocheckpoint=4000.
+      # Lowering to 500 (2 MB) triggers auto-checkpoints more frequently, keeping WAL
+      # scan overhead low for Solid Queue's 100ms polling interval.
       # At WEB_CONCURRENCY > 1, uniform large caches across all 4 DBs × N workers exhausts
       # memory on a 1-2 GB host.
       db_path = @config[:database].to_s
       if db_path.match?(/_cache|_queue|_cable/)
-        execute("PRAGMA cache_size=-4000;")       # 4 MB  — sufficient for append-heavy workloads
-        execute("PRAGMA mmap_size=33554432;")     # 32 MB
-        execute("PRAGMA wal_autocheckpoint=4000;") # 16 MB WAL before auto-checkpoint — reduces
-                                                   # checkpoint frequency for write-heavy DBs
+        execute("PRAGMA cache_size=-4000;")        # 4 MB  — sufficient for append-heavy workloads
+        execute("PRAGMA mmap_size=33554432;")      # 32 MB
+        execute("PRAGMA wal_autocheckpoint=500;")  # 2 MB WAL before auto-checkpoint — queue DB
+                                                   # was accumulating 4 MB WAL between nightly runs
         execute("PRAGMA journal_size_limit=33554432;") # 32 MB WAL cap; truncated after checkpoint
       else
-        execute("PRAGMA cache_size=-16000;")      # 16 MB — headroom for multi-worker scaling
-        execute("PRAGMA mmap_size=134217728;")    # 128 MB
+        execute("PRAGMA cache_size=-16000;")       # 16 MB — headroom for multi-worker scaling
+        execute("PRAGMA mmap_size=134217728;")     # 128 MB
         execute("PRAGMA wal_autocheckpoint=2000;") # 8 MB WAL before auto-checkpoint — balances
                                                    # read performance with WAL file size
         execute("PRAGMA journal_size_limit=67108864;") # 64 MB WAL cap; truncated after checkpoint
@@ -55,6 +58,14 @@ module AsthmaBuddy
 
       # Keep temp tables and sort buffers in memory rather than temp files.
       execute("PRAGMA temp_store=MEMORY;")
+    end
+
+    def disconnect!
+      # Freshen query planner statistics before disconnecting (e.g., on deploy/restart).
+      # The daily DatabaseMaintenanceJob handles periodic optimize; this covers the gap
+      # between maintenance windows when writes have shifted table statistics significantly.
+      execute("PRAGMA optimize;") rescue nil
+      super
     end
   end
 end
