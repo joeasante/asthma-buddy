@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 20 (Legal Pages, Cookie Banner & Error Pages) — COMPLETE
-Plan: Plan 03 complete. Phase complete.
-Status: Phase 20 Plan 03 complete. 2026-03-12.
-Last activity: 2026-03-12 — Phase 20 Plan 03 complete: Branded 404/500 error pages via ErrorsController + exceptions_app routing, standalone maintenance.html. 500 integration tests passing, 0 regressions.
+Phase: Phase 21 (SEO & Meta Tags) — COMPLETE
+Plan: Plan 04 (gap closure) complete. Phase complete.
+Status: Phase 21 Plan 04 complete. 2026-03-12.
+Last activity: 2026-03-12 — Phase 21 gap-04 complete: Added Medications card to Settings hub nav grid, closing UAT test 5 gap. 500 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 

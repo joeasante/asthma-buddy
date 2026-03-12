@@ -219,7 +219,7 @@ Plans:
 
 ## Progress
 
-- [ ] **Phase 21: SEO & Meta Tags** — Fix all page titles to follow "Page Name — Asthma Buddy" consistently; add `content_for :meta_description` infrastructure to both layouts; write meta descriptions for all public and authenticated pages.
+- [x] **Phase 21: SEO & Meta Tags** — Fix all page titles to follow "Page Name — Asthma Buddy" consistently; add `content_for :meta_description` infrastructure to both layouts; write meta descriptions for all public and authenticated pages.
 
 ---
 

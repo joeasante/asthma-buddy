@@ -30,9 +30,8 @@ result: pass
 
 ### 5. Medications settings page title
 expected: Go to Settings → Medications. Browser tab reads "Medications — Asthma Buddy" — NOT "Medications — Settings" (old incorrect format).
-result: issue
-reported: "The browser tab reads correct, but you cannot access the medications from settings. You have to just click on medications."
-severity: major
+result: pass
+note: Gap closed in plan 04 — Medications card added to Settings hub nav grid.
 
 ### 6. Sign-in page meta description
 expected: Visit the sign-in page (/sessions/new) logged out or in incognito. View source shows a `<meta name="description" content="...">` tag in the `<head>` with a description about signing in to Asthma Buddy.
@@ -45,17 +44,11 @@ result: pass
 ## Summary
 
 total: 7
-passed: 6
-issues: 1
+passed: 7
+issues: 0
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Medications page is accessible from Settings"
-  status: failed
-  reason: "User reported: The browser tab reads correct, but you cannot access the medications from settings. You have to just click on medications."
-  severity: major
-  test: 5
-  artifacts: []
-  missing: []
+[none — gap closed by plan 04]
