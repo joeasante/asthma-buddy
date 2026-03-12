@@ -120,7 +120,7 @@
       <%= render "layouts/bottom_nav" %>
     <% end %>
 
-    <%= render "layouts/cookie_notice" unless authenticated? || session[:cookie_notice_shown] %>
+    <%= render "layouts/cookie_notice" unless authenticated? || cookies[:cookie_notice_dismissed].present? %>
 
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
