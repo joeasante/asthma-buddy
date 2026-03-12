@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asthma Buddy — Under Maintenance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Standalone maintenance page — no external CSS, no Rails, no JS */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+      background-color: #f0fdfa;
+      color: #134e4a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .maintenance-container {
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .maintenance-logo {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #0d9488;
+      letter-spacing: -0.01em;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+    }
+
+    .maintenance-icon {
+      width: 64px;
+      height: 64px;
+      background-color: #ccfbf1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .maintenance-icon svg {
+      width: 32px;
+      height: 32px;
+      color: #0d9488;
+    }
+
+    .maintenance-heading {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #134e4a;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .maintenance-subheading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0d9488;
+      margin-bottom: 1.25rem;
+    }
+
+    .maintenance-body {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.7;
+      color: #5eead4;
+      color: #0f766e;
+      margin-bottom: 2rem;
+    }
+
+    .maintenance-divider {
+      width: 48px;
+      height: 3px;
+      background-color: #0d9488;
+      border-radius: 2px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .maintenance-contact {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #5eead4;
+      color: #0f766e;
+    }
+
+    .maintenance-contact a {
+      color: #0d9488;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .maintenance-contact a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .maintenance-heading {
+        font-size: 1.75rem;
+      }
+
+      .maintenance-subheading {
+        font-size: 1.125rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="maintenance-container">
+    <span class="maintenance-logo">Asthma Buddy</span>
+
+    <div class="maintenance-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+
+    <h1 class="maintenance-heading">Asthma Buddy</h1>
+    <p class="maintenance-subheading">Under Maintenance</p>
+
+    <div class="maintenance-divider"></div>
+
+    <p class="maintenance-body">
+      We're currently carrying out scheduled maintenance.
+      We'll be back shortly. Thank you for your patience.
+    </p>
+
+    <p class="maintenance-contact">
+      Need help? Contact us at
+      <a href="mailto:support@asthmabuddy.app">support@asthmabuddy.app</a>
+    </p>
+  </div>
+</body>
+</html>
