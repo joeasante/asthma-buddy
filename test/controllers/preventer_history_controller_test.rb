@@ -8,6 +8,11 @@ class PreventerHistoryControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
   end
 
+  test "GET /adherence redirects permanently to /preventer_history" do
+    get "/adherence"
+    assert_redirected_to "/preventer_history"
+  end
+
   test "index redirects unauthenticated user to sign in" do
     sign_out
     get preventer_history_url
