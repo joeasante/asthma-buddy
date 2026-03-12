@@ -118,7 +118,6 @@ class DashboardController < ApplicationController
       .where(ended_at: nil)
       .order(recorded_at: :desc)
       .first
-
   end
 
   private
