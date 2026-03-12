@@ -3,6 +3,7 @@
 <%= link_to symptom_log_path(symptom_log),
       id: dom_id(symptom_log),
       class: "timeline-card",
+      data: { turbo_frame: "_top" },
       aria: { label: "#{symptom_label}, #{symptom_log.severity} on #{symptom_log.recorded_at.strftime("%-d %b %Y")}" } do %>
 
   <div class="severity-indicator severity-indicator--<%= symptom_log.severity %>" aria-hidden="true"></div>
