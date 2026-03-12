@@ -61,7 +61,7 @@ class HealthEvent < ApplicationRecord
       label:        chart_label,
       css_modifier: event_type_css_modifier
     }
-    marker[:end_date] = ended_at.to_date.to_s if ended_at.present?
+    marker[:end_date] = ended_at.to_date.to_s if !point_in_time? && ended_at.present?
     marker
   end
 
