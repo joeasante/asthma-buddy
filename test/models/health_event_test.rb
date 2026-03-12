@@ -167,6 +167,40 @@ class HealthEventTest < ActiveSupport::TestCase
     assert_equal "gp-appointment", gp.event_type_css_modifier
   end
 
+  # --- to_chart_marker ---
+
+  test "to_chart_marker includes required base fields" do
+    event = health_events(:alice_illness_resolved)
+    marker = event.to_chart_marker
+    assert marker[:date].present?
+    assert marker[:type].present?
+    assert marker[:label].present?
+    assert marker[:css_modifier].present?
+  end
+
+  test "to_chart_marker includes end_date for duration events with ended_at" do
+    event = health_events(:alice_illness_resolved)
+    marker = event.to_chart_marker
+    assert marker.key?(:end_date), "expected end_date key for duration event with ended_at"
+  end
+
+  test "to_chart_marker excludes end_date for duration events without ended_at" do
+    event = health_events(:alice_illness_ongoing)
+    marker = event.to_chart_marker
+    assert_not marker.key?(:end_date)
+  end
+
+  test "to_chart_marker excludes end_date for point-in-time events even with ended_at" do
+    event = HealthEvent.new(
+      user: users(:verified_user),
+      event_type: :gp_appointment,
+      recorded_at: 3.days.ago,
+      ended_at: 2.days.ago
+    )
+    marker = event.to_chart_marker
+    assert_not marker.key?(:end_date), "point-in-time events must not have end_date"
+  end
+
   # --- Scopes ---
 
   test "recent_first orders by recorded_at descending" do
