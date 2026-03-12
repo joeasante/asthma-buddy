@@ -239,7 +239,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 17. Onboarding Flow | 0/2 | Not started | - |
 | 18. Temporary Medication Courses | 0/3 | Not started | - |
 | 19. Notifications | 0/3 | Not started | - |
-| 20. Legal Pages & Cookie Banner | 0/3 | Not started | - |
+| 20. Legal Pages & Cookie Banner | 3/3 | Complete ✓ | 2026-03-12 |
 | 21. SEO & Meta Tags | 0/3 | Not started | - |
 
 ---
