@@ -135,6 +135,7 @@ class Settings::MedicationsController < ApplicationController
       name:                med.name,
       medication_type:     med.medication_type,
       standard_dose_puffs: med.standard_dose_puffs,
+      sick_day_dose_puffs: med.sick_day_dose_puffs,
       starting_dose_count: med.starting_dose_count,
       doses_per_day:       med.doses_per_day,
       course:              med.course?,
