@@ -38,6 +38,7 @@ module AsthmaBuddy
     # for users near midnight in their local timezone. Both the index and the
     # one_session_per_day model validation must be audited together if timezone changes.
     config.time_zone = "London"
+    config.exceptions_app = self.routes
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

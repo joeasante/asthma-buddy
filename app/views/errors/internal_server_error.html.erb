@@ -1,0 +1,16 @@
+<% content_for :title, "Something Went Wrong — Asthma Buddy" %>
+
+<div class="error-page">
+  <span class="error-code" aria-hidden="true">500</span>
+  <div class="error-content">
+    <h1 class="error-heading">Something went wrong</h1>
+    <p class="error-description">
+      We've encountered an unexpected error. Please try again in a moment.
+      If the problem persists, please contact us at
+      <%= mail_to "support@asthmabuddy.app", "support@asthmabuddy.app" %>.
+    </p>
+    <%= link_to authenticated? ? dashboard_path : root_path, class: "btn-primary" do %>
+      <%= authenticated? ? "Go to dashboard" : "Go to home page" %>
+    <% end %>
+  </div>
+</div>
