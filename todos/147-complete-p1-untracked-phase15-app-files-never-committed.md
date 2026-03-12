@@ -1,5 +1,5 @@
 ---
-status: complete
+status: pending
 priority: p1
 issue_id: "147"
 tags: [code-review, git, process, health-events]

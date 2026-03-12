@@ -1,5 +1,5 @@
 ---
-status: complete
+status: pending
 priority: p1
 issue_id: "149"
 tags: [code-review, security, phi, logging, health-events]
