@@ -142,7 +142,7 @@ class RelieverUsageController < ApplicationController
       weeks:        @weeks,
       weekly_data:  @weekly_data.map { |w|
         { week_start: w[:week_start], week_end: w[:week_end],
-          uses: w[:uses], band: w[:band].to_s, label: w[:label] }
+          uses: w[:uses], band: w[:band].to_s, label: w[:label], fill_pct: w[:fill_pct] }
       },
       monthly_uses:   @monthly_uses,
       monthly_status: @monthly_pill_label,
