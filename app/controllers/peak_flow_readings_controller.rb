@@ -142,8 +142,8 @@ class PeakFlowReadingsController < ApplicationController
         format.html { render :new, status: :unprocessable_entity }
         format.json do
           json_response = { errors: @peak_flow_reading.errors.full_messages }
-          if @peak_flow_reading.duplicate_session_reading.present?
-            json_response[:duplicate_reading] = peak_flow_reading_json(@peak_flow_reading.duplicate_session_reading)
+          if @duplicate_reading.present?
+            json_response[:duplicate_reading] = peak_flow_reading_json(@duplicate_reading)
           end
           render json: json_response, status: :unprocessable_entity
         end
