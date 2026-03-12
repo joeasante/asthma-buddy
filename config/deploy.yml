@@ -14,6 +14,7 @@ proxy:
     interval: 3
   run:
     http_port: 3000       # kamal-proxy listens on :3000 — CloudPanel proxies here
+    https_port: 4430      # move away from 443 — CloudPanel Nginx owns that port
 
 registry:
   server: ghcr.io
