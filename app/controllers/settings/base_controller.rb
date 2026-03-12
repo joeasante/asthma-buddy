@@ -4,7 +4,7 @@ class Settings::BaseController < ApplicationController
   private
 
   def set_header_eyebrow_vars
-    all_meds = Current.user.medications.chronological.includes(:dose_logs)
+    all_meds = Current.user.medications.chronological
     visible  = all_meds.reject { |m| m.course? && !m.course_active? }
     @header_medication_count = visible.size
     @header_low_stock_count  = visible.count(&:low_stock?)
