@@ -177,7 +177,7 @@ class NotificationTest < ActiveSupport::TestCase
     end
   end
 
-  test "create_low_stock_for is a no-op when a read low_stock notification already exists" do
+  test "create_low_stock_for creates a new notification when existing low_stock notification is read" do
     medication = Medication.create!(
       user:                users(:verified_user),
       name:                "Already Acked Med",
@@ -197,8 +197,9 @@ class NotificationTest < ActiveSupport::TestCase
       read:              true
     )
 
-    # create_low_stock_for should not create a duplicate — deduplication is read-state agnostic
-    assert_no_difference "Notification.count" do
+    # After a refill + re-stock event, a new notification should be created
+    # even though a read notification already exists for this medication.
+    assert_difference "Notification.count", 1 do
       Notification.create_low_stock_for(medication)
     end
   end

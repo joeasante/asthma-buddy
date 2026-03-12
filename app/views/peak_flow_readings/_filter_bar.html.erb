@@ -1,56 +1,65 @@
-<div class="pf-filter-card" role="search" aria-label="Filter readings">
-  <div class="pf-filter-row">
-    <%# Period chips %>
-    <div class="pf-filter-group" role="group" aria-label="Time period">
-      <% [["7", "7 days"], ["30", "30 days"], ["90", "90 days"], ["all", "All time"]].each do |value, label| %>
-        <%= link_to label,
-              peak_flow_readings_path(preset: value, zone: active_zone),
-              class: "pf-filter-chip #{"pf-filter-chip--active" if active_preset == value}",
-              aria: { pressed: (active_preset == value).to_s },
-              data: { turbo_frame: "readings_content" } %>
-      <% end %>
-      <%= link_to "Custom",
-            peak_flow_readings_path(preset: "custom", zone: active_zone),
-            class: "pf-filter-chip #{"pf-filter-chip--active" if active_preset == "custom"}",
-            aria: { pressed: (active_preset == "custom").to_s },
-            data: { turbo_frame: "readings_content" } %>
-    </div>
+<div class="filter-bar" role="search" aria-label="Filter peak flow readings">
 
-    <span class="pf-filter-sep" aria-hidden="true"></span>
-
-    <%# Zone chips %>
-    <div class="pf-filter-group" role="group" aria-label="Zone filter">
-      <%= link_to "All zones",
-            peak_flow_readings_path(preset: active_preset, start_date: start_date, end_date: end_date),
-            class: "pf-filter-chip #{"pf-filter-chip--active" unless active_zone}",
-            aria: { pressed: active_zone.nil?.to_s },
-            data: { turbo_frame: "readings_content" } %>
-      <% [["green", "Green"], ["yellow", "Yellow"], ["red", "Red"]].each do |value, label| %>
-        <%= link_to peak_flow_readings_path(preset: active_preset, start_date: start_date, end_date: end_date, zone: value),
-              class: "pf-filter-chip pf-filter-chip--zone-#{value} #{"pf-filter-chip--active" if active_zone == value}",
-              aria: { pressed: (active_zone == value).to_s, label: "#{label} zone" },
-              data: { turbo_frame: "readings_content" } do %>
-          <span class="pf-filter-chip-dot pf-filter-chip-dot--<%= value %>" aria-hidden="true"></span>
-          <%= label %>
-        <% end %>
-      <% end %>
-    </div>
+  <%# Row 1: Period — primary control %>
+  <div class="filter-row" role="group" aria-label="Time period">
+    <% [["7", "7d"], ["30", "30d"], ["90", "3m"], ["all", "All"], ["custom", "Custom"]].each do |value, label| %>
+      <%= link_to label,
+            peak_flow_readings_path(preset: value, zone: active_zone),
+            class: "filter-chip #{"filter-chip--active" if active_preset == value}",
+            aria:  { pressed: (active_preset == value).to_s },
+            data:  { turbo_frame: "readings_content" } %>
+    <% end %>
+    <% if active_zone.present? %>
+      <%= link_to "Clear filters",
+            peak_flow_readings_path,
+            class: "filter-clear",
+            aria:  { label: "Clear all filters" },
+            data:  { turbo_frame: "readings_content" } %>
+    <% end %>
   </div>
 
-  <%# Date range — only shown when Custom is selected %>
+  <%# Row 2: Zone — secondary refinement %>
+  <div class="filter-row" role="group" aria-label="Zone filter">
+    <%= link_to "All",
+          peak_flow_readings_path(preset: active_preset, start_date: start_date, end_date: end_date),
+          class: "filter-chip #{"filter-chip--active" unless active_zone}",
+          aria:  { pressed: active_zone.nil?.to_s },
+          data:  { turbo_frame: "readings_content" } %>
+    <% [["green", "Green"], ["yellow", "Yellow"], ["red", "Red"]].each do |value, label| %>
+      <%= link_to peak_flow_readings_path(preset: active_preset, start_date: start_date, end_date: end_date, zone: value),
+            class: "filter-chip filter-chip--zone-#{value} #{"filter-chip--active" if active_zone == value}",
+            aria:  { pressed: (active_zone == value).to_s, label: "#{label} zone" },
+            data:  { turbo_frame: "readings_content" } do %>
+        <span class="filter-chip-dot filter-chip-dot--<%= value %>" aria-hidden="true"></span>
+        <%= label %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Custom date range — revealed only when Custom preset is active %>
   <% if active_preset == "custom" || start_date.present? || end_date.present? %>
     <%= form_with url: peak_flow_readings_path, method: :get,
-          data: { turbo_frame: "readings_content" },
-          class: "pf-filter-dates" do |f| %>
+          data: { controller: "date-range", turbo_frame: "readings_content" },
+          class: "filter-dates" do |f| %>
       <input type="hidden" name="preset" value="custom">
-      <input type="hidden" name="zone" value="<%= active_zone %>">
-      <%= f.label :start_date, "From", class: "pf-filter-date-label" %>
-      <%= f.date_field :start_date, value: start_date, class: "date-input date-input--sm",
-            aria: { label: "Start date" } %>
-      <%= f.label :end_date, "To", class: "pf-filter-date-label" %>
-      <%= f.date_field :end_date, value: end_date, class: "date-input date-input--sm",
-            aria: { label: "End date" } %>
-      <%= f.submit "Apply", class: "btn-apply-dates btn-apply-dates--sm" %>
+      <input type="hidden" name="zone"   value="<%= active_zone %>">
+      <div class="filter-date-row">
+        <span class="filter-date-label">From</span>
+        <%= f.date_field :start_date,
+              value: start_date,
+              class: "filter-date-input",
+              aria: { label: "Start date" },
+              data: { date_range_target: "start", action: "change->date-range#check" } %>
+      </div>
+      <div class="filter-date-row">
+        <span class="filter-date-label">To</span>
+        <%= f.date_field :end_date,
+              value: end_date,
+              class: "filter-date-input",
+              aria: { label: "End date" },
+              data: { date_range_target: "end", action: "change->date-range#check" } %>
+      </div>
     <% end %>
   <% end %>
+
 </div>

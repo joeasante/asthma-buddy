@@ -17,6 +17,7 @@ class PeakFlowReading < ApplicationRecord
                                     message: "must be between 1 and 900 L/min" }
   validates :recorded_at, presence: true
   validate :recorded_at_within_acceptable_range, if: -> { recorded_at.present? }
+  validate :one_session_per_day, on: :create, if: -> { recorded_at.present? && time_of_day.present? }
 
   # Zone is computed once at save time and persisted as a snapshot.
   # This preserves the historical zone classification shown to the user at the moment of recording.
@@ -76,12 +77,33 @@ class PeakFlowReading < ApplicationRecord
     zone_pct&.round
   end
 
+  attr_reader :duplicate_session_reading
+
   private
 
   def zone_pct
     pb = personal_best_at_reading_time
     return nil if pb.nil? || pb.zero?
     (value.to_f / pb) * 100
+  end
+
+  def one_session_per_day
+    return unless user
+    # Use UTC day boundaries to match the database unique index (DATE(recorded_at) in SQLite
+    # uses UTC). This prevents ActiveRecord::RecordNotUnique for London users between
+    # 23:00–00:00 UTC during BST, where Ruby's local-time date differs from the UTC date.
+    utc_start = recorded_at.utc.beginning_of_day
+    utc_end   = recorded_at.utc.end_of_day
+    existing = user.peak_flow_readings
+                   .where(time_of_day: time_of_day)
+                   .where(recorded_at: utc_start..utc_end)
+                   .first
+    return unless existing
+
+    @duplicate_session_reading = existing
+    local_date = recorded_at.to_date
+    label = local_date == Date.current ? "today" : local_date.strftime("%-d %b")
+    errors.add(:base, "You already have a #{time_of_day} reading for #{label}.")
   end
 
   def recorded_at_within_acceptable_range

@@ -13,6 +13,29 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     @other_dose_log = dose_logs(:bob_reliever_dose_1)
   end
 
+  # --- INDEX ---
+
+  test "GET index returns JSON dose log history" do
+    get settings_medication_dose_logs_path(@medication), as: :json
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert json.key?("dose_logs")
+    assert json.key?("total")
+    assert json.key?("medication_id")
+    assert json["dose_logs"].is_a?(Array)
+  end
+
+  test "GET index cross-user isolation" do
+    get settings_medication_dose_logs_path(@other_medication), as: :json
+    assert_response :not_found
+  end
+
+  test "GET index unauthenticated redirects" do
+    sign_out
+    get settings_medication_dose_logs_path(@medication), as: :json
+    assert_response :unauthorized
+  end
+
   # --- CREATE ---
 
   test "create saves a valid dose log and responds with turbo stream" do
@@ -23,6 +46,14 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html", response.media_type
+  end
+
+  test "create turbo stream includes today-doses-list" do
+    post settings_medication_dose_logs_path(@medication),
+      params: { dose_log: { puffs: 2, recorded_at: Time.current } },
+      as: :turbo_stream
+    assert_response :success
+    assert_match "today-doses-list", response.body
   end
 
   test "create scopes new dose log to current user" do

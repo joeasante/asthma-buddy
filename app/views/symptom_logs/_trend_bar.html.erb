@@ -1,25 +1,15 @@
 <% total = severity_counts.values.sum %>
 <% if total > 0 %>
-  <div class="trend-bar-wrapper">
-    <div class="trend-bar"
-         role="img"
-         aria-label="Severity distribution: <%= [
-           ("#{severity_counts[:mild]} mild"         if severity_counts[:mild].to_i > 0),
-           ("#{severity_counts[:moderate]} moderate"  if severity_counts[:moderate].to_i > 0),
-           ("#{severity_counts[:severe]} severe"      if severity_counts[:severe].to_i > 0)
-         ].compact.join(", ") %>">
-      <% [[:mild, "Mild"], [:moderate, "Moderate"], [:severe, "Severe"]].each do |key, label| %>
-        <% count = severity_counts[key] || 0 %>
-        <% pct   = ((count.to_f / total) * 100).round(1) %>
-        <% if count > 0 %>
-          <div class="trend-segment trend-segment--<%= key %>"
-               style="width: <%= pct %>%"
-               title="<%= label %>: <%= count %> <%= "entry".pluralize(count) %>">
-            <span class="trend-segment-label"><%= label %> <%= count %></span>
-          </div>
-        <% end %>
+  <div class="chart-severity-legend">
+    <% [[:mild, "Mild"], [:moderate, "Moderate"], [:severe, "Severe"]].each do |key, label| %>
+      <% count = severity_counts[key] || 0 %>
+      <% if count > 0 %>
+        <span class="chart-severity-pill chart-severity-pill--<%= key %>">
+          <span class="chart-severity-pill-dot" aria-hidden="true"></span>
+          <%= label %> <strong><%= count %></strong>
+        </span>
       <% end %>
-    </div>
-    <span class="trend-bar-total" aria-hidden="true"><%= total %> total</span>
+    <% end %>
+    <span class="chart-severity-total"><%= total %> total</span>
   </div>
 <% end %>

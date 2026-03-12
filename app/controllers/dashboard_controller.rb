@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DashboardController < ApplicationController
+  include DashboardVariables
+
   before_action :check_onboarding
 
   def index
@@ -10,6 +12,12 @@ class DashboardController < ApplicationController
 
     # Latest single reading — status card
     @last_reading = user.peak_flow_readings.chronological.first
+
+    # Best reading recorded today — used in the page header eyebrow
+    @todays_best_reading = user.peak_flow_readings
+      .where(recorded_at: Date.current.beginning_of_day..Date.current.end_of_day)
+      .order(value: :desc)
+      .first
 
     # Current week stats (week starts Monday)
     week_start       = Date.current.beginning_of_week(:monday)
@@ -37,10 +45,15 @@ class DashboardController < ApplicationController
     # Peak flow grouped by date (up to 4 days) so AM/PM render side-by-side.
     @recent_readings = user.peak_flow_readings
       .chronological
-      .limit(10)
+      .limit(9)
       .group_by { |r| r.recorded_at.to_date }
-      .first(4)
+      .first(3)
     @recent_symptoms = user.symptom_logs.chronological.includes(:rich_text_notes).limit(4)
+
+    # Totals for "View all N" section footers — cheap indexed COUNT queries.
+    @total_reading_count   = user.peak_flow_readings.count
+    @total_symptom_count   = user.symptom_logs.count
+    @total_health_event_count = user.health_events.count
 
     # 7-day chart data — one entry per day with separate morning/evening values.
     @chart_data = recent_readings
@@ -60,14 +73,7 @@ class DashboardController < ApplicationController
     @health_event_markers = user.health_events
       .where(recorded_at: week_start.beginning_of_day..Date.current.end_of_day)
       .order(recorded_at: :asc)
-      .map do |e|
-        {
-          date:         e.recorded_at.to_date.to_s,   # "YYYY-MM-DD"
-          type:         e.event_type,
-          label:        e.chart_label,
-          css_modifier: e.event_type_css_modifier
-        }
-      end
+      .map(&:to_chart_marker)
 
     # Duration events that started before this week and are still ongoing.
     # These have no valid x-axis position so they can't be chart markers,
@@ -89,18 +95,46 @@ class DashboardController < ApplicationController
     # Recent health events — 3 most recent, shown in the dashboard card
     @recent_health_events = user.health_events.recent_first.limit(3)
 
-    # Today's preventer adherence — only preventers with a doses_per_day schedule.
-    # Excludes course medications (COURSE-03): temporary courses are not preventer adherence targets.
-    today = Date.current
-    @preventer_adherence = user.medications
-      .where(medication_type: :preventer)
-      .where(course: false)
-      .includes(:dose_logs)
-      .select { |m| m.doses_per_day.present? }
-      .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+    # Today's preventer adherence, reliever medications, and active illness —
+    # shared with Settings::BaseController via the DashboardVariables concern.
+    set_dashboard_vars
+
+    respond_to do |format|
+      format.html
+      format.json { render json: dashboard_json }
+    end
   end
 
   private
+
+    def dashboard_json
+      {
+        peak_flow: {
+          latest:        @last_reading&.as_json(only: %i[id value zone time_of_day recorded_at]),
+          personal_best: @personal_best&.value,
+          week_avg:      @week_avg,
+          week_avg_zone: @week_avg_zone,
+          week_count:    @week_reading_count
+        },
+        symptoms: {
+          week_count:      @week_symptom_count,
+          severity_counts: @week_severity_counts,
+          last_severe:     @last_severe&.as_json(only: %i[id severity recorded_at])
+        },
+        medications: {
+          low_stock_count:      @low_stock_medications.size,
+          low_stock_medication_ids: @low_stock_medications.map(&:id)
+        },
+        health_events: {
+          total:         @total_health_event_count,
+          active_illness: @active_illness&.as_json(only: %i[id event_type recorded_at])
+        },
+        totals: {
+          readings: @total_reading_count,
+          symptoms: @total_symptom_count
+        }
+      }
+    end
 
     # Soft gate — only the dashboard is guarded. Users can navigate directly to
     # data-entry screens (peak flow, symptoms, etc.) without completing onboarding;

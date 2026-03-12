@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       member do
         patch :refill
       end
-      resources :dose_logs, only: %i[create destroy]
+      resources :dose_logs, only: %i[index create destroy]
     end
   end
 
@@ -40,7 +40,8 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  get "adherence",       to: "adherence#index",        as: :adherence
+  get "adherence", to: redirect("/preventer_history")
+  get "preventer_history", to: "preventer_history#index", as: :preventer_history
   get "reliever-usage",  to: "reliever_usage#index",   as: :reliever_usage
   get "dashboard", to: "dashboard#index", as: :dashboard
 
@@ -64,7 +65,11 @@ Rails.application.routes.draw do
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms
+  get "cookies", to: "pages#cookie_policy", as: :cookie_policy
 
   # Defines the root path route ("/")
   root "home#index"
+
+  match "/404", to: "errors#not_found",             via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
 end

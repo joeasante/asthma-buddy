@@ -1,4 +1,5 @@
-<% content_for :title, "Record a reading" %>
+<% content_for :title, "Record a Reading — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="Record a new peak flow reading — enter your result and compare against your personal best."><% end %>
 
 <div class="page-header">
   <h1>Record a reading</h1>
@@ -9,6 +10,7 @@
     <%= render "form",
           peak_flow_reading: @peak_flow_reading,
           has_personal_best: @has_personal_best,
-          personal_best_value: @personal_best_value %>
+          personal_best_value: @personal_best_value,
+          duplicate_reading: @duplicate_reading %>
   <% end %>
 </div>

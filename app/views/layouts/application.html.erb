@@ -2,11 +2,10 @@
 <html lang="en">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Asthma Buddy" %></title>
+    <%= yield(:meta_description) if content_for?(:meta_description) %>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
 
     <%# Trim to weights actually used — Inter 700 unused (headings use Plus Jakarta Sans) %>
     <%# Plus Jakarta Sans 600 unused (headings use 700/800 only) %>
@@ -14,14 +13,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="<%= asset_path 'favicon.svg' %>" type="image/svg+xml">
+    <link rel="icon" href="<%= asset_path 'favicon.png' %>" type="image/png">
+    <link rel="apple-touch-icon" href="<%= asset_path 'favicon.png' %>">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" %>
+    <%# Page-specific stylesheets injected via content_for :head in consuming views %>
+    <%= yield :head %>
+    <%# Cookie notice CSS — only when the banner will actually render %>
+    <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" unless authenticated? || cookies[:cookie_notice_dismissed].present? %>
     <% if authenticated? %>
-      <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "charts",            "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "dashboard",         "data-turbo-track": "reload" %>
@@ -117,7 +119,7 @@
       <%= render "layouts/bottom_nav" %>
     <% end %>
 
-    <%= render "layouts/cookie_notice" unless authenticated? || session[:cookie_notice_shown] %>
+    <%= render "layouts/cookie_notice" unless authenticated? || cookies[:cookie_notice_dismissed].present? || controller_name == "errors" %>
 
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
@@ -128,6 +130,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
+          <%= link_to "Cookies", cookie_policy_path %>
         </nav>
       </footer>
     <% else %>
@@ -136,6 +139,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
+          <%= link_to "Cookies", cookie_policy_path %>
         </nav>
         <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
       </footer>

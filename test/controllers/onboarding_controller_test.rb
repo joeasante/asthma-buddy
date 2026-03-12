@@ -30,6 +30,12 @@ class OnboardingControllerTest < ActionDispatch::IntegrationTest
 
   # -- OnboardingController guard --
 
+  test "step 1 redirects to step 2 if personal best already done" do
+    users(:new_user).update!(onboarding_personal_best_done: true)
+    get onboarding_step_path(1)
+    assert_redirected_to onboarding_step_path(2)
+  end
+
   test "GET /onboarding/step/1 redirects to dashboard when both flags true" do
     sign_in_as users(:verified_user)
     get onboarding_step_path(1)

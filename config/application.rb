@@ -32,7 +32,13 @@ module AsthmaBuddy
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # IMPORTANT: peak_flow_readings has a unique index on DATE(recorded_at) evaluated
+    # in UTC (see db/migrate/20260311200000_add_unique_session_index_to_peak_flow_readings.rb).
+    # Changing config.time_zone to a non-UTC value will break duplicate session detection
+    # for users near midnight in their local timezone. Both the index and the
+    # one_session_per_day model validation must be audited together if timezone changes.
+    config.time_zone = "London"
+    config.exceptions_app = self.routes
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 19 (Notifications) — COMPLETE
-Plan: Plan 03 complete.
-Status: Phase 19 all plans complete. 2026-03-11.
-Last activity: 2026-03-11 — Phase 19 Plan 03 complete: NotificationsControllerTest (11 integration tests: index scoping, mark_read Turbo Stream + cross-user 404, mark_all_read + isolation, unauthenticated redirects), NotificationsTest system tests (7 tests: badge visibility, mark single inline, mark all read, empty states x2, regression check). 462 integration tests passing, 0 regressions.
+Phase: Phase 21 (SEO & Meta Tags) — COMPLETE
+Plan: Plan 04 (gap closure) complete. Phase complete.
+Status: Phase 21 Plan 04 complete. 2026-03-12.
+Last activity: 2026-03-12 — Phase 21 gap-04 complete: Added Medications card to Settings hub nav grid, closing UAT test 5 gap. 500 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,16 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 20 Plan 03 completed: 2026-03-12 (~8 min, 2 tasks, 6 files created, 3 files modified, 5 new tests — branded error pages + maintenance page)
+- Tests at Phase 20-03 close: 500 integration passing (no regressions)
+- Phase 20 Plan 02 completed: 2026-03-12 (~1 min, 1 task, 0 files created, 3 files modified, 0 new tests — persistent cookie dismissal)
+- Tests at Phase 20-02 close: 495 integration passing (no regressions)
+- Phase 20 Plan 01 completed: 2026-03-12 (~3 min, 2 tasks, 2 files created, 5 files modified, 0 new tests — Cookie Policy page + legal.css + narrow layout applied)
+- Tests at Phase 20-01 close: 495 integration passing (no regressions)
+- Phase 21 Plan 03 completed: 2026-03-12 (~4 min, 2 tasks, 0 files created, 8 files modified, 0 new tests — meta description content only)
+- Tests at Phase 21-03 close: 483 integration passing (no regressions)
+- Phase 21 Plan 01 completed: 2026-03-12 (~3 min, 2 tasks, 0 files created, 2 files modified, 0 new tests — layout infrastructure only)
+- Tests at Phase 21-01 close: 483 integration passing (no regressions)
 - Phase 19 Plan 03 completed: 2026-03-11 (~3 min, 2 tasks, 2 files created, 0 files modified, 18 new tests — 11 controller + 7 system)
 - Tests at Phase 19-03 close: 462 integration passing, 7 system passing (no regressions)
 - Phase 19 Plan 02 completed: 2026-03-11 (~3 min, 2 tasks, 8 files created, 3 files modified, 0 new tests — UI-only plan)
@@ -114,6 +124,25 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 20 Plan 03 Decisions (2026-03-12)
+
+- **Remove public/404.html and public/500.html**: `ActionDispatch::Static` middleware serves these static files directly (before the Rails router), returning 200 status and bypassing `ErrorsController` entirely. Must be deleted when implementing `exceptions_app` routing.
+- **errors.css loaded unconditionally**: Error pages shown to both authenticated and unauthenticated users; placed outside `authenticated?` block alongside `legal` and `cookie_notice` stylesheets.
+- **allow_unauthenticated_access on ErrorsController**: Required so authentication before_action doesn't redirect unauthenticated users away from error pages to the login page.
+- **maintenance.html uses #0d9488 hex**: CSS custom properties unavailable outside Rails asset pipeline; hex `#0d9488` (teal-600) used directly as inline style fallback matching `--brand`.
+
+### Phase 20 Plan 02 Decisions (2026-03-12)
+
+- **Persistent cookie replaces session flag**: `cookies[:cookie_notice_dismissed]` (365 days) eliminates PECR nuisance of banner reappearing on every new session. Session cookie remains strictly necessary and exempt from consent.
+- **`head :no_content` unchanged**: Stimulus controller handles client-side hide/remove; no redirect or Turbo Stream needed for dismiss action.
+
+### Phase 20 Plan 01 Decisions (2026-03-12)
+
+- **legal.css loaded unconditionally**: Placed outside `authenticated?` block — legal pages are public (unauthenticated users visit /terms, /privacy, /cookies) so the stylesheet must load before authentication
+- **cookies action is empty (implicit render)**: `allow_unauthenticated_access` at PagesController class level covers the new action automatically; no extra configuration needed
+- **Legal page pattern established**: `.main--narrow` wrapper containing `.page-header` h1 → `.section-card` with `.legal-date` date → h2 sections → `.legal-back-link` at bottom — applied consistently across all three legal pages
+- **.pages-updated replaced with .legal-date**: Existing terms and privacy views used `.pages-updated` class; renamed to `.legal-date` for consistent styling across all three legal pages via legal.css
 
 ### Phase 19 Plan 03 Decisions (2026-03-11)
 
@@ -379,6 +408,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11
-Stopped at: Phase 19 Plan 03 complete — NotificationsControllerTest (11 integration tests) and NotificationsTest system tests (7 tests). 462 integration tests passing, 7 system tests passing, 0 regressions. Phase 19 fully complete.
+Last session: 2026-03-12
+Stopped at: Completed Phase 20 Plan 03 — Branded error pages (ErrorsController, exceptions_app routing, errors.css, maintenance.html). 500 tests passing.
 Resume file: None

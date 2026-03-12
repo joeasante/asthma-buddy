@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Asthma Buddy — Setup" %></title>
+    <%= yield(:meta_description) if content_for?(:meta_description) %>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -10,9 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="<%= asset_path 'favicon.svg' %>" type="image/svg+xml">
+    <link rel="icon" href="<%= asset_path 'favicon.png' %>" type="image/png">
+    <link rel="apple-touch-icon" href="<%= asset_path 'favicon.png' %>">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "onboarding", "data-turbo-track": "reload" %>

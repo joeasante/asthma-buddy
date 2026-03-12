@@ -8,4 +8,7 @@ class PagesController < ApplicationController
 
   def terms
   end
+
+  def cookie_policy
+  end
 end

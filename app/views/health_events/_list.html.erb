@@ -17,8 +17,10 @@
 <% else %>
   <% grouped_events.each do |month_start, events| %>
     <h3 class="events-month-heading"><%= month_start.strftime("%B %Y") %></h3>
-    <% events.each do |event| %>
-      <%= render "event_row", health_event: event %>
-    <% end %>
+    <div class="event-cards">
+      <% events.each do |event| %>
+        <%= render "event_row", health_event: event %>
+      <% end %>
+    </div>
   <% end %>
 <% end %>

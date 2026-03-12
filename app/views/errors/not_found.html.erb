@@ -1,0 +1,13 @@
+<% content_for :title, "Page Not Found — Asthma Buddy" %>
+<% content_for :head do %><%= stylesheet_link_tag "errors", "data-turbo-track": "reload" %><% end %>
+
+<div class="error-page">
+  <span class="error-code" aria-hidden="true">404</span>
+  <div class="error-content">
+    <h1 class="error-heading">Page not found</h1>
+    <p class="error-description">
+      The page you were looking for doesn't exist or may have moved.
+    </p>
+    <%= render "errors/home_link" %>
+  </div>
+</div>

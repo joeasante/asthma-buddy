@@ -1,0 +1,47 @@
+/* Error pages — 404, 500 */
+.error-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-md);
+  overflow: hidden;
+}
+
+.error-code {
+  position: absolute;
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: 800;
+  color: var(--brand-light);
+  line-height: 1;
+  user-select: none;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.error-content {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+}
+
+.error-heading {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+}
+
+.error-description {
+  color: var(--text-3);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+}

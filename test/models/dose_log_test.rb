@@ -97,12 +97,29 @@ class DoseLogTest < ActiveSupport::TestCase
     assert_equal newer.id, results.first.id
   end
 
-  test "for_medication scope filters to the given medication" do
-    med   = medications(:alice_reliever)
-    other = medications(:alice_preventer)
-    logs  = DoseLog.for_medication(med)
-    assert logs.all? { |l| l.medication_id == med.id }
-    assert_not logs.any? { |l| l.medication_id == other.id }
+  # GINA band classification
+
+  test "gina_band returns :controlled for uses below review threshold" do
+    assert_equal :controlled, DoseLog.gina_band(0)
+    assert_equal :controlled, DoseLog.gina_band(DoseLog::GINA_REVIEW_THRESHOLD - 1)
+  end
+
+  test "gina_band returns :review for uses at review threshold but below urgent threshold" do
+    assert_equal :review, DoseLog.gina_band(DoseLog::GINA_REVIEW_THRESHOLD)
+    assert_equal :review, DoseLog.gina_band(DoseLog::GINA_URGENT_THRESHOLD - 1)
+  end
+
+  test "gina_band returns :urgent for uses at or above urgent threshold" do
+    assert_equal :urgent, DoseLog.gina_band(DoseLog::GINA_URGENT_THRESHOLD)
+    assert_equal :urgent, DoseLog.gina_band(DoseLog::GINA_URGENT_THRESHOLD + 5)
+  end
+
+  test "GINA_REVIEW_THRESHOLD constant is defined on model" do
+    assert_equal 3, DoseLog::GINA_REVIEW_THRESHOLD
+  end
+
+  test "GINA_URGENT_THRESHOLD constant is defined on model" do
+    assert_equal 6, DoseLog::GINA_URGENT_THRESHOLD
   end
 
   # Cascade deletion

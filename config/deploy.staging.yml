@@ -1,0 +1,48 @@
+service: asthma_buddy
+image: joeasante/asthma-buddy
+
+servers:
+  web:
+    hosts:
+      - STAGING_SERVER_IP   # ← replace with your staging VPS IP
+
+proxy:
+  app_port: 80
+  forward_headers: true
+  healthcheck:
+    path: /up
+    interval: 3
+  run:
+    http_port: 3000         # CloudPanel Nginx on staging proxies here
+    https_port: 4430        # move away from 443 — CloudPanel Nginx owns that port
+
+registry:
+  server: ghcr.io
+  username: joeasante
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  secret:
+    - RAILS_MASTER_KEY
+  clear:
+    SOLID_QUEUE_IN_PUMA: true
+    APP_HOST: "staging.asthmabuddy.app"   # ← add this subdomain in Cloudflare → staging VPS IP
+
+builder:
+  arch: amd64
+  driver: docker
+  args:
+    APP_HOST: staging.asthmabuddy.app
+
+# Separate volume — staging data is completely isolated from production
+volumes:
+  - "asthma_buddy_staging_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell:   app exec --interactive --reuse "bash"
+  logs:    app logs -f
+  dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"

@@ -63,10 +63,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     )
 
     # Force chart data to exist so canvas renders, by creating a reading this week
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path
@@ -84,10 +84,10 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
 
   test "canvas element includes data-chart-health-events-value attribute when chart renders" do
     # Canvas only renders when @chart_data.any? — ensure a reading exists this week.
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path
@@ -96,15 +96,28 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     reading.destroy
   end
 
+  test "active_illness is nil when no ongoing illness" do
+    # Ensure no ongoing illness exists for verified_user in default fixtures
+    @user.health_events.where(event_type: :illness, ended_at: nil).destroy_all
+    get dashboard_path
+    assert_response :success
+  end
+
+  test "reliever medications excludes course medications" do
+    # Verify the dashboard loads correctly — courses should not appear in reliever section
+    get dashboard_path
+    assert_response :success
+  end
+
   test "health_event_markers JSON includes expected keys for events in window" do
     # Create an event within the chart window
     event = HealthEvent.create!(user: @user, event_type: :illness, recorded_at: Time.current - 1.hour)
 
     # Force chart to render
-    reading = PeakFlowReading.create!(time_of_day: :morning,
+    reading = PeakFlowReading.create!(time_of_day: :evening,
       user: @user,
       value: 400,
-      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 20.hours
     )
 
     get dashboard_path

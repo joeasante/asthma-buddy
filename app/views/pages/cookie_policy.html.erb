@@ -1,0 +1,68 @@
+<% content_for :title, "Cookie Policy — Asthma Buddy" %>
+<% content_for :head do %><%= stylesheet_link_tag "legal", "data-turbo-track": "reload" %><% end %>
+<% content_for :meta_description do %><meta name="description" content="Asthma Buddy cookie policy — what cookies we use, why we use them, and your rights under UK PECR and UK GDPR."><% end %>
+
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div>
+        <h1>Cookie Policy</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main--narrow">
+  <div class="section-card">
+    <p class="legal-date">Last updated: 12 March 2026</p>
+
+    <h2>What are cookies</h2>
+    <p>Cookies are small text files that a website places on your device when you visit. They are widely used to make websites work correctly, to remember your preferences, and — on many commercial sites — to track your behaviour across the internet for advertising purposes.</p>
+    <p>This policy explains exactly which cookies Asthma Buddy uses, why we use them, and what your rights are under UK law.</p>
+
+    <h2>How we use cookies</h2>
+    <p>Asthma Buddy uses only two cookies. Both are strictly necessary for the service to function. We do not use any optional, analytics, or advertising cookies.</p>
+
+    <ul>
+      <li>
+        <strong>_asthma_buddy_session</strong><br>
+        <em>Purpose:</em> This is the Rails session cookie. It keeps you signed in as you navigate between pages and protects your account against cross-site request forgery (CSRF) attacks. Without this cookie you would be signed out on every page load and the application would not work.<br>
+        <em>Duration:</em> Session (deleted when you close your browser or sign out).<br>
+        <em>Classification:</em> Strictly necessary.
+      </li>
+      <li>
+        <strong>cookie_notice_dismissed</strong><br>
+        <em>Purpose:</em> Records that you have acknowledged the cookie notice banner so it does not appear on every visit.<br>
+        <em>Duration:</em> 365 days from the date of dismissal.<br>
+        <em>Classification:</em> Strictly necessary (functional preference only — contains no personal data or tracking identifiers).
+      </li>
+    </ul>
+
+    <h2>Cookies we do not use</h2>
+    <p>We explicitly do not use cookies for any of the following purposes:</p>
+    <ul>
+      <li>Analytics or usage tracking (no Google Analytics, Mixpanel, or similar).</li>
+      <li>Advertising or remarketing (no Facebook Pixel, Google Ads, or similar).</li>
+      <li>Third-party tracking of any kind — no cookies are set by any party other than Asthma Buddy itself.</li>
+      <li>A/B testing or personalisation services.</li>
+      <li>Social media embeds or sharing widgets.</li>
+    </ul>
+    <p>Because we use no third-party services on this platform, your browsing activity on Asthma Buddy is never shared with external companies.</p>
+
+    <h2>Your rights under UK law</h2>
+    <p>The Privacy and Electronic Communications Regulations 2003 (PECR) govern the use of cookies in the UK. Under PECR, strictly necessary cookies — those essential for a service explicitly requested by the user — do not require consent. Both cookies listed above fall into this category: the session cookie is required for authentication and CSRF protection, and the dismissal cookie serves a functional purpose with no personal data content.</p>
+    <p>You are not required to accept these cookies, but if you choose to block or delete them your experience of Asthma Buddy will be affected:</p>
+    <ul>
+      <li>Deleting or blocking <strong>_asthma_buddy_session</strong> will sign you out immediately. You will need to sign in again on every visit.</li>
+      <li>Deleting <strong>cookie_notice_dismissed</strong> will cause the cookie notice banner to reappear on your next visit.</li>
+    </ul>
+    <p>You can manage and delete cookies at any time using your browser's settings. Most browsers allow you to view, block, or delete cookies for specific sites. Refer to your browser's help documentation for instructions.</p>
+    <p>Under UK GDPR you also have a general right to access information about how your personal data is processed. Our full <%= link_to "Privacy Policy", privacy_path %> describes all personal data we hold and your rights in relation to it.</p>
+
+    <h2>Contact us</h2>
+    <p>If you have any questions about this Cookie Policy or how we handle cookies, please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>. We aim to respond to all enquiries within 5 working days.</p>
+    <p>If you are not satisfied with our response, you have the right to raise a concern with the UK's data protection regulator, the <strong>Information Commissioner's Office (ICO)</strong>, at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>.</p>
+  </div>
+
+  <%= link_to "← Back", url_from(request.referer) || root_path, class: "legal-back-link" %>
+</div>

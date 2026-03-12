@@ -1,6 +1,6 @@
 <%= link_to health_event_path(health_event),
       id: dom_id(health_event),
-      class: "event-row",
+      class: "event-card",
       aria: { label: "#{health_event.event_type_label} on #{health_event.recorded_at.strftime("%-d %b %Y")}" } do %>
 
   <div class="event-row-body">
@@ -14,14 +14,14 @@
         </time>
       <% elsif health_event.ended_at.present? %>
         <span class="event-row-time">
-          <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %></time>
+          <time datetime="<%= health_event.recorded_at.iso8601 %>"><%= health_event.recorded_at.strftime("%-d %b %Y") %></time>
           <span aria-hidden="true">–</span>
-          <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y, %H:%M") %></time>
+          <time datetime="<%= health_event.ended_at.iso8601 %>"><%= health_event.ended_at.strftime("%-d %b %Y") %></time>
           <span class="event-row-duration"><%= health_event.formatted_duration %></span>
         </span>
       <% else %>
         <time class="event-row-time" datetime="<%= health_event.recorded_at.iso8601 %>">
-          <%= health_event.recorded_at.strftime("%-d %b %Y, %H:%M") %>
+          <%= health_event.recorded_at.strftime("%-d %b %Y") %>
         </time>
         <span class="event-ongoing-badge">Ongoing</span>
       <% end %>

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Settings
-  class AccountsController < ApplicationController
+  class AccountsController < Settings::BaseController
     rate_limit to: 3, within: 10.minutes, only: :destroy, with: -> {
       respond_to do |format|
         format.html { redirect_to settings_path, alert: "Too many deletion attempts. Please try again later." }

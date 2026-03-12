@@ -1,6 +1,7 @@
 <%= link_to peak_flow_reading_path(reading),
       id: dom_id(reading),
       class: "pf-reading-card pf-reading-card--#{reading.zone_css_modifier}",
+      data: { turbo_frame: "_top" },
       aria: { label: "#{reading.time_of_day_label} reading: #{reading.value} L/min#{", #{reading.zone.capitalize} zone" if reading.zone}" } do %>
   <span class="pf-reading-card-body">
     <span class="tod-badge tod-badge--<%= reading.time_of_day %>"><%= reading.time_of_day_label %></span>

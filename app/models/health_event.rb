@@ -54,6 +54,17 @@ class HealthEvent < ApplicationRecord
     CHART_LABELS[event_type] || "Evt"
   end
 
+  def to_chart_marker
+    marker = {
+      date:         recorded_at.to_date.to_s,
+      type:         event_type,
+      label:        chart_label,
+      css_modifier: event_type_css_modifier
+    }
+    marker[:end_date] = ended_at.to_date.to_s if !point_in_time? && ended_at.present?
+    marker
+  end
+
   def point_in_time?
     POINT_IN_TIME_TYPES.include?(event_type)
   end

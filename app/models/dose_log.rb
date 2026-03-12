@@ -4,14 +4,25 @@ class DoseLog < ApplicationRecord
   belongs_to :user
   belongs_to :medication
 
+  GINA_REVIEW_THRESHOLD = 3
+  GINA_URGENT_THRESHOLD = 6
+
   validates :puffs, presence: true,
             numericality: { only_integer: true, greater_than: 0 }
   validates :recorded_at, presence: true
 
   scope :chronological, -> { order(recorded_at: :desc) }
-  scope :for_medication, ->(medication) { where(medication: medication) }
-
   after_create_commit :check_low_stock
+
+  def self.gina_band(uses)
+    if uses >= GINA_URGENT_THRESHOLD
+      :urgent
+    elsif uses >= GINA_REVIEW_THRESHOLD
+      :review
+    else
+      :controlled
+    end
+  end
 
   private
 

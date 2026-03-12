@@ -1,10 +1,77 @@
-<% content_for :title, "Dashboard" %>
+<% content_for :title, "Dashboard — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="Your asthma at a glance — today's peak flow, symptom summary, medication adherence, and low-stock alerts."><% end %>
 
 <div class="page-header">
-  <h1><%= Date.current.strftime("%A, %-d %B %Y") %></h1>
+  <div class="page-header-eyebrow">
+    <% if @todays_best_reading %>
+      <% zone = @todays_best_reading.zone %>
+      <span class="eyebrow-stat">Today: <strong><%= @todays_best_reading.value %> L/min</strong></span>
+      <% if zone && @personal_best %>
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        <span class="eyebrow-pill eyebrow-pill--<%= @todays_best_reading.zone_css_modifier %>">
+          <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3"/></svg>
+          <%= zone.capitalize %> zone
+        </span>
+      <% end %>
+    <% else %>
+      <span class="eyebrow-stat">No peak flow reading today</span>
+    <% end %>
+    <% if @active_illness %>
+      <span class="eyebrow-dot" aria-hidden="true"></span>
+      <span class="eyebrow-pill eyebrow-pill--amber" aria-label="Active illness">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+        </svg>
+      </span>
+    <% end %>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <div>
+        <h1><%= Date.current.strftime("%A, %-d %B %Y") %></h1>
+        <p class="page-header-subtitle">Your health at a glance</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="dashboard">
+<div class="dashboard"
+     data-controller="day-reset"
+     data-day-reset-date-value="<%= Date.current %>">
+
+  <%# Declare early so all sections below can use it %>
+  <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
+
+  <%# ── No data — welcome empty state ─────────────────────────────── %>
+  <% if no_data %>
+    <div class="section-card empty-state">
+      <div class="empty-state-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Welcome to Asthma Buddy</h3>
+      <p>Start by logging a reading or a symptom — your dashboard fills in as you go.</p>
+    </div>
+  <% end %>
+
+  <%# ── Active illness banner ────────────────────────────────────── %>
+  <% if @active_illness %>
+    <div class="dash-illness-banner" role="status">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+      </svg>
+      <span class="dash-illness-banner-text">Active illness &middot; since <%= @active_illness.recorded_at.strftime("%-d %b") %></span>
+      <%= link_to "View &rarr;".html_safe, health_event_path(@active_illness), class: "dash-illness-banner-link" %>
+    </div>
+  <% end %>
 
   <%# ── Personal best missing — callout ────────────────────────── %>
   <% if @personal_best.nil? && @last_reading %>
@@ -53,32 +120,33 @@
   <% end %>
 
   <%# ── Today's Doses ───────────────────────────────────────────── %>
-  <% if @preventer_adherence.any? %>
-    <% all_on_track = @preventer_adherence.all? { |e| e[:result].status == :on_track } %>
-    <section class="dash-adherence" aria-label="Preventer adherence today">
+  <% if @preventer_adherence.any? || @reliever_medications.any? %>
+    <% sick_day_active = @active_illness && (
+         @preventer_adherence.any? { |e| e[:medication].sick_day_dose_puffs.present? } ||
+         @reliever_medications.any? { |m| m.sick_day_dose_puffs.present? }
+       ) %>
+    <section class="dash-adherence" aria-label="Today's doses">
       <div class="dash-section-header">
-        <h2>Today's Doses</h2>
-        <%= link_to "Preventer History", adherence_path, class: "dash-section-link" %>
-        <%= link_to "Reliever Usage", reliever_usage_path, class: "dash-section-link" %>
-      </div>
-      <ul class="dash-adherence-list">
-        <% if all_on_track %>
-          <li class="dash-adherence-item dash-adherence-item--on_track dash-adherence-item--all-on-track">
-            <span class="dash-adherence-all-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M2 6l2.5 2.5 5.5-5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="dash-section-header-left">
+          <h2>Today's Doses</h2>
+          <% if sick_day_active %>
+            <span class="dash-sick-day-tag">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
               </svg>
+              Sick day doses
             </span>
-            <span>All medications taken today</span>
-          </li>
-        <% else %>
-          <% @preventer_adherence.each do |entry| %>
-            <%= render "dashboard/adherence_card",
-                  medication: entry[:medication],
-                  result: entry[:result] %>
           <% end %>
-        <% end %>
-      </ul>
+        </div>
+        <div class="dash-section-links">
+          <%= link_to "Preventer History", preventer_history_path, class: "dash-section-link" %>
+          <%= link_to "Reliever Usage", reliever_usage_path, class: "dash-section-link" %>
+        </div>
+      </div>
+      <%= render "dashboard/today_doses_list",
+            preventer_adherence: @preventer_adherence,
+            reliever_medications: @reliever_medications,
+            active_illness: @active_illness %>
     </section>
   <% end %>
 
@@ -101,17 +169,14 @@
     <% end %>
   </div>
 
-  <%# Declare here so both This Week and the empty-state check can use it %>
-  <% no_data = @recent_readings.none? && @recent_symptoms.none? %>
-
   <%# ── This Week — summary stats + chart ───────────────────────── %>
   <% unless no_data %>
     <section class="dash-week-section" aria-label="This week's data">
       <div class="dash-section-header">
         <h2>This Week</h2>
         <div class="dash-section-links">
-          <%= link_to "Peak Flow", peak_flow_readings_path, class: "dash-section-link" %>
-          <%= link_to "Symptoms", symptom_logs_path, class: "dash-section-link" %>
+          <%= link_to "Peak Flow", peak_flow_readings_path(anchor: "peak-flow-graph"), class: "dash-section-link" %>
+          <%= link_to "Symptoms", symptom_logs_path(anchor: "symptoms-graph"), class: "dash-section-link" %>
         </div>
       </div>
 
@@ -225,17 +290,16 @@
     <section class="dash-medications" aria-label="Low stock medications">
       <div class="dash-section-header">
         <h2>Medications</h2>
-        <%= link_to "Manage", settings_medications_path, class: "dash-section-link" %>
+        <%= link_to "Manage", settings_medications_path(anchor: "medications-page-header"), class: "dash-section-link" %>
       </div>
       <ul class="dash-low-stock-list">
         <% @low_stock_medications.each do |medication| %>
           <li class="dash-low-stock-item">
-            <%= link_to edit_settings_medication_path(medication), class: "dash-recent-row-link" do %>
-              <span class="low-stock-badge">Low stock</span>
-              <span class="dash-low-stock-name"><%= medication.name %></span>
-              <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left</span>
-            <% end %>
-            <%= link_to "Refill", edit_settings_medication_path(medication), class: "dash-low-stock-refill-link" %>
+            <span class="low-stock-badge">Low stock</span>
+            <%= link_to medication.name,
+                  settings_medications_path(anchor: dom_id(medication)),
+                  class: "dash-low-stock-name" %>
+            <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left</span>
           </li>
         <% end %>
       </ul>
@@ -274,6 +338,11 @@
               </li>
             <% end %>
           </ul>
+          <% if @total_reading_count > 9 %>
+            <div class="dash-section-more">
+              <%= link_to "View all #{@total_reading_count} readings", peak_flow_readings_path %>
+            </div>
+          <% end %>
         <% else %>
           <p class="dash-recent-empty">No readings yet. <%= link_to "Log one now", new_peak_flow_reading_path %>.</p>
         <% end %>
@@ -285,19 +354,24 @@
           <%= link_to "View all", symptom_logs_path, class: "dash-section-link" %>
         </div>
         <% if @recent_symptoms.any? %>
-          <ol class="dash-recent-list">
+          <div class="dash-recent-list">
             <% @recent_symptoms.each do |log| %>
-              <li class="dash-recent-row dash-recent-row--<%= log.severity %>">
-                <%= link_to symptom_log_path(log), class: "dash-recent-row-link" do %>
-                  <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize %></span>
-                  <span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span>
-                  <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
-                    <%= log.recorded_at.strftime("%-d %b") %>
-                  </time>
-                <% end %>
-              </li>
+              <%= link_to symptom_log_path(log),
+                    class: "dash-recent-row dash-recent-row--#{log.severity}",
+                    aria: { label: "#{log.symptom_type.humanize}, #{log.severity}, #{log.recorded_at.strftime("%-d %b")}" } do %>
+                <span class="dash-recent-symptom-type"><%= log.symptom_type.humanize %></span>
+                <span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span>
+                <time class="dash-recent-time" datetime="<%= log.recorded_at.iso8601 %>">
+                  <%= log.recorded_at.strftime("%-d %b") %>
+                </time>
+              <% end %>
             <% end %>
-          </ol>
+          </div>
+          <% if @total_symptom_count > 4 %>
+            <div class="dash-section-more">
+              <%= link_to "View all #{@total_symptom_count} symptoms", symptom_logs_path %>
+            </div>
+          <% end %>
         <% else %>
           <p class="dash-recent-empty">No symptoms logged. <%= link_to "Log one now", new_symptom_log_path %>.</p>
         <% end %>
@@ -314,37 +388,30 @@
         <h2>Medical History</h2>
         <%= link_to "View all", health_events_path, class: "dash-section-link" %>
       </div>
-      <ul class="dash-health-events-list">
+      <div class="dash-health-events-list">
         <% @recent_health_events.each do |event| %>
-          <li class="dash-health-event-row">
-            <%= link_to health_event_path(event), class: "dash-recent-row-link" do %>
-              <span class="event-badge event-badge--<%= event.event_type_css_modifier %>">
-                <%= event.event_type_label %>
-              </span>
-              <time class="dash-health-event-time" datetime="<%= event.recorded_at.iso8601 %>">
-                <%= event.recorded_at.strftime("%-d %b %Y") %>
-              </time>
-              <% if event.ongoing? %>
-                <span class="event-ongoing-badge">Ongoing</span>
-              <% end %>
+          <%= link_to health_event_path(event),
+                class: "dash-health-event-row",
+                aria: { label: "#{event.event_type_label}, #{event.recorded_at.strftime("%-d %b %Y")}" } do %>
+            <span class="event-badge event-badge--<%= event.event_type_css_modifier %>">
+              <%= event.event_type_label %>
+            </span>
+            <% if event.ongoing? %>
+              <span class="event-ongoing-badge">Ongoing</span>
             <% end %>
-          </li>
+            <time class="dash-health-event-time" datetime="<%= event.recorded_at.iso8601 %>">
+              <%= event.recorded_at.strftime("%-d %b %Y") %>
+            </time>
+          <% end %>
         <% end %>
-      </ul>
+      </div>
+      <% if @total_health_event_count > 3 %>
+        <div class="dash-section-more">
+          <%= link_to "View all #{@total_health_event_count} events", health_events_path %>
+        </div>
+      <% end %>
     </section>
   <% end %>
 
-  <%# ── No data — welcome empty state ─────────────────────────────── %>
-  <% if no_data %>
-    <div class="section-card empty-state">
-      <div class="empty-state-icon" aria-hidden="true">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h3>Welcome to Asthma Buddy</h3>
-      <p>Start by logging a reading or a symptom — your dashboard fills in as you go.</p>
-    </div>
-  <% end %>
 
 </div>

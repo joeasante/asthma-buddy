@@ -23,3 +23,8 @@ production:
     class: PruneNotificationsJob
     queue: default
     schedule: every day at 3am
+
+  database_maintenance:
+    class: DatabaseMaintenanceJob
+    queue: default
+    schedule: every day at 4am

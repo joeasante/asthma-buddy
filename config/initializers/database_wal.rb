@@ -21,19 +21,39 @@ module AsthmaBuddy
       # a single-server cloud VM in a datacenter with redundant power.
       execute("PRAGMA synchronous=NORMAL;")
 
-      # Size cache and mmap by database role. Primary needs larger caches for health data range
-      # scans. Queue/cache/cable are high-churn, small-row workloads. At WEB_CONCURRENCY > 1,
-      # uniform 32 MB × 4 DBs × N workers × pool_size exhausts memory on a 1-2 GB host.
+      # Enforce foreign key constraints at the database level. Rails declares all FK
+      # relationships via add_foreign_key in schema.rb — enabling this pragma catches
+      # orphan writes that bypass Rails callbacks (e.g. direct SQL, fixtures, migrations).
+      # Must be set per-connection; SQLite does not persist this setting.
+      execute("PRAGMA foreign_keys=ON;")
+
+      # Allow SQLite to use up to 4 auxiliary OS threads for parallel B-tree traversal,
+      # sorting, and index operations. Default is 0 (single-threaded). On a multi-core VM
+      # this improves throughput for complex dashboard and chart queries.
+      execute("PRAGMA threads=4;")
+
+      # Size cache, mmap, autocheckpoint and journal_size_limit by database role.
+      # Primary needs larger caches for health data range scans and chart queries.
+      # Queue/cache/cable are high-churn, small-row workloads that benefit from a higher
+      # autocheckpoint threshold (fewer checkpoint interruptions per write burst).
+      # At WEB_CONCURRENCY > 1, uniform large caches across all 4 DBs × N workers exhausts
+      # memory on a 1-2 GB host.
       db_path = @config[:database].to_s
       if db_path.match?(/_cache|_queue|_cable/)
-        execute("PRAGMA cache_size=-4000;")    # 4 MB — sufficient for append-heavy workloads
-        execute("PRAGMA mmap_size=33554432;")  # 32 MB
+        execute("PRAGMA cache_size=-4000;")       # 4 MB  — sufficient for append-heavy workloads
+        execute("PRAGMA mmap_size=33554432;")     # 32 MB
+        execute("PRAGMA wal_autocheckpoint=4000;") # 16 MB WAL before auto-checkpoint — reduces
+                                                   # checkpoint frequency for write-heavy DBs
+        execute("PRAGMA journal_size_limit=33554432;") # 32 MB WAL cap; truncated after checkpoint
       else
-        execute("PRAGMA cache_size=-16000;")   # 16 MB — headroom for safe multi-worker scaling
-        execute("PRAGMA mmap_size=134217728;") # 128 MB
+        execute("PRAGMA cache_size=-16000;")      # 16 MB — headroom for multi-worker scaling
+        execute("PRAGMA mmap_size=134217728;")    # 128 MB
+        execute("PRAGMA wal_autocheckpoint=2000;") # 8 MB WAL before auto-checkpoint — balances
+                                                   # read performance with WAL file size
+        execute("PRAGMA journal_size_limit=67108864;") # 64 MB WAL cap; truncated after checkpoint
       end
 
-      # Keep temp tables and indexes in memory rather than temp files.
+      # Keep temp tables and sort buffers in memory rather than temp files.
       execute("PRAGMA temp_store=MEMORY;")
     end
   end
@@ -51,7 +71,7 @@ Rails.application.config.after_initialize do
 
   begin
     result = ActiveRecord::Base.connection.execute("PRAGMA journal_mode;")
-    mode = result.first&.first
+    mode = result.first&.fetch("journal_mode", nil)
     unless mode == "wal"
       Rails.logger.error "[AsthmaBuddy] CRITICAL: SQLite WAL mode NOT active on primary DB (got: #{mode.inspect})"
     end

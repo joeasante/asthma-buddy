@@ -88,6 +88,11 @@
 - [x] **LEGAL-02**: App has a Privacy Policy page (UK GDPR + Data Protection Act 2018 compliant) — *legal requirement; reassures users their health data is handled responsibly*
 - [x] **LEGAL-03**: App displays a brief session cookie notice on first visit (informational — no consent banner needed for essential session cookies only) — *GDPR compliance for essential cookies*
 
+### Error Pages
+
+- [ ] **ERR-01**: App shows a branded 404 Not Found page that matches the visual design, with a recovery link to the dashboard or home page — *prevents users from seeing a broken Rails default; maintains trust during navigation errors*
+- [ ] **ERR-02**: App shows a branded 500 Internal Server Error page that matches the visual design, with a recovery link — *prevents users from seeing a broken Rails default during incidents; maintains trust under failure conditions*
+
 ---
 
 ## v2 Requirements (Milestone 3)
@@ -187,11 +192,13 @@
 | LEGAL-01 | Phase 16 — Account Management | Pending |
 | LEGAL-02 | Phase 16 — Account Management | Pending |
 | LEGAL-03 | Phase 16 — Account Management | Pending |
+| ERR-01 | Phase 20 — Legal Pages, Cookie Banner & Error Pages | Pending |
+| ERR-02 | Phase 20 — Legal Pages, Cookie Banner & Error Pages | Pending |
 
 **Coverage:**
 - v1 requirements: 19 total — 19 mapped, 0 unmapped ✓
-- v2 requirements: 20 total — 20 mapped, 0 unmapped ✓
+- v2 requirements: 22 total — 22 mapped, 0 unmapped ✓
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-08 — Milestone 2 requirements defined*
+*Last updated: 2026-03-12 — ERR-01 and ERR-02 added (Phase 20 error pages)*
