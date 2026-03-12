@@ -1,76 +1,78 @@
 <% content_for :title, "Privacy Policy — Asthma Buddy" %>
 <% content_for :meta_description do %><meta name="description" content="Asthma Buddy privacy policy — how we collect, use, and protect your personal health data under UK GDPR."><% end %>
 
-<div class="page-header">
-  <h1>Privacy Policy</h1>
+<div class="main--narrow">
+  <div class="page-header">
+    <h1>Privacy Policy</h1>
+  </div>
+
+  <div class="section-card">
+    <p class="legal-date">Last updated: March 10, 2026</p>
+
+    <h2>1. Who we are</h2>
+    <p>Asthma Buddy is a personal health tracking application registered in England and Wales. We are the data controller for the personal data processed through this service. If you have any questions about this Privacy Policy or how we handle your data, please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>.</p>
+
+    <h2>2. What personal data we collect</h2>
+    <p>We collect only the data that is necessary to provide and maintain the service. This includes:</p>
+    <ul>
+      <li><strong>Account data:</strong> Your email address, which you provide during registration, used for account authentication, email verification, and password recovery.</li>
+      <li><strong>Health data you enter:</strong> Symptom logs (type, severity, and notes), peak flow readings, personal best values, zone computations, medication records, dose logs, and health events such as illness episodes or medical appointments. This constitutes special category data under UK GDPR Article 9.</li>
+      <li><strong>Profile data (optional):</strong> Your name and profile photograph, if you choose to provide them via Settings.</li>
+      <li><strong>Server logs:</strong> IP address and request timestamps, collected automatically and retained for 90 days for security and fraud prevention purposes.</li>
+    </ul>
+    <p>We do not collect any data beyond what is described above. We do not use third-party analytics, advertising networks, or tracking services.</p>
+
+    <h2>3. Why we process your data (lawful basis)</h2>
+    <p>We process your personal data on the following legal bases under UK GDPR:</p>
+    <ul>
+      <li><strong>Performance of contract (Article 6(1)(b)):</strong> We process your account data (email address) and profile data because it is necessary to provide the service you have signed up for and to manage your account.</li>
+      <li><strong>Explicit consent (Article 6(1)(a) and Article 9(2)(a)):</strong> Your health data — symptom logs, peak flow readings, medication records, dose logs, and health events — constitutes special category data. We process this data solely on the basis of your explicit consent, given at the point of account creation. You may withdraw your consent at any time by deleting your account.</li>
+      <li><strong>Legitimate interests (Article 6(1)(f)):</strong> We retain server logs for 90 days to detect, investigate, and prevent security incidents and fraudulent access. This processing is necessary for the security and integrity of the service.</li>
+    </ul>
+
+    <h2>4. Special category health data</h2>
+    <p>The health data you log in Asthma Buddy — including peak flow readings, symptom records, medication usage, and health events — constitutes special category personal data under UK GDPR Article 9, due to its sensitivity as data relating to your physical health. We take additional care in handling this data. Specifically:</p>
+    <ul>
+      <li>We process your health data solely to deliver the service to you personally. We do not share it with any third parties.</li>
+      <li>We do not use your health data for advertising, profiling, or any commercial purpose.</li>
+      <li>Your health data is never combined with data from other users or sold in any form.</li>
+      <li>Access to health data within our infrastructure is strictly limited to technical personnel with a legitimate operational need.</li>
+    </ul>
+
+    <h2>5. How we store your data</h2>
+    <p>Your personal data is stored in an encrypted database on a dedicated server located within the UK or the European Economic Area (EEA). Data is encrypted at rest and in transit using industry-standard protocols. Passwords are hashed using bcrypt with a cost factor appropriate for the current hardware environment — your password is never stored in plaintext and cannot be retrieved by us. We do not use third-party cloud storage services, analytics platforms, or advertising services that would involve the transfer of your data to external parties.</p>
+
+    <h2>6. Data retention</h2>
+    <p>We retain your data for as long as your account is active. Upon account deletion:</p>
+    <ul>
+      <li>All personal data, including your email address, health logs, medication records, dose logs, and health events, will be permanently and irreversibly erased within 30 days.</li>
+      <li>Server logs are retained for a maximum of 90 days and then automatically deleted, regardless of account status.</li>
+    </ul>
+    <p>Once data has been erased we cannot recover it. Account deletion is permanent.</p>
+
+    <h2>7. Your rights under UK GDPR</h2>
+    <p>As a data subject under the UK GDPR and the UK Data Protection Act 2018, you have the following rights:</p>
+    <ul>
+      <li><strong>Right of access:</strong> You have the right to request a copy of the personal data we hold about you.</li>
+      <li><strong>Right to rectification:</strong> You have the right to correct inaccurate or incomplete personal data. You can update your account details from Settings at any time.</li>
+      <li><strong>Right to erasure:</strong> You have the right to request deletion of your personal data ("the right to be forgotten"). You can exercise this right immediately by deleting your account from the Settings page. All data will be permanently erased within 30 days.</li>
+      <li><strong>Right to restriction of processing:</strong> You have the right to request that we restrict processing of your data in certain circumstances, for example while a complaint is being investigated.</li>
+      <li><strong>Right to data portability:</strong> You have the right to receive a copy of the personal data you have provided to us in a structured, commonly used, and machine-readable format. Please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a> to make a portability request.</li>
+      <li><strong>Right to object:</strong> Where we process your data on the basis of legitimate interests, you have the right to object to that processing. We will cease processing unless we can demonstrate compelling legitimate grounds that override your interests.</li>
+      <li><strong>Right to withdraw consent:</strong> Where processing is based on your explicit consent (particularly for health data), you have the right to withdraw that consent at any time. Withdrawal of consent does not affect the lawfulness of processing carried out before withdrawal. You can withdraw consent by deleting your account.</li>
+    </ul>
+    <p>To exercise any of these rights, contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>. We will respond within one calendar month as required by UK GDPR.</p>
+
+    <h2>8. Cookies</h2>
+    <p>Asthma Buddy uses a single session cookie, which is strictly necessary for the service to function. This cookie maintains your authenticated session while you are logged in and is deleted when you sign out or close your browser. We do not use tracking cookies, advertising cookies, or any cookies that monitor your behaviour across other websites. Because the session cookie is essential to the operation of the service, we do not require your consent to set it under the UK Privacy and Electronic Communications Regulations (PECR). See our full <%= link_to "Cookie Policy", cookies_path %> for details.</p>
+
+    <h2>9. Changes to this policy</h2>
+    <p>We may update this Privacy Policy from time to time to reflect changes to our data practices, the service, or applicable law. Where changes are material — meaning they significantly affect how we handle your personal data or your rights — we will notify you by email at least 14 days before the updated policy takes effect. We encourage you to review this page periodically. The "Last updated" date at the top of this page indicates when the policy was most recently revised.</p>
+
+    <h2>10. Contact and complaints</h2>
+    <p>If you have any questions, concerns, or requests relating to this Privacy Policy or our processing of your personal data, please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>. We aim to respond to all privacy enquiries within 5 working days.</p>
+    <p>If you believe we have not handled your personal data correctly, you have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong>, the UK's independent supervisory authority for data protection. You can contact the ICO at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a> or by calling their helpline on 0303 123 1113. We would always appreciate the opportunity to address your concerns directly before you approach the ICO, but you are entitled to contact them at any time.</p>
+  </div>
+
+  <%= link_to "← Back", :back, class: "legal-back-link" %>
 </div>
-
-<div class="section-card">
-  <p class="pages-updated">Last updated: March 10, 2026</p>
-
-  <h2>1. Who we are</h2>
-  <p>Asthma Buddy is a personal health tracking application registered in England and Wales. We are the data controller for the personal data processed through this service. If you have any questions about this Privacy Policy or how we handle your data, please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>.</p>
-
-  <h2>2. What personal data we collect</h2>
-  <p>We collect only the data that is necessary to provide and maintain the service. This includes:</p>
-  <ul>
-    <li><strong>Account data:</strong> Your email address, which you provide during registration, used for account authentication, email verification, and password recovery.</li>
-    <li><strong>Health data you enter:</strong> Symptom logs (type, severity, and notes), peak flow readings, personal best values, zone computations, medication records, dose logs, and health events such as illness episodes or medical appointments. This constitutes special category data under UK GDPR Article 9.</li>
-    <li><strong>Profile data (optional):</strong> Your name and profile photograph, if you choose to provide them via Settings.</li>
-    <li><strong>Server logs:</strong> IP address and request timestamps, collected automatically and retained for 90 days for security and fraud prevention purposes.</li>
-  </ul>
-  <p>We do not collect any data beyond what is described above. We do not use third-party analytics, advertising networks, or tracking services.</p>
-
-  <h2>3. Why we process your data (lawful basis)</h2>
-  <p>We process your personal data on the following legal bases under UK GDPR:</p>
-  <ul>
-    <li><strong>Performance of contract (Article 6(1)(b)):</strong> We process your account data (email address) and profile data because it is necessary to provide the service you have signed up for and to manage your account.</li>
-    <li><strong>Explicit consent (Article 6(1)(a) and Article 9(2)(a)):</strong> Your health data — symptom logs, peak flow readings, medication records, dose logs, and health events — constitutes special category data. We process this data solely on the basis of your explicit consent, given at the point of account creation. You may withdraw your consent at any time by deleting your account.</li>
-    <li><strong>Legitimate interests (Article 6(1)(f)):</strong> We retain server logs for 90 days to detect, investigate, and prevent security incidents and fraudulent access. This processing is necessary for the security and integrity of the service.</li>
-  </ul>
-
-  <h2>4. Special category health data</h2>
-  <p>The health data you log in Asthma Buddy — including peak flow readings, symptom records, medication usage, and health events — constitutes special category personal data under UK GDPR Article 9, due to its sensitivity as data relating to your physical health. We take additional care in handling this data. Specifically:</p>
-  <ul>
-    <li>We process your health data solely to deliver the service to you personally. We do not share it with any third parties.</li>
-    <li>We do not use your health data for advertising, profiling, or any commercial purpose.</li>
-    <li>Your health data is never combined with data from other users or sold in any form.</li>
-    <li>Access to health data within our infrastructure is strictly limited to technical personnel with a legitimate operational need.</li>
-  </ul>
-
-  <h2>5. How we store your data</h2>
-  <p>Your personal data is stored in an encrypted database on a dedicated server located within the UK or the European Economic Area (EEA). Data is encrypted at rest and in transit using industry-standard protocols. Passwords are hashed using bcrypt with a cost factor appropriate for the current hardware environment — your password is never stored in plaintext and cannot be retrieved by us. We do not use third-party cloud storage services, analytics platforms, or advertising services that would involve the transfer of your data to external parties.</p>
-
-  <h2>6. Data retention</h2>
-  <p>We retain your data for as long as your account is active. Upon account deletion:</p>
-  <ul>
-    <li>All personal data, including your email address, health logs, medication records, dose logs, and health events, will be permanently and irreversibly erased within 30 days.</li>
-    <li>Server logs are retained for a maximum of 90 days and then automatically deleted, regardless of account status.</li>
-  </ul>
-  <p>Once data has been erased we cannot recover it. Account deletion is permanent.</p>
-
-  <h2>7. Your rights under UK GDPR</h2>
-  <p>As a data subject under the UK GDPR and the UK Data Protection Act 2018, you have the following rights:</p>
-  <ul>
-    <li><strong>Right of access:</strong> You have the right to request a copy of the personal data we hold about you.</li>
-    <li><strong>Right to rectification:</strong> You have the right to correct inaccurate or incomplete personal data. You can update your account details from Settings at any time.</li>
-    <li><strong>Right to erasure:</strong> You have the right to request deletion of your personal data ("the right to be forgotten"). You can exercise this right immediately by deleting your account from the Settings page. All data will be permanently erased within 30 days.</li>
-    <li><strong>Right to restriction of processing:</strong> You have the right to request that we restrict processing of your data in certain circumstances, for example while a complaint is being investigated.</li>
-    <li><strong>Right to data portability:</strong> You have the right to receive a copy of the personal data you have provided to us in a structured, commonly used, and machine-readable format. Please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a> to make a portability request.</li>
-    <li><strong>Right to object:</strong> Where we process your data on the basis of legitimate interests, you have the right to object to that processing. We will cease processing unless we can demonstrate compelling legitimate grounds that override your interests.</li>
-    <li><strong>Right to withdraw consent:</strong> Where processing is based on your explicit consent (particularly for health data), you have the right to withdraw that consent at any time. Withdrawal of consent does not affect the lawfulness of processing carried out before withdrawal. You can withdraw consent by deleting your account.</li>
-  </ul>
-  <p>To exercise any of these rights, contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>. We will respond within one calendar month as required by UK GDPR.</p>
-
-  <h2>8. Cookies</h2>
-  <p>Asthma Buddy uses a single session cookie, which is strictly necessary for the service to function. This cookie maintains your authenticated session while you are logged in and is deleted when you sign out or close your browser. We do not use tracking cookies, advertising cookies, or any cookies that monitor your behaviour across other websites. Because the session cookie is essential to the operation of the service, we do not require your consent to set it under the UK Privacy and Electronic Communications Regulations (PECR).</p>
-
-  <h2>9. Changes to this policy</h2>
-  <p>We may update this Privacy Policy from time to time to reflect changes to our data practices, the service, or applicable law. Where changes are material — meaning they significantly affect how we handle your personal data or your rights — we will notify you by email at least 14 days before the updated policy takes effect. We encourage you to review this page periodically. The "Last updated" date at the top of this page indicates when the policy was most recently revised.</p>
-
-  <h2>10. Contact and complaints</h2>
-  <p>If you have any questions, concerns, or requests relating to this Privacy Policy or our processing of your personal data, please contact us at <a href="mailto:privacy@asthmabuddy.app">privacy@asthmabuddy.app</a>. We aim to respond to all privacy enquiries within 5 working days.</p>
-  <p>If you believe we have not handled your personal data correctly, you have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong>, the UK's independent supervisory authority for data protection. You can contact the ICO at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a> or by calling their helpline on 0303 123 1113. We would always appreciate the opportunity to address your concerns directly before you approach the ICO, but you are entitled to contact them at any time.</p>
-</div>
-
-<p class="page-back-link"><%= link_to "&larr; Back to home".html_safe, root_path %></p>

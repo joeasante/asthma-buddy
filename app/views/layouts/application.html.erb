@@ -22,6 +22,7 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "legal", "data-turbo-track": "reload" %>
     <% if authenticated? %>
       <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
@@ -130,6 +131,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
+          <%= link_to "Cookies", cookies_path %>
         </nav>
       </footer>
     <% else %>
@@ -138,6 +140,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
+          <%= link_to "Cookies", cookies_path %>
         </nav>
         <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
       </footer>

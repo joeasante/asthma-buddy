@@ -1,0 +1,51 @@
+/* Legal pages — narrow prose layout */
+.main--narrow {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.legal-date {
+  color: var(--text-3);
+  font-size: 0.875rem;
+  margin-bottom: var(--space-lg);
+}
+
+.legal-back-link {
+  display: inline-block;
+  margin-top: var(--space-xl);
+  color: var(--brand);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.legal-back-link:hover {
+  text-decoration: underline;
+}
+
+/* Prose typography inside legal section cards */
+.main--narrow .section-card {
+  line-height: 1.75;
+}
+
+.main--narrow .section-card h2 {
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-sm);
+  font-size: 1.125rem;
+  color: var(--text);
+}
+
+.main--narrow .section-card p {
+  margin-bottom: var(--space-md);
+  color: var(--text-2);
+}
+
+.main--narrow .section-card ul {
+  padding-left: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.main--narrow .section-card li {
+  margin-bottom: var(--space-xs);
+  color: var(--text-2);
+}
