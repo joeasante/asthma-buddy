@@ -24,7 +24,6 @@
     <%# Cookie notice CSS — only when the banner will actually render %>
     <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" unless authenticated? || cookies[:cookie_notice_dismissed].present? %>
     <% if authenticated? %>
-      <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "charts",            "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "dashboard",         "data-turbo-track": "reload" %>

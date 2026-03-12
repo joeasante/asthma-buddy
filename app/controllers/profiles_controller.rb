@@ -74,6 +74,7 @@ class ProfilesController < ApplicationController
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to profile_path, notice: "Profile photo removed." }
+      format.json { render json: { success: true } }
     end
   end
 

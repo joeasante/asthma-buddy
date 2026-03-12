@@ -89,15 +89,20 @@ class PeakFlowReading < ApplicationRecord
 
   def one_session_per_day
     return unless user
-    date = recorded_at.to_date
+    # Use UTC day boundaries to match the database unique index (DATE(recorded_at) in SQLite
+    # uses UTC). This prevents ActiveRecord::RecordNotUnique for London users between
+    # 23:00–00:00 UTC during BST, where Ruby's local-time date differs from the UTC date.
+    utc_start = recorded_at.utc.beginning_of_day
+    utc_end   = recorded_at.utc.end_of_day
     existing = user.peak_flow_readings
                    .where(time_of_day: time_of_day)
-                   .where(recorded_at: date.beginning_of_day..date.end_of_day)
+                   .where(recorded_at: utc_start..utc_end)
                    .first
     return unless existing
 
     @duplicate_session_reading = existing
-    label = date == Date.current ? "today" : date.strftime("%-d %b")
+    local_date = recorded_at.to_date
+    label = local_date == Date.current ? "today" : local_date.strftime("%-d %b")
     errors.add(:base, "You already have a #{time_of_day} reading for #{label}.")
   end
 

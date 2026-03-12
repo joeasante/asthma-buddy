@@ -12,8 +12,6 @@ class DoseLog < ApplicationRecord
   validates :recorded_at, presence: true
 
   scope :chronological, -> { order(recorded_at: :desc) }
-  scope :for_medication, ->(medication) { where(medication: medication) }
-
   after_create_commit :check_low_stock
 
   def self.gina_band(uses)

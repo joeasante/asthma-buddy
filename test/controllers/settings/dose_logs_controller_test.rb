@@ -19,7 +19,10 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     get settings_medication_dose_logs_path(@medication), as: :json
     assert_response :success
     json = JSON.parse(response.body)
-    assert json.is_a?(Array)
+    assert json.key?("dose_logs")
+    assert json.key?("total")
+    assert json.key?("medication_id")
+    assert json["dose_logs"].is_a?(Array)
   end
 
   test "GET index cross-user isolation" do

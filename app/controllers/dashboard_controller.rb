@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DashboardController < ApplicationController
+  include DashboardVariables
+
   before_action :check_onboarding
 
   def index
@@ -93,34 +95,46 @@ class DashboardController < ApplicationController
     # Recent health events — 3 most recent, shown in the dashboard card
     @recent_health_events = user.health_events.recent_first.limit(3)
 
-    # Today's preventer adherence — only preventers with a doses_per_day schedule.
-    # Excludes course medications (COURSE-03): temporary courses are not preventer adherence targets.
-    today = Date.current
-    @preventer_adherence = user.medications
-      .where(medication_type: :preventer)
-      .where(course: false)
-      .includes(:dose_logs)
-      .select { |m| m.doses_per_day.present? }
-      .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+    # Today's preventer adherence, reliever medications, and active illness —
+    # shared with Settings::BaseController via the DashboardVariables concern.
+    set_dashboard_vars
 
-    # Reliever medications — shown on dashboard for quick dose logging.
-    @reliever_medications = user.medications
-      .where(medication_type: :reliever)
-      .where(course: false)
-      .includes(:dose_logs)
-      .chronological
-      .to_a
-
-    # Active illness event — most recently started ongoing illness, or nil.
-    # Drives the eyebrow pill, the dashboard banner, and the sick-day dose buttons.
-    @active_illness = user.health_events
-      .where(event_type: :illness)
-      .where(ended_at: nil)
-      .order(recorded_at: :desc)
-      .first
+    respond_to do |format|
+      format.html
+      format.json { render json: dashboard_json }
+    end
   end
 
   private
+
+    def dashboard_json
+      {
+        peak_flow: {
+          latest:        @last_reading&.as_json(only: %i[id value zone time_of_day recorded_at]),
+          personal_best: @personal_best&.value,
+          week_avg:      @week_avg,
+          week_avg_zone: @week_avg_zone,
+          week_count:    @week_reading_count
+        },
+        symptoms: {
+          week_count:      @week_symptom_count,
+          severity_counts: @week_severity_counts,
+          last_severe:     @last_severe&.as_json(only: %i[id severity recorded_at])
+        },
+        medications: {
+          low_stock_count:      @low_stock_medications.size,
+          low_stock_medication_ids: @low_stock_medications.map(&:id)
+        },
+        health_events: {
+          total:         @total_health_event_count,
+          active_illness: @active_illness&.as_json(only: %i[id event_type recorded_at])
+        },
+        totals: {
+          readings: @total_reading_count,
+          symptoms: @total_symptom_count
+        }
+      }
+    end
 
     # Soft gate — only the dashboard is guarded. Users can navigate directly to
     # data-entry screens (peak flow, symptoms, etc.) without completing onboarding;

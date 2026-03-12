@@ -43,17 +43,22 @@ class Medication < ApplicationRecord
 
   # Returns true when this is a course medication that hasn't ended yet.
   def course_active?
-    course? && ends_on >= Date.current
+    course? && (ends_on.nil? || ends_on >= Date.current)
   end
 
   # Returns how many doses remain in the current inhaler.
-  # Formula: starting count minus every puff ever logged for this medication.
-  # NOTE: Phase 13 will introduce a refill action that resets starting_dose_count
-  # and records refilled_at. This method will then correctly reflect the
-  # post-refill count because starting_dose_count itself is updated on refill.
+  # Only counts puffs taken since the last refill (or since creation if never refilled),
+  # so the count resets to starting_dose_count when a refill is recorded.
+  # Uses dose_logs.loaded? to avoid an extra query when the association is eager-loaded.
   def remaining_doses
     return nil if starting_dose_count.nil?
-    starting_dose_count - dose_logs.sum(:puffs)
+    since = refilled_at || created_at
+    taken = if dose_logs.loaded?
+      dose_logs.select { |dl| dl.recorded_at >= since }.sum(&:puffs)
+    else
+      dose_logs.where("recorded_at >= ?", since).sum(:puffs)
+    end
+    starting_dose_count - taken
   end
 
   # Returns how many days of supply remain at the current daily dose rate.

@@ -1,12 +1,22 @@
 # frozen_string_literal: true
 
 class NotificationsController < ApplicationController
+  # Badge count is recomputed inline within each action here, so skip the global before_action.
+  skip_before_action :set_notification_badge_count
+  rate_limit to: 60, within: 1.minute, by: -> { Current.user.id }, with: -> {
+    respond_to do |format|
+      format.turbo_stream { head :too_many_requests }
+      format.html { redirect_to notifications_path, alert: "Too many requests. Please slow down." }
+      format.json { render json: { error: "Rate limit exceeded." }, status: :too_many_requests }
+    end
+  }
   before_action :set_notification, only: %i[mark_read]
 
   def index
-    @notifications       = Current.user.notifications.newest_first
-    @unread_count        = Current.user.notifications.unread.count
-    @last_notification   = @notifications.first
+    @notifications              = Current.user.notifications.newest_first
+    @unread_count               = Current.user.notifications.unread.count
+    @unread_notification_count  = @unread_count
+    @last_notification          = @notifications.first
 
     respond_to do |format|
       format.html
@@ -22,8 +32,9 @@ class NotificationsController < ApplicationController
   def mark_read
     destination = resolve_notification_path(@notification)
     @notification.update!(read: true)
-    @unread_count      = Current.user.notifications.unread.count
-    @last_notification = Current.user.notifications.newest_first.first
+    @unread_count              = Current.user.notifications.unread.count
+    @unread_notification_count = @unread_count
+    @last_notification         = Current.user.notifications.newest_first.first
 
     respond_to do |format|
       format.turbo_stream
@@ -33,11 +44,12 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_read
-    @notifications     = Current.user.notifications.unread.newest_first.to_a
+    @notifications             = Current.user.notifications.unread.newest_first.to_a
     @notifications.each { |n| n.read = true }
     Current.user.notifications.unread.update_all(read: true)
-    @unread_count      = 0
-    @last_notification = Current.user.notifications.newest_first.first
+    @unread_count              = 0
+    @unread_notification_count = 0
+    @last_notification         = Current.user.notifications.newest_first.first
 
     respond_to do |format|
       format.turbo_stream

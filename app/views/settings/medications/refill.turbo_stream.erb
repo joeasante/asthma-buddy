@@ -7,5 +7,5 @@
 <% end %>
 
 <%= turbo_stream.replace "flash-messages" do %>
-  <%= render "layouts/flash" %>
+  <div id="flash-messages" data-controller="toast" data-toast-message="<%= flash.now[:notice] %>" data-toast-variant="success"></div>
 <% end %>

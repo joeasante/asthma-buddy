@@ -24,7 +24,7 @@ class Notification < ApplicationRecord
   def self.create_low_stock_for(medication)
     user = medication.user
     return unless medication.low_stock?
-    return if exists?(user: user, notification_type: :low_stock, notifiable: medication)
+    return if exists?(user: user, notification_type: :low_stock, notifiable: medication, read: false)
 
     create!(
       user:              user,

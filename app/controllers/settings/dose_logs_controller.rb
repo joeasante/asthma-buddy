@@ -15,7 +15,13 @@ class Settings::DoseLogsController < Settings::BaseController
       dose_logs = dose_logs.where("recorded_at >= ?", since_date)
     end
     respond_to do |format|
-      format.json { render json: dose_logs.map { |dl| dose_log_json(dl) } }
+      format.json do
+        render json: {
+          dose_logs:     dose_logs.map { |dl| dose_log_json(dl) },
+          total:         dose_logs.size,
+          medication_id: @medication.id
+        }
+      end
     end
   end
 
@@ -58,7 +64,7 @@ class Settings::DoseLogsController < Settings::BaseController
   end
 
   def set_dose_log
-    @dose_log = Current.user.dose_logs.find(params[:id])
+    @dose_log = @medication.dose_logs.find(params[:id])
   end
 
   def dose_log_params

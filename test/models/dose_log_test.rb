@@ -97,14 +97,6 @@ class DoseLogTest < ActiveSupport::TestCase
     assert_equal newer.id, results.first.id
   end
 
-  test "for_medication scope filters to the given medication" do
-    med   = medications(:alice_reliever)
-    other = medications(:alice_preventer)
-    logs  = DoseLog.for_medication(med)
-    assert logs.all? { |l| l.medication_id == med.id }
-    assert_not logs.any? { |l| l.medication_id == other.id }
-  end
-
   # GINA band classification
 
   test "gina_band returns :controlled for uses below review threshold" do
