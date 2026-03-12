@@ -38,6 +38,7 @@ module Authentication
     def request_authentication
       respond_to do |format|
         format.html do
+          # url_from validates same-origin to prevent open redirect; falls back to root_url for external URLs.
           session[:return_to_after_authenticating] = url_from(request.url) || root_url
           redirect_to new_session_path
         end
