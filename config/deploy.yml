@@ -5,11 +5,17 @@ servers:
   web:
     hosts:
       - 91.99.132.217
-    proxy: false   # CloudPanel's Nginx is the reverse proxy on 80/443
-    options:
-      publish:
-        - "127.0.0.1:3000:80"   # map container port 80 to loopback:3000 only
-                                 # CloudPanel's Nginx reverse-proxies to this
+
+proxy:
+  app_port: 80            # Thruster inside the container listens on port 80
+  forward_headers: true   # preserve X-Forwarded-For/Proto from CloudPanel
+  healthcheck:
+    path: /up
+    interval: 3
+  run:
+    http_port: 3000       # kamal-proxy binds to 127.0.0.1:3000 (CloudPanel proxies here)
+    bind_ips:
+      - 127.0.0.1         # loopback only — not exposed publicly
 
 registry:
   server: ghcr.io
