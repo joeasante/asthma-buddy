@@ -43,7 +43,7 @@ class Settings::DoseLogsController < Settings::BaseController
   end
 
   def set_dose_log
-    @dose_log = @medication.dose_logs.find(params[:id])
+    @dose_log = Current.user.dose_logs.find(params[:id])
   end
 
   def dose_log_params
