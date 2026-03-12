@@ -1,11 +1,18 @@
 <% content_for :title, "Cookie Policy — Asthma Buddy" %>
+<% content_for :head do %><%= stylesheet_link_tag "legal", "data-turbo-track": "reload" %><% end %>
 <% content_for :meta_description do %><meta name="description" content="Asthma Buddy cookie policy — what cookies we use, why we use them, and your rights under UK PECR and UK GDPR."><% end %>
 
-<div class="main--narrow">
-  <div class="page-header">
-    <h1>Cookie Policy</h1>
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div>
+        <h1>Cookie Policy</h1>
+      </div>
+    </div>
   </div>
+</div>
 
+<div class="main--narrow">
   <div class="section-card">
     <p class="legal-date">Last updated: 12 March 2026</p>
 
@@ -57,5 +64,5 @@
     <p>If you are not satisfied with our response, you have the right to raise a concern with the UK's data protection regulator, the <strong>Information Commissioner's Office (ICO)</strong>, at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>.</p>
   </div>
 
-  <%= link_to "← Back", :back, class: "legal-back-link" %>
+  <%= link_to "← Back", url_from(request.referer) || root_path, class: "legal-back-link" %>
 </div>

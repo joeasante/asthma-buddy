@@ -1,5 +1,5 @@
 ---
-status: pending
+status: complete
 priority: p3
 issue_id: 316
 tags: [code-review, dry, views, error-handling]

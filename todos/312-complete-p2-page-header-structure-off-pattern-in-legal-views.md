@@ -1,5 +1,5 @@
 ---
-status: pending
+status: complete
 priority: p2
 issue_id: 312
 tags: [code-review, css, ui-consistency]

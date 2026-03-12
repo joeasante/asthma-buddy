@@ -31,4 +31,30 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
     # Should not redirect to login
     assert_not_equal new_session_url, response.location
   end
+
+  test "GET /500 accessible without authentication" do
+    get "/500"
+    assert_response :internal_server_error
+    assert_not_equal new_session_url, response.location
+  end
+
+  test "GET /404 home link goes to root path" do
+    get "/404"
+    assert_select ".btn-primary[href='#{root_path}']"
+  end
+
+  test "GET /500 home link goes to root path" do
+    get "/500"
+    assert_select ".btn-primary[href='#{root_path}']"
+  end
+
+  test "GET /500 does not render cookie notice" do
+    get "/500"
+    assert_select ".cookie-notice", count: 0
+  end
+
+  test "GET /404 does not render cookie notice" do
+    get "/404"
+    assert_select ".cookie-notice", count: 0
+  end
 end

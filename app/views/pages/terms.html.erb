@@ -1,13 +1,20 @@
 <% content_for :title, "Terms of Service — Asthma Buddy" %>
+<% content_for :head do %><%= stylesheet_link_tag "legal", "data-turbo-track": "reload" %><% end %>
 <% content_for :meta_description do %><meta name="description" content="Asthma Buddy terms of service — the rules and conditions for using the app and your rights as a user."><% end %>
 
-<div class="main--narrow">
-  <div class="page-header">
-    <h1>Terms of Service</h1>
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div>
+        <h1>Terms of Service</h1>
+      </div>
+    </div>
   </div>
+</div>
 
+<div class="main--narrow">
   <div class="section-card">
-    <p class="legal-date">Last updated: March 10, 2026</p>
+    <p class="legal-date">Last updated: 10 March 2026</p>
 
     <h2>1. About this service</h2>
     <p>Asthma Buddy is a personal health tracking application that helps individuals log and monitor asthma-related data, including symptom records, peak flow readings, and medication usage. Asthma Buddy is not a medical device and is not regulated as such. It does not provide medical advice, diagnosis, or treatment recommendations. Nothing on this platform should be interpreted as a substitute for professional medical care. Always consult your GP, respiratory nurse, or other qualified healthcare provider before making any clinical decisions about your condition or treatment.</p>
@@ -47,5 +54,5 @@
     <p>If you have any questions about these Terms of Service or how we operate the service, please contact us at <a href="mailto:legal@asthmabuddy.app">legal@asthmabuddy.app</a>. We aim to respond to all enquiries within 5 working days.</p>
   </div>
 
-  <%= link_to "← Back", :back, class: "legal-back-link" %>
+  <%= link_to "← Back", url_from(request.referer) || root_path, class: "legal-back-link" %>
 </div>

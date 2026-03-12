@@ -2,6 +2,7 @@
 
 class ErrorsController < ApplicationController
   allow_unauthenticated_access
+  skip_before_action :set_notification_badge_count
 
   def not_found
     render status: :not_found

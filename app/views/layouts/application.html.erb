@@ -7,8 +7,6 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
     <%# Trim to weights actually used — Inter 700 unused (headings use Plus Jakarta Sans) %>
     <%# Plus Jakarta Sans 600 unused (headings use 700/800 only) %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,9 +19,10 @@
     <link rel="apple-touch-icon" href="<%= asset_path 'favicon.png' %>">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "legal", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "errors", "data-turbo-track": "reload" %>
+    <%# Page-specific stylesheets injected via content_for :head in consuming views %>
+    <%= yield :head %>
+    <%# Cookie notice CSS — only when the banner will actually render %>
+    <%= stylesheet_link_tag "cookie_notice", "data-turbo-track": "reload" unless authenticated? || cookies[:cookie_notice_dismissed].present? %>
     <% if authenticated? %>
       <%= stylesheet_link_tag "lexxy",             "data-turbo-track": "reload" %>
       <%= stylesheet_link_tag "profile",           "data-turbo-track": "reload" %>
@@ -121,7 +120,7 @@
       <%= render "layouts/bottom_nav" %>
     <% end %>
 
-    <%= render "layouts/cookie_notice" unless authenticated? || cookies[:cookie_notice_dismissed].present? %>
+    <%= render "layouts/cookie_notice" unless authenticated? || cookies[:cookie_notice_dismissed].present? || controller_name == "errors" %>
 
     <%# Toast region — toasts are appended here by toast_controller.js %>
     <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="false"></div>
@@ -132,7 +131,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
-          <%= link_to "Cookies", cookies_path %>
+          <%= link_to "Cookies", cookie_policy_path %>
         </nav>
       </footer>
     <% else %>
@@ -141,7 +140,7 @@
         <nav class="footer-nav" aria-label="Footer">
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
-          <%= link_to "Cookies", cookies_path %>
+          <%= link_to "Cookies", cookie_policy_path %>
         </nav>
         <p class="footer-legal">&copy; <%= Time.current.year %> Asthma Buddy</p>
       </footer>

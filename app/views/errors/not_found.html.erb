@@ -1,4 +1,5 @@
 <% content_for :title, "Page Not Found — Asthma Buddy" %>
+<% content_for :head do %><%= stylesheet_link_tag "errors", "data-turbo-track": "reload" %><% end %>
 
 <div class="error-page">
   <span class="error-code" aria-hidden="true">404</span>
@@ -7,8 +8,6 @@
     <p class="error-description">
       The page you were looking for doesn't exist or may have moved.
     </p>
-    <%= link_to authenticated? ? dashboard_path : root_path, class: "btn-primary" do %>
-      <%= authenticated? ? "Go to dashboard" : "Go to home page" %>
-    <% end %>
+    <%= render "errors/home_link" %>
   </div>
 </div>

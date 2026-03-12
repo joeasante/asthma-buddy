@@ -45,9 +45,3 @@
   line-height: 1.6;
   margin-bottom: var(--space-xl);
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .error-code {
-    animation: none;
-  }
-}

@@ -1,5 +1,5 @@
 ---
-status: pending
+status: complete
 priority: p2
 issue_id: 313
 tags: [code-review, ux, error-handling, cookie-notice]
