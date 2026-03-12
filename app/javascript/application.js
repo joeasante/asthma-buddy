@@ -4,22 +4,24 @@ import "controllers"
 
 import "lexxy"
 
-// Re-assert favicon after every Turbo navigation.
-// Turbo's head merge can briefly drop <link rel="icon"> tags, causing
-// browsers to revert to a cached or default favicon.
-document.addEventListener("turbo:render", () => {
-  const icons = [
-    { rel: "icon", href: "/icon.png?v=2", type: "image/png" },
+// Force favicon refresh on every Turbo navigation.
+// Turbo's head merge disrupts <link rel="icon"> tags; the only reliable
+// fix is to remove them all and re-add fresh on each turbo:load.
+document.addEventListener("turbo:load", () => {
+  document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(el => el.remove())
+
+  const favicons = [
+    { rel: "icon", href: "/favicon.ico", sizes: "any" },
     { rel: "icon", href: "/icon.svg?v=2", type: "image/svg+xml" },
+    { rel: "icon", href: "/icon.png?v=2", type: "image/png" },
     { rel: "apple-touch-icon", href: "/icon.png?v=2" }
   ]
-  icons.forEach(({ rel, href, type }) => {
-    if (!document.querySelector(`link[href="${href}"]`)) {
-      const link = document.createElement("link")
-      link.rel = rel
-      link.href = href
-      if (type) link.type = type
-      document.head.appendChild(link)
-    }
+  favicons.forEach(({ rel, href, type, sizes }) => {
+    const link = document.createElement("link")
+    link.rel = rel
+    link.href = href
+    if (type) link.type = type
+    if (sizes) link.sizes = sizes
+    document.head.appendChild(link)
   })
 })
