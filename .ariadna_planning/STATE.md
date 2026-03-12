@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 20 (Legal Pages, Cookie Banner & Error Pages) — IN PROGRESS
-Plan: Plan 01 complete.
-Status: Phase 20 Plan 01 complete. 2026-03-12.
-Last activity: 2026-03-12 — Phase 20 Plan 01 complete: Cookie Policy page (GET /cookies), legal.css narrow prose layout (680px), .main--narrow applied to all three legal pages, Cookies link added to both footers. 495 integration tests passing, 0 regressions.
+Plan: Plan 02 complete.
+Status: Phase 20 Plan 02 complete. 2026-03-12.
+Last activity: 2026-03-12 — Phase 20 Plan 02 complete: Persistent 365-day cookie dismissal for cookie notice banner (cookies[:cookie_notice_dismissed]). 495 integration tests passing, 0 regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 20 Plan 02 completed: 2026-03-12 (~1 min, 1 task, 0 files created, 3 files modified, 0 new tests — persistent cookie dismissal)
+- Tests at Phase 20-02 close: 495 integration passing (no regressions)
 - Phase 20 Plan 01 completed: 2026-03-12 (~3 min, 2 tasks, 2 files created, 5 files modified, 0 new tests — Cookie Policy page + legal.css + narrow layout applied)
 - Tests at Phase 20-01 close: 495 integration passing (no regressions)
 - Phase 21 Plan 03 completed: 2026-03-12 (~4 min, 2 tasks, 0 files created, 8 files modified, 0 new tests — meta description content only)
@@ -120,6 +122,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 20 Plan 02 Decisions (2026-03-12)
+
+- **Persistent cookie replaces session flag**: `cookies[:cookie_notice_dismissed]` (365 days) eliminates PECR nuisance of banner reappearing on every new session. Session cookie remains strictly necessary and exempt from consent.
+- **`head :no_content` unchanged**: Stimulus controller handles client-side hide/remove; no redirect or Turbo Stream needed for dismiss action.
 
 ### Phase 20 Plan 01 Decisions (2026-03-12)
 
@@ -393,5 +400,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed Phase 20 Plan 01 — Cookie Policy page, legal.css narrow layout, Cookies footer links. 495 tests passing.
+Stopped at: Completed Phase 20 Plan 02 — Persistent 365-day cookie dismissal (cookies[:cookie_notice_dismissed]). 495 tests passing.
 Resume file: None
