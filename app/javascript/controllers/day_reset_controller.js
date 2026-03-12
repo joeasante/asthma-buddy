@@ -19,17 +19,18 @@ export default class extends Controller {
 
   scheduleMidnightReload() {
     const now = new Date()
-    const nextMidnight = new Date(Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate() + 1
-    ))
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
     const msUntilMidnight = nextMidnight - now
     this.midnightTimeout = setTimeout(() => this.reload(), msUntilMidnight)
   }
 
   checkDate() {
-    const today = new Date().toISOString().slice(0, 10)
+    const now = new Date()
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0")
+    ].join("-")
     if (today !== this.dateValue) this.reload()
   }
 
