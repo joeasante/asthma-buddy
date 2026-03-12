@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 21 (SEO and Meta Tags) — IN PROGRESS
-Plan: Plan 03 complete.
-Status: Phase 21 Plan 03 complete. 2026-03-12.
-Last activity: 2026-03-12 — Phase 21 Plan 03 complete: Added meta descriptions to all 8 public/onboarding pages (auth pages, legal pages, onboarding wizard). 483 integration tests passing, 0 regressions.
+Phase: Phase 20 (Legal Pages, Cookie Banner & Error Pages) — IN PROGRESS
+Plan: Plan 01 complete.
+Status: Phase 20 Plan 01 complete. 2026-03-12.
+Last activity: 2026-03-12 — Phase 20 Plan 01 complete: Cookie Policy page (GET /cookies), legal.css narrow prose layout (680px), .main--narrow applied to all three legal pages, Cookies link added to both footers. 495 integration tests passing, 0 regressions.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Milestone 3 Velocity:**
+- Phase 20 Plan 01 completed: 2026-03-12 (~3 min, 2 tasks, 2 files created, 5 files modified, 0 new tests — Cookie Policy page + legal.css + narrow layout applied)
+- Tests at Phase 20-01 close: 495 integration passing (no regressions)
 - Phase 21 Plan 03 completed: 2026-03-12 (~4 min, 2 tasks, 0 files created, 8 files modified, 0 new tests — meta description content only)
 - Tests at Phase 21-03 close: 483 integration passing (no regressions)
 - Phase 21 Plan 01 completed: 2026-03-12 (~3 min, 2 tasks, 0 files created, 2 files modified, 0 new tests — layout infrastructure only)
@@ -118,6 +120,13 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 20 Plan 01 Decisions (2026-03-12)
+
+- **legal.css loaded unconditionally**: Placed outside `authenticated?` block — legal pages are public (unauthenticated users visit /terms, /privacy, /cookies) so the stylesheet must load before authentication
+- **cookies action is empty (implicit render)**: `allow_unauthenticated_access` at PagesController class level covers the new action automatically; no extra configuration needed
+- **Legal page pattern established**: `.main--narrow` wrapper containing `.page-header` h1 → `.section-card` with `.legal-date` date → h2 sections → `.legal-back-link` at bottom — applied consistently across all three legal pages
+- **.pages-updated replaced with .legal-date**: Existing terms and privacy views used `.pages-updated` class; renamed to `.legal-date` for consistent styling across all three legal pages via legal.css
 
 ### Phase 19 Plan 03 Decisions (2026-03-11)
 
@@ -384,5 +393,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Code review fixes — todos 288, 291, 299, 303, 305 marked complete. 5 atomic commits: UTC midnight bug in day_reset_controller (288), mark_all_read @last_notification scope (291), duplicate_session_reading called twice in JSON path (299), fill_pct missing from reliever usage JSON (303), url_from open-redirect comment (305).
+Stopped at: Completed Phase 20 Plan 01 — Cookie Policy page, legal.css narrow layout, Cookies footer links. 495 tests passing.
 Resume file: None
