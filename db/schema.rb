@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_12_120000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -56,8 +56,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.datetime "recorded_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["medication_id", "recorded_at", "puffs"], name: "index_dose_logs_covering_remaining_doses"
     t.index ["medication_id", "recorded_at"], name: "index_dose_logs_on_medication_id_and_recorded_at"
-    t.index ["medication_id"], name: "index_dose_logs_on_medication_id"
     t.index ["recorded_at"], name: "index_dose_logs_on_recorded_at"
     t.index ["user_id", "medication_id", "recorded_at"], name: "index_dose_logs_on_user_medication_recorded_at"
     t.index ["user_id"], name: "index_dose_logs_on_user_id"
@@ -71,8 +71,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id", "ended_at"], name: "index_health_events_on_user_id_and_ended_at"
+    t.index ["user_id", "event_type", "ended_at", "recorded_at"], name: "index_health_events_covering_illness_query"
     t.index ["user_id", "recorded_at"], name: "index_health_events_on_user_id_and_recorded_at"
-    t.index ["user_id"], name: "index_health_events_on_user_id"
   end
 
   create_table "medications", force: :cascade do |t|
@@ -89,8 +89,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.date "starts_on"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["ends_on"], name: "index_medications_on_ends_on"
     t.index ["medication_type"], name: "index_medications_on_medication_type"
+    t.index ["user_id", "course", "ends_on"], name: "index_medications_covering_course_queries"
     t.index ["user_id"], name: "index_medications_on_user_id"
   end
 
@@ -107,7 +107,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.index ["user_id", "notifiable_type", "notifiable_id", "notification_type"], name: "index_notifications_unique_unread_per_notifiable", unique: true, where: "read = 0"
     t.index ["user_id", "notification_type", "notifiable_type", "notifiable_id"], name: "index_notifications_deduplication"
     t.index ["user_id", "read"], name: "index_notifications_on_user_id_and_read"
-    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "peak_flow_readings", force: :cascade do |t|
@@ -119,6 +118,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.integer "value", null: false
     t.integer "zone"
     t.index "user_id, time_of_day, DATE(recorded_at)", name: "index_peak_flow_readings_unique_session_per_day", unique: true
+    t.index ["user_id", "recorded_at", "value", "zone", "time_of_day"], name: "index_peak_flow_readings_covering_chart"
     t.index ["user_id", "recorded_at"], name: "index_peak_flow_readings_on_user_id_and_recorded_at"
   end
 
@@ -152,6 +152,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_11_200000) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id", "recorded_at"], name: "index_symptom_logs_on_user_id_and_recorded_at"
+    t.index ["user_id", "severity", "recorded_at"], name: "index_symptom_logs_covering_severity"
     t.index ["user_id"], name: "index_symptom_logs_on_user_id"
   end
 
