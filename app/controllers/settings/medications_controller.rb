@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Settings::MedicationsController < ApplicationController
+class Settings::MedicationsController < Settings::BaseController
   before_action :set_medication, only: %i[edit update destroy refill]
   before_action :ensure_course_not_archived, only: %i[edit update]
 

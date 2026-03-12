@@ -4,6 +4,21 @@ class Settings::DoseLogsController < Settings::BaseController
   before_action :set_medication
   before_action :set_dose_log, only: :destroy
 
+  def index
+    dose_logs = @medication.dose_logs.chronological
+    if params[:since].present?
+      since_date = begin
+        Date.parse(params[:since])
+      rescue ArgumentError, TypeError
+        Date.current
+      end
+      dose_logs = dose_logs.where("recorded_at >= ?", since_date)
+    end
+    respond_to do |format|
+      format.json { render json: dose_logs.map { |dl| dose_log_json(dl) } }
+    end
+  end
+
   def create
     @dose_log = @medication.dose_logs.new(dose_log_params)
     @dose_log.user = Current.user

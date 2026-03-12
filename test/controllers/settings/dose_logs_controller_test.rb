@@ -13,6 +13,26 @@ class Settings::DoseLogsControllerTest < ActionDispatch::IntegrationTest
     @other_dose_log = dose_logs(:bob_reliever_dose_1)
   end
 
+  # --- INDEX ---
+
+  test "GET index returns JSON dose log history" do
+    get settings_medication_dose_logs_path(@medication), as: :json
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert json.is_a?(Array)
+  end
+
+  test "GET index cross-user isolation" do
+    get settings_medication_dose_logs_path(@other_medication), as: :json
+    assert_response :not_found
+  end
+
+  test "GET index unauthenticated redirects" do
+    sign_out
+    get settings_medication_dose_logs_path(@medication), as: :json
+    assert_response :unauthorized
+  end
+
   # --- CREATE ---
 
   test "create saves a valid dose log and responds with turbo stream" do

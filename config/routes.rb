@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       member do
         patch :refill
       end
-      resources :dose_logs, only: %i[create destroy]
+      resources :dose_logs, only: %i[index create destroy]
     end
   end
 
