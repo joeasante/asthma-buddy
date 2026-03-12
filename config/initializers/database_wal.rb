@@ -51,7 +51,7 @@ Rails.application.config.after_initialize do
 
   begin
     result = ActiveRecord::Base.connection.execute("PRAGMA journal_mode;")
-    mode = result.first&.first
+    mode = result.first&.fetch("journal_mode", nil)
     unless mode == "wal"
       Rails.logger.error "[AsthmaBuddy] CRITICAL: SQLite WAL mode NOT active on primary DB (got: #{mode.inspect})"
     end
