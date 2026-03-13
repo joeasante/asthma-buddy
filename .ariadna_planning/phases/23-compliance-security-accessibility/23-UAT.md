@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 23-compliance-security-accessibility
 source: [23-01-SUMMARY.md]
 started: 2026-03-13T21:30:00Z
@@ -49,5 +49,10 @@ skipped: 1
   reason: "User reported: It said try again later. Need a better error message though"
   severity: minor
   test: 3
-  artifacts: []
-  missing: []
+  root_cause: "throttled_responder in rack_attack.rb returns a single generic message for all throttle types — does not differentiate login (20s window) from signup (1h window)"
+  artifacts:
+    - path: "config/initializers/rack_attack.rb"
+      issue: "throttled_responder ignores which throttle fired, returns generic plain-text message"
+  missing:
+    - "Branch on req.env['rack.attack.matched'] to return context-specific messages per throttle rule"
+  debug_session: ""
