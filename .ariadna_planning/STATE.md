@@ -425,7 +425,6 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 
 ### Pending Todos
 
-- **Reconsider dose logging UX location** — Dose logging lives in Settings under each medication card, but Settings should be for managing medications (CRUD) not day-to-day logging. Consider moving to dashboard or dedicated logging flow. (`2026-03-13-reconsider-dose-logging-ux-location.md`)
 - **Add admin user management page** — No in-app way to promote/demote users to admin. Need a simple `/admin/users` page (admin-only) listing all users with a toggle-admin action. Guard against self-demotion. Link from Settings Mission Control card. (`2026-03-13-add-admin-user-management-page.md`)
 
 ### Blockers/Concerns
