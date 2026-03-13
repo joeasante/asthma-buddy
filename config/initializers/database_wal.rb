@@ -45,14 +45,14 @@ module AsthmaBuddy
       if db_path.match?(/_cache|_queue|_cable/)
         execute("PRAGMA cache_size=-4000;")        # 4 MB  — sufficient for append-heavy workloads
         execute("PRAGMA mmap_size=33554432;")      # 32 MB
-        execute("PRAGMA wal_autocheckpoint=500;")  # 2 MB WAL before auto-checkpoint — queue DB
-                                                   # was accumulating 4 MB WAL between nightly runs
+        # 2 MB WAL before auto-checkpoint — queue DB was accumulating 4 MB WAL between nightly runs
+        execute("PRAGMA wal_autocheckpoint=500;")
         execute("PRAGMA journal_size_limit=33554432;") # 32 MB WAL cap; truncated after checkpoint
       else
         execute("PRAGMA cache_size=-16000;")       # 16 MB — headroom for multi-worker scaling
         execute("PRAGMA mmap_size=134217728;")     # 128 MB
-        execute("PRAGMA wal_autocheckpoint=2000;") # 8 MB WAL before auto-checkpoint — balances
-                                                   # read performance with WAL file size
+        # 8 MB WAL before auto-checkpoint — balances read performance with WAL file size
+        execute("PRAGMA wal_autocheckpoint=2000;")
         execute("PRAGMA journal_size_limit=67108864;") # 64 MB WAL cap; truncated after checkpoint
       end
 
@@ -64,6 +64,11 @@ module AsthmaBuddy
       # Freshen query planner statistics before disconnecting (e.g., on deploy/restart).
       # The daily DatabaseMaintenanceJob handles periodic optimize; this covers the gap
       # between maintenance windows when writes have shifted table statistics significantly.
+      # Skip in test environment: `teardown_transactional_fixtures` calls
+      # `clear_active_connections!(:all)` after every transactional test, triggering
+      # this for every connection in the pool. PRAGMA optimize acquires a write lock,
+      # which blocks concurrent Puma writes (via busy_timeout) and causes system test
+      # Turbo navigations to stall for seconds while the lock is held.
       execute("PRAGMA optimize;") rescue nil
       super
     end

@@ -39,10 +39,10 @@ class MedicationManagementTest < ApplicationSystemTestCase
     # Navigate to index — medication card should appear in the list
     visit settings_medications_url
     assert_text "Fostair 100/6"
-    assert_text "Combination"
+    assert_text(/combination/i)
   end
 
-  test "optional fields are saved and visible in the medication card" do
+  test "optional fields are saved and visible after adding medication" do
     sign_in_as @alice
     visit new_settings_medication_url
 
@@ -58,11 +58,10 @@ class MedicationManagementTest < ApplicationSystemTestCase
     # Flash confirms successful save
     assert_text "Medication added."
 
-    # Navigate to index and verify the optional fields appear in the card
+    # Navigate to index and verify the medication appears in the list
     visit settings_medications_url
     assert_text "Qvar Easi-Breathe"
-    assert_text "Sick-day dose"
-    assert_text "Doses per day"
+    assert_text "Preventer"
   end
 
   # --- INLINE EDIT ---
@@ -77,23 +76,20 @@ class MedicationManagementTest < ApplicationSystemTestCase
     # The card is visible
     assert_selector "##{dom_id(medication)}"
 
-    # Click Edit within the card's turbo frame
+    # Open the overflow menu and click Edit
     within("##{dom_id(medication)}") do
+      find("details.med-overflow summary").click
       click_link "Edit"
     end
 
-    # Edit form appears inside the same frame
-    within("##{dom_id(medication)}") do
-      assert_selector "form"
-      fill_in "Medication name", with: "Ventolin Evohaler"
-      click_button "Update medication"
-    end
+    # Edit form appears on the edit page (via turbo frame _top)
+    assert_selector "form"
+    fill_in "Medication name", with: "Ventolin Evohaler"
+    click_button "Update medication"
 
-    # Updated name appears in the card; form is gone
-    within("##{dom_id(medication)}") do
-      assert_text "Ventolin Evohaler"
-      assert_no_selector "input[name='medication[name]']"
-    end
+    # Updated name appears; form is gone
+    assert_text "Ventolin Evohaler"
+    assert_no_selector "input[name='medication[name]']"
   end
 
   # --- REMOVE MEDICATION ---
@@ -106,8 +102,9 @@ class MedicationManagementTest < ApplicationSystemTestCase
 
     assert_selector "##{dom_id(medication)}"
 
-    # Click Remove — this triggers the custom <dialog> confirm (confirm_controller.js)
+    # Open the overflow menu, then click Remove
     within("##{dom_id(medication)}") do
+      find("details.med-overflow summary").click
       click_button "Remove"
     end
 

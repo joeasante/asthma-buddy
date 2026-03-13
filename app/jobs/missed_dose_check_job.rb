@@ -14,7 +14,6 @@ class MissedDoseCheckJob < ApplicationJob
               .where.not(doses_per_day: nil)
               .includes(:user)
               .find_each do |medication|
-
       doses_logged_today = DoseLog.where(
         medication: medication,
         recorded_at: today.beginning_of_day..today.end_of_day

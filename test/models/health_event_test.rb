@@ -215,7 +215,6 @@ class HealthEventTest < ActiveSupport::TestCase
     results = HealthEvent.where(id: [ older.id, newer.id ]).recent_first
     assert_equal newer.id, results.first.id
   end
-
 end
 
 # Dashboard cache invalidation tests for HealthEvent

@@ -5,36 +5,42 @@ require "application_system_test_case"
 class OnboardingTest < ApplicationSystemTestCase
   # System tests run in a separate Puma thread; disabling transactional tests
   # ensures DB changes from browser actions are committed and visible across
-  # all connections. Cleanup is handled explicitly in teardown.
+  # all connections. Cleanup is handled explicitly in setup and teardown.
   self.use_transactional_tests = false
 
   setup do
     # Reset charlie's onboarding flags before each test in case a previous test
     # left them set (no transaction rollback when use_transactional_tests = false).
+    # Fixture reloads from other test classes re-insert users.yml data (flags = false)
+    # but OnboardingTest tests may run before any other class triggers a reload.
     User.where(email_address: "charlie@example.com")
         .update_all(onboarding_personal_best_done: false, onboarding_medication_done: false)
 
     @new_user = User.find_by!(email_address: "charlie@example.com")
 
-    # Sign in as charlie (new_user). After sign-in, charlie is redirected to
-    # the onboarding wizard (both flags false). We sign in via the form since
-    # charlie is not onboarded and lands on the wizard, not the dashboard.
-    visit new_session_url
-    fill_in "Email address", with: @new_user.email_address
-    fill_in "Password", with: "password123"
-    click_button "Sign in"
-    # Wait for the page to navigate away from the sign-in form.
-    # Charlie lands at either the onboarding wizard or dashboard.
-    # If still at sign-in after wait, authentication may have failed — check for
-    # "What's your personal best?" which confirms we reached the onboarding wizard.
+    # Clear stale browser cookies so no old session_id lingers from a prior test.
+    page.driver.browser.manage.delete_all_cookies rescue nil
+
+    # Sign in via the fixture session rather than the sign-in form.
+    # The `new_user_session` fixture has a deterministic ID that is re-inserted
+    # identically on every fixture reload (DELETE … INSERT) by other test classes.
+    # This means concurrent fixture reloads cannot invalidate charlie's session —
+    # the browser's signed cookie remains valid for the entire test.
+    sign_in_as_fixture(:new_user_session)
+
+    visit onboarding_step_path(1)
     assert_text "What's your personal best?", wait: 15
   end
 
   teardown do
-    # Clean up any sessions, personal_best_records, medications created during test
-    @new_user&.sessions&.delete_all
+    # Clean up records created during the test (but NOT sessions — the fixture
+    # session must remain so the next test's sign_in_as_fixture can find it;
+    # setup_fixtures will DELETE/re-INSERT all fixture data before each test anyway).
     @new_user&.personal_best_records&.delete_all
     @new_user&.medications&.destroy_all
+    # Reset flags for charlie so the next test's setup finds a clean slate
+    User.where(email_address: "charlie@example.com")
+        .update_all(onboarding_personal_best_done: false, onboarding_medication_done: false)
     # Reset flags for alice (verified_user) in case any test modified them
     User.where(email_address: "alice@example.com")
         .update_all(onboarding_personal_best_done: true, onboarding_medication_done: true)
@@ -53,14 +59,14 @@ class OnboardingTest < ApplicationSystemTestCase
     fill_in "Personal best (L/min)", with: "450"
     click_on "Save and continue"
 
-    # Step 2
-    assert_text "Add your inhaler", wait: 10
+    # Step 2 — Turbo form submission; allow up to 20s for server response in full suite
+    assert_text "Add your inhaler", wait: 20
     fill_in "Medication name", with: "Ventolin"
     fill_in "Puffs per dose", with: "2"
     click_on "Save and continue"
 
-    # Dashboard
-    assert_current_path dashboard_path
+    # Dashboard — another Turbo form submission redirect
+    assert_current_path dashboard_path, wait: 20
     assert_text "Welcome to Asthma Buddy"
   end
 
@@ -68,12 +74,13 @@ class OnboardingTest < ApplicationSystemTestCase
     visit onboarding_step_path(1)
     click_on "Skip this step"
 
-    assert_text "Add your inhaler", wait: 10
+    # Turbo form submission; allow up to 20s for server response in full suite
+    assert_text "Add your inhaler", wait: 20
     fill_in "Medication name", with: "Ventolin"
     fill_in "Puffs per dose", with: "2"
     click_on "Save and continue"
 
-    assert_current_path dashboard_path
+    assert_current_path dashboard_path, wait: 20
     assert @new_user.reload.onboarding_personal_best_done?
     assert @new_user.reload.onboarding_medication_done?
   end
@@ -83,10 +90,11 @@ class OnboardingTest < ApplicationSystemTestCase
     fill_in "Personal best (L/min)", with: "500"
     click_on "Save and continue"
 
-    assert_text "Add your inhaler", wait: 10
+    # Turbo form submission; allow up to 20s for server response in full suite
+    assert_text "Add your inhaler", wait: 20
     click_on "Skip this step"
 
-    assert_current_path dashboard_path
+    assert_current_path dashboard_path, wait: 20
     assert @new_user.reload.onboarding_personal_best_done?
     assert @new_user.reload.onboarding_medication_done?
   end
@@ -97,10 +105,11 @@ class OnboardingTest < ApplicationSystemTestCase
 
     # Wait for Step 2 to appear before skipping it, avoiding a timing issue
     # where the second click fires before the page transitions to Step 2.
-    assert_text "Add your inhaler", wait: 5
+    # Allow up to 20s for Turbo form submission in full suite.
+    assert_text "Add your inhaler", wait: 20
     click_on "Skip this step"
 
-    assert_current_path dashboard_path
+    assert_current_path dashboard_path, wait: 20
     assert @new_user.reload.onboarding_personal_best_done?
     assert @new_user.reload.onboarding_medication_done?
   end

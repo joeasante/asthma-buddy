@@ -26,7 +26,7 @@ class AuthenticationTest < ApplicationSystemTestCase
     fill_in "Email address", with: email
     fill_in "Password", with: original_password
     fill_in "Confirm password", with: original_password
-    click_button "Sign up"
+    click_button "Create account"
 
     assert_text "Account created"
     assert_current_path new_session_path
@@ -50,19 +50,24 @@ class AuthenticationTest < ApplicationSystemTestCase
     fill_in "Password", with: original_password
     click_button "Sign in"
 
-    assert_current_path root_path
-    assert_text email
-    assert_text "Sign out"
+    # New user lands on onboarding wizard — skip both steps to reach dashboard
+    if page.has_text?("What's your personal best?", wait: 3)
+      click_button "Skip this step"
+      assert_text "Add your inhaler", wait: 5
+      click_button "Skip this step"
+    end
 
-    # Step 5: Navigate away and confirm still logged in
-    visit root_path
-    assert_text "Sign out"
-    assert_text email
+    # Now on dashboard
+    assert_current_path dashboard_path, wait: 5
 
-    # Step 6: Sign out
+    # Step 5: Navigate away and confirm still logged in (nav has user menu)
+    visit dashboard_path
+    assert_selector ".nav-user"
+
+    # Step 6: Sign out (open the dropdown then click Sign out)
+    find(".nav-avatar-btn").click
     click_on "Sign out"
     assert_text "Sign in"
-    assert_text "Sign up"
 
     # Step 7: Visit login page and go to forgot password
     visit new_session_path
@@ -91,7 +96,7 @@ class AuthenticationTest < ApplicationSystemTestCase
     visit edit_password_path(reset_token)
     fill_in "New password", with: new_password
     fill_in "Confirm new password", with: new_password
-    click_on "Reset password"
+    click_on "Set new password"
 
     assert_current_path new_session_path
     assert_text "Password has been reset"
@@ -101,19 +106,18 @@ class AuthenticationTest < ApplicationSystemTestCase
     fill_in "Password", with: new_password
     click_button "Sign in"
 
-    assert_current_path root_path
-    assert_text "Sign out"
-    assert_text email
+    assert_current_path dashboard_path
+    assert_selector ".nav-user"
   end
 
-  test "nav shows Sign in and Sign up when logged out" do
+  test "nav shows Sign in and Get started when logged out" do
     visit root_path
     assert_text "Sign in"
-    assert_text "Sign up"
-    assert_no_text "Sign out"
+    assert_text "Get started"
+    assert_no_selector ".nav-user"
   end
 
-  test "nav shows email and Sign out when logged in" do
+  test "nav shows user menu when logged in" do
     user = users(:verified_user)
     # Log in via the form
     visit new_session_path
@@ -121,8 +125,8 @@ class AuthenticationTest < ApplicationSystemTestCase
     fill_in "Password", with: "password123"
     click_button "Sign in"
 
-    assert_text user.email_address
-    assert_text "Sign out"
+    # User avatar/menu button present in nav
+    assert_selector ".nav-user"
     assert_no_text "Sign in"
   end
 end

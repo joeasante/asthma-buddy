@@ -129,7 +129,6 @@ class DoseLogTest < ActiveSupport::TestCase
     @medication.destroy
     assert_not DoseLog.exists?(log.id)
   end
-
 end
 
 # Dashboard cache invalidation tests for DoseLog

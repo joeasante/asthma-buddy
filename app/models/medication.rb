@@ -102,5 +102,4 @@ class Medication < ApplicationRecord
         errors.add(:ends_on, "must be after the start date")
       end
     end
-
 end

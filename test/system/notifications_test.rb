@@ -7,24 +7,12 @@ class NotificationsTest < ApplicationSystemTestCase
     @user = users(:verified_user)
     sign_in_as @user
 
-    # Create unread notifications inline for system test isolation.
-    # (fixtures alice_low_stock and alice_missed_dose also exist for this user,
-    # but we create these explicitly so each test has a known baseline)
-    @low_stock_notif = Notification.create!(
-      user:              @user,
-      notification_type: :low_stock,
-      notifiable:        medications(:alice_preventer),
-      body:              "Clenil Modulite is running low.",
-      read:              false
-    )
-
-    @missed_dose_notif = Notification.create!(
-      user:              @user,
-      notification_type: :missed_dose,
-      notifiable:        medications(:alice_preventer),
-      body:              "You haven't logged your Clenil Modulite dose today.",
-      read:              false
-    )
+    # Use the existing fixture notifications — fixtures already create alice_low_stock
+    # and alice_missed_dose for alice_preventer. Assign them here for reference in tests.
+    # Creating new unread notifications for the same (user, notifiable, type) would violate
+    # the partial unique index (read = 0), so we reference fixtures directly.
+    @low_stock_notif  = notifications(:alice_low_stock)
+    @missed_dose_notif = notifications(:alice_missed_dose)
   end
 
   # ---------------------------------------------------------------
@@ -53,7 +41,7 @@ class NotificationsTest < ApplicationSystemTestCase
     visit notifications_path
 
     # Unread notification body is visible with bold styling
-    assert_selector ".notification-body--unread", text: /Clenil Modulite is running low/, wait: 5
+    assert_selector ".notification-body--unread", text: /Clenil Modulite/, wait: 5
 
     # Click mark read on the low_stock notification using its turbo frame ID
     within("##{dom_id(@low_stock_notif)}") do

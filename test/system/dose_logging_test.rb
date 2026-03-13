@@ -42,10 +42,11 @@ class DoseLoggingTest < ApplicationSystemTestCase
     sign_in_as @alice
     visit settings_medications_url
 
-    # alice_reliever: starting_dose_count 200, fixture logs total 4 puffs (dose_1: 2, dose_2: 2)
-    # remaining_doses = 200 - 4 = 196
+    # alice_reliever: starting_dose_count 200, fixture logs total 26 puffs
+    # (dose_1: 2, dose_2: 2, plus 4 weekly_3w logs * 2, plus 7 weekly_5w logs * 2 = 26)
+    # remaining_doses = 200 - 26 = 174
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "196 doses"
+      assert_text "174 doses"
     end
 
     # Open log panel and log 2 more puffs
@@ -55,9 +56,9 @@ class DoseLoggingTest < ApplicationSystemTestCase
       click_button "Log dose"
     end
 
-    # Remaining count should now be 194
+    # Remaining count should now be 172
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "194 doses"
+      assert_text "172 doses"
     end
   end
 
@@ -67,9 +68,9 @@ class DoseLoggingTest < ApplicationSystemTestCase
     sign_in_as @alice
     visit settings_medications_url
 
-    # alice_reliever: 200 - 4 = 196 remaining
+    # alice_reliever: 200 - 26 = 174 remaining
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "196 doses"
+      assert_text "174 doses"
     end
 
     within("##{dom_id(@medication)}") do
@@ -81,9 +82,10 @@ class DoseLoggingTest < ApplicationSystemTestCase
       click_button "Confirm refill"
     end
 
-    # After refill, remaining count reflects new starting count minus existing logs
+    # After refill, refilled_at is reset to now so dose log history before refill is excluded.
+    # Remaining = new starting_dose_count - doses taken since refill = 100 - 0 = 100
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "96 doses"
+      assert_text "100 doses"
     end
   end
 
@@ -92,7 +94,7 @@ class DoseLoggingTest < ApplicationSystemTestCase
     visit settings_medications_url
 
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "196 doses"
+      assert_text "174 doses"
     end
 
     within("##{dom_id(@medication)}") do
@@ -102,8 +104,10 @@ class DoseLoggingTest < ApplicationSystemTestCase
       click_button "Confirm refill"
     end
 
+    # After refill, refilled_at is reset so prior dose logs are excluded.
+    # Remaining = 300 - 0 = 300
     within("#remaining_count_#{dom_id(@medication)}") do
-      assert_text "296 doses"
+      assert_text "300 doses"
     end
   end
 

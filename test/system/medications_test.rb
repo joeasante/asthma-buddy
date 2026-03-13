@@ -19,7 +19,7 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     fill_in "Starting dose count", with: "40"
 
     # Check the course checkbox — Stimulus controller should show date fields
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
 
     # Date inputs in headless Chrome require .set() to avoid concatenation issues
     end_date = 7.days.from_now.to_date
@@ -44,13 +44,13 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     assert_selector "[data-course-toggle-target='courseFields']", visible: :hidden
 
     # Checking the box reveals the date fields
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
     assert_no_selector "[data-course-toggle-target='courseFields']", visible: :hidden
     assert_selector "input[name='medication[starts_on]']"
     assert_selector "input[name='medication[ends_on]']"
 
     # Unchecking hides them again
-    uncheck "This is a temporary course (e.g. prednisolone)"
+    uncheck "This is a temporary course (e.g. prednisolone tablets)"
     assert_selector "[data-course-toggle-target='courseFields']", visible: :hidden
   end
 
@@ -60,7 +60,7 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     # doses_per_day visible initially
     assert_no_selector "[data-course-toggle-target='dosesPerDayField']", visible: :hidden
 
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
 
     # doses_per_day hidden after checking
     assert_selector "[data-course-toggle-target='dosesPerDayField']", visible: :hidden
@@ -126,6 +126,9 @@ class MedicationsSystemTest < ApplicationSystemTestCase
 
   test "active course has Log dose button and logging a dose decrements remaining count" do
     active_course = medications(:alice_active_course)
+    # Capture expected remaining BEFORE logging so the dose log is not included
+    # in the remaining_doses DB query (remaining_doses does a live query).
+    expected_remaining = active_course.remaining_doses - active_course.standard_dose_puffs
 
     visit settings_medications_url
 
@@ -141,7 +144,6 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     end
 
     # Remaining count should decrement (check in the remaining count container)
-    expected_remaining = active_course.remaining_doses - active_course.standard_dose_puffs
     within "#remaining_count_#{dom_id(active_course)}" do
       assert_text "#{expected_remaining} doses"
     end
