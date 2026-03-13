@@ -129,4 +129,45 @@ class DoseLogTest < ActiveSupport::TestCase
     @medication.destroy
     assert_not DoseLog.exists?(log.id)
   end
+
+end
+
+# Dashboard cache invalidation tests for DoseLog
+# Placed as a top-level class so self.use_transactional_tests = false takes effect.
+# after_create_commit / after_destroy_commit only fire when the transaction actually
+# commits — wrapping in a rolled-back test transaction suppresses the callbacks.
+class DoseLogDashboardCacheTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
+  setup do
+    @user       = users(:verified_user)
+    @medication = medications(:alice_reliever)
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  teardown do
+    Rails.cache.clear
+    Rails.cache = ActiveSupport::Cache::NullStore.new
+    # Clean up records created outside of a transaction
+    DoseLog.where(puffs: 99, user: @user, medication: @medication).delete_all
+  end
+
+  test "creating a dose log deletes the dashboard vars cache for today" do
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
+    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+
+    DoseLog.create!(user: @user, medication: @medication, puffs: 99, recorded_at: Time.current)
+
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
+
+  test "destroying a dose log deletes the dashboard vars cache for today" do
+    log = DoseLog.create!(user: @user, medication: @medication, puffs: 99, recorded_at: Time.current)
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
+    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+
+    log.destroy
+
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
 end

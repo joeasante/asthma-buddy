@@ -215,4 +215,58 @@ class HealthEventTest < ActiveSupport::TestCase
     results = HealthEvent.where(id: [ older.id, newer.id ]).recent_first
     assert_equal newer.id, results.first.id
   end
+
+end
+
+# Dashboard cache invalidation tests for HealthEvent
+# Placed as a top-level class so self.use_transactional_tests = false takes effect.
+# after_commit callbacks only fire when the transaction actually commits —
+# wrapping in a rolled-back test transaction suppresses them.
+class HealthEventDashboardCacheTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
+  setup do
+    @user = users(:verified_user)
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  teardown do
+    Rails.cache.clear
+    Rails.cache = ActiveSupport::Cache::NullStore.new
+    # Clean up records created outside of a transaction
+    HealthEvent.where(user: @user, event_type: "gp_appointment")
+               .where("recorded_at >= ?", 1.minute.ago)
+               .delete_all
+    # Restore fixture state: alice_illness_ongoing must remain ended_at: nil
+    HealthEvent.where(id: health_events(:alice_illness_ongoing).id).update_all(ended_at: nil)
+  end
+
+  test "creating a health event deletes the dashboard vars cache" do
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
+    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+
+    HealthEvent.create!(user: @user, event_type: :gp_appointment, recorded_at: Time.current.change(sec: 0))
+
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
+
+  test "updating a health event deletes the dashboard vars cache" do
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
+    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+
+    event = health_events(:alice_illness_ongoing)
+    event.update!(ended_at: Time.current)
+
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
+
+  test "destroying a health event deletes the dashboard vars cache" do
+    event = HealthEvent.create!(user: @user, event_type: :gp_appointment, recorded_at: Time.current.change(sec: 0))
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
+    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+
+    event.destroy
+
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
 end
