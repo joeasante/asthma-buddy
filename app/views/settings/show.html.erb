@@ -55,7 +55,7 @@
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
   <% if Current.user.admin? %>
-    <a href="/jobs" class="section-card section-card--nav" aria-label="Admin — Mission Control Jobs">
+    <div class="section-card section-card--admin-links">
       <div class="settings-nav-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
           <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.75"/>
@@ -65,8 +65,12 @@
       <div class="settings-nav-body">
         <p class="settings-nav-title">Mission Control <span class="badge badge--admin">Admin</span></p>
         <p class="settings-nav-description">Monitor background jobs and queue health.</p>
+        <div class="admin-nav-links">
+          <%= link_to "Jobs", "/jobs", class: "admin-nav-link" %>
+          <%= link_to "Users", admin_users_path, class: "admin-nav-link" %>
+          <%= link_to "Stats", admin_root_path, class: "admin-nav-link" %>
+        </div>
       </div>
-      <span class="settings-nav-chevron" aria-hidden="true"></span>
-    </a>
+    </div>
   <% end %>
 </div>

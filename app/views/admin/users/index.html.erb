@@ -1,0 +1,84 @@
+<% content_for :title, "Users — Admin — Asthma Buddy" %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section"><%= pluralize(@users.size, "user") %></span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div>
+        <h1>Users</h1>
+        <p class="page-header-subtitle">All registered accounts</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "Stats", admin_root_path, class: "btn-secondary" %>
+    </div>
+  </div>
+</div>
+
+<% if @users.empty? %>
+  <div class="empty-state">
+    <p>No users yet.</p>
+  </div>
+<% else %>
+  <div class="section-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Joined</th>
+          <th>Last sign in</th>
+          <th>Sign-ins</th>
+          <th>Admin</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr id="<%= dom_id(user) %>">
+            <td><%= user.email_address %></td>
+            <td><%= user.full_name.presence || "—" %></td>
+            <td><%= user.created_at.strftime("%d %b %Y") %></td>
+            <td>
+              <% if user.last_sign_in_at? %>
+                <%= time_ago_in_words(user.last_sign_in_at) %> ago
+              <% else %>
+                Never
+              <% end %>
+            </td>
+            <td><%= user.sign_in_count %></td>
+            <td>
+              <% if user.admin? %>
+                <span class="badge badge--admin">Admin</span>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td>
+              <% if user == Current.user %>
+                <button class="btn-secondary" disabled title="Cannot change your own admin status">
+                  <%= user.admin? ? "Remove admin" : "Make admin" %>
+                </button>
+              <% else %>
+                <%= button_to(
+                      user.admin? ? "Remove admin" : "Make admin",
+                      toggle_admin_admin_user_path(user),
+                      method: :patch,
+                      class: "btn-secondary",
+                      data: {
+                        turbo_confirm: user.admin? ?
+                          "Remove admin from #{user.email_address}? They will lose access to this page." :
+                          "Grant admin to #{user.email_address}? They will have full admin access."
+                      }
+                    ) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
