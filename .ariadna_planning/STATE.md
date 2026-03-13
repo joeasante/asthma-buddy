@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 23 (Compliance, Security, Accessibility) — IN PROGRESS
-Plan: Plan 01 (Rate limiting and session timeout) complete.
-Status: Phase 23 Plan 01 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 23-01 complete: IP-based rate limiting via rack-attack (5 logins/20s, 3 signups/1h) and 60-min idle session timeout via check_session_freshness before_action. 531 tests passing.
+Plan: Plan 02 (Throttle message gap closure) complete.
+Status: Phase 23 Plan 02 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 23-02 complete: throttled_responder updated to branch on rack.attack.matched, returning login-specific 20-second retry message and signup-specific hourly-limit message. 531 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Phase 23 Velocity:**
+- Phase 23 Plan 02 completed: 2026-03-13 (~1 min, 1 task, 0 files created, 1 file modified, 0 new tests — throttle message gap closure)
+- Tests at Phase 23-02 close: 531 passing (no regressions)
 - Phase 23 Plan 01 completed: 2026-03-13 (~18 min, 3 tasks, 5 files created, 10 files modified, 7 new tests — rack-attack rate limiting + idle session timeout)
 - Tests at Phase 23-01 close: 531 passing (no regressions)
 
@@ -136,6 +138,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 23 Plan 02 Decisions (2026-03-13)
+
+- **throttled_responder uses req not _env**: rack-attack 6.x throttled_responder receives a `Rack::Attack::Request` object. The throttle name that fired is at `req.env["rack.attack.matched"]`. Using `_env` (raw Rack env hash) would require `_env["rack.attack.matched"]` but the idiom should use the `req` accessor pattern.
+- **catch-all else in throttled_responder**: A generic fallback branch ensures any future throttle names produce a sensible message without requiring another file edit.
 
 ### Phase 23 Plan 01 Decisions (2026-03-13)
 
@@ -447,5 +454,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed Phase 23 Plan 01 — rack-attack rate limiting and idle session timeout. 531 tests passing.
+Stopped at: Completed Phase 23 Plan 02 — throttle message gap closure (context-specific 429 messages). 531 tests passing.
 Resume file: None
