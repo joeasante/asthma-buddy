@@ -1,0 +1,135 @@
+<% content_for :title, "Stats — Admin — Asthma Buddy" %>
+
+<% content_for :head do %>
+  <style>
+    .admin-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+    @media (min-width: 768px) {
+      .admin-stat-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .admin-stat-card { text-align: center; padding: var(--space-md); }
+    .admin-stat-label { font-size: 0.8125rem; color: var(--text-3); margin: 0 0 var(--space-xs); }
+    .admin-stat-value { font-size: 2rem; font-weight: 700; color: var(--text); margin: 0; line-height: 1; }
+    .admin-stat-sub { font-size: 0.75rem; color: var(--text-3); margin: var(--space-xs) 0 0; }
+    .admin-tables { display: grid; gap: var(--space-lg); }
+    @media (min-width: 1024px) {
+      .admin-tables { grid-template-columns: 1fr 1fr; }
+    }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .admin-table th { text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--border); color: var(--text-3); font-weight: 600; }
+    .admin-table td { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--border); color: var(--text); }
+    .admin-table tbody tr:last-child td { border-bottom: none; }
+    .section-card-title { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-md); color: var(--text); }
+    .empty-state-text { color: var(--text-3); font-size: 0.875rem; }
+  </style>
+<% end %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Admin</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div>
+        <h1>Stats</h1>
+        <p class="page-header-subtitle">User growth and engagement</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "Users", admin_users_path, class: "btn-secondary" %>
+    </div>
+  </div>
+</div>
+
+<div class="admin-stat-grid">
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">Total Users</p>
+    <p class="admin-stat-value"><%= @total_users %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">New This Week</p>
+    <p class="admin-stat-value"><%= @new_this_week %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">New This Month</p>
+    <p class="admin-stat-value"><%= @new_this_month %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">WAU (7 days)</p>
+    <p class="admin-stat-value"><%= @wau %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">MAU (30 days)</p>
+    <p class="admin-stat-value"><%= @mau %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">Never Returned</p>
+    <p class="admin-stat-value"><%= @never_returned %></p>
+    <p class="admin-stat-sub">Signed up, logged in once</p>
+  </div>
+</div>
+
+<div class="admin-tables">
+  <div class="section-card">
+    <h2 class="section-card-title">Recent Signups</h2>
+    <% if @recent_signups.empty? %>
+      <p class="empty-state-text">No signups yet.</p>
+    <% else %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_signups.each do |user| %>
+            <tr>
+              <td><%= user.email_address %></td>
+              <td><%= user.full_name.presence || "—" %></td>
+              <td><%= user.created_at.strftime("%d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+
+  <div class="section-card">
+    <h2 class="section-card-title">Most Active</h2>
+    <% if @most_active.empty? %>
+      <p class="empty-state-text">No activity yet.</p>
+    <% else %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Sign-ins</th>
+            <th>Last sign in</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @most_active.each do |user| %>
+            <tr>
+              <td><%= user.email_address %></td>
+              <td><%= user.sign_in_count %></td>
+              <td>
+                <% if user.last_sign_in_at? %>
+                  <%= user.last_sign_in_at.strftime("%d %b %Y") %>
+                <% else %>
+                  Never
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>
