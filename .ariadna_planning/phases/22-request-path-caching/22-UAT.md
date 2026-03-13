@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 22-request-path-caching
 source: [22-01-SUMMARY.md, 22-02-SUMMARY.md]
 started: 2026-03-13T11:00:00Z
@@ -47,7 +47,12 @@ skipped: 1
   reason: "User reported: badge icon disappeared, but reappeared when i went to other pages"
   severity: major
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "mark_all_read uses update_all (bulk SQL) which bypasses ActiveRecord callbacks entirely — the after_commit lambda on Notification that deletes the cache key never fires. The Turbo Stream response on /notifications hardcodes unread_count: 0, masking the bug on that page. All subsequent page loads serve the stale cached count from Rails.cache.fetch."
+  artifacts:
+    - path: "app/controllers/notifications_controller.rb"
+      issue: "update_all on line 49 skips AR callbacks — no cache invalidation fires for bulk mark-read"
+    - path: "app/models/notification.rb"
+      issue: "after_commit guard (if: :saved_change_to_read?) is never reached by update_all"
+  missing:
+    - "Explicit Rails.cache.delete(\"unread_notifications/#{Current.user.id}\") in NotificationsController#mark_all_read after the update_all call"
   debug_session: ""
