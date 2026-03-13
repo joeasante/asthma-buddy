@@ -73,6 +73,15 @@ Rails.application.routes.draw do
     get "test/sign_in/:session_id", to: "test/sessions#create", as: :test_sign_in
   end
 
+  namespace :admin do
+    root "dashboard#index"
+    resources :users, only: [:index] do
+      member do
+        patch :toggle_admin
+      end
+    end
+  end
+
   # Job monitoring UI — protected by HTTP Basic Auth (credentials: mission_control.http_basic_auth_*)
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
