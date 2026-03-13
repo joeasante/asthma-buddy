@@ -1,16 +1,18 @@
 <div class="filter-bar" role="search" aria-label="Filter symptom history">
 
-  <%# Row 1: Period — primary control %>
-  <div class="filter-row" role="group" aria-label="Time period">
-    <% [["7", "7d"], ["30", "30d"], ["90", "3m"], ["all", "All"], ["custom", "Custom"]].each do |value, label| %>
-      <%= link_to label,
-            symptom_logs_path(preset: value, symptom_type: active_symptom_type, severity: active_severity),
-            class: "filter-chip #{"filter-chip--active" if active_preset == value}",
-            aria:  { pressed: (active_preset == value).to_s },
-            data:  { turbo_frame: "timeline_content" } %>
-    <% end %>
+  <%# Row 1: Period — segmented control with optional clear link alongside %>
+  <div class="filter-bar-period">
+    <div class="filter-row filter-row--period" role="group" aria-label="Time period">
+      <% [["7", "7d"], ["30", "30d"], ["90", "3m"], ["all", "All"], ["custom", "Custom"]].each do |value, label| %>
+        <%= link_to label,
+              symptom_logs_path(preset: value, symptom_type: active_symptom_type, severity: active_severity),
+              class: "filter-chip #{"filter-chip--active" if active_preset == value}",
+              aria:  { pressed: (active_preset == value).to_s },
+              data:  { turbo_frame: "timeline_content" } %>
+      <% end %>
+    </div>
     <% if active_symptom_type.present? || active_severity.present? %>
-      <%= link_to "Clear filters",
+      <%= link_to "Clear",
             symptom_logs_path,
             class: "filter-clear",
             aria:  { label: "Clear all filters" },
@@ -18,8 +20,8 @@
     <% end %>
   </div>
 
-  <%# Row 2: Severity %>
-  <div class="filter-row" role="group" aria-label="Severity filter">
+  <%# Row 2: Severity — secondary %>
+  <div class="filter-row filter-row--secondary" role="group" aria-label="Severity filter">
     <% [["", "All"], ["mild", "Mild"], ["moderate", "Moderate"], ["severe", "Severe"]].each do |value, label| %>
       <%= link_to label,
             symptom_logs_path(preset: active_preset, symptom_type: active_symptom_type, severity: value),
@@ -29,8 +31,8 @@
     <% end %>
   </div>
 
-  <%# Row 3: Symptom type %>
-  <div class="filter-row" role="group" aria-label="Symptom type filter">
+  <%# Row 3: Symptom type — secondary %>
+  <div class="filter-row filter-row--secondary" role="group" aria-label="Symptom type filter">
     <% [["", "All"], ["wheezing", "Wheezing"], ["coughing", "Coughing"],
         ["shortness_of_breath", "Breathlessness"], ["chest_tightness", "Chest tightness"]].each do |value, label| %>
       <%= link_to label,
