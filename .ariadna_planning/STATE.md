@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 22 (Request-Path Caching) — COMPLETE
-Plan: Plan 03 (mark_all_read cache invalidation) complete. Phase complete.
-Status: Phase 22 Plan 03 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 22-03 complete: Explicit Rails.cache.delete after update_all in mark_all_read closes UAT gap (badge reappearing). 516 tests passing.
+Phase: Phase 23 (Compliance, Security, Accessibility) — IN PROGRESS
+Plan: Plan 01 (Rate limiting and session timeout) complete.
+Status: Phase 23 Plan 01 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 23-01 complete: IP-based rate limiting via rack-attack (5 logins/20s, 3 signups/1h) and 60-min idle session timeout via check_session_freshness before_action. 531 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -34,6 +34,10 @@ All 9 phases delivered:
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
 - Tests at close: 195 passing
+
+**Phase 23 Velocity:**
+- Phase 23 Plan 01 completed: 2026-03-13 (~18 min, 3 tasks, 5 files created, 10 files modified, 7 new tests — rack-attack rate limiting + idle session timeout)
+- Tests at Phase 23-01 close: 531 passing (no regressions)
 
 **Phase 22 Velocity:**
 - Phase 22 Plan 03 completed: 2026-03-13 (~5 min, 2 tasks, 0 files created, 2 files modified, 1 new test — mark_all_read explicit cache delete)
@@ -132,6 +136,15 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 23 Plan 01 Decisions (2026-03-13)
+
+- **Rack::Attack dedicated MemoryStore**: Rails.cache uses NullStore in the test environment — throttle counters never accumulate. Set `Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new` in the initializer so the store is independent of Rails.cache in all environments.
+- **Rack::Attack disabled by default in test env**: `Rack::Attack.enabled = false` in initializer for test env; `RateLimitingTest` brackets with `enabled = true` in setup and `false` in teardown. Middleware stays in the test stack.
+- **Session timeout tests use travel() not manual session key manipulation**: Integration test `session` modifications between requests don't persist via cookie. `travel N.minutes` advances `Time.current` so `check_session_freshness` computes correct elapsed time.
+- **sign_in_via_post needs two follow_redirect! calls**: `POST /session` redirects to `root_url` (via after_authentication_url), which redirects to `dashboard_path` for authenticated users.
+- **skip_before_action :check_session_freshness required on all unauthenticated controllers**: Any future unauthenticated controller must add this skip to avoid false timeout redirects.
+- **CspReportsController inherits ActionController::Base, not ApplicationController**: check_session_freshness never registered there; no skip needed.
 
 ### Phase 22 Plan 03 Decisions (2026-03-13)
 
@@ -434,5 +447,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed Phase 22 Plan 03 — mark_all_read cache invalidation gap closure. 516 tests passing. Phase 22 complete.
+Stopped at: Completed Phase 23 Plan 01 — rack-attack rate limiting and idle session timeout. 531 tests passing.
 Resume file: None
