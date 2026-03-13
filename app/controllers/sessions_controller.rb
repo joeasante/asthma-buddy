@@ -32,6 +32,10 @@ class SessionsController < ApplicationController
 
     start_new_session_for user
     session[:last_seen_at] = Time.current
+    user.update_columns(
+      last_sign_in_at: Time.current,
+      sign_in_count:   user.sign_in_count + 1
+    )
     # NOTE: JSON clients must preserve the Set-Cookie response header (session_id cookie)
     # and replay it on all subsequent authenticated requests. There is no bearer token yet.
     respond_to do |format|
