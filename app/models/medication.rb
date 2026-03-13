@@ -101,6 +101,6 @@ class Medication < ApplicationRecord
     end
 
     def invalidate_dashboard_cache
-      Rails.cache.delete("dashboard_vars/#{user_id}/#{Date.current}")
+      Rails.cache.delete(DashboardVariables.dashboard_cache_key(user_id))
     end
 end

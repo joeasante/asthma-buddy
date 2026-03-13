@@ -156,7 +156,7 @@ class DashboardVarsCacheTest < ActionDispatch::IntegrationTest
   test "set_dashboard_vars writes to cache on first dashboard load" do
     get dashboard_path
     assert_response :success
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 
   test "set_dashboard_vars reads from cache on second dashboard load without re-populating" do
@@ -166,13 +166,13 @@ class DashboardVarsCacheTest < ActionDispatch::IntegrationTest
 
     # Overwrite cache with sentinel value
     sentinel = { preventer_adherence: [], reliever_medications: [], active_illness: nil }
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", sentinel)
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), sentinel)
 
     # Second call should read from cache (sentinel), not re-query DB
     get dashboard_path
     assert_response :success
 
-    cached = Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    cached = Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
     assert_equal sentinel, cached
   end
 end

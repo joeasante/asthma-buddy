@@ -47,7 +47,8 @@ class NotificationsController < ApplicationController
     @notifications             = Current.user.notifications.unread.newest_first.to_a
     @notifications.each { |n| n.read = true }
     Current.user.notifications.unread.update_all(read: true)
-    Rails.cache.delete("unread_notifications/#{Current.user.id}")
+    # update_all bypasses AR callbacks — explicitly invalidate badge cache here
+    Rails.cache.delete(Notification.badge_cache_key(Current.user.id))
     @unread_count              = 0
     @unread_notification_count = 0
     @last_notification         = Current.user.notifications.newest_first.first

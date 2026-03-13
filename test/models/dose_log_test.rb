@@ -153,21 +153,21 @@ class DoseLogDashboardCacheTest < ActiveSupport::TestCase
   end
 
   test "creating a dose log deletes the dashboard vars cache for today" do
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), { test: true })
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
 
     DoseLog.create!(user: @user, medication: @medication, puffs: 99, recorded_at: Time.current)
 
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 
   test "destroying a dose log deletes the dashboard vars cache for today" do
     log = DoseLog.create!(user: @user, medication: @medication, puffs: 99, recorded_at: Time.current)
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), { test: true })
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
 
     log.destroy
 
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 end

@@ -7,13 +7,27 @@
 module DashboardVariables
   extend ActiveSupport::Concern
 
+  def self.dashboard_cache_key(user_id, date = Date.current)
+    "dashboard_vars/#{user_id}/#{date}"
+  end
+
   private
 
   def set_dashboard_vars
     user  = Current.user
     today = Date.current
 
-    cached = Rails.cache.fetch("dashboard_vars/#{user.id}/#{today}", expires_in: 5.minutes) do
+    # NOTE: The cache stores full ActiveRecord objects (Medication with preloaded dose_logs,
+    # HealthEvent). This keeps the fetch block simple but carries a Marshal/schema-migration
+    # caveat: a column rename between cache write and read can produce nil fields on the
+    # deserialized objects. The 5-minute TTL and write-triggered invalidation callbacks on
+    # DoseLog, HealthEvent, and Medication keep the risk window small. A future refactor
+    # should replace AR objects with plain scalar hashes (see todo 338).
+    cached = Rails.cache.fetch(
+      DashboardVariables.dashboard_cache_key(user.id, today),
+      expires_in: 5.minutes,
+      race_condition_ttl: 10.seconds
+    ) do
       preventer_adherence = user.medications
         .where(medication_type: :preventer)
         .where(course: false)

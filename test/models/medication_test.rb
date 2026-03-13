@@ -448,12 +448,12 @@ class MedicationDashboardCacheTest < ActiveSupport::TestCase
   end
 
   test "creating a medication invalidates the dashboard cache" do
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), "sentinel")
     Medication.create!(
       user: @user, name: "Cache Test Med", medication_type: :reliever,
       standard_dose_puffs: 2, starting_dose_count: 200
     )
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 
   test "updating a medication invalidates the dashboard cache" do
@@ -461,9 +461,9 @@ class MedicationDashboardCacheTest < ActiveSupport::TestCase
       user: @user, name: "Cache Test Med", medication_type: :reliever,
       standard_dose_puffs: 2, starting_dose_count: 200
     )
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), "sentinel")
     med.update!(name: "Cache Test Med Updated")
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
     med.update!(name: "Cache Test Med")  # restore for teardown delete_all
   end
 
@@ -472,8 +472,8 @@ class MedicationDashboardCacheTest < ActiveSupport::TestCase
       user: @user, name: "Cache Test Med", medication_type: :reliever,
       standard_dose_puffs: 2, starting_dose_count: 200
     )
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), "sentinel")
     med.destroy!
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 end

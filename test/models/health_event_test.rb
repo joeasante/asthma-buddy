@@ -242,31 +242,31 @@ class HealthEventDashboardCacheTest < ActiveSupport::TestCase
   end
 
   test "creating a health event deletes the dashboard vars cache" do
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), { test: true })
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
 
     HealthEvent.create!(user: @user, event_type: :gp_appointment, recorded_at: Time.current.change(sec: 0))
 
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 
   test "updating a health event deletes the dashboard vars cache" do
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), { test: true })
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
 
     event = health_events(:alice_illness_ongoing)
     event.update!(ended_at: Time.current)
 
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 
   test "destroying a health event deletes the dashboard vars cache" do
     event = HealthEvent.create!(user: @user, event_type: :gp_appointment, recorded_at: Time.current.change(sec: 0))
-    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", { test: true })
-    assert_not_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    Rails.cache.write(DashboardVariables.dashboard_cache_key(@user.id), { test: true })
+    assert_not_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
 
     event.destroy
 
-    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    assert_nil Rails.cache.read(DashboardVariables.dashboard_cache_key(@user.id))
   end
 end

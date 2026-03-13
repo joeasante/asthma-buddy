@@ -42,9 +42,7 @@ class HealthEvent < ApplicationRecord
 
   scope :recent_first, -> { order(recorded_at: :desc) }
 
-  after_commit -> { invalidate_dashboard_cache }, on: :create
-  after_commit -> { invalidate_dashboard_cache }, on: :update
-  after_commit -> { invalidate_dashboard_cache }, on: :destroy
+  after_commit :invalidate_dashboard_cache, on: %i[create update destroy]
 
   def event_type_label
     TYPE_LABELS[event_type]
@@ -93,26 +91,26 @@ class HealthEvent < ApplicationRecord
 
   private
 
-  def invalidate_dashboard_cache
-    Rails.cache.delete("dashboard_vars/#{user_id}/#{Date.current}")
-  end
-
-  def ended_at_after_recorded_at
-    return unless ended_at.present? && recorded_at.present?
-    errors.add(:ended_at, "must be after the start date") if ended_at <= recorded_at
-  end
-
-  def recorded_at_within_bounds
-    return unless recorded_at.present?
-    if recorded_at > Time.current + 1.minute
-      errors.add(:recorded_at, "cannot be in the future")
-    elsif recorded_at.to_date < EARLIEST_VALID_DATE
-      errors.add(:recorded_at, "is too far in the past")
+    def invalidate_dashboard_cache
+      Rails.cache.delete(DashboardVariables.dashboard_cache_key(user_id))
     end
-  end
 
-  def ended_at_within_bounds
-    return unless ended_at.present?
-    errors.add(:ended_at, "cannot be in the future") if ended_at > Time.current + 1.minute
-  end
+    def ended_at_after_recorded_at
+      return unless ended_at.present? && recorded_at.present?
+      errors.add(:ended_at, "must be after the start date") if ended_at <= recorded_at
+    end
+
+    def recorded_at_within_bounds
+      return unless recorded_at.present?
+      if recorded_at > Time.current + 1.minute
+        errors.add(:recorded_at, "cannot be in the future")
+      elsif recorded_at.to_date < EARLIEST_VALID_DATE
+        errors.add(:recorded_at, "is too far in the past")
+      end
+    end
+
+    def ended_at_within_bounds
+      return unless ended_at.present?
+      errors.add(:ended_at, "cannot be in the future") if ended_at > Time.current + 1.minute
+    end
 end

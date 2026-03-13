@@ -22,6 +22,10 @@ class Notification < ApplicationRecord
   after_commit -> { invalidate_badge_cache }, on: :create
   after_commit -> { invalidate_badge_cache }, on: :update, if: :saved_change_to_read?
 
+  def self.badge_cache_key(user_id)
+    "unread_notifications/#{user_id}"
+  end
+
   # Creates a low_stock notification for a medication if none already exists.
   # Called after a DoseLog is saved; safe to call frequently — deduplication is inside.
   def self.create_low_stock_for(medication)
@@ -40,6 +44,6 @@ class Notification < ApplicationRecord
   private
 
     def invalidate_badge_cache
-      Rails.cache.delete("unread_notifications/#{user_id}")
+      Rails.cache.delete(Notification.badge_cache_key(user_id))
     end
 end
