@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Local quality gate — run before every push.
+# Mirrors the CI jobs in .github/workflows/ci.yml.
+set -euo pipefail
+
+echo "=== Tests ==="
+bin/rails test
+
+echo ""
+echo "=== RuboCop ==="
+bin/rubocop
+
+echo ""
+echo "=== Brakeman ==="
+bin/brakeman --quiet
+
+echo ""
+echo "=== Bundler Audit ==="
+bin/bundler-audit check --update
+
+echo ""
+echo "✓ All checks passed"

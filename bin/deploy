@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Safe production deployment wrapper.
+#
+# Usage:
+#   bin/deploy              — deploy and run migrations
+#   bin/deploy --no-backup  — skip the SQLite backup (use only when no migrations are included)
+#
+# What this does:
+#   1. Confirms you are on main and it is pushed to origin
+#   2. Backs up the production SQLite database
+#   3. Runs bin/kamal deploy
+#   4. Runs db:migrate in the new container
+#   5. Shows recent app logs
+set -euo pipefail
+
+SKIP_BACKUP=false
+for arg in "$@"; do
+  [[ "$arg" == "--no-backup" ]] && SKIP_BACKUP=true
+done
+
+# ── 1. Safety checks ──────────────────────────────────────────────────────────
+
+current_branch=$(git branch --show-current)
+if [[ "$current_branch" != "main" ]]; then
+  echo "ERROR: You must be on main to deploy. Currently on: $current_branch" >&2
+  exit 1
+fi
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "ERROR: Working directory is not clean. Commit or stash changes first." >&2
+  git status --short >&2
+  exit 1
+fi
+
+git fetch origin main --quiet
+local_sha=$(git rev-parse HEAD)
+remote_sha=$(git rev-parse origin/main)
+
+if [[ "$local_sha" != "$remote_sha" ]]; then
+  echo "ERROR: Local main is not in sync with origin/main." >&2
+  echo "  Local:  $local_sha" >&2
+  echo "  Remote: $remote_sha" >&2
+  echo "Run: git pull origin main" >&2
+  exit 1
+fi
+
+echo "Deploying $(git log --oneline -1)"
+echo ""
+
+# ── 2. Backup production SQLite database ─────────────────────────────────────
+
+if [[ "$SKIP_BACKUP" == false ]]; then
+  echo "=== Backing up production database ==="
+  backup_name="production.sqlite3.backup-$(date +%Y%m%d%H%M)"
+  bin/kamal app exec --reuse "cp storage/production.sqlite3 storage/$backup_name" 2>/dev/null \
+    && echo "  Backup created: storage/$backup_name" \
+    || echo "  Warning: backup skipped (container may not be running yet — safe on first deploy)"
+  echo ""
+fi
+
+# ── 3. Deploy ─────────────────────────────────────────────────────────────────
+
+echo "=== Deploying ==="
+bin/kamal deploy
+
+# ── 4. Run migrations ─────────────────────────────────────────────────────────
+
+echo ""
+echo "=== Running migrations ==="
+bin/kamal app exec --reuse "bin/rails db:migrate"
+
+# ── 5. Tail logs briefly ──────────────────────────────────────────────────────
+
+echo ""
+echo "=== Recent logs (ctrl-c to stop) ==="
+bin/kamal app logs --since 2m || true
