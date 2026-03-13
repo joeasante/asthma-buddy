@@ -241,6 +241,9 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 19. Notifications | 0/3 | Not started | - |
 | 20. Legal Pages & Cookie Banner | 3/3 | Complete ✓ | 2026-03-12 |
 | 21. SEO & Meta Tags | 0/3 | Not started | - |
+| 22. Request-Path Caching | 3/3 | Complete ✓ | 2026-03-12 |
+| 23. Compliance, Security & Accessibility | 2/2 | Complete ✓ | 2026-03-13 |
+| 24. Admin & Observability | 0/3 | Not started | - |
 
 ---
 
@@ -406,3 +409,19 @@ Plans:
 - [x] 22-03-PLAN.md — Gap closure: explicit `Rails.cache.delete` in `mark_all_read` after `update_all` (bulk SQL bypasses AR callbacks)
 
 ---
+
+---
+
+### Phase 24: Admin & Observability
+
+**Goal**: You are running a live app with real users and have zero visibility into who has registered, when they last used the app, or whether the app is providing value. This phase delivers: user activity tracking (last_sign_in_at + sign_in_count recorded on every login, admin email notification on new signup); an admin Users page (in-app user list with admin toggle, self/last-admin protection, audit logging); and an admin Stats dashboard (total users, WAU, MAU, new signups, never-returned count).
+**Why this matters**: Operational visibility is a prerequisite for a solo developer running a live health app. Without it, issues go unnoticed, engagement is a black box, and admin actions require server access.
+**Depends on**: Phase 23
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — User activity tracking: migration (last_sign_in_at, sign_in_count), SessionsController#create update_columns, AdminMailer#new_signup, User after_create_commit callback, tests
+- [ ] 24-02-PLAN.md — Admin Users page: admin namespace routes, Admin::UsersController (index + toggle_admin), users index view, Settings Mission Control card links, controller tests
+- [ ] 24-03-PLAN.md — Admin Stats dashboard: Admin::DashboardController#index (6 metrics + 2 tables), stats view, controller tests
+
