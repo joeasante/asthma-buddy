@@ -22,10 +22,25 @@ class ApplicationController < ActionController::Base
   # Precompute unread badge count once per request; views use @unread_notification_count.
   before_action :set_notification_badge_count, if: :authenticated?
 
+  # Terminate idle authenticated sessions after 60 minutes of inactivity.
+  # Skipped by all controllers that handle unauthenticated access.
+  IDLE_TIMEOUT = 60.minutes
+  before_action :check_session_freshness
+
   private
 
   def set_no_store_cache_for_authenticated_users
     response.headers["Cache-Control"] = "no-store" if authenticated?
+  end
+
+  def check_session_freshness
+    return unless session[:last_seen_at]
+    if Time.current - session[:last_seen_at].to_time > IDLE_TIMEOUT
+      reset_session
+      redirect_to new_session_path, alert: "Your session expired due to inactivity. Please sign in again."
+    else
+      session[:last_seen_at] = Time.current
+    end
   end
 
   def set_notification_badge_count

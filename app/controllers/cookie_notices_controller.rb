@@ -2,6 +2,7 @@
 
 class CookieNoticesController < ApplicationController
   allow_unauthenticated_access
+  skip_before_action :check_session_freshness
 
   # Persistent dismissal: sets a cookie lasting 365 days so the notice never
   # reappears after the user dismisses it, even across sessions. The session

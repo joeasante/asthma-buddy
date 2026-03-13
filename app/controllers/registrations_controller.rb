@@ -2,6 +2,7 @@
 
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create ]
+  skip_before_action :check_session_freshness, only: %i[ new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
     respond_to do |format|
       format.html { redirect_to new_registration_path, alert: "Try again later." }
