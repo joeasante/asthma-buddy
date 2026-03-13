@@ -1,0 +1,5 @@
+<h1>New signup on Asthma Buddy</h1>
+<p><strong>Email:</strong> <%= @user.email_address %></p>
+<p><strong>Name:</strong> <%= @user.full_name.presence || "(not set)" %></p>
+<p><strong>Joined:</strong> <%= @user.created_at.strftime("%d %b %Y at %H:%M UTC") %></p>
+<p><%= link_to "View in Admin", @admin_users_url %></p>

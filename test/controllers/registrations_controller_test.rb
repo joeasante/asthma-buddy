@@ -42,8 +42,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "POST /registration with valid params enqueues email verification mailer" do
-    assert_enqueued_emails 1 do
+  test "POST /registration with valid params enqueues email verification and admin notification" do
+    assert_enqueued_emails 2 do
       post registration_path, params: {
         user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" }
       }

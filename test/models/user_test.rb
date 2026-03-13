@@ -3,6 +3,7 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   test "valid user is valid" do
     user = User.new(email_address: "newuser@example.com", password: "password123", password_confirmation: "password123")
     assert user.valid?
@@ -70,5 +71,25 @@ class UserTest < ActiveSupport::TestCase
 
   test "onboarding_complete? returns true when both flags are true" do
     assert users(:verified_user).onboarding_complete?
+  end
+
+  # -- sign_in_count --
+
+  test "sign_in_count defaults to 0 on a new user record" do
+    user = User.new(email_address: "newtrack@example.com", password: "password123")
+    # Default is enforced at the DB level — not a Ruby default
+    assert_equal 0, user.sign_in_count
+  end
+
+  # -- after_create_commit :notify_admin_of_signup --
+
+  test "creating a user enqueues AdminMailer.new_signup via deliver_later" do
+    assert_enqueued_with(job: ActionMailer::MailDeliveryJob) do
+      User.create!(
+        email_address: "trackme@example.com",
+        password: "password123",
+        password_confirmation: "password123"
+      )
+    end
   end
 end

@@ -1,0 +1,7 @@
+New signup on Asthma Buddy
+
+Email: <%= @user.email_address %>
+Name: <%= @user.full_name.presence || "(not set)" %>
+Joined: <%= @user.created_at.strftime("%d %b %Y at %H:%M UTC") %>
+
+View in Admin: <%= @admin_users_url %>
