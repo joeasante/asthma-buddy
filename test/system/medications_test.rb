@@ -19,7 +19,7 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     fill_in "Starting dose count", with: "40"
 
     # Check the course checkbox — Stimulus controller should show date fields
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
 
     # Date inputs in headless Chrome require .set() to avoid concatenation issues
     end_date = 7.days.from_now.to_date
@@ -44,13 +44,13 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     assert_selector "[data-course-toggle-target='courseFields']", visible: :hidden
 
     # Checking the box reveals the date fields
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
     assert_no_selector "[data-course-toggle-target='courseFields']", visible: :hidden
     assert_selector "input[name='medication[starts_on]']"
     assert_selector "input[name='medication[ends_on]']"
 
     # Unchecking hides them again
-    uncheck "This is a temporary course (e.g. prednisolone)"
+    uncheck "This is a temporary course (e.g. prednisolone tablets)"
     assert_selector "[data-course-toggle-target='courseFields']", visible: :hidden
   end
 
@@ -60,7 +60,7 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     # doses_per_day visible initially
     assert_no_selector "[data-course-toggle-target='dosesPerDayField']", visible: :hidden
 
-    check "This is a temporary course (e.g. prednisolone)"
+    check "This is a temporary course (e.g. prednisolone tablets)"
 
     # doses_per_day hidden after checking
     assert_selector "[data-course-toggle-target='dosesPerDayField']", visible: :hidden

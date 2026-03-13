@@ -32,7 +32,7 @@ class PreventerHistoryTest < ApplicationSystemTestCase
   test "dashboard adherence section links to history page" do
     visit dashboard_path
     within ".dash-adherence" do
-      click_link "View history"
+      click_link "Preventer History"
     end
     assert_current_path preventer_history_path
   end
@@ -41,8 +41,8 @@ class PreventerHistoryTest < ApplicationSystemTestCase
 
   test "preventer history page renders with 7-day grid by default" do
     visit preventer_history_path
-    assert_selector "h1", text: "Preventer Adherence"
-    assert_selector ".adherence-toggle-btn--active", text: "7 days"
+    assert_selector "h1", text: "Preventer History"
+    assert_selector ".btn-sm--active", text: "7 days"
     assert_selector ".adherence-grid"
     assert_selector ".adherence-cell", minimum: 7
   end
@@ -50,7 +50,7 @@ class PreventerHistoryTest < ApplicationSystemTestCase
   test "switching to 30-day view shows 30 cells" do
     visit preventer_history_path
     click_link "30 days"
-    assert_selector ".adherence-toggle-btn--active", text: "30 days"
+    assert_selector ".btn-sm--active", text: "30 days"
     assert_selector ".adherence-cell", minimum: 30
   end
 
@@ -65,7 +65,7 @@ class PreventerHistoryTest < ApplicationSystemTestCase
       doses_per_day: 2
     )
 
-    visit preventer_history_path(days: 7)
+    visit preventer_history_path(period: 7)
     within ".adherence-medication-section", text: "BrandNewPreventer" do
       # The medication was created today — the 6 days before today should all be grey (no_schedule)
       # Today itself should be red (missed, 0 taken) or on_track if logged

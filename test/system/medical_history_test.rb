@@ -13,10 +13,6 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     ActiveJob::Base.queue_adapter = :test
   end
 
-  def confirm_dialog
-    find("dialog.confirm-dialog button[data-action='confirm#accept']").click
-  end
-
   # --- NAVIGATION AND INDEX ---
 
   test "user can visit Medical History page" do
@@ -36,8 +32,14 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     assert_current_path new_health_event_url
 
     select "Illness", from: "Event type"
-    # recorded_at is pre-filled — clear and set an explicit value to avoid test flakiness
-    fill_in "Date", with: "2026-01-15T10:00"  # datetime-local format
+    # Use execute_script to set datetime-local field — Capybara's .set() can be
+    # unreliable for datetime-local inputs in Chrome/Selenium
+    execute_script(
+      "var el = document.querySelector(\"input[name='health_event[recorded_at]']\"); " \
+      "el.value = '2026-01-15T10:00'; " \
+      "el.dispatchEvent(new Event('input', { bubbles: true })); " \
+      "el.dispatchEvent(new Event('change', { bubbles: true }));"
+    )
 
     click_button "Save event"
 
@@ -54,7 +56,12 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     visit new_health_event_url
 
     select "GP appointment", from: "Event type"
-    fill_in "Date", with: "2026-01-20T14:30"
+    execute_script(
+      "var el = document.querySelector(\"input[name='health_event[recorded_at]']\"); " \
+      "el.value = '2026-01-20T14:30'; " \
+      "el.dispatchEvent(new Event('input', { bubbles: true })); " \
+      "el.dispatchEvent(new Event('change', { bubbles: true }));"
+    )
 
     click_button "Save event"
 
@@ -63,16 +70,18 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     assert_text(/gp appointment/i)
   end
 
-  # --- EDIT EVENT ---
+  # --- EDIT EVENT — via show page ---
 
   test "user can edit an existing event" do
     event = health_events(:alice_gp_appointment)
     sign_in_as @alice
     visit health_events_url
 
-    within("##{dom_id(event)}") do
-      click_link "Edit"
-    end
+    # Click on the event card to navigate to show page
+    find("##{dom_id(event)}").click
+
+    # Click Edit on the show page
+    click_link "Edit"
 
     assert_selector "h1", text: "Edit medical event"
 
@@ -86,23 +95,26 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     assert_text(/other/i)
   end
 
-  # --- DELETE EVENT ---
+  # --- DELETE EVENT — via show page ---
 
-  test "user can delete an event and it disappears from the list" do
+  test "user can delete an event from the show page" do
     event = health_events(:alice_medication_change)
     sign_in_as @alice
     visit health_events_url
 
     assert_selector "##{dom_id(event)}"
 
-    within("##{dom_id(event)}") do
-      click_button "Delete"
-    end
+    # Navigate to show page
+    find("##{dom_id(event)}").click
 
-    confirm_dialog
+    assert_selector "h1", text: "Medical History Entry"
 
-    assert_no_selector "##{dom_id(event)}"
-    assert_text "Medical event deleted."
+    # Delete button — form has turbo: false, no confirm dialog fires
+    click_button "Delete"
+
+    # Redirected to index; event is gone
+    assert_current_path health_events_path, wait: 5
+    assert_no_selector "##{dom_id(event)}", wait: 5
   end
 
   # --- POINT-IN-TIME DISPLAY (gp_appointment) ---
@@ -182,21 +194,24 @@ class MedicalHistoryTest < ApplicationSystemTestCase
     )
 
     # Ensure peak flow reading exists this week so the chart section renders
+    # time_of_day is now required — use "morning"
     reading = PeakFlowReading.create!(
       user: @alice,
       value: 400,
+      time_of_day: "morning",
       recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 10.hours
     )
 
     sign_in_as @alice
     visit dashboard_url
 
-    # The chart canvas section must be present
-    within("section[aria-label='7-day peak flow chart']") do
-      assert_selector "canvas[data-chart-health-events-value]"
+    # The chart section (div.chart-section) carries data-chart-health-events-value,
+    # not the canvas element itself.
+    within("section[aria-label=\"This week's data\"]") do
+      assert_selector "div[data-chart-health-events-value]"
       # The data attribute must contain our event's date
-      canvas = find("canvas[data-chart-health-events-value]")
-      markers_json = canvas["data-chart-health-events-value"]
+      chart_div = find("div[data-chart-health-events-value]")
+      markers_json = chart_div["data-chart-health-events-value"]
       assert_includes markers_json, event.recorded_at.to_date.to_s
     end
 

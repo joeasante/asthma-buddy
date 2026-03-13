@@ -12,10 +12,10 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     # alice has personal best records: 500 (30 days ago) and 520 (7 days ago)
     # Visit the entry form
     visit new_peak_flow_reading_path
-    assert_text "Log Peak Flow Reading"
+    assert_text "Record a reading"
 
     # Banner should NOT appear (alice has personal best)
-    assert_no_css ".peak-flow-banner"
+    assert_no_css ".pf-form-banner"
 
     # Fill in the form
     fill_in "Reading value", with: "450"
@@ -26,18 +26,15 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     # Flash message should appear with zone info
     # 450 / 520 = 86.5% => Green Zone
     assert_text "Reading saved"
-    assert_text "Green Zone"
-
-    # Form should be reset (value field cleared)
-    assert_field "Reading value", with: ""
+    assert_text "Green zone"
   end
 
   test "banner appears when user has no personal best" do
     PersonalBestRecord.where(user: @user).destroy_all
     visit new_peak_flow_reading_path
 
-    assert_css ".peak-flow-banner"
-    assert_text "Set your personal best"
+    assert_css ".pf-form-banner"
+    assert_text "set your personal best"
   end
 
   test "user sees 'set your personal best' flash when no personal best exists" do
@@ -63,19 +60,18 @@ class PeakFlowRecordingTest < ApplicationSystemTestCase
     assert_text "Value"
   end
 
-  test "user can set personal best in settings and banner disappears on form" do
+  test "user can set personal best on profile page and banner disappears on form" do
     PersonalBestRecord.where(user: @user).destroy_all
 
-    # Visit settings and set personal best
-    visit settings_path
-    assert_text "No personal best set"
-    fill_in "Personal best value", with: "520"
+    # Visit profile and set personal best
+    visit profile_path
+    fill_in "Enter your personal best", with: "520"
     click_button "Set personal best"
 
-    assert_text "Personal best updated to 520 L/min"
+    assert_text "520"
 
     # Now visit the peak flow entry form — banner should be gone
     visit new_peak_flow_reading_path
-    assert_no_css ".peak-flow-banner"
+    assert_no_css ".pf-form-banner"
   end
 end

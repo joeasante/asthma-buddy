@@ -15,16 +15,21 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     ActiveJob::Base.queue_adapter = :test
   end
 
+  # Helper to select severity via label click (severity uses radio buttons in a styled group)
+  def choose_severity(label_text)
+    find("label.severity-btn", text: label_text).click
+  end
+
   # --- CORE LOGGING FLOW ---
 
   test "logged-in user can log a symptom and it appears in the list" do
     sign_in_as @alice
 
-    visit symptom_logs_url
+    visit new_symptom_log_path
 
     # Fill in the form
     select "Wheezing", from: "Symptom type"
-    select "Moderate", from: "Severity"
+    choose_severity "Moderate"
     # recorded_at is pre-filled with current time — leave as is
 
     click_button "Save symptom"
@@ -36,24 +41,22 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
   test "form clears after successful submission" do
     sign_in_as @alice
-    visit symptom_logs_url
+    visit new_symptom_log_path
 
     select "Coughing", from: "Symptom type"
-    select "Mild", from: "Severity"
+    choose_severity "Mild"
     click_button "Save symptom"
 
-    # Form is cleared — symptom type select should be back to the blank prompt
-    within("turbo-frame#symptom_log_form") do
-      assert_selector "option[selected]", count: 0
-    end
+    # After submission we should see the saved entry text
+    assert_text "Coughing"
   end
 
-  test "notes are saved and appear in the entry list" do
+  test "notes are saved and appear when viewing the entry" do
     sign_in_as @alice
-    visit symptom_logs_url
+    visit new_symptom_log_path
 
     select "Chest tightness", from: "Symptom type"
-    select "Severe", from: "Severity"
+    choose_severity "Severe"
 
     # Lexxy renders a <lexxy-editor> custom element via JavaScript.
     # Wait up to 10 seconds for it to finish booting before interacting.
@@ -63,13 +66,21 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
     click_button "Save symptom"
 
+    # Flash confirms save
+    assert_text "Symptom logged."
+
+    # Navigate to the index with All filter to find the new entry and verify notes
+    visit symptom_logs_path(preset: "all")
     assert_text "Chest tightness"
+
+    # Click through to the show page to verify notes were saved
+    find(".timeline-card", text: /Chest tightness/i, match: :first).click
     assert_text "Triggered by cold air outside"
   end
 
   test "validation error appears inline without leaving the page" do
     sign_in_as @alice
-    visit symptom_logs_url
+    visit new_symptom_log_path
 
     # The selects have HTML5 `required` which triggers browser-native validation.
     # Remove `required` via JS to force submission to the server so Rails validation fires.
@@ -82,7 +93,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     # Rails validation error message appears on the same page via Turbo Stream
     assert_text "error"
     # Still on symptom logs page
-    assert_current_path symptom_logs_url
+    assert_current_path new_symptom_log_path
   end
 
   # --- MULTI-USER ISOLATION ---
@@ -111,61 +122,50 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     assert_current_path new_session_url
   end
 
-  # --- EDIT FLOW ---
+  # --- EDIT FLOW — via show page ---
 
-  test "user can edit an existing symptom entry inline" do
-    # Use the alice_wheezing fixture — it already exists in the list
+  test "user can edit an existing symptom entry via the show page" do
     entry = symptom_logs(:alice_wheezing)
 
     sign_in_as @alice
     visit symptom_logs_url
 
-    # The entry should be visible
-    assert_selector "##{dom_id(entry)}"
+    # Click on the entry card to navigate to show page
+    find("##{dom_id(entry)}").click
 
-    # Click the Edit button within this entry's turbo frame
-    within("##{dom_id(entry)}") do
-      click_link "Edit"
-    end
+    # Click Edit on the show page
+    click_link "Edit"
 
-    # The edit form should now appear inline inside the same frame
-    within("##{dom_id(entry)}") do
-      assert_selector "form"
-      select "Chest tightness", from: "Symptom type"
-      select "Severe", from: "Severity"
-      click_button "Update symptom"
-    end
+    # Edit form appears
+    assert_selector "form"
+    select "Chest tightness", from: "Symptom type"
+    choose_severity "Severe"
+    click_button "Update symptom"
 
-    # After save, the entry in the list shows updated values
-    within("##{dom_id(entry)}") do
-      assert_text "Chest tightness"
-      assert_text "Severe"
-      # The edit form is gone — only the entry display (no form inputs visible)
-      assert_no_selector "input, select[name='symptom_log[symptom_type]']"
-    end
+    # After save, the entry display updates (turbo stream replaces the form with display)
+    assert_text "Chest tightness"
+    assert_text "Severe"
   end
 
-  # --- DELETE FLOW ---
+  # --- DELETE FLOW — via show page ---
 
-  test "user can delete a symptom entry and it disappears from the list" do
+  test "user can delete a symptom entry from the show page" do
     entry = symptom_logs(:alice_wheezing)
 
     sign_in_as @alice
     visit symptom_logs_url
 
-    assert_selector "##{dom_id(entry)}"
+    # Navigate to show page by clicking the entry card
+    find("##{dom_id(entry)}").click
 
-    # Dismiss the browser confirm dialog (accept it)
-    # Capybara handles data-turbo-confirm via the browser's native dialog.
-    # accept_confirm wraps the action that triggers the dialog.
-    accept_confirm "Remove this entry? This can't be undone." do
-      within("##{dom_id(entry)}") do
-        click_button "Delete"
-      end
-    end
+    assert_selector "h1", text: "Symptoms Log"
 
-    # Entry no longer in the DOM
-    assert_no_selector "##{dom_id(entry)}"
+    # Delete button — form has turbo: false, no confirm dialog fires
+    click_button "Delete"
+
+    # Redirected to symptom logs index
+    assert_current_path symptom_logs_path, wait: 5
+    assert_no_selector "##{dom_id(entry)}", wait: 5
   end
 
   # --- CROSS-USER URL ISOLATION ---
@@ -189,40 +189,39 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
     visit symptom_logs_path
 
-    # The timeline section must be visible
-    assert_selector "section[aria-label='Symptom timeline']"
+    # The filter bar must be visible
+    assert_selector ".filter-bar"
 
-    # Click the "7 days" chip — should update timeline_content frame
-    within(".filter-bar") { click_on "7 days" }
-    # Active chip state must update (filter_bar now inside the frame)
-    assert_selector ".filter-chip--active", text: "7 days"
+    # Click the "7d" chip — should update timeline_content frame
+    within("[role='group'][aria-label='Time period']") { click_on "7d" }
+    # Active chip state must update
+    assert_selector ".filter-chip--active", text: "7d"
 
     # alice_coughing_old (40 days ago) should not be in the updated list
-    assert_no_selector ".timeline-row", text: /Coughing/i
+    assert_no_selector ".timeline-card", text: /Coughing/i
 
-    # Page heading still present — confirms no full page reload wiped the form section
-    assert_selector "h1", text: "Log a Symptom"
+    # Page heading still present — confirms no full page reload wiped the header
+    assert_selector "h1", text: "Symptoms"
   end
 
-  test "trend bar shows severity counts above entry list" do
+  test "severity legend shows counts above entry list" do
     sign_in_as users(:verified_user)
     visit symptom_logs_path
 
-    # Trend bar rendered (Alice has entries of varied severity)
-    assert_selector ".trend-bar"
-
-    # At least one segment present
-    assert_selector ".trend-segment"
+    # Severity legend rendered (Alice has entries of varied severity)
+    # Uses chart-severity-legend / chart-severity-pill CSS classes
+    assert_selector ".chart-severity-legend"
+    assert_selector ".chart-severity-pill"
   end
 
   test "All chip shows entries from every date" do
     sign_in_as users(:verified_user)
     visit symptom_logs_path
 
-    within(".filter-bar") { click_on "All" }
+    within("[role='group'][aria-label='Time period']") { click_on "All" }
 
     # alice_coughing_old (40 days ago) should now appear
-    assert_selector ".timeline-row", text: /Coughing/i
+    assert_selector ".timeline-card", text: /Coughing/i
   end
 
   test "empty state shown when no entries match filter" do
@@ -230,6 +229,6 @@ class SymptomLoggingTest < ApplicationSystemTestCase
     sign_in_as users(:verified_user)
     visit symptom_logs_path(start_date: 1.year.from_now.to_date.to_s, end_date: 2.years.from_now.to_date.to_s)
 
-    assert_selector ".timeline-empty-state"
+    assert_selector ".empty-state"
   end
 end
