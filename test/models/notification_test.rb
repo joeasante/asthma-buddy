@@ -177,6 +177,67 @@ class NotificationTest < ActiveSupport::TestCase
     end
   end
 
+  # -------------------------------------------------------------------------
+  # Cache invalidation
+  # -------------------------------------------------------------------------
+
+  class CacheInvalidationTest < ActiveSupport::TestCase
+    # after_create_commit and after_update_commit only fire when the transaction
+    # actually commits. Disable transactional tests so Rails flushes each
+    # Notification write to the real DB connection and fires the callbacks.
+    self.use_transactional_tests = false
+
+    setup do
+      @user = users(:verified_user)
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    end
+
+    teardown do
+      Rails.cache.clear
+      Rails.cache = ActiveSupport::Cache::NullStore.new
+      # Clean up any records created outside of a transaction
+      Notification.where(body: [ "Cache invalidation test", "Updated body text" ]).delete_all
+    end
+
+    test "creating a notification deletes the badge cache for the owner" do
+      Rails.cache.write("unread_notifications/#{@user.id}", 99)
+      assert_equal 99, Rails.cache.read("unread_notifications/#{@user.id}")
+
+      Notification.create!(
+        user:              @user,
+        notification_type: :system,
+        body:              "Cache invalidation test"
+      )
+
+      assert_nil Rails.cache.read("unread_notifications/#{@user.id}")
+    end
+
+    test "marking a notification as read deletes the badge cache" do
+      notification = notifications(:alice_low_stock)
+      Rails.cache.write("unread_notifications/#{@user.id}", 99)
+      assert_equal 99, Rails.cache.read("unread_notifications/#{@user.id}")
+
+      notification.update!(read: true)
+
+      assert_nil Rails.cache.read("unread_notifications/#{@user.id}")
+    ensure
+      # Restore fixture state so other tests aren't affected
+      notification&.update_columns(read: false)
+    end
+
+    test "updating a notification field other than read does not clear the badge cache" do
+      notification = notifications(:alice_low_stock)
+      original_body = notification.body
+      Rails.cache.write("unread_notifications/#{@user.id}", 99)
+
+      notification.update!(body: "Updated body text")
+
+      assert_equal 99, Rails.cache.read("unread_notifications/#{@user.id}")
+    ensure
+      notification&.update_columns(body: original_body)
+    end
+  end
+
   test "create_low_stock_for creates a new notification when existing low_stock notification is read" do
     medication = Medication.create!(
       user:                users(:verified_user),

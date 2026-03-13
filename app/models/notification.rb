@@ -19,8 +19,8 @@ class Notification < ApplicationRecord
   scope :newest_first, -> { order(created_at: :desc) }
   scope :pruneable,    -> { where(read: true).where("created_at < ?", 90.days.ago) }
 
-  after_create_commit  :invalidate_badge_cache
-  after_update_commit  :invalidate_badge_cache, if: :saved_change_to_read?
+  after_commit -> { invalidate_badge_cache }, on: :create
+  after_commit -> { invalidate_badge_cache }, on: :update, if: :saved_change_to_read?
 
   # Creates a low_stock notification for a medication if none already exists.
   # Called after a DoseLog is saved; safe to call frequently — deduplication is inside.

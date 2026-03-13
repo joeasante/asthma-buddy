@@ -42,9 +42,9 @@ class HealthEvent < ApplicationRecord
 
   scope :recent_first, -> { order(recorded_at: :desc) }
 
-  after_create_commit  :invalidate_dashboard_cache
-  after_update_commit  :invalidate_dashboard_cache
-  after_destroy_commit :invalidate_dashboard_cache
+  after_commit -> { invalidate_dashboard_cache }, on: :create
+  after_commit -> { invalidate_dashboard_cache }, on: :update
+  after_commit -> { invalidate_dashboard_cache }, on: :destroy
 
   def event_type_label
     TYPE_LABELS[event_type]

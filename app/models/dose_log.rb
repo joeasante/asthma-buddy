@@ -12,9 +12,9 @@ class DoseLog < ApplicationRecord
   validates :recorded_at, presence: true
 
   scope :chronological, -> { order(recorded_at: :desc) }
-  after_create_commit  :check_low_stock
-  after_create_commit  :invalidate_dashboard_cache
-  after_destroy_commit :invalidate_dashboard_cache
+  after_create_commit :check_low_stock
+  after_commit -> { invalidate_dashboard_cache }, on: :create
+  after_commit -> { invalidate_dashboard_cache }, on: :destroy
 
   def self.gina_band(uses)
     if uses >= GINA_URGENT_THRESHOLD

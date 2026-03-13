@@ -127,3 +127,31 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, body["unread_count"]
   end
 end
+
+# Badge cache integration — swaps to MemoryStore so fetch/delete behave like production.
+class BadgeCacheTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:verified_user)
+    sign_in_as @user
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  teardown do
+    Rails.cache.clear
+    Rails.cache = ActiveSupport::Cache::NullStore.new
+  end
+
+  test "set_notification_badge_count writes to cache on first call and reads from cache on second call" do
+    # First request — cache is cold; fetch block executes, value is stored.
+    get dashboard_path
+    assert_response :success
+    cached_value = Rails.cache.read("unread_notifications/#{@user.id}")
+    assert_not_nil cached_value, "Expected cache to be populated after first authenticated request"
+
+    # Second request — cache is warm; value persists (block is not re-executed).
+    get dashboard_path
+    assert_response :success
+    assert_equal cached_value, Rails.cache.read("unread_notifications/#{@user.id}"),
+      "Expected cached value to remain the same on the second request"
+  end
+end
