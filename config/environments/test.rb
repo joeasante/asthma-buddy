@@ -53,6 +53,7 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
-  # Disable rack-attack globally in tests; integration tests re-enable it selectively.
-  config.middleware.delete Rack::Attack
+  # Keep Rack::Attack in the middleware stack so integration tests can enable it
+  # selectively, but start with it disabled so it does not affect unrelated tests.
+  # RateLimitingTest re-enables it in setup and disables it in teardown.
 end
