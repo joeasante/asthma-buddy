@@ -430,3 +430,50 @@ class MedicationTest < ActiveSupport::TestCase
     assert med.low_stock?
   end
 end
+
+class MedicationDashboardCacheTest < ActiveSupport::TestCase
+  self.use_transactional_tests = false
+
+  setup do
+    @user = users(:verified_user)
+    Rails.cache.clear
+    ActiveSupport::Cache::NullStore  # pre-load constant
+    @original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  teardown do
+    Rails.cache = @original_cache
+    Medication.where(name: "Cache Test Med").delete_all
+  end
+
+  test "creating a medication invalidates the dashboard cache" do
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    Medication.create!(
+      user: @user, name: "Cache Test Med", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 200
+    )
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
+
+  test "updating a medication invalidates the dashboard cache" do
+    med = Medication.create!(
+      user: @user, name: "Cache Test Med", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 200
+    )
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    med.update!(name: "Cache Test Med Updated")
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+    med.update!(name: "Cache Test Med")  # restore for teardown delete_all
+  end
+
+  test "destroying a medication invalidates the dashboard cache" do
+    med = Medication.create!(
+      user: @user, name: "Cache Test Med", medication_type: :reliever,
+      standard_dose_puffs: 2, starting_dose_count: 200
+    )
+    Rails.cache.write("dashboard_vars/#{@user.id}/#{Date.current}", "sentinel")
+    med.destroy!
+    assert_nil Rails.cache.read("dashboard_vars/#{@user.id}/#{Date.current}")
+  end
+end

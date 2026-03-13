@@ -34,6 +34,10 @@ class Medication < ApplicationRecord
 
   before_validation :clear_course_dates_unless_course
 
+  after_commit -> { invalidate_dashboard_cache }, on: :create
+  after_commit -> { invalidate_dashboard_cache }, on: :update
+  after_commit -> { invalidate_dashboard_cache }, on: :destroy
+
   LOW_STOCK_DAYS = 14
 
   scope :chronological,    -> { order(created_at: :desc) }
@@ -94,5 +98,9 @@ class Medication < ApplicationRecord
       if ends_on <= starts_on
         errors.add(:ends_on, "must be after the start date")
       end
+    end
+
+    def invalidate_dashboard_cache
+      Rails.cache.delete("dashboard_vars/#{user_id}/#{Date.current}")
     end
 end
