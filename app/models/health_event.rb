@@ -42,6 +42,10 @@ class HealthEvent < ApplicationRecord
 
   scope :recent_first, -> { order(recorded_at: :desc) }
 
+  after_create_commit  :invalidate_dashboard_cache
+  after_update_commit  :invalidate_dashboard_cache
+  after_destroy_commit :invalidate_dashboard_cache
+
   def event_type_label
     TYPE_LABELS[event_type]
   end
@@ -88,6 +92,10 @@ class HealthEvent < ApplicationRecord
   end
 
   private
+
+  def invalidate_dashboard_cache
+    Rails.cache.delete("dashboard_vars/#{user_id}/#{Date.current}")
+  end
 
   def ended_at_after_recorded_at
     return unless ended_at.present? && recorded_at.present?

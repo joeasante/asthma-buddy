@@ -12,22 +12,31 @@ module DashboardVariables
   def set_dashboard_vars
     user  = Current.user
     today = Date.current
-    @preventer_adherence = user.medications
-      .where(medication_type: :preventer)
-      .where(course: false)
-      .includes(:dose_logs)
-      .select { |m| m.doses_per_day.present? }
-      .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
-    @reliever_medications = user.medications
-      .where(medication_type: :reliever)
-      .where(course: false)
-      .includes(:dose_logs)
-      .chronological
-      .to_a
-    @active_illness = user.health_events
-      .where(event_type: :illness)
-      .where(ended_at: nil)
-      .order(recorded_at: :desc)
-      .first
+
+    cached = Rails.cache.fetch("dashboard_vars/#{user.id}/#{today}", expires_in: 5.minutes) do
+      preventer_adherence = user.medications
+        .where(medication_type: :preventer)
+        .where(course: false)
+        .includes(:dose_logs)
+        .select { |m| m.doses_per_day.present? }
+        .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+      reliever_medications = user.medications
+        .where(medication_type: :reliever)
+        .where(course: false)
+        .includes(:dose_logs)
+        .chronological
+        .to_a
+      active_illness = user.health_events
+        .where(event_type: :illness)
+        .where(ended_at: nil)
+        .order(recorded_at: :desc)
+        .first
+
+      { preventer_adherence: preventer_adherence, reliever_medications: reliever_medications, active_illness: active_illness }
+    end
+
+    @preventer_adherence  = cached[:preventer_adherence]
+    @reliever_medications = cached[:reliever_medications]
+    @active_illness       = cached[:active_illness]
   end
 end
