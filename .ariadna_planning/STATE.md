@@ -418,7 +418,7 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 
 ### Pending Todos
 
-None.
+- **Reconsider dose logging UX location** — Dose logging lives in Settings under each medication card, but Settings should be for managing medications (CRUD) not day-to-day logging. Consider moving to dashboard or dedicated logging flow. (`2026-03-13-reconsider-dose-logging-ux-location.md`)
 
 ### Blockers/Concerns
 
