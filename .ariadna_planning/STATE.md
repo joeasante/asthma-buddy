@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 23 (Compliance, Security, Accessibility) — IN PROGRESS
-Plan: Plan 02 (Throttle message gap closure) complete.
-Status: Phase 23 Plan 02 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 23-02 complete: throttled_responder updated to branch on rack.attack.matched, returning login-specific 20-second retry message and signup-specific hourly-limit message. 531 tests passing.
+Phase: Phase 24 (Admin Observability) — IN PROGRESS
+Plan: Plan 01 (Activity tracking + admin signup notifications) complete.
+Status: Phase 24 Plan 01 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 24-01 complete: login activity tracking (last_sign_in_at + sign_in_count), AdminMailer#new_signup with after_create_commit callback, 7 new tests. 538 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -30,6 +30,10 @@ All 9 phases delivered:
 - Phase 9: Dashboard + Accessibility + Polish (solid teal hero card, symptom pills, chart above filter)
 
 ## Performance Metrics
+
+**Phase 24 Velocity:**
+- Phase 24 Plan 01 completed: 2026-03-13 (~12 min, 2 tasks, 6 files created, 6 files modified, 7 new tests — activity tracking + admin signup mailer)
+- Tests at Phase 24-01 close: 538 passing (no regressions)
 
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
@@ -138,6 +142,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 24 Plan 01 Decisions (2026-03-13)
+
+- **update_columns for login metadata**: `update_columns` bypasses validations and callbacks — correct approach for tracking metadata. Single SQL UPDATE for last_sign_in_at and sign_in_count.
+- **Local user variable in SessionsController#create**: `Current.user` is not yet populated immediately after `start_new_session_for`; session cookie hasn't been re-read. Local `user` variable is safe.
+- **NameError rescue in AdminMailer#new_signup**: `admin_users_url` route doesn't exist until Plan 24-02. Rescued `NameError`, set `@admin_users_url` ivar with `/admin/users` fallback. Views use ivar. Route resolves correctly post-24-02.
+- **assert_enqueued_emails 2 in RegistrationsControllerTest**: New signup now enqueues both email verification AND admin notification. Updated from 1 to 2.
+- **include ActiveJob::TestHelper in UserTest**: Required to gain access to `assert_enqueued_with` — not available in `ActiveSupport::TestCase` by default.
 
 ### Phase 23 Plan 02 Decisions (2026-03-13)
 
@@ -454,5 +466,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed Phase 23 Plan 02 — throttle message gap closure (context-specific 429 messages). 531 tests passing.
+Stopped at: Completed Phase 24 Plan 01 — activity tracking (last_sign_in_at + sign_in_count on login) + AdminMailer#new_signup with User after_create_commit callback. 538 tests passing.
 Resume file: None
