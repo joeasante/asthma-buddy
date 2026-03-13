@@ -75,4 +75,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "lexxy", "0.1.26.beta"
+gem "lexxy", "0.8.0.beta"
