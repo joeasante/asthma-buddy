@@ -40,6 +40,10 @@ module AsthmaBuddy
     # one_session_per_day model validation must be audited together if timezone changes.
     config.time_zone = "London"
     config.exceptions_app = self.routes
+
+    # IP-level rate limiting via Rack::Attack — guards login and signup endpoints
+    # against brute-force and credential-stuffing attacks.
+    config.middleware.use Rack::Attack
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
