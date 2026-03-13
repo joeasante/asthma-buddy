@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DoseLog < ApplicationRecord
+  include DashboardCacheInvalidatable
+
   belongs_to :user
   belongs_to :medication
 
@@ -13,8 +15,7 @@ class DoseLog < ApplicationRecord
 
   scope :chronological, -> { order(recorded_at: :desc) }
   after_create_commit :check_low_stock
-  after_commit -> { invalidate_dashboard_cache }, on: :create
-  after_commit -> { invalidate_dashboard_cache }, on: :destroy
+  after_commit :invalidate_dashboard_cache, on: %i[create destroy]
 
   def self.gina_band(uses)
     if uses >= GINA_URGENT_THRESHOLD
@@ -32,7 +33,4 @@ class DoseLog < ApplicationRecord
       Notification.create_low_stock_for(medication)
     end
 
-    def invalidate_dashboard_cache
-      Rails.cache.delete(DashboardVariables.dashboard_cache_key(user_id))
-    end
 end

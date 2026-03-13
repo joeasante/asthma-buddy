@@ -8,7 +8,7 @@ module DashboardVariables
   extend ActiveSupport::Concern
 
   def self.dashboard_cache_key(user_id, date = Date.current)
-    "dashboard_vars/#{user_id}/#{date}"
+    DashboardCacheInvalidatable.dashboard_cache_key(user_id, date)
   end
 
   private
@@ -24,10 +24,11 @@ module DashboardVariables
     ) do
       preventer_adherence = user.medications
         .where(medication_type: :preventer, course: false)
+        .where.not(doses_per_day: nil)
         .includes(:dose_logs)
-        .select { |m| m.doses_per_day.present? }
         .map do |m|
-          result = AdherenceCalculator.call(m, today)
+          today_logs = m.dose_logs.select { |dl| dl.recorded_at.to_date == today }
+          result = AdherenceCalculator.call(m, today, preloaded_logs: today_logs)
           {
             id:                  m.id,
             name:                m.name,

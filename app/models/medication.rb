@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Medication < ApplicationRecord
+  include DashboardCacheInvalidatable
+
   belongs_to :user
   has_many :dose_logs, dependent: :destroy
 
@@ -35,7 +37,8 @@ class Medication < ApplicationRecord
   before_validation :clear_course_dates_unless_course
 
   after_commit -> { invalidate_dashboard_cache }, on: :create
-  after_commit -> { invalidate_dashboard_cache }, on: :update
+  after_commit -> { invalidate_dashboard_cache }, on: :update,
+    if: -> { saved_change_to_name? || saved_change_to_medication_type? || saved_change_to_standard_dose_puffs? || saved_change_to_sick_day_dose_puffs? || saved_change_to_doses_per_day? || saved_change_to_course? }
   after_commit -> { invalidate_dashboard_cache }, on: :destroy
 
   LOW_STOCK_DAYS = 14
@@ -100,7 +103,4 @@ class Medication < ApplicationRecord
       end
     end
 
-    def invalidate_dashboard_cache
-      Rails.cache.delete(DashboardVariables.dashboard_cache_key(user_id))
-    end
 end

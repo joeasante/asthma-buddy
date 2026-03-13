@@ -436,14 +436,12 @@ class MedicationDashboardCacheTest < ActiveSupport::TestCase
 
   setup do
     @user = users(:verified_user)
-    Rails.cache.clear
-    ActiveSupport::Cache::NullStore  # pre-load constant
-    @original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
   end
 
   teardown do
-    Rails.cache = @original_cache
+    Rails.cache.clear
+    Rails.cache = ActiveSupport::Cache::NullStore.new
     Medication.where(name: "Cache Test Med").delete_all
   end
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class HealthEvent < ApplicationRecord
+  include DashboardCacheInvalidatable
+
   belongs_to :user
   has_rich_text :notes
 
@@ -90,10 +92,6 @@ class HealthEvent < ApplicationRecord
   end
 
   private
-
-    def invalidate_dashboard_cache
-      Rails.cache.delete(DashboardVariables.dashboard_cache_key(user_id))
-    end
 
     def ended_at_after_recorded_at
       return unless ended_at.present? && recorded_at.present?
