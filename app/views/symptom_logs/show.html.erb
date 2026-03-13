@@ -23,7 +23,7 @@
 </div>
 
 <div class="section-card">
-  <div style="padding: var(--space-lg);">
+  <div class="detail-body">
     <div class="timeline-row timeline-row--embedded">
       <div class="severity-indicator severity-indicator--<%= @symptom_log.severity %>"></div>
       <div class="timeline-row-body">
@@ -39,7 +39,7 @@
         </time>
 
         <% if @symptom_log.triggers.any? %>
-          <div class="timeline-triggers" style="margin-top: var(--space-sm);">
+          <div class="timeline-triggers">
             <% @symptom_log.triggers.each do |trigger| %>
               <span class="trigger-tag"><%= trigger.humanize %></span>
             <% end %>
@@ -47,7 +47,7 @@
         <% end %>
 
         <% if @symptom_log.notes.body.present? %>
-          <div class="timeline-notes" style="margin-top: var(--space-sm);">
+          <div class="timeline-notes">
             <%= @symptom_log.notes %>
           </div>
         <% end %>

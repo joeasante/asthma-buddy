@@ -2910,3 +2910,17 @@ button.med-overflow-item--danger:hover {
     100% { background-position: -200% 0; }
   }
 }
+
+/* ==========================================================================
+   Shared detail-page layout — used by peak flow, symptom, and health event
+   show views to avoid inline style attributes (CSP style-src-attr).
+   ========================================================================== */
+
+.detail-body     { padding: var(--space-lg); }
+.detail-dl       { display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md); }
+.detail-dl-row   { display: flex; gap: var(--space-md); align-items: baseline; }
+.detail-dt       { color: var(--text-3); font-size: 0.9375rem; min-width: 6rem; }
+.detail-dd       { color: var(--text); font-weight: 500; }
+
+/* Inline icon inside a button — provides spacing without an inline style attribute */
+.btn-icon        { margin-right: 0.375rem; }

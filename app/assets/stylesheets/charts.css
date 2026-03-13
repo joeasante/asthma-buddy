@@ -17,6 +17,10 @@
   max-height: 200px;
 }
 
+.chart-canvas--symptoms { max-height: 220px; }
+.chart-canvas--peakflow  { max-height: 260px; }
+.chart-section--peakflow { margin-bottom: 1.25rem; }
+
 /* --------------------------------------------------------------------------
    Session toggle — pill buttons above chart to show/focus Morning or Evening.
    Uses aria-pressed for state; matches the tod-toggle pill language on the form.

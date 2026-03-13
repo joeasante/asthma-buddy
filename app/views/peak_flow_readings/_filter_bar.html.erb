@@ -1,16 +1,18 @@
 <div class="filter-bar" role="search" aria-label="Filter peak flow readings">
 
-  <%# Row 1: Period — primary control %>
-  <div class="filter-row" role="group" aria-label="Time period">
-    <% [["7", "7d"], ["30", "30d"], ["90", "3m"], ["all", "All"], ["custom", "Custom"]].each do |value, label| %>
-      <%= link_to label,
-            peak_flow_readings_path(preset: value, zone: active_zone),
-            class: "filter-chip #{"filter-chip--active" if active_preset == value}",
-            aria:  { pressed: (active_preset == value).to_s },
-            data:  { turbo_frame: "readings_content" } %>
-    <% end %>
+  <%# Row 1: Period — segmented control with optional clear link alongside %>
+  <div class="filter-bar-period">
+    <div class="filter-row filter-row--period" role="group" aria-label="Time period">
+      <% [["7", "7d"], ["30", "30d"], ["90", "3m"], ["all", "All"], ["custom", "Custom"]].each do |value, label| %>
+        <%= link_to label,
+              peak_flow_readings_path(preset: value, zone: active_zone),
+              class: "filter-chip #{"filter-chip--active" if active_preset == value}",
+              aria:  { pressed: (active_preset == value).to_s },
+              data:  { turbo_frame: "readings_content" } %>
+      <% end %>
+    </div>
     <% if active_zone.present? %>
-      <%= link_to "Clear filters",
+      <%= link_to "Clear",
             peak_flow_readings_path,
             class: "filter-clear",
             aria:  { label: "Clear all filters" },
@@ -19,8 +21,8 @@
   </div>
 
   <%# Row 2: Zone — secondary refinement %>
-  <div class="filter-row" role="group" aria-label="Zone filter">
-    <%= link_to "All",
+  <div class="filter-row filter-row--secondary" role="group" aria-label="Zone filter">
+    <%= link_to "All zones",
           peak_flow_readings_path(preset: active_preset, start_date: start_date, end_date: end_date),
           class: "filter-chip #{"filter-chip--active" unless active_zone}",
           aria:  { pressed: active_zone.nil?.to_s },

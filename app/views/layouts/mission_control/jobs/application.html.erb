@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Mission Control — Asthma Buddy</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="turbo-cache-control" content="no-cache">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+
+  <%= stylesheet_link_tag "mission_control/jobs/bulma.min" %>
+  <%= stylesheet_link_tag "mission_control/jobs/application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "mission_control_overrides", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags "application", importmap: MissionControl::Jobs.importmap  %>
+</head>
+<body>
+
+<header class="mc-header">
+  <nav class="mc-nav" aria-label="Mission Control navigation">
+    <div class="mc-nav-start">
+      <%= link_to "/settings", class: "mc-brand", data: { turbo: false } do %>
+        Asthma Buddy
+      <% end %>
+      <span class="mc-brand-sep" aria-hidden="true">/</span>
+      <span class="mc-brand-section">Mission Control</span>
+    </div>
+    <div class="mc-nav-end">
+      <%= render "layouts/mission_control/jobs/application_selection/servers", application: @application %>
+      <%= render "layouts/mission_control/jobs/application_selection/applications" if selectable_applications.any? %>
+    </div>
+  </nav>
+</header>
+
+<main class="mc-main">
+  <div class="mc-container">
+    <%= render "layouts/mission_control/jobs/flash" %>
+    <%= render "layouts/mission_control/jobs/navigation" %>
+    <%= yield %>
+  </div>
+</main>
+
+</body>
+</html>

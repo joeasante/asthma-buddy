@@ -203,10 +203,11 @@ class MedicationTest < ActiveSupport::TestCase
     assert_nil med.days_of_supply_remaining
   end
 
-  test "days_of_supply_remaining divides remaining_doses by doses_per_day rounded to 1dp" do
+  test "days_of_supply_remaining divides remaining_doses by total puffs per day" do
     med = medications(:alice_preventer)
-    # 120 starting - 2 logged puffs = 118 remaining; 118 / 2 = 59.0
-    assert_equal 59.0, med.days_of_supply_remaining
+    # 120 starting - 2 logged puffs = 118 remaining
+    # doses_per_day=2, standard_dose_puffs=2 → 4 puffs/day; 118 / 4 = 29.5
+    assert_equal 29.5, med.days_of_supply_remaining
   end
 
   test "days_of_supply_remaining rounds to one decimal place" do
@@ -215,8 +216,8 @@ class MedicationTest < ActiveSupport::TestCase
       standard_dose_puffs: 2, starting_dose_count: 100,
       doses_per_day: 3
     )
-    # 100 / 3 = 33.333... → rounds to 33.3
-    assert_equal 33.3, med.days_of_supply_remaining
+    # doses_per_day=3, standard_dose_puffs=2 → 6 puffs/day; 100 / 6 = 16.666... → 16.7
+    assert_equal 16.7, med.days_of_supply_remaining
   end
 
   test "days_of_supply_remaining returns 0.0 when no doses remain" do
@@ -227,6 +228,53 @@ class MedicationTest < ActiveSupport::TestCase
     )
     DoseLog.create!(user: @user, medication: med, puffs: 2, recorded_at: Time.current)
     assert_equal 0.0, med.days_of_supply_remaining
+  end
+
+  # sick_days_of_supply_remaining
+
+  test "sick_days_of_supply_remaining returns nil when sick_day_dose_puffs is nil" do
+    med = medications(:alice_preventer)  # sick_day_dose_puffs: nil
+    assert_nil med.sick_days_of_supply_remaining
+  end
+
+  test "sick_days_of_supply_remaining returns nil when doses_per_day is nil" do
+    med = Medication.create!(
+      user: @user, name: "No Schedule", medication_type: :preventer,
+      standard_dose_puffs: 2, sick_day_dose_puffs: 4, starting_dose_count: 120
+    )
+    assert_nil med.sick_days_of_supply_remaining
+  end
+
+  test "sick_days_of_supply_remaining divides remaining_doses by sick daily puffs" do
+    med = Medication.create!(
+      user: @user, name: "Fobumix", medication_type: :preventer,
+      standard_dose_puffs: 2, sick_day_dose_puffs: 3,
+      starting_dose_count: 120, doses_per_day: 2
+    )
+    # 2 sessions/day × 3 sick puffs/session = 6 puffs/day; 120 / 6 = 20.0
+    assert_equal 20.0, med.sick_days_of_supply_remaining
+  end
+
+  test "sick_days_of_supply_remaining is less than days_of_supply_remaining when sick dose is higher" do
+    med = Medication.create!(
+      user: @user, name: "Preventer", medication_type: :preventer,
+      standard_dose_puffs: 2, sick_day_dose_puffs: 4,
+      starting_dose_count: 120, doses_per_day: 2
+    )
+    # Normal: 120 / (2×2) = 30 days; sick: 120 / (2×4) = 15 days
+    assert_equal 30.0, med.days_of_supply_remaining
+    assert_equal 15.0, med.sick_days_of_supply_remaining
+    assert med.sick_days_of_supply_remaining < med.days_of_supply_remaining
+  end
+
+  test "sick_days_of_supply_remaining rounds to one decimal place" do
+    med = Medication.create!(
+      user: @user, name: "Odd Sick", medication_type: :preventer,
+      standard_dose_puffs: 2, sick_day_dose_puffs: 3,
+      starting_dose_count: 100, doses_per_day: 3
+    )
+    # 3 sessions/day × 3 sick puffs/session = 9 puffs/day; 100 / 9 = 11.111... → 11.1
+    assert_equal 11.1, med.sick_days_of_supply_remaining
   end
 
   # refilled_at
@@ -251,20 +299,20 @@ class MedicationTest < ActiveSupport::TestCase
   end
 
   test "low_stock? returns false when days_of_supply_remaining is exactly 14" do
-    # 14 days * 2 doses/day = 28 doses remaining needed; starting_count=28, no logs
+    # 14 days * 2 doses/day * 2 puffs/dose = 56 puffs needed; starting_count=56, no logs
     med = Medication.create!(
       user: @user, name: "Boundary", medication_type: :preventer,
-      standard_dose_puffs: 2, starting_dose_count: 28, doses_per_day: 2
+      standard_dose_puffs: 2, starting_dose_count: 56, doses_per_day: 2
     )
     assert_equal 14.0, med.days_of_supply_remaining
     assert_not med.low_stock?
   end
 
   test "low_stock? returns true when days_of_supply_remaining is below 14" do
-    # 13 days * 2 doses/day = 26 doses remaining; starting=26, no logs
+    # 13 days * 2 doses/day * 2 puffs/dose = 52 puffs; starting=52, no logs → 13 days
     med = Medication.create!(
       user: @user, name: "LowBoundary", medication_type: :preventer,
-      standard_dose_puffs: 2, starting_dose_count: 26, doses_per_day: 2
+      standard_dose_puffs: 2, starting_dose_count: 52, doses_per_day: 2
     )
     assert_equal 13.0, med.days_of_supply_remaining
     assert med.low_stock?
@@ -283,7 +331,7 @@ class MedicationTest < ActiveSupport::TestCase
       user: @user, name: "Running low", medication_type: :preventer,
       standard_dose_puffs: 2, starting_dose_count: 30, doses_per_day: 2
     )
-    # Log 6 puffs — 24 remaining / 2 per day = 12 days → low stock
+    # Log 6 puffs — 24 remaining / (2 doses/day × 2 puffs/dose) = 6 days → low stock
     DoseLog.create!(user: @user, medication: med, puffs: 6, recorded_at: Time.current)
     assert med.low_stock?
   end

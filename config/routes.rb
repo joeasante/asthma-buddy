@@ -73,6 +73,9 @@ Rails.application.routes.draw do
     get "test/sign_in/:session_id", to: "test/sessions#create", as: :test_sign_in
   end
 
+  # Job monitoring UI — protected by HTTP Basic Auth (credentials: mission_control.http_basic_auth_*)
+  mount MissionControl::Jobs::Engine, at: "/jobs"
+
   # Defines the root path route ("/")
   root "home#index"
 

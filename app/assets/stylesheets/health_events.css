@@ -95,6 +95,36 @@
 .event-row-notes {
   font-size: 0.9rem;
   color: var(--text-2);
+  margin-top: var(--space-md);
+}
+
+/* Show page — detail layout */
+.event-show-dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  font-size: 0.875rem;
+}
+
+.event-show-dl-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.event-show-dt {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.event-show-dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.event-show-ongoing {
+  color: var(--text-3);
 }
 
 .event-row-duration {

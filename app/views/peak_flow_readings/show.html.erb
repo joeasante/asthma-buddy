@@ -23,12 +23,10 @@
 </div>
 
 <div class="section-card">
-  <div style="padding: var(--space-lg);">
-    <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: var(--space-md);">
-      <span class="pf-row-value" style="font-size: 3rem; font-weight: 800; font-family: var(--font-heading);">
-        <%= @peak_flow_reading.value %>
-      </span>
-      <span class="pf-row-unit" style="font-size: 1.125rem;">L/min</span>
+  <div class="detail-body">
+    <div class="pf-show-hero">
+      <span class="pf-row-value"><%= @peak_flow_reading.value %></span>
+      <span class="pf-row-unit">L/min</span>
       <% if @peak_flow_reading.time_of_day.present? %>
         <span class="tod-badge tod-badge--<%= @peak_flow_reading.time_of_day %>">
           <%= @peak_flow_reading.time_of_day_label %>
@@ -38,33 +36,33 @@
 
     <% zone = @peak_flow_reading.zone %>
     <% if zone && @personal_best %>
-      <div style="margin-bottom: var(--space-md);">
+      <div class="pf-show-zone">
         <span class="zone-badge zone-badge--<%= zone %>">
           <%= zone.capitalize %> zone &bull; <%= @zone_percentage %>% of personal best
         </span>
       </div>
     <% end %>
 
-    <dl style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md);">
-      <div style="display: flex; gap: var(--space-md);">
-        <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Date</dt>
-        <dd style="color: var(--text); font-weight: 500;">
+    <dl class="detail-dl">
+      <div class="detail-dl-row">
+        <dt class="detail-dt">Date</dt>
+        <dd class="detail-dd">
           <time datetime="<%= @peak_flow_reading.recorded_at.iso8601 %>">
             <%= @peak_flow_reading.recorded_at.strftime("%-d %B %Y") %>
           </time>
         </dd>
       </div>
-      <div style="display: flex; gap: var(--space-md);">
-        <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Time</dt>
-        <dd style="color: var(--text); font-weight: 500;">
+      <div class="detail-dl-row">
+        <dt class="detail-dt">Time</dt>
+        <dd class="detail-dd">
           <time datetime="<%= @peak_flow_reading.recorded_at.iso8601 %>">
             <%= @peak_flow_reading.recorded_at.strftime("%H:%M") %>
           </time>
         </dd>
       </div>
       <% if zone %>
-        <div style="display: flex; gap: var(--space-md);">
-          <dt style="color: var(--text-3); font-size: 0.9375rem; min-width: 6rem;">Zone</dt>
+        <div class="detail-dl-row">
+          <dt class="detail-dt">Zone</dt>
           <dd>
             <span class="zone-badge zone-badge--<%= zone %>"><%= zone.capitalize %></span>
           </dd>

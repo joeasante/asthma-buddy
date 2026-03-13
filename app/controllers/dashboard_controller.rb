@@ -48,7 +48,7 @@ class DashboardController < ApplicationController
       .limit(9)
       .group_by { |r| r.recorded_at.to_date }
       .first(3)
-    @recent_symptoms = user.symptom_logs.chronological.includes(:rich_text_notes).limit(4)
+    @recent_symptoms = user.symptom_logs.in_date_range(week_start, nil).chronological.includes(:rich_text_notes).limit(4)
 
     # Totals for "View all N" section footers — cheap indexed COUNT queries.
     @total_reading_count   = user.peak_flow_readings.count
@@ -92,8 +92,18 @@ class DashboardController < ApplicationController
       .includes(:dose_logs)
       .select(&:low_stock?)
 
-    # Recent health events — 3 most recent, shown in the dashboard card
-    @recent_health_events = user.health_events.recent_first.limit(3)
+    # Recent health events — ongoing duration events (any age) + any event in last 14 days.
+    # Ongoing = ended_at IS NULL AND not a point-in-time type (appointments never have ended_at,
+    # so we'd include every old appointment without the POINT_IN_TIME_TYPES exclusion).
+    fourteen_days_ago = 14.days.ago.beginning_of_day
+    @recent_health_events = user.health_events
+      .where(
+        "recorded_at >= ? OR (ended_at IS NULL AND event_type NOT IN (?))",
+        fourteen_days_ago,
+        HealthEvent::POINT_IN_TIME_TYPES
+      )
+      .recent_first
+      .limit(3)
 
     # Today's preventer adherence, reliever medications, and active illness —
     # shared with Settings::BaseController via the DashboardVariables concern.

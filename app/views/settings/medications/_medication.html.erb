@@ -12,6 +12,9 @@
       <span><%= medication.remaining_doses %> doses</span>
       <% if medication.days_of_supply_remaining.present? %>
         <span class="med-row-supply">~<%= medication.days_of_supply_remaining %> days</span>
+        <% if medication.sick_days_of_supply_remaining.present? %>
+          <span class="med-row-supply med-row-supply--sick">(~<%= medication.sick_days_of_supply_remaining %> if ill)</span>
+        <% end %>
       <% end %>
       <% if medication.low_stock? %>
         <span class="low-stock-badge">Low stock</span>

@@ -9,6 +9,20 @@
   </div>
 
   <%= turbo_frame_tag "timeline_content" do %>
+    <% if @chart_data&.any? %>
+      <div class="chart-section"
+           data-controller="chart"
+           data-chart-type-value="symptoms"
+           data-chart-data-value="<%= @chart_data.to_json %>">
+        <div class="chart-canvas-wrapper">
+          <canvas class="chart-canvas chart-canvas--symptoms"
+                  aria-label="Symptom severity over time"
+                  role="img">
+          </canvas>
+        </div>
+      </div>
+    <% end %>
+
     <%= render "filter_bar",
           active_preset:       @active_preset,
           start_date:          @start_date,
@@ -22,21 +36,6 @@
             active_severity: @active_severity,
             current_preset:  @active_preset %>
     </div>
-
-    <% if @chart_data&.any? %>
-      <div class="chart-section"
-           data-controller="chart"
-           data-chart-type-value="symptoms"
-           data-chart-data-value="<%= @chart_data.to_json %>">
-        <div class="chart-canvas-wrapper">
-          <canvas class="chart-canvas"
-                  style="max-height: 220px;"
-                  aria-label="Symptom severity over time"
-                  role="img">
-          </canvas>
-        </div>
-      </div>
-    <% end %>
 
     <% if @symptom_logs.empty? %>
       <div class="empty-state">
