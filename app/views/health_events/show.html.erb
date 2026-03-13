@@ -23,7 +23,7 @@
 </div>
 
 <div class="section-card">
-  <div style="padding: var(--space-lg);">
+  <div class="detail-body">
     <div class="event-row event-row--flat">
       <div class="event-row-body">
         <div class="event-row-meta">
@@ -35,10 +35,10 @@
           <% end %>
         </div>
 
-        <dl style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md); font-size: 0.875rem;">
-          <div style="display: flex; align-items: baseline; gap: 0.375rem;">
-            <dt style="color: var(--text-2); font-weight: 600;"><%= @health_event.point_in_time? ? "Date" : "Started" %></dt>
-            <dd style="margin: 0; color: var(--text);">
+        <dl class="event-show-dl">
+          <div class="event-show-dl-row">
+            <dt class="event-show-dt"><%= @health_event.point_in_time? ? "Date" : "Started" %></dt>
+            <dd class="event-show-dd">
               <time datetime="<%= @health_event.recorded_at.iso8601 %>">
                 <%= @health_event.recorded_at.strftime("%-d %B %Y") %>
               </time>
@@ -46,23 +46,23 @@
           </div>
 
           <% unless @health_event.point_in_time? %>
-            <div style="display: flex; align-items: baseline; gap: 0.375rem;">
-              <dt style="color: var(--text-2); font-weight: 600;">Ended</dt>
-              <dd style="margin: 0; color: var(--text);">
+            <div class="event-show-dl-row">
+              <dt class="event-show-dt">Ended</dt>
+              <dd class="event-show-dd">
                 <% if @health_event.ended_at.present? %>
                   <time datetime="<%= @health_event.ended_at.iso8601 %>">
                     <%= @health_event.ended_at.strftime("%-d %B %Y") %>
                   </time>
                 <% else %>
-                  <span style="color: var(--text-3);">Ongoing</span>
+                  <span class="event-show-ongoing">Ongoing</span>
                 <% end %>
               </dd>
             </div>
 
             <% if @health_event.formatted_duration.present? %>
-              <div style="display: flex; align-items: baseline; gap: 0.375rem;">
-                <dt style="color: var(--text-2); font-weight: 600;">Duration</dt>
-                <dd style="margin: 0;">
+              <div class="event-show-dl-row">
+                <dt class="event-show-dt">Duration</dt>
+                <dd class="event-show-dd">
                   <span class="event-row-duration"><%= @health_event.formatted_duration %></span>
                 </dd>
               </div>
@@ -71,7 +71,7 @@
         </dl>
 
         <% if @health_event.notes.body.present? %>
-          <div class="event-row-notes" style="margin-top: var(--space-md);">
+          <div class="event-row-notes">
             <%= @health_event.notes %>
           </div>
         <% end %>

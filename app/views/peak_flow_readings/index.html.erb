@@ -49,40 +49,9 @@
 <section id="peak-flow-graph" aria-label="Peak flow reading history" data-controller="hash-scroll">
   <%= turbo_frame_tag "readings_content" do %>
 
-    <%# 1. Filters — always at the top so the user sets context before seeing results %>
-    <%= render "filter_bar",
-          active_preset: @active_preset,
-          start_date: @start_date,
-          end_date: @end_date,
-          active_zone: @active_zone %>
-
-    <%# 2. Period stats — compact strip so it reads as context, not content %>
-    <div class="pf-stat-strip" aria-label="Period summary">
-      <% if @period_count.to_i > 0 %>
-        <span class="pf-stat-strip-item">
-          <strong><%= @period_count %></strong> <%= "reading".pluralize(@period_count) %>
-        </span>
-        <% if @period_avg %>
-          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
-          <span class="pf-stat-strip-item">
-            avg <strong><%= @period_avg %></strong> L/min<% if @period_avg_pct %> <span class="pf-stat-strip-sub">(<%= @period_avg_pct %>%)</span><% end %>
-          </span>
-        <% end %>
-        <% if @period_best %>
-          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
-          <span class="pf-stat-strip-item">
-            best <strong><%= @period_best %></strong> L/min<% if @period_best_pct %> <span class="pf-stat-strip-sub">(<%= @period_best_pct %>%)</span><% end %>
-          </span>
-        <% end %>
-      <% else %>
-        <span class="pf-stat-strip-item pf-stat-strip-item--empty">No readings in this period</span>
-      <% end %>
-    </div>
-
-    <%# 3. Chart — comes after filters so the user understands what they're looking at %>
+    <%# 1. Chart — visible immediately on page load %>
     <% if @chart_data&.any? %>
-      <div class="chart-section"
-           style="margin-bottom: 1.25rem;"
+      <div class="chart-section chart-section--peakflow"
            data-controller="chart"
            data-chart-type-value="peakflow-bands"
            data-chart-personal-best-value="<%= @current_personal_best&.value || 0 %>"
@@ -109,8 +78,7 @@
           </button>
         </div>
         <div class="chart-canvas-wrapper">
-          <canvas class="chart-canvas"
-                  style="max-height: 260px;"
+          <canvas class="chart-canvas chart-canvas--peakflow"
                   aria-label="Peak flow readings chart"
                   role="img">
           </canvas>
@@ -123,6 +91,36 @@
         </div>
       <% end %>
     <% end %>
+
+    <%# 2. Filters %>
+    <%= render "filter_bar",
+          active_preset: @active_preset,
+          start_date: @start_date,
+          end_date: @end_date,
+          active_zone: @active_zone %>
+
+    <%# 3. Period stats — compact strip summarising the filtered window %>
+    <div class="pf-stat-strip" aria-label="Period summary">
+      <% if @period_count.to_i > 0 %>
+        <span class="pf-stat-strip-item">
+          <strong><%= @period_count %></strong> <%= "reading".pluralize(@period_count) %>
+        </span>
+        <% if @period_avg %>
+          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
+          <span class="pf-stat-strip-item">
+            avg <strong><%= @period_avg %></strong> L/min<% if @period_avg_pct %> <span class="pf-stat-strip-sub">(<%= @period_avg_pct %>%)</span><% end %>
+          </span>
+        <% end %>
+        <% if @period_best %>
+          <span class="pf-stat-strip-sep" aria-hidden="true">&middot;</span>
+          <span class="pf-stat-strip-item">
+            best <strong><%= @period_best %></strong> L/min<% if @period_best_pct %> <span class="pf-stat-strip-sub">(<%= @period_best_pct %>%)</span><% end %>
+          </span>
+        <% end %>
+      <% else %>
+        <span class="pf-stat-strip-item pf-stat-strip-item--empty">No readings in this period</span>
+      <% end %>
+    </div>
 
     <%# 4. Reading list or empty state %>
     <% if @peak_flow_readings.empty? %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_232012) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_13_184514) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -141,6 +141,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_232012) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+# Could not dump table "sqlite_stat1" because of following StandardError
+#   Unknown type '' for column 'idx'
+
+
   create_table "symptom_logs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "recorded_at", null: false
@@ -154,6 +158,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_232012) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin"
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email_address", null: false

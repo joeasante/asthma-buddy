@@ -9,13 +9,13 @@ class LowStockTest < ApplicationSystemTestCase
     sign_in_as @user
 
     # Create a medication that is below the 14-day threshold:
-    # 20 doses / 2 per day = 10 days → low_stock? is true
+    # 40 puffs / (2 doses/day × 2 puffs/dose) = 10 days → low_stock? is true
     @low_stock_med = Medication.create!(
       user: @user,
       name: "TestPreventer",
       medication_type: :preventer,
       standard_dose_puffs: 2,
-      starting_dose_count: 20,
+      starting_dose_count: 40,
       doses_per_day: 2
     )
   end
@@ -73,8 +73,8 @@ class LowStockTest < ApplicationSystemTestCase
       find("details.med-overflow summary").click
       find("details.med-refill-details summary").click
 
-      # 60 doses / 2 per day = 30 days → not low stock
-      fill_in "medication[starting_dose_count]", with: "60"
+      # 120 puffs / (2 doses/day × 2 puffs/dose) = 30 days → not low stock
+      fill_in "medication[starting_dose_count]", with: "120"
       click_button "Confirm refill"
     end
 
@@ -87,7 +87,7 @@ class LowStockTest < ApplicationSystemTestCase
 
   test "after refill, dashboard Medications section hides the medication" do
     # First, refill via the model directly (not UI) to test dashboard update
-    @low_stock_med.update!(starting_dose_count: 60, refilled_at: Time.current)
+    @low_stock_med.update!(starting_dose_count: 120, refilled_at: Time.current)
 
     visit dashboard_path
     # 30 days remaining — no longer low stock — section should be gone

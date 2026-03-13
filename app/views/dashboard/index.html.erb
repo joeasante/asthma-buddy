@@ -299,7 +299,7 @@
             <%= link_to medication.name,
                   settings_medications_path(anchor: dom_id(medication)),
                   class: "dash-low-stock-name" %>
-            <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left</span>
+            <span class="dash-low-stock-supply">~<%= medication.days_of_supply_remaining.round %> days left<% if medication.sick_days_of_supply_remaining.present? %> (~<%= medication.sick_days_of_supply_remaining.round %> if ill)<% end %></span>
           </li>
         <% end %>
       </ul>

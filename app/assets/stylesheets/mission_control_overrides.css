@@ -1,0 +1,302 @@
+/*
+ * Mission Control — Asthma Buddy theme
+ * Overrides Bulma's default blue/grey scheme to match Asthma Buddy's
+ * white-surface, teal-accent, Inter-font design language.
+ *
+ * Asthma Buddy brand teal: #14b8a6 → HSL(174deg, 79%, 40%)
+ * Brand dark (hover):      #0d9488 → HSL(175deg, 76%, 31%)
+ */
+
+/* ── Bulma CSS variable overrides ─────────────────────────────────────── */
+:root {
+  /* Teal accent — replaces Bulma's default blue (233deg, 100%, 63%) */
+  --bulma-link-h: 174deg;
+  --bulma-link-s: 79%;
+  --bulma-link-l: 40%;
+
+  /* Keep scheme neutral — prevents Bulma tinting page greys with teal */
+  --bulma-scheme-h: 220;
+  --bulma-scheme-s: 13%;
+
+  /* Font — match Asthma Buddy */
+  --bulma-family-primary: 'Inter', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --bulma-family-secondary: var(--bulma-family-primary);
+  --bulma-weight-semibold: 600;
+
+  /* Tighten border radius to match Asthma Buddy's --radius-md/lg */
+  --bulma-radius: 6px;
+  --bulma-radius-large: 8px;
+
+}
+
+/* ── Reset Bulma body styles ──────────────────────────────────────────── */
+html,
+body {
+  background-color: #f1f5f9 !important;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+  font-size: 1rem !important;
+  color: #111827 !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Headings — Plus Jakarta Sans to match Asthma Buddy ──────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* ── Bulma is-size-* overrides — compiled Bulma uses !important directly  */
+/*    so CSS variables cannot override them; must match specificity        */
+.is-size-1 { font-size: 2.25rem  !important; }
+.is-size-2 { font-size: 1.625rem !important; }
+.is-size-3 { font-size: 1.25rem  !important; }
+.is-size-4 { font-size: 1.125rem !important; }
+.is-size-5 { font-size: 1rem     !important; }
+.is-size-6 { font-size: 0.875rem !important; }
+.is-size-7 { font-size: 0.75rem  !important; }
+
+/* ── Bulma .title and .subtitle ───────────────────────────────────────── */
+.title    { font-size: 1.625rem !important; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important; }
+.subtitle { font-size: 1.125rem !important; }
+
+/* ── Sticky header — Asthma Buddy nav style ──────────────────────────── */
+.mc-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 3.5rem;
+}
+
+.mc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 100%;
+  gap: 1rem;
+}
+
+.mc-nav-start {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.mc-nav-end {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Brand wordmark — matches .nav-brand */
+.mc-brand {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  color: #0d9488;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.mc-brand:hover {
+  color: #0d9488;
+  text-decoration: none;
+}
+
+.mc-brand-sep {
+  color: #d1d5db;
+  font-weight: 300;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.mc-brand-section {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* ── Main content area ────────────────────────────────────────────────── */
+.mc-main {
+  padding: 2rem 0 3rem;
+}
+
+.mc-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Suppress the Bulma .section wrapper (engine adds it in base layout  */
+/*    but our layout doesn't emit it — guard against engine changes)      */
+.section {
+  padding: 2rem 1.5rem;
+  background: transparent;
+}
+
+/* ── Tab navigation — make it look like Asthma Buddy nav links ────────── */
+.tabs.is-boxed {
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabs.is-boxed ul {
+  border-bottom: none;
+  gap: 0.25rem;
+}
+
+.tabs.is-boxed li a {
+  border: none !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  padding: 0.375rem 0.875rem !important;
+  margin-bottom: 0 !important;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.tabs.is-boxed li a:hover {
+  color: #111827 !important;
+  background: #f3f4f6 !important;
+}
+
+.tabs.is-boxed li.is-active a {
+  color: #0d9488 !important;
+  background: #f0fdfa !important;
+  font-weight: 600 !important;
+}
+
+/* ── Buttons — teal to match Asthma Buddy ─────────────────────────────── */
+.button.is-primary,
+.button.is-link {
+  background-color: #0d9488 !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.button.is-primary:hover,
+.button.is-link:hover {
+  background-color: #0f766e !important;
+}
+
+.button {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif !important;
+  border-radius: 6px !important;
+}
+
+/* ── Tags / badges ────────────────────────────────────────────────────── */
+.tag.is-primary,
+.tag.is-link {
+  background-color: #ccfbf1 !important;
+  color: #0f766e !important;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+.table-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.table {
+  background: #ffffff !important;
+  font-size: 1rem !important;
+  color: #111827 !important;
+}
+
+.table thead th {
+  background: #f9fafb !important;
+  border-bottom-color: #e5e7eb !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  font-size: 0.8125rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+.table td,
+.table th {
+  border-bottom-color: #f3f4f6 !important;
+  vertical-align: middle !important;
+}
+
+.table tbody tr:hover td {
+  background: #f9fafb !important;
+}
+
+/* ── Box / card ───────────────────────────────────────────────────────── */
+.box {
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────── */
+.pagination-link.is-current {
+  background-color: #0d9488 !important;
+  border-color: #0d9488 !important;
+}
+
+/* ── Navbar (Bulma) — hide since we use .mc-header ───────────────────── */
+.navbar {
+  display: none !important;
+}
+
+/* ── Progress bar ─────────────────────────────────────────────────────── */
+.progress::-webkit-progress-value {
+  background-color: #14b8a6;
+}
+
+.progress.is-primary::-webkit-progress-value,
+.progress.is-link::-webkit-progress-value {
+  background-color: #14b8a6;
+}
+
+/* ── Select / form controls ───────────────────────────────────────────── */
+.select select,
+.input,
+.textarea {
+  border-radius: 6px !important;
+  border-color: #d1d5db !important;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 1rem !important;
+  color: #111827 !important;
+}
+
+.select select:focus,
+.input:focus,
+.textarea:focus {
+  border-color: #14b8a6 !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15) !important;
+}
+
+/* ── Notification (flash) ─────────────────────────────────────────────── */
+.notification {
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+}
+
+.notification.is-success {
+  background-color: #f0fdfa !important;
+  color: #0f766e !important;
+}
+
+/* ── Links ────────────────────────────────────────────────────────────── */
+a {
+  color: #0d9488;
+}
+
+a:hover {
+  color: #0f766e;
+}

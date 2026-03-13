@@ -137,7 +137,7 @@ class NotificationTest < ActiveSupport::TestCase
   # 8. create_low_stock_for is a no-op when medication is NOT low_stock?
   # -------------------------------------------------------------------------
   test "create_low_stock_for is a no-op when medication is not low_stock?" do
-    # alice_preventer has 120 doses, 2/day = 60 days supply, well above 14-day threshold
+    # alice_preventer has 120 puffs, 2 doses/day × 2 puffs/dose = 30 days supply, well above 14-day threshold
     # but it has dose_logs in fixtures that may reduce supply, so create a fresh one
     medication = Medication.create!(
       user:                users(:verified_user),

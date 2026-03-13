@@ -86,7 +86,8 @@
               </span>
               <div class="reliever-bar-track">
                 <div class="reliever-bar-fill reliever-bar-fill--<%= week[:band] %>"
-                     style="--bar-fill-height: <%= week[:fill_pct] %>%;"
+                     data-controller="bar-height"
+                     data-bar-height-value="<%= week[:fill_pct] %>%"
                      aria-label="<%= week[:label] %>: <%= week[:uses] %> use<%= week[:uses] == 1 ? "" : "s" %>">
                 </div>
               </div>

@@ -68,13 +68,27 @@ class Medication < ApplicationRecord
     starting_dose_count - taken
   end
 
-  # Returns how many days of supply remain at the current daily dose rate.
+  # Returns how many days of supply remain at normal daily dose rate.
   # Returns nil when doses_per_day is blank — callers must guard against nil
   # before displaying or triggering low-stock logic (Phase 13).
   # Rounded to one decimal place for display (e.g. 6.5 days remaining).
+  #
+  # Total puffs consumed per day = doses_per_day × standard_dose_puffs.
+  # Example: 2 sessions/day × 2 puffs/session = 4 puffs/day;
+  #          120-puff inhaler ÷ 4 = 30 days.
   def days_of_supply_remaining
     return nil if doses_per_day.blank? || doses_per_day == 0
-    (remaining_doses.to_f / doses_per_day).round(1)
+    total_puffs_per_day = doses_per_day * standard_dose_puffs
+    (remaining_doses.to_f / total_puffs_per_day).round(1)
+  end
+
+  # Returns how many days of supply remain when taking the sick-day dose each session.
+  # Returns nil when sick_day_dose_puffs or doses_per_day is not set.
+  # Example: 120 puffs, 2 sessions/day × 3 sick puffs/session = 6 puffs/day → 20 days.
+  def sick_days_of_supply_remaining
+    return nil if sick_day_dose_puffs.blank? || doses_per_day.blank? || doses_per_day == 0
+    total_sick_puffs_per_day = doses_per_day * sick_day_dose_puffs
+    (remaining_doses.to_f / total_sick_puffs_per_day).round(1)
   end
 
   # Returns true when a days-of-supply estimate is available AND fewer than

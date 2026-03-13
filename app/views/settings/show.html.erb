@@ -4,6 +4,9 @@
 <div class="page-header">
   <div class="page-header-eyebrow">
     <span class="eyebrow-section">Your Account</span>
+    <% if Current.user.admin? %>
+      <span class="eyebrow-pill" style="background: var(--brand); color: #fff; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.6875rem;">Admin</span>
+    <% end %>
     <div class="eyebrow-rule" aria-hidden="true"></div>
   </div>
   <div class="page-header-main">
@@ -51,4 +54,19 @@
     </div>
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
+  <% if Current.user.admin? %>
+    <a href="/jobs" class="section-card section-card--nav" aria-label="Admin — Mission Control Jobs">
+      <div class="settings-nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.75"/>
+          <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="settings-nav-body">
+        <p class="settings-nav-title">Mission Control <span class="badge badge--admin">Admin</span></p>
+        <p class="settings-nav-description">Monitor background jobs and queue health.</p>
+      </div>
+      <span class="settings-nav-chevron" aria-hidden="true"></span>
+    </a>
+  <% end %>
 </div>
