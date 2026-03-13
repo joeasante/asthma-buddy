@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 22 (Request-Path Caching) — COMPLETE
-Plan: Plan 02 (dashboard vars cache) complete. Phase complete.
-Status: Phase 22 Plan 02 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 22-02 complete: Dashboard vars cached with Rails.cache.fetch (5min TTL, Date.current key for midnight rotation); DoseLog and HealthEvent write callbacks invalidate cache. 515 tests passing.
+Plan: Plan 03 (mark_all_read cache invalidation) complete. Phase complete.
+Status: Phase 22 Plan 03 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 22-03 complete: Explicit Rails.cache.delete after update_all in mark_all_read closes UAT gap (badge reappearing). 516 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at close: 195 passing
 
 **Phase 22 Velocity:**
+- Phase 22 Plan 03 completed: 2026-03-13 (~5 min, 2 tasks, 0 files created, 2 files modified, 1 new test — mark_all_read explicit cache delete)
+- Tests at Phase 22-03 close: 516 passing (no regressions)
 - Phase 22 Plan 02 completed: 2026-03-13 (~12 min, 2 tasks, 0 files created, 6 files modified, 7 new tests — dashboard vars cache + model invalidation callbacks)
 - Tests at Phase 22-02 close: 515 passing (no regressions)
 - Phase 22 Plan 01 completed: 2026-03-13 (~5 min, 2 tasks, 0 files created, 6 files modified, 4 new tests — badge count cache + after_commit dedup fix)
@@ -130,6 +132,11 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 22 Plan 03 Decisions (2026-03-13)
+
+- **update_all bypass requires explicit cache invalidation**: `update_all` skips all AR callbacks including `after_commit`; the badge cache key must be deleted at the controller call site immediately after `update_all` in `mark_all_read`.
+- **Cache key deleted, not written to 0**: `mark_all_read` deletes the key so the next request recomputes from DB via `fetch`, preserving the single-source-of-truth pattern rather than caching a hardcoded 0.
 
 ### Phase 22 Plan 02 Decisions (2026-03-13)
 
@@ -427,5 +434,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed Phase 22 Plan 02 — Dashboard vars cache (set_dashboard_vars + DoseLog + HealthEvent invalidation callbacks). 515 tests passing. Phase 22 complete.
+Stopped at: Completed Phase 22 Plan 03 — mark_all_read cache invalidation gap closure. 516 tests passing. Phase 22 complete.
 Resume file: None
