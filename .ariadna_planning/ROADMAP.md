@@ -401,7 +401,8 @@ Plans:
 **Depends on**: Phase 21
 
 **Plans**:
-- [ ] 22-01-PLAN.md — Notification badge count: `Rails.cache.fetch` in `set_notification_badge_count`; `after_create_commit`/`after_update_commit` invalidation callbacks on `Notification` model; tests
-- [ ] 22-02-PLAN.md — Dashboard variables: `Rails.cache.fetch` in `DashboardVariables#set_dashboard_vars`; `after_create_commit`/`after_destroy_commit` invalidation on `DoseLog` and `HealthEvent` models; tests
+- [x] 22-01-PLAN.md — Notification badge count: `Rails.cache.fetch` in `set_notification_badge_count`; `after_create_commit`/`after_update_commit` invalidation callbacks on `Notification` model; tests
+- [x] 22-02-PLAN.md — Dashboard variables: `Rails.cache.fetch` in `DashboardVariables#set_dashboard_vars`; `after_create_commit`/`after_destroy_commit` invalidation on `DoseLog` and `HealthEvent` models; tests
+- [x] 22-03-PLAN.md — Gap closure: explicit `Rails.cache.delete` in `mark_all_read` after `update_all` (bulk SQL bypasses AR callbacks)
 
 ---
