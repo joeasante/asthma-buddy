@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 21 (SEO & Meta Tags) — COMPLETE
-Plan: Plan 04 (gap closure) complete. Phase complete.
-Status: Phase 21 Plan 04 complete. 2026-03-12.
-Last activity: 2026-03-12 — Phase 21 gap-04 complete: Added Medications card to Settings hub nav grid, closing UAT test 5 gap. 500 tests passing.
+Phase: Phase 22 (Request-Path Caching) — COMPLETE
+Plan: Plan 02 (dashboard vars cache) complete. Phase complete.
+Status: Phase 22 Plan 02 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 22-02 complete: Dashboard vars cached with Rails.cache.fetch (5min TTL, Date.current key for midnight rotation); DoseLog and HealthEvent write callbacks invalidate cache. 515 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -34,6 +34,12 @@ All 9 phases delivered:
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
 - Tests at close: 195 passing
+
+**Phase 22 Velocity:**
+- Phase 22 Plan 02 completed: 2026-03-13 (~12 min, 2 tasks, 0 files created, 6 files modified, 7 new tests — dashboard vars cache + model invalidation callbacks)
+- Tests at Phase 22-02 close: 515 passing (no regressions)
+- Phase 22 Plan 01 completed: 2026-03-13 (~5 min, 2 tasks, 0 files created, 6 files modified, 4 new tests — badge count cache + after_commit dedup fix)
+- Tests at Phase 22-01 close: 515 passing (no regressions)
 
 **Milestone 3 Velocity:**
 - Phase 20 Plan 03 completed: 2026-03-12 (~8 min, 2 tasks, 6 files created, 3 files modified, 5 new tests — branded error pages + maintenance page)
@@ -124,6 +130,18 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 22 Plan 02 Decisions (2026-03-13)
+
+- **Top-level test class required for use_transactional_tests = false**: Nested class declarations inside an outer `TestCase` class do not propagate `self.use_transactional_tests = false` in Rails 8's parallel test runner. Placed cache invalidation tests as separate top-level classes (`DoseLogDashboardCacheTest`, `HealthEventDashboardCacheTest`) after the outer class closing `end`.
+- **puffs: 99 sentinel for non-transactional DoseLog cleanup**: Avoids colliding with fixture records (puffs: 2) when cleaning up in teardown via `delete_all`.
+- **HealthEvent.where(id:).update_all in teardown**: Restores `alice_illness_ongoing.ended_at` to nil without triggering after_commit callbacks (which would call the cache invalidation) — `update_all` bypasses AR callbacks.
+
+### Phase 22 Plan 01 Decisions (2026-03-13)
+
+- **Lambda callbacks bypass Rails after_commit deduplication**: Rails deduplicates `_commit_callbacks` by filter symbol — `after_create_commit :method` followed by `after_update_commit :method` (same name) silently registers only the last one. Fix: `after_commit -> { method }, on: :create` creates a unique Proc per registration. Applied to Notification, DoseLog, and HealthEvent.
+- **`use_transactional_tests = false` in nested CacheInvalidationTest class**: `after_create_commit` and `after_update_commit` fire only when the DB transaction actually commits. Rails transactional tests never commit — callbacks never fire. Nested class disables transactional tests with explicit teardown to restore fixture state.
+- **Direct `user_id` FK in invalidate_badge_cache**: Avoids association load inside the commit callback — single cache delete with no DB query.
 
 ### Phase 20 Plan 03 Decisions (2026-03-12)
 
@@ -408,6 +426,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: Completed Phase 20 Plan 03 — Branded error pages (ErrorsController, exceptions_app routing, errors.css, maintenance.html). 500 tests passing.
+Last session: 2026-03-13
+Stopped at: Completed Phase 22 Plan 02 — Dashboard vars cache (set_dashboard_vars + DoseLog + HealthEvent invalidation callbacks). 515 tests passing. Phase 22 complete.
 Resume file: None
