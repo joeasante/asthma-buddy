@@ -16,9 +16,17 @@ class Rack::Attack
     req.ip if req.path == "/registration" && req.post?
   end
 
-  # Custom response for throttled requests
-  self.throttled_responder = lambda do |_env|
-    [429, { "Content-Type" => "text/plain" }, ["Too many requests. Please wait before trying again."]]
+  # Custom response for throttled requests — message varies by which throttle fired
+  self.throttled_responder = lambda do |req|
+    message = case req.env["rack.attack.matched"]
+              when "logins/ip"
+                "Too many sign-in attempts. Please wait 20 seconds before trying again."
+              when "signups/ip"
+                "Too many sign-up attempts from this IP address. Please try again later."
+              else
+                "Too many requests. Please try again later."
+              end
+    [429, { "Content-Type" => "text/plain" }, [message]]
   end
 end
 
