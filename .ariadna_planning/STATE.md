@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 24 (Admin Observability) — IN PROGRESS
-Plan: Plan 01 (Activity tracking + admin signup notifications) complete.
-Status: Phase 24 Plan 01 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 24-01 complete: login activity tracking (last_sign_in_at + sign_in_count), AdminMailer#new_signup with after_create_commit callback, 7 new tests. 538 tests passing.
+Phase: Phase 24 (Admin Observability) — COMPLETE
+Plan: Plan 03 (Admin stats dashboard) complete. Phase 24 done.
+Status: Phase 24 Plan 03 complete. 2026-03-13.
+Last activity: 2026-03-13 — Phase 24-03 complete: Admin::DashboardController with 8 queries (total users, new this week/month, WAU, MAU, never returned, recent signups, most active), stats view with 6 metric cards and 2 data tables, 4 controller tests. 550 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -34,6 +34,10 @@ All 9 phases delivered:
 **Phase 24 Velocity:**
 - Phase 24 Plan 01 completed: 2026-03-13 (~12 min, 2 tasks, 6 files created, 6 files modified, 7 new tests — activity tracking + admin signup mailer)
 - Tests at Phase 24-01 close: 538 passing (no regressions)
+- Phase 24 Plan 02 completed: 2026-03-13 (~8 min, 2 tasks, 4 files created, 3 files modified, 8 new controller tests — admin users panel)
+- Tests at Phase 24-02 close: 546 passing (no regressions)
+- Phase 24 Plan 03 completed: 2026-03-13 (~15 min, 2 tasks, 2 files created, 1 file modified, 4 new controller tests — admin stats dashboard)
+- Tests at Phase 24-03 close: 550 passing (no regressions)
 
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
@@ -142,6 +146,14 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 24 Plan 02 Decisions (2026-03-13)
+
+- **Admin::DashboardController stub**: Route `root 'dashboard#index'` inside admin namespace requires controller to exist at load time. Created stub with stats queries; route ready for Plan 24-03 view implementation.
+- **NameError rescue removed from AdminMailer**: Forward-reference rescue (Plan 24-01 workaround) removed once `admin_users_url` route became available in Plan 24-02.
+- **button_to with turbo_confirm for admin toggles**: Browser native confirm dialog sufficient at this scale — no custom Stimulus controller needed.
+- **user == Current.user for self-demotion guard**: AR overrides `==` to compare record ids. `equal?` would compare object identity and fail across request cycles.
+- **Settings Mission Control redesigned to multi-link card**: Changed from single `section-card--nav` anchor to `section-card--admin-links` div with Jobs/Users/Stats sub-links.
 
 ### Phase 24 Plan 01 Decisions (2026-03-13)
 
