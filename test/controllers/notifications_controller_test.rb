@@ -155,3 +155,42 @@ class BadgeCacheTest < ActionDispatch::IntegrationTest
       "Expected cached value to remain the same on the second request"
   end
 end
+
+# Proves mark_all_read explicitly clears the badge cache so subsequent page
+# loads do not resurrect the badge from a stale cached count.
+class MarkAllReadCacheInvalidationTest < ActionDispatch::IntegrationTest
+  self.use_transactional_tests = false
+
+  setup do
+    @user = users(:verified_user)
+    sign_in_as @user
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    # Seed the cache with a non-zero count to simulate a warm cache from prior requests.
+    Rails.cache.write("unread_notifications/#{@user.id}", 3)
+  end
+
+  teardown do
+    Notification.where(user: @user).delete_all
+    Rails.cache.clear
+    Rails.cache = ActiveSupport::Cache::NullStore.new
+  end
+
+  test "mark_all_read deletes the badge cache key so the next request recomputes from DB" do
+    # Cache is warm with stale count of 3.
+    assert_equal 3, Rails.cache.read("unread_notifications/#{@user.id}")
+
+    post mark_all_read_notifications_path,
+         headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+
+    # Cache key must be gone — not 3, not 0.
+    assert_nil Rails.cache.read("unread_notifications/#{@user.id}"),
+      "Expected cache key to be deleted by mark_all_read, but it still exists"
+
+    # Next authenticated request (e.g. dashboard) must re-populate cache from DB (which is 0).
+    get dashboard_path
+    assert_response :success
+    assert_equal 0, Rails.cache.read("unread_notifications/#{@user.id}"),
+      "Expected cache to be repopulated with 0 after mark_all_read cleared all notifications"
+  end
+end
