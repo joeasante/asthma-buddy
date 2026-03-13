@@ -32,5 +32,4 @@ class DoseLog < ApplicationRecord
     def check_low_stock
       Notification.create_low_stock_for(medication)
     end
-
 end

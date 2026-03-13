@@ -126,6 +126,9 @@ class MedicationsSystemTest < ApplicationSystemTestCase
 
   test "active course has Log dose button and logging a dose decrements remaining count" do
     active_course = medications(:alice_active_course)
+    # Capture expected remaining BEFORE logging so the dose log is not included
+    # in the remaining_doses DB query (remaining_doses does a live query).
+    expected_remaining = active_course.remaining_doses - active_course.standard_dose_puffs
 
     visit settings_medications_url
 
@@ -141,7 +144,6 @@ class MedicationsSystemTest < ApplicationSystemTestCase
     end
 
     # Remaining count should decrement (check in the remaining count container)
-    expected_remaining = active_course.remaining_doses - active_course.standard_dose_puffs
     within "#remaining_count_#{dom_id(active_course)}" do
       assert_text "#{expected_remaining} doses"
     end

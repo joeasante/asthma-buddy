@@ -52,7 +52,7 @@ Rails.application.routes.draw do
     patch "skip/:step", to: "onboarding#skip",    as: :skip,  constraints: { step: /[12]/ }
   end
 
-  resources :notifications, only: [:index] do
+  resources :notifications, only: [ :index ] do
     member do
       patch :mark_read
     end
@@ -66,6 +66,12 @@ Rails.application.routes.draw do
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms
   get "cookies", to: "pages#cookie_policy", as: :cookie_policy
+
+  # Test-only route: signs a browser session in using a fixture session ID (sets signed cookie).
+  # Only mounted in the test environment — never available in production.
+  if Rails.env.test?
+    get "test/sign_in/:session_id", to: "test/sessions#create", as: :test_sign_in
+  end
 
   # Defines the root path route ("/")
   root "home#index"

@@ -11,5 +11,4 @@ class Settings::BaseController < ApplicationController
     @header_medication_count = visible.size
     @header_low_stock_count  = visible.count(&:low_stock?)
   end
-
 end
