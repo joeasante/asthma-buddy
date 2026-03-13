@@ -17,34 +17,45 @@ module DashboardVariables
     user  = Current.user
     today = Date.current
 
-    # NOTE: The cache stores full ActiveRecord objects (Medication with preloaded dose_logs,
-    # HealthEvent). This keeps the fetch block simple but carries a Marshal/schema-migration
-    # caveat: a column rename between cache write and read can produce nil fields on the
-    # deserialized objects. The 5-minute TTL and write-triggered invalidation callbacks on
-    # DoseLog, HealthEvent, and Medication keep the risk window small. A future refactor
-    # should replace AR objects with plain scalar hashes (see todo 338).
     cached = Rails.cache.fetch(
       DashboardVariables.dashboard_cache_key(user.id, today),
       expires_in: 5.minutes,
       race_condition_ttl: 10.seconds
     ) do
       preventer_adherence = user.medications
-        .where(medication_type: :preventer)
-        .where(course: false)
+        .where(medication_type: :preventer, course: false)
         .includes(:dose_logs)
         .select { |m| m.doses_per_day.present? }
-        .map { |m| { medication: m, result: AdherenceCalculator.call(m, today) } }
+        .map do |m|
+          result = AdherenceCalculator.call(m, today)
+          {
+            id:                  m.id,
+            name:                m.name,
+            standard_dose_puffs: m.standard_dose_puffs,
+            sick_day_dose_puffs: m.sick_day_dose_puffs,
+            taken:               result.taken,
+            scheduled:           result.scheduled,
+            status:              result.status
+          }
+        end
       reliever_medications = user.medications
-        .where(medication_type: :reliever)
-        .where(course: false)
+        .where(medication_type: :reliever, course: false)
         .includes(:dose_logs)
         .chronological
-        .to_a
-      active_illness = user.health_events
-        .where(event_type: :illness)
-        .where(ended_at: nil)
+        .map do |m|
+          {
+            id:                  m.id,
+            name:                m.name,
+            standard_dose_puffs: m.standard_dose_puffs,
+            sick_day_dose_puffs: m.sick_day_dose_puffs,
+            today_puffs:         m.dose_logs.select { |dl| dl.recorded_at.to_date == today }.sum(&:puffs)
+          }
+        end
+      illness = user.health_events
+        .where(event_type: :illness, ended_at: nil)
         .order(recorded_at: :desc)
         .first
+      active_illness = illness && { id: illness.id, recorded_at: illness.recorded_at }
 
       { preventer_adherence: preventer_adherence, reliever_medications: reliever_medications, active_illness: active_illness }
     end

@@ -68,8 +68,8 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
       </svg>
-      <span class="dash-illness-banner-text">Active illness &middot; since <%= @active_illness.recorded_at.strftime("%-d %b") %></span>
-      <%= link_to "View &rarr;".html_safe, health_event_path(@active_illness), class: "dash-illness-banner-link" %>
+      <span class="dash-illness-banner-text">Active illness &middot; since <%= @active_illness[:recorded_at].strftime("%-d %b") %></span>
+      <%= link_to "View &rarr;".html_safe, health_event_path(@active_illness[:id]), class: "dash-illness-banner-link" %>
     </div>
   <% end %>
 
@@ -122,8 +122,8 @@
   <%# ── Today's Doses ───────────────────────────────────────────── %>
   <% if @preventer_adherence.any? || @reliever_medications.any? %>
     <% sick_day_active = @active_illness && (
-         @preventer_adherence.any? { |e| e[:medication].sick_day_dose_puffs.present? } ||
-         @reliever_medications.any? { |m| m.sick_day_dose_puffs.present? }
+         @preventer_adherence.any? { |e| e[:sick_day_dose_puffs].present? } ||
+         @reliever_medications.any? { |m| m[:sick_day_dose_puffs].present? }
        ) %>
     <section class="dash-adherence" aria-label="Today's doses">
       <div class="dash-section-header">

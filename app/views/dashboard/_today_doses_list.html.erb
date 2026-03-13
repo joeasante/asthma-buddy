@@ -1,5 +1,5 @@
 <%# Local variables: preventer_adherence, reliever_medications, active_illness %>
-<% all_on_track = preventer_adherence.all? { |e| e[:result].status == :on_track } %>
+<% all_on_track = preventer_adherence.all? { |e| e[:status] == :on_track } %>
 
 <ul class="dash-adherence-list" id="today-doses-list">
   <% if all_on_track && reliever_medications.empty? && !active_illness %>
@@ -14,8 +14,7 @@
   <% else %>
     <% preventer_adherence.each do |entry| %>
       <%= render "dashboard/preventer_history_card",
-            medication: entry[:medication],
-            result: entry[:result],
+            entry: entry,
             active_illness: active_illness %>
     <% end %>
   <% end %>

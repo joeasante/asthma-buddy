@@ -1,31 +1,31 @@
-<li class="dash-adherence-item dash-adherence-item--<%= result.status %>">
-  <%= link_to medication.name,
-        settings_medications_path(anchor: dom_id(medication)),
+<li class="dash-adherence-item dash-adherence-item--<%= entry[:status] %>">
+  <%= link_to entry[:name],
+        settings_medications_path(anchor: "medication_#{entry[:id]}"),
         class: "dash-adherence-name" %>
   <div class="dash-adherence-stats">
-    <span class="dash-adherence-count" aria-label="<%= result.taken %> of <%= result.scheduled %> doses taken today">
-      <%= result.taken %> / <%= result.scheduled %>
+    <span class="dash-adherence-count" aria-label="<%= entry[:taken] %> of <%= entry[:scheduled] %> doses taken today">
+      <%= entry[:taken] %> / <%= entry[:scheduled] %>
     </span>
     <span class="dash-adherence-label">taken today</span>
   </div>
   <div class="dash-adherence-actions">
-    <%= button_to settings_medication_dose_logs_path(medication),
-          params: { dose_log: { puffs: medication.standard_dose_puffs } },
+    <%= button_to settings_medication_dose_logs_path(entry[:id]),
+          params: { dose_log: { puffs: entry[:standard_dose_puffs] } },
           class: "dash-dose-btn",
           form: { style: "display: contents" },
-          aria: { label: "Log #{medication.standard_dose_puffs} standard puffs of #{medication.name}" } do %>
-      +<%= medication.standard_dose_puffs %> puffs
+          aria: { label: "Log #{entry[:standard_dose_puffs]} standard puffs of #{entry[:name]}" } do %>
+      +<%= entry[:standard_dose_puffs] %> puffs
     <% end %>
-    <% if active_illness && medication.sick_day_dose_puffs.present? %>
-      <%= button_to settings_medication_dose_logs_path(medication),
-            params: { dose_log: { puffs: medication.sick_day_dose_puffs } },
+    <% if active_illness && entry[:sick_day_dose_puffs].present? %>
+      <%= button_to settings_medication_dose_logs_path(entry[:id]),
+            params: { dose_log: { puffs: entry[:sick_day_dose_puffs] } },
             class: "dash-dose-btn dash-dose-btn--sick",
             form: { style: "display: contents" },
-            aria: { label: "Log sick day dose: #{medication.sick_day_dose_puffs} puffs of #{medication.name}" } do %>
+            aria: { label: "Log sick day dose: #{entry[:sick_day_dose_puffs]} puffs of #{entry[:name]}" } do %>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
         </svg>
-        +<%= medication.sick_day_dose_puffs %> puffs
+        +<%= entry[:sick_day_dose_puffs] %> puffs
       <% end %>
     <% end %>
   </div>
