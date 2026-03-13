@@ -29,6 +29,12 @@ class ApplicationController < ActionController::Base
   end
 
   def set_notification_badge_count
-    @unread_notification_count = Current.user.notifications.unread.count
+    user_id = Current.user.id
+    @unread_notification_count = Rails.cache.fetch(
+      "unread_notifications/#{user_id}",
+      expires_in: 1.hour
+    ) do
+      Current.user.notifications.unread.count
+    end
   end
 end
