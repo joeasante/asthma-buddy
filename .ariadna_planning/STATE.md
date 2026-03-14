@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — COMPLETE
-Plan: Plan 04 (Dashboard UX Polish) complete. All plans in phase 25 done.
-Status: Phase 25 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-04 complete: zone-coloured insight card for interpretation, GP Summary button in header, 12-month PB threshold, 561 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — COMPLETE (gap closure done)
+Plan: Plan 05 (Health Report Gap Closure) complete. All plans + gap closure in phase 25 done.
+Status: Phase 25 complete with gap closure. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-05 complete: renamed to 30-Day Health Report, zone legend, full notes, guideline labels, sick-day dose, period courses, tighter print layout, 567 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -32,6 +32,8 @@ All 9 phases delivered:
 ## Performance Metrics
 
 **Phase 25 Velocity:**
+- Phase 25 Plan 05 completed: 2026-03-14 (~3 min, 2 tasks, 7 files modified, 3 new tests -- health report gap closure: rename, zone legend, full notes, guideline labels, sick-day dose, period courses, print tightening)
+- Tests at Phase 25-05 close: 567 passing (no regressions)
 - Phase 25 Plan 04 completed: 2026-03-14 (~2 min, 1 task, 4 files modified -- dashboard UX polish: zone insight card, header button, PB threshold)
 - Phase 25 Plan 03 completed: 2026-03-14 (~4 min, 2 tasks, 4 files modified, 3 new tests -- appointment summary detail tables + print layout fix)
 - Tests at Phase 25-03 close: 564 passing (no regressions)
