@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 24 (Admin Observability) — COMPLETE
-Plan: Plan 04 (Admin UI polish) complete. Phase 24 fully done.
-Status: Phase 24 Plan 04 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 24-04 complete: admin.css created with design-system tokens, settings hub split into two section-card--nav anchors (Mission Control + Admin), page-header icons added to /admin/users and /admin/stats, inline styles removed from stats view. 550 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — IN PROGRESS
+Plan: Plan 01 (Interpreted Insights) complete. Plan 02 pending.
+Status: Phase 25 Plan 01 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-01 complete: three interpreted-insight features added (dashboard week interpretation sentence, GINA reliever warning callout, peak flow PB aging alert). 554 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
