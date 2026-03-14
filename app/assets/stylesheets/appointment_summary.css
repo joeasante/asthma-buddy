@@ -5,7 +5,7 @@
 .appt-summary {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .appt-section-title {
@@ -132,6 +132,7 @@
 
 .appt-section.section-card {
   padding: 0.625rem 1rem;
+  margin-bottom: 0;  /* flex gap handles inter-section spacing, don't double up */
 }
 
 .appt-detail-heading {
@@ -140,7 +141,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-3);
-  margin: var(--space-sm) 0 var(--space-xs);
+  margin: var(--space-md) 0 var(--space-xs);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
 }
 
 .appt-detail-table {
@@ -212,12 +215,11 @@
 .appt-mobile-print {
   display: none;
   text-align: center;
-  padding: var(--space-sm) 0;
+  padding: var(--space-xs) 0;
 }
 
 .appt-mobile-print .appt-print-btn {
-  width: 100%;
-  justify-content: center;
+  font-size: 0.75rem;
 }
 
 /* --------------------------------------------------------------------------
