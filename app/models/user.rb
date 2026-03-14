@@ -84,6 +84,12 @@ class User < ApplicationRecord
     codes
   end
 
+  def regenerate_recovery_codes!
+    codes = generate_recovery_codes
+    update!(otp_recovery_codes: codes.join(","))
+    codes
+  end
+
   def disable_mfa!
     update!(
       otp_secret: nil,

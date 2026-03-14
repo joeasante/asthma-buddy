@@ -11,9 +11,14 @@ class SessionsController < ApplicationController
   }
 
   def new
+    session.delete(:pending_mfa_user_id)
+    session.delete(:pending_mfa_at)
   end
 
   def create
+    session.delete(:pending_mfa_user_id)
+    session.delete(:pending_mfa_at)
+
     user = User.authenticate_by(params.permit(:email_address, :password))
 
     unless user
@@ -34,6 +39,15 @@ class SessionsController < ApplicationController
       return respond_to do |format|
         format.html { redirect_to new_session_path, alert: "Please verify your email address before signing in. Check your inbox for a verification link." }
         format.json { render json: { error: "Email address not verified. Check your inbox." }, status: :forbidden }
+      end
+    end
+
+    if user.otp_required_for_login?
+      session[:pending_mfa_user_id] = user.id
+      session[:pending_mfa_at] = Time.current.to_i
+      return respond_to do |format|
+        format.html { redirect_to new_mfa_challenge_path }
+        format.json { render json: { error: "MFA required", mfa_required: true }, status: :forbidden }
       end
     end
 

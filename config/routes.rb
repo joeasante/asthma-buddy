@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   resource :session
+  resource :mfa_challenge, only: %i[ new create ], path: "mfa-challenge"
   resource :registration, only: %i[ new create ]
   get "email_verification/new", to: "email_verifications#new", as: :new_email_verification
   post "email_verification", to: "email_verifications#create", as: :email_verification_resend
@@ -24,6 +25,16 @@ Rails.application.routes.draw do
         patch :refill
       end
       resources :dose_logs, only: %i[index create destroy]
+    end
+    resource :security, only: [ :show ], controller: "security" do
+      get :setup
+      post :confirm_setup
+      get :recovery_codes
+      post :download_recovery_codes
+      get :disable
+      post :confirm_disable
+      get :regenerate_recovery_codes
+      post :confirm_regenerate_recovery_codes
     end
   end
 
