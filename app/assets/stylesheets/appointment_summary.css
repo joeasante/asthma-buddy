@@ -130,6 +130,10 @@
    Detail tables — individual record listings
    -------------------------------------------------------------------------- */
 
+.appt-section.section-card {
+  padding: 1rem 1.25rem;
+}
+
 .appt-detail-heading {
   font-size: 0.8125rem;
   font-weight: 600;
@@ -137,8 +141,6 @@
   letter-spacing: 0.05em;
   color: var(--text-3);
   margin: var(--space-sm) 0 var(--space-xs);
-  padding-top: var(--space-sm);
-  border-top: 1px dashed var(--border);
 }
 
 .appt-detail-table {
