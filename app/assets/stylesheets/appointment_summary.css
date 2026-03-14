@@ -5,16 +5,16 @@
 .appt-summary {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 0.375rem;
 }
 
 .appt-section-title {
   font-size: 1rem;
   font-weight: 700;
-  margin: 0 0 var(--space-sm);
+  margin: 0 0 0.375rem !important;
   color: var(--text);
   border-bottom: 1px solid var(--border);
-  padding-bottom: var(--space-xs);
+  padding-bottom: 0.25rem;
 }
 
 .appt-stats-grid {
@@ -132,7 +132,7 @@
 
 .appt-section.section-card {
   padding: 0.25rem 1rem 0.625rem;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .appt-detail-heading {
