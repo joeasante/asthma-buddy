@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_201031) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_211111) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -168,6 +168,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_201031) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.datetime "api_key_created_at"
+    t.string "api_key_digest"
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email_address", null: false
@@ -184,6 +186,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_201031) do
     t.integer "role", default: 0, null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["api_key_digest"], name: "index_users_on_api_key_digest", unique: true
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["last_sign_in_at"], name: "index_users_on_last_sign_in_at"

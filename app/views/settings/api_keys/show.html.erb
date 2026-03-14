@@ -1,0 +1,78 @@
+<% content_for :title, "API Key — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="Generate and manage your API key for programmatic access."><% end %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Settings</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.4; margin: 0 0.25rem;"><polyline points="9 18 15 12 9 6"/></svg>
+    <span class="eyebrow-section">API Key</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </svg>
+      </div>
+      <div>
+        <h1>API Key</h1>
+        <p class="page-header-subtitle">Manage programmatic access to your data</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if flash[:notice].present? %>
+  <p role="status" class="flash flash--notice"><%= flash[:notice] %></p>
+<% end %>
+
+<% if @plaintext_key.present? %>
+  <div class="section-card section-card--highlight">
+    <div class="section-card-header">
+      <h2 class="section-card-title">Your New API Key</h2>
+      <span class="badge badge--warning">Copy Now</span>
+    </div>
+    <div class="section-card-body">
+      <p><strong>Copy this key now. It will not be shown again.</strong></p>
+      <div class="api-key-display">
+        <code class="api-key-value" id="api-key-value"><%= @plaintext_key %></code>
+        <button type="button" class="btn-secondary btn-small" data-controller="clipboard" data-clipboard-target-value="api-key-value" data-action="clipboard#copy">Copy</button>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if @has_key %>
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2 class="section-card-title">API Key</h2>
+      <span class="badge badge--enabled">Active</span>
+    </div>
+    <div class="section-card-body">
+      <p>Your API key was created on <strong><%= @key_created_at.strftime("%B %-d, %Y at %-I:%M %p") %></strong>. Use it in the <code>Authorization</code> header as a Bearer token for programmatic access to your data.</p>
+
+      <div class="mfa-actions">
+        <%= button_to "Revoke API Key", settings_api_key_path, method: :delete, class: "btn-delete", data: { turbo_confirm: "Are you sure you want to revoke your API key? Any integrations using this key will stop working." } %>
+      </div>
+    </div>
+  </div>
+<% elsif @plaintext_key.blank? %>
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2 class="section-card-title">API Key</h2>
+      <span class="badge badge--disabled">None</span>
+    </div>
+    <div class="section-card-body">
+      <p>Generate an API key to access your Asthma Buddy data programmatically. The key will be shown once upon creation — store it somewhere safe.</p>
+
+      <div class="mfa-actions">
+        <%= button_to "Generate API Key", settings_api_key_path, method: :post, class: "btn-primary" %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="form-actions">
+  <%= link_to "Back to Settings", settings_path, class: "btn-cancel" %>
+</div>

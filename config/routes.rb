@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      resources :symptom_logs, only: [ :index ]
+      resources :peak_flow_readings, only: [ :index ]
+      resources :medications, only: [ :index ]
+      resources :dose_logs, only: [ :index ]
+      resources :health_events, only: [ :index ]
+    end
+  end
+
   resource :session
   resource :mfa_challenge, only: %i[ new create ], path: "mfa-challenge", controller: "mfa_challenge"
   resource :registration, only: %i[ new create ]
@@ -26,6 +36,7 @@ Rails.application.routes.draw do
       end
       resources :dose_logs, only: %i[index create destroy]
     end
+    resource :api_key, only: %i[show create destroy]
     resource :security, only: [ :show ], controller: "security" do
       get :setup
       post :confirm_setup

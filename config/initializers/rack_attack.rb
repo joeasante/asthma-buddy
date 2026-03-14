@@ -27,21 +27,51 @@ class Rack::Attack
     end
   end
 
+  # Throttle API requests: 60 per minute per API key
+  throttle("api/v1/requests", limit: 60, period: 1.minute) do |req|
+    if req.path.start_with?("/api/v1/")
+      # Throttle by API key digest (extracted from Bearer token)
+      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
+      Digest::SHA256.hexdigest(token) if token.present?
+    end
+  end
+
+  # Throttle unauthenticated API requests by IP (stricter limit)
+  throttle("api/v1/unauthenticated", limit: 10, period: 1.minute) do |req|
+    if req.path.start_with?("/api/v1/")
+      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
+      req.ip unless token.present?
+    end
+  end
+
   # Custom response for throttled requests — format-aware (JSON or plain text)
   self.throttled_responder = lambda do |req|
-    message = case req.env["rack.attack.matched"]
-    when "logins/ip", "logins/email"
-                "Too many sign-in attempts. Please wait before trying again."
-    when "signups/ip"
-                "Too many sign-up attempts from this IP address. Please try again later."
-    else
-                "Too many requests. Please try again later."
-    end
+    matched = req.env["rack.attack.matched"]
 
-    if req.env["HTTP_ACCEPT"]&.include?("application/json") || req.content_type&.include?("application/json")
-      [ 429, { "Content-Type" => "application/json" }, [ { error: message }.to_json ] ]
+    if matched == "api/v1/requests"
+      # API throttle: return JSON error with Retry-After header
+      match_data = req.env["rack.attack.match_data"]
+      retry_after = match_data[:period] - (Time.now.to_i % match_data[:period])
+
+      body = { error: { status: 429, message: "Rate limit exceeded. Try again later.", details: nil } }.to_json
+
+      [ 429, { "Content-Type" => "application/json", "Retry-After" => retry_after.to_s }, [ body ] ]
     else
-      [ 429, { "Content-Type" => "text/plain" }, [ message ] ]
+      # Web throttle: existing behavior
+      message = case matched
+      when "logins/ip", "logins/email"
+                  "Too many sign-in attempts. Please wait before trying again."
+      when "signups/ip"
+                  "Too many sign-up attempts from this IP address. Please try again later."
+      else
+                  "Too many requests. Please try again later."
+      end
+
+      if req.env["HTTP_ACCEPT"]&.include?("application/json") || req.content_type&.include?("application/json")
+        [ 429, { "Content-Type" => "application/json" }, [ { error: message }.to_json ] ]
+      else
+        [ 429, { "Content-Type" => "text/plain" }, [ message ] ]
+      end
     end
   end
 end
