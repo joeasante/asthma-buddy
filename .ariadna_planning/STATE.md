@@ -5,16 +5,32 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 2 — Medication & Compliance (starting Phase 10)
+**Current focus:** Milestone 3 — SaaS Foundation (starting Phase 26)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — Plan 08 complete
-Plan: Plan 08 (Dose Unit for Medications) complete. dose_unit enum (puffs/tablets/ml), form dropdown, course dose fields, dynamic Health Report units.
-Status: Phase 25 plan 08 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-08 complete: dose_unit string-backed enum, dose_unit_label helper, form dropdown, course dose fields, dynamic unit display in Health Report, 576 tests passing.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for Milestone 3
+Last activity: 2026-03-14 — Milestone 3 started; Milestone 2 complete (576 tests, 25 phases)
 
-Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
+Progress: ░░░░░░░░░░ 0% (Milestone 3 — SaaS Foundation)
+
+## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
+
+All 17 phases delivered (10–25, including 15.1):
+- Phase 10–13: Medication data layer, management UI, dose logging, dose tracking & low stock
+- Phase 14: Adherence dashboard (preventer compliance)
+- Phase 15–15.1: Health events, reliever usage history
+- Phase 16–17: Account management, legal, onboarding
+- Phase 18–19: Temporary medication courses, notifications
+- Phase 20–21: Legal pages, cookie banner, error pages, SEO & meta tags
+- Phase 22: Request-path caching (Solid Cache)
+- Phase 23: Compliance, security & accessibility (Rack::Attack, session timeout)
+- Phase 24: Admin & observability (user tracking, admin panel, stats dashboard)
+- Phase 25: Clinical intelligence (interpreted insights, 30-day Health Report, dose units)
+
+Tests at close: 576
 
 ## Milestone 1 Summary (v1.0 — Complete)
 
