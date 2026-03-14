@@ -244,7 +244,7 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 22. Request-Path Caching | 3/3 | Complete ✓ | 2026-03-12 |
 | 23. Compliance, Security & Accessibility | 2/2 | Complete ✓ | 2026-03-13 |
 | 24. Admin & Observability | 4/4 | Complete ✓ | 2026-03-14 |
-| 25. Clinical Intelligence | 6/6 | Complete ✓ | 2026-03-14 |
+| 25. Clinical Intelligence | 6/8 | In Progress | 2026-03-14 |
 
 ---
 
@@ -432,7 +432,7 @@ Plans:
 **Why this matters**: A person with asthma sees numbers but has no context for whether they are good or bad. This phase adds the interpretation layer — the single highest-value UX addition possible without changing the data model.
 **Depends on**: Phase 24
 
-**Plans:** 6 plans
+**Plans:** 8 plans
 
 Plans:
 - [ ] 25-01-PLAN.md — Dashboard Intelligence: week interpretation sentence, GINA reliever warning callout, personal best aging alert on Peak Flow page
@@ -441,3 +441,5 @@ Plans:
 - [ ] 25-04-PLAN.md — Gap closure: dashboard appointment link to header, zone-coloured insight card, PB aging 12-month threshold
 - [ ] 25-05-PLAN.md — Gap closure: rename to 30-Day Health Report, route change, dashboard link restyle, zone legend, full notes, GINA jargon removal, sick-day dose column, period-overlapping courses, print tightening
 - [ ] 25-06-PLAN.md — Gap closure: UAT fixes — screen spacing, courses table, reliever label, mobile hides
+- [ ] 25-07-PLAN.md — Gap closure: detail table card layout, dose log type, stats mobile, print button, mobile Health Report link
+- [ ] 25-08-PLAN.md — Gap closure: dose_unit data model (migration + form + display) for tablet-based courses
