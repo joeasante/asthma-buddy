@@ -559,41 +559,35 @@
 .dash-insight-card--none .dash-insight-icon { color: var(--brand); }
 
 /* --------------------------------------------------------------------------
-   GINA reliever threshold warning — shown when >2 reliever uses this week
+   GINA reliever threshold warning — compact dismissable banner
+   Mirrors .dash-illness-banner layout: icon + text + link + dismiss
    -------------------------------------------------------------------------- */
 
 .dash-gina-warning {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
   background: var(--severity-moderate-bg);
   border-left: 4px solid var(--severity-moderate);
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.875rem;
+  padding: 0.625rem 0.5rem 0.625rem 0.875rem;
   color: var(--severity-moderate-text);
 }
 
-.dash-gina-warning svg {
+.dash-gina-warning-icon {
   flex-shrink: 0;
-  margin-top: 0.125rem;
   color: var(--severity-moderate);
 }
 
-.dash-gina-warning-body {
+.dash-gina-warning-text {
   flex: 1;
-}
-
-.dash-gina-warning-body strong {
-  display: block;
   font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.dash-gina-warning-body p {
-  font-size: 0.8125rem;
-  margin: 0;
-  opacity: 0.9;
+.dash-gina-warning-text strong {
+  font-weight: 700;
 }
 
 .dash-gina-warning-link {
@@ -603,13 +597,34 @@
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  align-self: center;
   opacity: 0.8;
 }
 
 .dash-gina-warning-link:hover {
   opacity: 1;
   text-decoration: underline;
+}
+
+.dash-gina-warning-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--severity-moderate-text);
+  opacity: 0.45;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dash-gina-warning-dismiss:hover {
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.06);
 }
 
 /* --------------------------------------------------------------------------

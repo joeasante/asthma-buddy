@@ -185,7 +185,7 @@ body {
   background-color: var(--bg);
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;  /* dvh tracks the dynamic viewport on iOS Safari so the bottom nav doesn't float */
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
