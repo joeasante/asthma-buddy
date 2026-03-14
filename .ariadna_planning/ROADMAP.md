@@ -41,7 +41,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The existing admin panel, admin-only pages, and admin checks continue working identically after the migration from `admin` boolean to `role` enum — no existing functionality breaks.
   4. An admin can toggle registration open or closed from the admin panel; when closed, the signup page shows a "Registration is currently closed" message and the signup form is inaccessible.
 
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 26-01-PLAN.md — Role enum migration + Pundit policies on all controllers
+- [ ] 26-02-PLAN.md — Registration toggle + comprehensive RBAC test suite
 
 ---
 
@@ -125,7 +129,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 26. Role-Based Access Control | 0/TBD | Not started | - |
+| 26. Role-Based Access Control | 0/2 | Planning complete | - |
 | 27. Multi-Factor Authentication | 0/TBD | Not started | - |
 | 28. REST API | 0/TBD | Not started | - |
 | 29. Stripe Billing | 0/TBD | Not started | - |
