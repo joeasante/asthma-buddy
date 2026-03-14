@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 25-clinical-intelligence
 source: [25-01-SUMMARY.md, 25-02-SUMMARY.md]
 started: 2026-03-14T09:15:00Z
@@ -58,27 +58,71 @@ skipped: 1
   reason: "User reported: A GP would prefer more details — actual readings, triggers, symptoms with times/dates. Also wants email export option."
   severity: major
   test: 4
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Controller only loads aggregates (counts, averages). No individual peak flow readings, no symptom records with types/times/notes, no dose log detail, no trigger info. View renders only summary stats and counts."
+  artifacts:
+    - path: "app/controllers/appointment_summaries_controller.rb"
+      issue: "Only loads aggregate queries — no individual reading/symptom/dose records"
+    - path: "app/views/appointment_summaries/show.html.erb"
+      issue: "Only renders summary stats, zone counts, severity counts — no detailed tables"
+  missing:
+    - "Load individual peak flow readings with value, time_of_day, zone, recorded_at"
+    - "Load individual symptom logs with symptom_type, severity, recorded_at, notes"
+    - "Load individual reliever dose logs with medication name, puffs, recorded_at"
+    - "Render detailed tables with dates, times, values for each data type"
+    - "Email export action (future phase — not gap closure scope)"
 
 - truth: "Print layout renders content efficiently across pages"
   status: failed
   reason: "User reported: First page has hardly anything on it, then details start on following page — huge gap."
   severity: minor
   test: 5
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "No CSS page-break rules in @media print block. Page header + sparse first section pushes content to page 2. Missing break-inside:avoid, orphans/widows control, and print-specific spacing reduction."
+  artifacts:
+    - path: "app/assets/stylesheets/appointment_summary.css"
+      issue: "@media print block lacks break-inside, break-after rules and print-specific spacing"
+  missing:
+    - "Add break-inside:avoid on .appt-section"
+    - "Reduce page-header padding in print"
+    - "Add orphans/widows CSS properties"
 
 - truth: "Appointment summary link is discoverable and well-positioned"
   status: failed
   reason: "User reported: Link buried at bottom of This Week section is not the best place."
   severity: cosmetic
   test: 6
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Link placed at line 293 inside .dash-week-section after chart and zone legend — requires scrolling past the entire section to discover."
+  artifacts:
+    - path: "app/views/dashboard/index.html.erb"
+      issue: ".dash-appt-link placed after chart at bottom of This Week section (line 293)"
+  missing:
+    - "Move link to page-header-actions area as a secondary button"
+
+- truth: "Dashboard interpretation sentence is visually prominent and follows clinical dashboard patterns"
+  status: failed
+  reason: "User reported: styling too weak — plain italic blends in, doesn't look great. Should match clinical symptom tracking patterns (Apple Health, medical dashboards)."
+  severity: minor
+  test: 1
+  root_cause: ".dash-interpretation styled as italic paragraph with no container, background, or visual weight. Positioned after stats where it's sandwiched between visually loud elements."
+  artifacts:
+    - path: "app/assets/stylesheets/dashboard.css"
+      issue: ".dash-interpretation is just font-style:italic with color:var(--text-2) — no card/container"
+    - path: "app/views/dashboard/index.html.erb"
+      issue: "Interpretation <p> rendered after .dash-stats (line 225), before severity cards"
+  missing:
+    - "Restyle as zone-coloured insight card with background, icon, and visual weight"
+    - "Reposition before stats grid as lead element in This Week section"
+
+- truth: "Personal best aging threshold is clinically appropriate"
+  status: failed
+  reason: "User reported: 18 months is too long. 12 months would be better."
+  severity: minor
+  test: 3
+  root_cause: "Hardcoded 18.months.ago threshold in peak_flow_readings/index.html.erb line 47"
+  artifacts:
+    - path: "app/views/peak_flow_readings/index.html.erb"
+      issue: "18.months.ago threshold — user wants 12 months"
+  missing:
+    - "Change 18.months.ago to 12.months.ago"
 
 ## Additional feedback (not Phase 25 bugs)
 
