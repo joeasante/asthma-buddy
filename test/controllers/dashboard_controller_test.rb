@@ -112,7 +112,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     )
     get dashboard_path
     assert_response :success
-    assert_select ".dash-interpretation"
+    assert_select ".dash-insight-card"
     reading.destroy
   end
 
@@ -120,7 +120,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     @user.peak_flow_readings.where(recorded_at: Date.current.beginning_of_week(:monday)..).destroy_all
     get dashboard_path
     assert_response :success
-    assert_select ".dash-interpretation", count: 0
+    assert_select ".dash-insight-card", count: 0
   end
 
   test "GET /dashboard renders GINA warning when reliever used more than twice this week" do

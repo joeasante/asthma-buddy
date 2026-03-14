@@ -452,15 +452,60 @@
 }
 
 /* --------------------------------------------------------------------------
-   This Week — interpretation sentence
+   This Week — zone-coloured insight card
    -------------------------------------------------------------------------- */
 
-.dash-interpretation {
-  font-size: 0.875rem;
-  color: var(--text-2);
-  margin-top: var(--space-sm);
-  font-style: italic;
+.dash-insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  background: var(--surface-alt);
+  border-left: 3px solid var(--border);
 }
+
+.dash-insight-icon {
+  flex-shrink: 0;
+  margin-top: 0.0625rem;
+  opacity: 0.85;
+}
+
+.dash-insight-text {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--text);
+}
+
+/* Zone variants */
+.dash-insight-card--green {
+  background: var(--severity-mild-bg);
+  border-left-color: var(--severity-mild);
+}
+.dash-insight-card--green .dash-insight-icon { color: var(--severity-mild-text); }
+.dash-insight-card--green .dash-insight-text { color: var(--severity-mild-text); }
+
+.dash-insight-card--yellow {
+  background: var(--severity-moderate-bg);
+  border-left-color: var(--severity-moderate);
+}
+.dash-insight-card--yellow .dash-insight-icon { color: var(--severity-moderate-text); }
+.dash-insight-card--yellow .dash-insight-text { color: var(--severity-moderate-text); }
+
+.dash-insight-card--red {
+  background: var(--severity-severe-bg);
+  border-left-color: var(--severity-severe);
+}
+.dash-insight-card--red .dash-insight-icon { color: var(--severity-severe); }
+.dash-insight-card--red .dash-insight-text { color: var(--severity-severe-text, var(--severity-severe)); }
+
+.dash-insight-card--none {
+  background: var(--surface-alt);
+  border-left-color: var(--brand);
+}
+.dash-insight-card--none .dash-insight-icon { color: var(--brand); }
 
 /* --------------------------------------------------------------------------
    GINA reliever threshold warning — shown when >2 reliever uses this week
