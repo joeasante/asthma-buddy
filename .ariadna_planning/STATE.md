@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — COMPLETE (gap closure done)
-Plan: Plan 05 (Health Report Gap Closure) complete. All plans + gap closure in phase 25 done.
-Status: Phase 25 complete with gap closure. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-05 complete: renamed to 30-Day Health Report, zone legend, full notes, guideline labels, sick-day dose, period courses, tighter print layout, 567 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — COMPLETE (all UAT gaps closed)
+Plan: Plan 06 (UAT Gap Closure) complete. All plans + UAT fixes in phase 25 done.
+Status: Phase 25 fully complete with all UAT gaps closed. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-06 complete: fixed screen spacing, mobile responsive hides, simplified reliever label, removed sick-day dose columns, 567 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -493,3 +493,4 @@ None.
 Last session: 2026-03-14
 Stopped at: Completed Phase 25 Plan 02 — print-optimised /appointment-summary page with 5-section 30-day GP consultation summary. Phase 25 (Clinical Intelligence) fully complete. 561 tests passing.
 Resume file: None
+- **Replace GINA dashboard banner with notification** — Remove the persistent amber "Reliever used X times this week" callout from dashboard. Replace with a one-time notification (type: :reliever_threshold) triggered when weekly count crosses 2. Keep GINA threshold info in Health Report for GP context. (`2026-03-14-reliever-threshold-notification.md`)
