@@ -372,9 +372,9 @@
   .appt-stat dt { font-size: 7pt; }
   .appt-stat dd { font-size: 10pt; }
 
-  /* Page break control */
+  /* Allow sections to break across pages — avoids pushing large sections to next page */
   .appt-section {
-    break-inside: avoid;
+    break-inside: auto;
   }
 
   .appt-detail-table {
