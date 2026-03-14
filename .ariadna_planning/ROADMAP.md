@@ -234,16 +234,17 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
 | 14. Adherence Dashboard | 3/3 | Complete ✓ | 2026-03-10 |
 | 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
-| 15.1. Reliever Usage History | 0/2 | Not started | - |
-| 16. Account Management & Legal | 0/3 | Not started | - |
-| 17. Onboarding Flow | 0/2 | Not started | - |
-| 18. Temporary Medication Courses | 0/3 | Not started | - |
-| 19. Notifications | 0/3 | Not started | - |
+| 15.1. Reliever Usage History | 3/3 | Complete ✓ | 2026-03-10 |
+| 16. Account Management & Legal | 3/3 | Complete ✓ | 2026-03-10 |
+| 17. Onboarding Flow | 3/3 | Complete ✓ | 2026-03-10 |
+| 18. Temporary Medication Courses | 3/3 | Complete ✓ | 2026-03-10 |
+| 19. Notifications | 3/3 | Complete ✓ | 2026-03-11 |
 | 20. Legal Pages & Cookie Banner | 3/3 | Complete ✓ | 2026-03-12 |
-| 21. SEO & Meta Tags | 0/3 | Not started | - |
+| 21. SEO & Meta Tags | 4/4 | Complete ✓ | 2026-03-12 |
 | 22. Request-Path Caching | 3/3 | Complete ✓ | 2026-03-12 |
 | 23. Compliance, Security & Accessibility | 2/2 | Complete ✓ | 2026-03-13 |
-| 24. Admin & Observability | 0/3 | Not started | - |
+| 24. Admin & Observability | 4/4 | Complete ✓ | 2026-03-14 |
+| 25. Clinical Intelligence | 0/2 | In progress | — |
 
 ---
 
@@ -425,3 +426,14 @@ Plans:
 - [ ] 24-02-PLAN.md — Admin Users page: admin namespace routes, Admin::UsersController (index + toggle_admin), users index view, Settings Mission Control card links, controller tests
 - [ ] 24-03-PLAN.md — Admin Stats dashboard: Admin::DashboardController#index (6 metrics + 2 tables), stats view, controller tests
 
+### Phase 25: Clinical Intelligence
+
+**Goal**: Turn raw tracking data into interpreted insight — a one-sentence dashboard interpretation, GINA 2×/week reliever threshold warning, personal best aging alert, and a printable 30-day GP consultation summary.
+**Why this matters**: A person with asthma sees numbers but has no context for whether they are good or bad. This phase adds the interpretation layer — the single highest-value UX addition possible without changing the data model.
+**Depends on**: Phase 24
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 25-01-PLAN.md — Dashboard Intelligence: week interpretation sentence, GINA reliever warning callout, personal best aging alert on Peak Flow page
+- [ ] 25-02-PLAN.md — Appointment Summary view: /appointment-summary route, AppointmentSummariesController#show, print-optimised view, appointment_summary.css, dashboard link, controller tests
