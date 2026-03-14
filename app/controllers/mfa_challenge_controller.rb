@@ -70,9 +70,6 @@ class MfaChallengeController < ApplicationController
   def complete_mfa_login(user)
     session.delete(:pending_mfa_user_id)
     session.delete(:pending_mfa_at)
-    start_new_session_for user
-    session[:last_seen_at] = Time.current
-    user.update_columns(last_sign_in_at: Time.current)
-    User.where(id: user.id).update_all("sign_in_count = sign_in_count + 1")
+    complete_sign_in(user)
   end
 end

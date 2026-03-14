@@ -58,6 +58,14 @@ module Authentication
       end
     end
 
+    def complete_sign_in(user)
+      start_new_session_for user
+      session[:last_seen_at] = Time.current
+      User.where(id: user.id).update_all(
+        [ "last_sign_in_at = ?, sign_in_count = sign_in_count + 1", Time.current ]
+      )
+    end
+
     def terminate_session
       Current.session&.destroy
       cookies.delete(:session_id)

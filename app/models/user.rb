@@ -64,8 +64,8 @@ class User < ApplicationRecord
     return false if code.blank?
 
     normalized = code.to_s.strip.downcase.delete("-")
-    codes = recovery_codes_array
-    index = codes.index(normalized)
+    codes = recovery_codes
+    index = codes.index { |c| ActiveSupport::SecurityUtils.secure_compare(c.delete("-"), normalized) }
     return false unless index
 
     codes.delete_at(index)
@@ -100,11 +100,11 @@ class User < ApplicationRecord
   end
 
   def recovery_codes
-    recovery_codes_array
+    (otp_recovery_codes || "").split(",").reject(&:blank?)
   end
 
   def recovery_codes_remaining
-    recovery_codes_array.size
+    recovery_codes.size
   end
 
   private
@@ -113,12 +113,8 @@ class User < ApplicationRecord
     avatar.purge if avatar.attached?
   end
 
-  def recovery_codes_array
-    (otp_recovery_codes || "").split(",").reject(&:blank?)
-  end
-
   def generate_recovery_codes
-    10.times.map { SecureRandom.hex(5) }
+    10.times.map { SecureRandom.hex(8).scan(/.{8}/).join("-") }
   end
 
   def notify_admin_of_signup

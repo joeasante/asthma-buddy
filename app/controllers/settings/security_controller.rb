@@ -2,12 +2,17 @@
 
 class Settings::SecurityController < Settings::BaseController
   before_action -> { authorize :settings, :show? }
+  before_action :require_mfa_disabled, only: %i[setup confirm_setup]
+  before_action :require_mfa_enabled, only: %i[recovery_codes download_recovery_codes disable confirm_disable regenerate_recovery_codes confirm_regenerate_recovery_codes]
+  rate_limit to: 5, within: 1.minute, only: %i[confirm_disable confirm_regenerate_recovery_codes], with: -> {
+    redirect_to settings_security_path, alert: "Too many attempts. Try again later."
+  }
 
   def show
   end
 
   def setup
-    session[:pending_otp_secret] = ROTP::Base32.random
+    session[:pending_otp_secret] ||= ROTP::Base32.random
     prepare_setup_view(session[:pending_otp_secret])
   end
 
@@ -76,5 +81,13 @@ class Settings::SecurityController < Settings::BaseController
     @provisioning_uri = totp.provisioning_uri(Current.user.email_address)
     @qr_svg = helpers.mfa_qr_svg(@provisioning_uri)
     @manual_key = secret
+  end
+
+  def require_mfa_enabled
+    redirect_to settings_security_path, alert: "Two-factor authentication is not enabled." unless Current.user.otp_required_for_login?
+  end
+
+  def require_mfa_disabled
+    redirect_to settings_security_path, alert: "Two-factor authentication is already enabled." if Current.user.otp_required_for_login?
   end
 end
