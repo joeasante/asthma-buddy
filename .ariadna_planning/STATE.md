@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — IN PROGRESS
-Plan: Plan 01 (Interpreted Insights) complete. Plan 02 pending.
-Status: Phase 25 Plan 01 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-01 complete: three interpreted-insight features added (dashboard week interpretation sentence, GINA reliever warning callout, peak flow PB aging alert). 554 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — COMPLETE
+Plan: Plan 02 (Appointment Summary) complete. All plans in phase 25 done.
+Status: Phase 25 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-02 complete: print-optimised /appointment-summary page with 5 data sections (peak flow, symptoms, reliever use, medications, health events), 7 new tests, 561 total passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -30,6 +30,12 @@ All 9 phases delivered:
 - Phase 9: Dashboard + Accessibility + Polish (solid teal hero card, symptom pills, chart above filter)
 
 ## Performance Metrics
+
+**Phase 25 Velocity:**
+- Phase 25 Plan 02 completed: 2026-03-14 (~3 min, 2 tasks, 4 files created, 3 files modified, 7 new tests -- appointment summary page)
+- Tests at Phase 25-02 close: 561 passing (no regressions)
+- Phase 25 Plan 01 completed: 2026-03-14 (~5 min, 2 tasks -- interpreted insights)
+- Tests at Phase 25-01 close: 554 passing (no regressions)
 
 **Phase 24 Velocity:**
 - Phase 24 Plan 01 completed: 2026-03-13 (~12 min, 2 tasks, 6 files created, 6 files modified, 7 new tests — activity tracking + admin signup mailer)
@@ -479,6 +485,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13
-Stopped at: Completed Phase 24 Plan 01 — activity tracking (last_sign_in_at + sign_in_count on login) + AdminMailer#new_signup with User after_create_commit callback. 538 tests passing.
+Last session: 2026-03-14
+Stopped at: Completed Phase 25 Plan 02 — print-optimised /appointment-summary page with 5-section 30-day GP consultation summary. Phase 25 (Clinical Intelligence) fully complete. 561 tests passing.
 Resume file: None
