@@ -63,7 +63,12 @@ Plans:
   4. A user can disable MFA from their security settings after re-entering their password — subsequent logins no longer require a TOTP code.
   5. TOTP secrets and recovery codes are stored encrypted at rest; viewing the database directly does not reveal plaintext secrets.
 
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 27-01-PLAN.md — Gems, AR Encryption, MFA migration, User model MFA methods + tests
+- [ ] 27-02-PLAN.md — Routes, controllers (SecurityController, MfaChallengeController, SessionsController), views, settings Security card
+- [ ] 27-03-PLAN.md — Controller tests for MFA challenge, sessions, and security settings
 
 ---
 
@@ -130,7 +135,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
-| 27. Multi-Factor Authentication | 0/TBD | Not started | - |
+| 27. Multi-Factor Authentication | 0/3 | Not started | - |
 | 28. REST API | 0/TBD | Not started | - |
 | 29. Stripe Billing | 0/TBD | Not started | - |
 | 30. Cross-Feature Integration Tests | 0/TBD | Not started | - |
