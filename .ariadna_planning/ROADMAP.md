@@ -87,7 +87,12 @@ Plans:
   5. API requests exceeding the rate limit receive a 429 response with a Retry-After header; web requests are not affected by API rate limits.
   6. A user can revoke their API key from settings; subsequent API requests with that key return 401.
 
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 28-01-PLAN.md — API key infrastructure (migration, model concern, settings UI)
+- [ ] 28-02-PLAN.md — Versioned JSON API endpoints with auth, pagination, filtering
+- [ ] 28-03-PLAN.md — API-specific rate limiting via Rack::Attack
 
 ---
 
@@ -136,7 +141,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 |-------|----------------|--------|-----------|
 | 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
 | 27. Multi-Factor Authentication | 3/3 | ✓ Complete | 2026-03-14 |
-| 28. REST API | 0/TBD | Not started | - |
+| 28. REST API | 0/3 | Not started | - |
 | 29. Stripe Billing | 0/TBD | Not started | - |
 | 30. Cross-Feature Integration Tests | 0/TBD | Not started | - |
 
