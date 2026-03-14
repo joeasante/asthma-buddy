@@ -104,6 +104,116 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 0, user.sign_in_count
   end
 
+  # -- MFA: otp_required_for_login? --
+
+  test "otp_required_for_login? returns false when MFA not enabled" do
+    assert_not users(:verified_user).otp_required_for_login?
+  end
+
+  test "otp_required_for_login? returns true when MFA enabled" do
+    user = users(:mfa_user)
+    user.enable_mfa!(ROTP::Base32.random)
+    assert user.otp_required_for_login?
+  end
+
+  # -- MFA: enable_mfa! --
+
+  test "enable_mfa! sets otp_secret and returns 10 recovery codes" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    codes = user.enable_mfa!(secret)
+
+    assert_equal 10, codes.size
+    assert user.otp_required_for_login?
+    assert_equal secret, user.otp_secret
+  end
+
+  # -- MFA: verify_otp --
+
+  test "verify_otp accepts valid TOTP code" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    user.enable_mfa!(secret)
+
+    totp = ROTP::TOTP.new(secret, issuer: "Asthma Buddy")
+    code = totp.now
+
+    assert user.verify_otp(code)
+  end
+
+  test "verify_otp rejects invalid code" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    user.enable_mfa!(secret)
+
+    assert_not user.verify_otp("000000")
+  end
+
+  test "verify_otp prevents replay" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    user.enable_mfa!(secret)
+
+    totp = ROTP::TOTP.new(secret, issuer: "Asthma Buddy")
+    code = totp.now
+
+    assert user.verify_otp(code)
+    assert_not user.verify_otp(code)
+  end
+
+  test "verify_otp returns false for blank code" do
+    user = users(:verified_user)
+    user.enable_mfa!(ROTP::Base32.random)
+    assert_not user.verify_otp("")
+    assert_not user.verify_otp(nil)
+  end
+
+  # -- MFA: verify_recovery_code --
+
+  test "verify_recovery_code consumes code on use" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    codes = user.enable_mfa!(secret)
+
+    assert user.verify_recovery_code(codes.first)
+    assert_equal 9, user.recovery_codes_remaining
+    assert_not user.verify_recovery_code(codes.first)
+  end
+
+  test "verify_recovery_code normalizes input" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    codes = user.enable_mfa!(secret)
+
+    # Add dashes and uppercase
+    mangled = codes.first.upcase.insert(3, "-")
+    assert user.verify_recovery_code(mangled)
+  end
+
+  # -- MFA: disable_mfa! --
+
+  test "disable_mfa! clears all MFA fields" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    user.enable_mfa!(secret)
+    user.disable_mfa!
+
+    assert_nil user.otp_secret
+    assert_not user.otp_required_for_login?
+    assert_empty user.recovery_codes
+  end
+
+  # -- MFA: encryption at rest --
+
+  test "otp_secret is encrypted at rest" do
+    user = users(:verified_user)
+    secret = ROTP::Base32.random
+    user.enable_mfa!(secret)
+
+    raw = User.connection.select_value("SELECT otp_secret FROM users WHERE id = #{user.id}")
+    assert_not_equal secret, raw
+  end
+
   # -- after_create_commit :notify_admin_of_signup --
 
   test "creating a user enqueues AdminMailer.new_signup via deliver_later" do

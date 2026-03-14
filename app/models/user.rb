@@ -36,14 +36,83 @@ class User < ApplicationRecord
     password_salt.last(10)
   end
 
+  encrypts :otp_secret, deterministic: false
+  encrypts :otp_recovery_codes, deterministic: false
+
   def onboarding_complete?
     onboarding_personal_best_done? && onboarding_medication_done?
+  end
+
+  # -- MFA --
+
+  def otp_required_for_login?
+    otp_secret.present? && self[:otp_required_for_login]
+  end
+
+  def verify_otp(code)
+    return false if otp_secret.blank? || code.blank?
+
+    totp = ROTP::TOTP.new(otp_secret, issuer: "Asthma Buddy")
+    timestamp = totp.verify(code.to_s, drift_behind: 15, after: last_otp_at.to_i)
+    return false unless timestamp
+
+    update!(last_otp_at: Time.at(timestamp))
+    true
+  end
+
+  def verify_recovery_code(code)
+    return false if code.blank?
+
+    normalized = code.to_s.strip.downcase.delete("-")
+    codes = recovery_codes_array
+    index = codes.index(normalized)
+    return false unless index
+
+    codes.delete_at(index)
+    update!(otp_recovery_codes: codes.join(","))
+    true
+  end
+
+  def enable_mfa!(secret)
+    codes = generate_recovery_codes
+    update!(
+      otp_secret: secret,
+      otp_required_for_login: true,
+      otp_recovery_codes: codes.join(","),
+      last_otp_at: nil
+    )
+    codes
+  end
+
+  def disable_mfa!
+    update!(
+      otp_secret: nil,
+      otp_required_for_login: false,
+      otp_recovery_codes: nil,
+      last_otp_at: nil
+    )
+  end
+
+  def recovery_codes
+    recovery_codes_array
+  end
+
+  def recovery_codes_remaining
+    recovery_codes_array.size
   end
 
   private
 
   def purge_avatar_attachment
     avatar.purge if avatar.attached?
+  end
+
+  def recovery_codes_array
+    (otp_recovery_codes || "").split(",").reject(&:blank?)
+  end
+
+  def generate_recovery_codes
+    10.times.map { SecureRandom.hex(5) }
   end
 
   def notify_admin_of_signup
