@@ -303,9 +303,12 @@
 
 @media print {
   /* Hide non-print elements */
+  header,
   .bottom-nav,
   .top-nav,
   .no-print,
+  .skip-link,
+  .confirm-dialog,
   .footer-app { display: none !important; }
 
   /* Base print typography */
@@ -313,38 +316,51 @@
     font-size: 10pt;
     color: #000;
     background: #fff;
+    padding: 0;
+    margin: 0;
   }
 
-  /* Reduce page header spacing for print */
+  /* Tighten page header for print */
   .page-header {
     padding: 0;
-    margin-bottom: 0.25cm;
+    margin: 0 0 0.2cm;
   }
 
   .page-header-icon { display: none; }
 
-  .page-header h1 { font-size: 14pt; margin: 0; }
+  .page-header h1 { font-size: 14pt; margin: 0 !important; }
   .page-header-subtitle { font-size: 9pt; margin: 0; }
 
   .page-header-main {
     padding: 0;
   }
 
+  /* Remove main content area top spacing */
+  main {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
   /* Reduce section card spacing */
   .section-card {
     box-shadow: none;
     border: 1px solid #ccc;
-    padding: 0.3cm 0.4cm;
-    margin-bottom: 0.2cm;
+    padding: 0.2cm 0.3cm;
+    margin: 0;
+  }
+
+  .appt-section.section-card {
+    padding: 0.15cm 0.3cm;
+    margin: 0;
   }
 
   .appt-summary {
-    gap: 0.15cm;
+    gap: 0.1cm;
   }
 
   .appt-section-title {
-    margin-bottom: 0.2cm;
-    padding-bottom: 0.1cm;
+    margin: 0 0 0.15cm !important;
+    padding-bottom: 0.05cm;
     font-size: 11pt;
   }
 
