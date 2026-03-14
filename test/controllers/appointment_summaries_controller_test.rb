@@ -56,7 +56,7 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Individual Readings", response.body
     assert_match "420", response.body
-    assert_match "Morning", response.body
+    assert_match "08:00", response.body
     reading.destroy
   end
 

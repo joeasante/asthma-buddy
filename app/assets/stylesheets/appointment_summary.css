@@ -11,10 +11,10 @@
 .appt-section-title {
   font-size: 1rem;
   font-weight: 700;
-  margin: 0 0 var(--space-md);
+  margin: 0 0 var(--space-sm);
   color: var(--text);
   border-bottom: 1px solid var(--border);
-  padding-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
 }
 
 .appt-stats-grid {
@@ -70,12 +70,13 @@
 }
 
 .appt-footer {
-  font-size: 0.75rem;
-  color: var(--text-3);
+  font-size: 0.6875rem;
+  color: var(--text-4, var(--text-3));
   text-align: center;
-  padding: var(--space-md) 0;
+  padding: var(--space-sm) var(--space-md);
   border-top: 1px solid var(--border);
   margin-top: var(--space-sm);
+  line-height: 1.4;
 }
 
 /* Hide the screen-only footer in print, show print-only footer */
@@ -135,7 +136,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-3);
-  margin: var(--space-md) 0 var(--space-sm);
+  margin: var(--space-sm) 0 var(--space-xs);
   padding-top: var(--space-sm);
   border-top: 1px dashed var(--border);
 }
@@ -205,11 +206,31 @@
   border-color: var(--brand);
 }
 
+/* Mobile-only print button — shown at bottom of report on small screens */
+.appt-mobile-print {
+  display: none;
+  text-align: center;
+  padding: var(--space-sm) 0;
+}
+
+.appt-mobile-print .appt-print-btn {
+  width: 100%;
+  justify-content: center;
+}
+
 /* --------------------------------------------------------------------------
    Mobile responsive
    -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
+  /* Show bottom print button, hide header one */
+  .appt-mobile-print {
+    display: block;
+  }
+
+  .page-header-actions {
+    display: none;
+  }
   .appt-detail-table,
   .appt-detail-table thead,
   .appt-detail-table tbody,
@@ -234,33 +255,27 @@
   .appt-detail-table td {
     padding: 0.125rem 0;
     border-bottom: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
     font-size: 0.8125rem;
   }
 
   .appt-detail-table td::before {
-    content: attr(data-label);
+    content: attr(data-label) ": ";
     font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--text-3);
-    flex-shrink: 0;
-    margin-right: var(--space-sm);
   }
 
-  /* Notes cells span full width and stack below */
+  /* Notes cells — label on its own line, then content below */
   .appt-detail-table td.appt-notes-full {
-    flex-direction: column;
-    align-items: flex-start;
     margin-top: var(--space-xs);
     padding-top: var(--space-xs);
     border-top: 1px dashed var(--border);
   }
 
   .appt-detail-table td.appt-notes-full::before {
+    display: block;
     margin-bottom: 0.125rem;
   }
 
