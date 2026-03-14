@@ -31,6 +31,15 @@
     <% end %>
   </div>
 
+  <div class="field">
+    <%= form.label :dose_unit, "Dose unit" %>
+    <%= form.select :dose_unit,
+          Medication.dose_units.keys.map { |k| [k.humanize.capitalize, k] },
+          { selected: medication.dose_unit || "puffs" },
+          {} %>
+    <p class="field-hint">Puffs for inhalers, tablets for oral courses, ml for liquid medications.</p>
+  </div>
+
   <%# Course toggle checkbox %>
   <div class="field field--checkbox">
     <%= form.check_box :course, data: { "course-toggle-target": "checkbox", action: "change->course-toggle#toggle" } %>
@@ -97,6 +106,21 @@
         <% if medication.errors[:ends_on].any? %>
           <p class="field-error"><%= medication.errors[:ends_on].first %></p>
         <% end %>
+      </div>
+
+      <div class="field">
+        <%= form.label :standard_dose_puffs, "Dose per session" %>
+        <%= form.number_field :standard_dose_puffs, min: 1, step: 1 %>
+        <p class="field-hint">Number of tablets/puffs per dose session.</p>
+        <% if medication.errors[:standard_dose_puffs].any? %>
+          <p class="field-error"><%= medication.errors[:standard_dose_puffs].first %></p>
+        <% end %>
+      </div>
+
+      <div class="field">
+        <%= form.label :doses_per_day, "Sessions per day" %>
+        <%= form.number_field :doses_per_day, min: 1, step: 1 %>
+        <p class="field-hint">How many times per day this course is taken.</p>
       </div>
 
     </fieldset>

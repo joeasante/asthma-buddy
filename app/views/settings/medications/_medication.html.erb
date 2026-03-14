@@ -32,14 +32,14 @@
           <details class="med-refill-details">
             <summary class="med-overflow-item">Refill</summary>
             <div class="med-refill-form-wrap">
-              <p class="refill-form-hint">Enter the puff count of your new inhaler.</p>
+              <p class="refill-form-hint">Enter the total count for your new supply.</p>
               <%= form_with url: refill_settings_medication_path(medication), method: :patch do |f| %>
                 <div class="refill-form">
-                  <%= f.label :starting_dose_count, "Puffs in new inhaler", class: "sr-only" %>
+                  <%= f.label :starting_dose_count, "Units in new supply", class: "sr-only" %>
                   <%= f.number_field :starting_dose_count,
                         value: medication.starting_dose_count,
                         min: 0,
-                        placeholder: "Puff count",
+                        placeholder: "Total count",
                         class: "refill-count-input",
                         name: "medication[starting_dose_count]" %>
                   <%= f.submit "Confirm refill", class: "btn-primary btn-sm" %>

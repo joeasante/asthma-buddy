@@ -210,7 +210,7 @@
               <tr>
                 <td><%= med.name %></td>
                 <td><%= med.medication_type.humanize.capitalize %></td>
-                <td><%= med.standard_dose_puffs %> puff<%= "s" if med.standard_dose_puffs != 1 %></td>
+                <td><%= med.standard_dose_puffs %> <%= med.dose_unit_label(med.standard_dose_puffs) %></td>
               </tr>
             <% end %>
           </tbody>
@@ -227,7 +227,13 @@
               <tr>
                 <td><%= course.name %></td>
                 <td>Course</td>
-                <td><%= course.standard_dose_puffs %> puff<%= "s" if course.standard_dose_puffs != 1 %></td>
+                <td>
+                  <% if course.standard_dose_puffs.present? %>
+                    <%= course.standard_dose_puffs %> <%= course.dose_unit_label(course.standard_dose_puffs) %><%= " x#{course.doses_per_day}/day" if course.doses_per_day.present? %>
+                  <% else %>
+                    &mdash;
+                  <% end %>
+                </td>
                 <td><%= course.starts_on.strftime("%-d %b") %> &ndash; <%= course.ends_on.strftime("%-d %b %Y") %></td>
               </tr>
             <% end %>

@@ -119,6 +119,7 @@ class Settings::MedicationsController < Settings::BaseController
       :starting_dose_count,
       :sick_day_dose_puffs,
       :doses_per_day,
+      :dose_unit,
       :course,
       :starts_on,
       :ends_on
