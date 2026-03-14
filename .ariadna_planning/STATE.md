@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 26 of 30 (Role-Based Access Control)
-Plan: 01 complete
-Status: Plan 01 complete
-Last activity: 2026-03-14 — Phase 26 Plan 01 executed (RBAC foundation, Pundit policies, role enum)
+Plan: 02 complete (phase complete)
+Status: Phase 26 complete
+Last activity: 2026-03-14 — Phase 26 Plan 02 executed (registration toggle, RBAC test suite)
 
 Progress: ##░░░░░░░░ 20% (Milestone 3 — SaaS Foundation)
 
@@ -46,13 +46,14 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (Milestone 3)
-- Average duration: 13 min
-- Total execution time: 13 min
+- Total plans completed: 2 (Milestone 3)
+- Average duration: 9 min
+- Total execution time: 17 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 26    | 01   | 13 min   | 3     | 52    |
+| 26    | 02   | 4 min    | 2     | 20    |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - 26-01: Kept require_admin in Admin::BaseController as defense-in-depth alongside Pundit
 - 26-01: Used headless policies for non-model controllers (authorize :symbol, :action?)
 - 26-01: Defined pundit_user mapping to Current.user (app uses Current.user, not current_user)
+- 26-02: Kept ALLOWED_EMAILS for login restriction, SiteSetting only controls registration toggle
+- 26-02: Used Rails.cache.fetch with 5-min TTL for registration_open? to avoid per-request DB queries
+- 26-02: Used find_or_create_by! in toggle_registration! for resilience
 
 ### Pending Todos
 
@@ -82,5 +86,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 26-01-PLAN.md
+Stopped at: Completed 26-02-PLAN.md (Phase 26 complete)
 Resume file: None
