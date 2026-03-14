@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 26: Role-Based Access Control** — Replace admin boolean with role enum; authorize every action via Pundit policies
 - [x] **Phase 27: Multi-Factor Authentication** — TOTP-based MFA with QR setup, recovery codes, and encrypted secrets
-- [ ] **Phase 28: REST API** — Versioned JSON API with key-based auth, pagination, filtering, and rate limiting
+- [x] **Phase 28: REST API** — Versioned JSON API with key-based auth, pagination, filtering, and rate limiting
 - [ ] **Phase 29: Stripe Billing** — Subscription plans, Stripe Checkout, Customer Portal, webhook processing, feature gating
 - [ ] **Phase 30: Cross-Feature Integration Tests** — Verify interactions between MFA, API, billing, and RBAC
 
@@ -90,9 +90,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 28-01-PLAN.md — API key infrastructure (migration, model concern, settings UI)
-- [ ] 28-02-PLAN.md — Versioned JSON API endpoints with auth, pagination, filtering
-- [ ] 28-03-PLAN.md — API-specific rate limiting via Rack::Attack
+- [x] 28-01-PLAN.md — API key infrastructure (migration, model concern, settings UI)
+- [x] 28-02-PLAN.md — Versioned JSON API endpoints with auth, pagination, filtering
+- [x] 28-03-PLAN.md — API-specific rate limiting via Rack::Attack
 
 ---
 
@@ -141,7 +141,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 |-------|----------------|--------|-----------|
 | 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
 | 27. Multi-Factor Authentication | 3/3 | ✓ Complete | 2026-03-14 |
-| 28. REST API | 0/3 | Not started | - |
+| 28. REST API | 3/3 | ✓ Complete | 2026-03-14 |
 | 29. Stripe Billing | 0/TBD | Not started | - |
 | 30. Cross-Feature Integration Tests | 0/TBD | Not started | - |
 
