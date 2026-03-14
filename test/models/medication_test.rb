@@ -336,6 +336,63 @@ class MedicationTest < ActiveSupport::TestCase
     assert med.low_stock?
   end
 
+  # --- dose_unit ---
+
+  test "dose_unit defaults to puffs for new records" do
+    med = Medication.new(valid_attributes)
+    assert_equal "puffs", med.dose_unit
+  end
+
+  test "dose_unit can be set to tablets" do
+    med = Medication.new(valid_attributes.merge(dose_unit: :tablets))
+    assert med.valid?, med.errors.full_messages.inspect
+    assert_equal "tablets", med.dose_unit
+  end
+
+  test "dose_unit can be set to ml" do
+    med = Medication.new(valid_attributes.merge(dose_unit: :ml))
+    assert med.valid?, med.errors.full_messages.inspect
+    assert_equal "ml", med.dose_unit
+  end
+
+  test "dose_unit rejects invalid values" do
+    med = Medication.new(valid_attributes)
+    med.dose_unit = "capsules"
+    assert_not med.valid?
+    assert med.errors[:dose_unit].any?
+  end
+
+  # --- dose_unit_label ---
+
+  test "dose_unit_label returns puffs plural by default" do
+    med = Medication.new(valid_attributes)
+    assert_equal "puffs", med.dose_unit_label
+    assert_equal "puffs", med.dose_unit_label(2)
+  end
+
+  test "dose_unit_label returns puff singular" do
+    med = Medication.new(valid_attributes)
+    assert_equal "puff", med.dose_unit_label(1)
+  end
+
+  test "dose_unit_label returns tablets plural" do
+    med = Medication.new(valid_attributes.merge(dose_unit: :tablets))
+    assert_equal "tablets", med.dose_unit_label
+    assert_equal "tablets", med.dose_unit_label(2)
+  end
+
+  test "dose_unit_label returns tablet singular" do
+    med = Medication.new(valid_attributes.merge(dose_unit: :tablets))
+    assert_equal "tablet", med.dose_unit_label(1)
+  end
+
+  test "dose_unit_label returns ml regardless of count" do
+    med = Medication.new(valid_attributes.merge(dose_unit: :ml))
+    assert_equal "ml", med.dose_unit_label(1)
+    assert_equal "ml", med.dose_unit_label(2)
+    assert_equal "ml", med.dose_unit_label(5)
+  end
+
   # --- Course scopes ---
 
   test "active_courses scope returns only course medications with ends_on >= today" do

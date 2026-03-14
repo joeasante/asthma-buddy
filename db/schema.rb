@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_13_231818) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -77,6 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_231818) do
   create_table "medications", force: :cascade do |t|
     t.boolean "course", default: false, null: false
     t.datetime "created_at", null: false
+    t.string "dose_unit"
     t.integer "doses_per_day"
     t.date "ends_on"
     t.integer "medication_type", null: false
