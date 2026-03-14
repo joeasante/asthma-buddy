@@ -18,7 +18,7 @@ Milestone 3 transforms Asthma Buddy from a personal health tracker into a SaaS-r
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 26: Role-Based Access Control** — Replace admin boolean with role enum; authorize every action via Pundit policies
+- [x] **Phase 26: Role-Based Access Control** — Replace admin boolean with role enum; authorize every action via Pundit policies
 - [ ] **Phase 27: Multi-Factor Authentication** — TOTP-based MFA with QR setup, recovery codes, and encrypted secrets
 - [ ] **Phase 28: REST API** — Versioned JSON API with key-based auth, pagination, filtering, and rate limiting
 - [ ] **Phase 29: Stripe Billing** — Subscription plans, Stripe Checkout, Customer Portal, webhook processing, feature gating
@@ -44,8 +44,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 26-01-PLAN.md — Role enum migration + Pundit policies on all controllers
-- [ ] 26-02-PLAN.md — Registration toggle + comprehensive RBAC test suite
+- [x] 26-01-PLAN.md — Role enum migration + Pundit policies on all controllers
+- [x] 26-02-PLAN.md — Registration toggle + comprehensive RBAC test suite
 
 ---
 
@@ -129,7 +129,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 26. Role-Based Access Control | 0/2 | Planning complete | - |
+| 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
 | 27. Multi-Factor Authentication | 0/TBD | Not started | - |
 | 28. REST API | 0/TBD | Not started | - |
 | 29. Stripe Billing | 0/TBD | Not started | - |

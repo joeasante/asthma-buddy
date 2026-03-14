@@ -241,10 +241,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RBAC-01 | Phase 26 — Role-Based Access Control | Pending |
-| RBAC-02 | Phase 26 — Role-Based Access Control | Pending |
-| RBAC-03 | Phase 26 — Role-Based Access Control | Pending |
-| RBAC-04 | Phase 26 — Role-Based Access Control | Pending |
+| RBAC-01 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-02 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-03 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-04 | Phase 26 — Role-Based Access Control | Complete |
 | MFA-01 | Phase 27 — Multi-Factor Authentication | Pending |
 | MFA-02 | Phase 27 — Multi-Factor Authentication | Pending |
 | MFA-03 | Phase 27 — Multi-Factor Authentication | Pending |
@@ -270,8 +270,8 @@
 **Coverage:**
 - v1 requirements: 19 total — 19 mapped, 19 complete
 - v2 requirements: 22 total — 22 mapped, 22 complete (+ 2 REL requirements)
-- v3 requirements: 22 total — 22 mapped, 0 complete
+- v3 requirements: 22 total — 22 mapped, 4 complete
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-14 — Milestone 3 roadmap created; all 22 v3 requirements mapped to phases 26-30*
+*Last updated: 2026-03-14 — Phase 26 complete; RBAC-01 through RBAC-04 verified*
