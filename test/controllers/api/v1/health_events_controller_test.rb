@@ -78,7 +78,7 @@ class Api::V1::HealthEventsControllerTest < ActionDispatch::IntegrationTest
   test "each record has expected fields" do
     get api_v1_health_events_url, headers: api_headers(@api_token)
     record = parsed_response["data"].first
-    %w[id event_type recorded_at created_at].each do |field|
+    %w[id event_type ended_at ongoing recorded_at created_at].each do |field|
       assert record.key?(field), "Missing field: #{field}"
     end
   end

@@ -42,6 +42,7 @@ class Settings::ApiKeysControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#api-key-value", /\A[0-9a-f]{64}\z/
     assert_equal "API key generated. Copy it now — it won't be shown again.", flash[:notice]
+    assert_equal "no-store", response.headers["Cache-Control"]
   end
 
   test "create replaces existing key" do

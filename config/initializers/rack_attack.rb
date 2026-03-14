@@ -10,6 +10,11 @@ else
 end
 
 class Rack::Attack
+  # Shared helper: extract Bearer token from Authorization header
+  EXTRACT_API_TOKEN = lambda { |req|
+    req.env["HTTP_AUTHORIZATION"]&.match(ApiAuthenticatable::BEARER_PATTERN)&.[](1)
+  }
+
   # Throttle login attempts: 5 per IP per 20 seconds
   throttle("logins/ip", limit: 5, period: 20) do |req|
     req.ip if req.path == "/session" && req.post?
@@ -30,8 +35,7 @@ class Rack::Attack
   # Throttle API requests: 60 per minute per API key
   throttle("api/v1/requests", limit: 60, period: 1.minute) do |req|
     if req.path.start_with?("/api/v1/")
-      # Throttle by API key digest (extracted from Bearer token)
-      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
+      token = EXTRACT_API_TOKEN.call(req)
       Digest::SHA256.hexdigest(token) if token.present?
     end
   end
@@ -39,7 +43,7 @@ class Rack::Attack
   # Throttle unauthenticated API requests by IP (stricter limit)
   throttle("api/v1/unauthenticated", limit: 10, period: 1.minute) do |req|
     if req.path.start_with?("/api/v1/")
-      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
+      token = EXTRACT_API_TOKEN.call(req)
       req.ip unless token.present?
     end
   end
@@ -48,7 +52,7 @@ class Rack::Attack
   self.throttled_responder = lambda do |req|
     matched = req.env["rack.attack.matched"]
 
-    if matched == "api/v1/requests"
+    if matched.start_with?("api/v1/")
       # API throttle: return JSON error with Retry-After header
       match_data = req.env["rack.attack.match_data"]
       retry_after = match_data[:period] - (Time.now.to_i % match_data[:period])

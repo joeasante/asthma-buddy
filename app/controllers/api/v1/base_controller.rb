@@ -44,13 +44,14 @@ module Api
         end
 
         Current.user = user
+        Rails.logger.info("[API] user=#{user.id} endpoint=#{request.path} ip=#{request.remote_ip}")
       end
 
       def extract_bearer_token
         header = request.headers["Authorization"]
         return nil unless header.present?
 
-        match = header.match(/\ABearer\s+([a-f0-9]{64})\z/)
+        match = header.match(ApiAuthenticatable::BEARER_PATTERN)
         match&.captures&.first
       end
 
@@ -70,17 +71,21 @@ module Api
         column = scope.arel_table[date_column]
 
         if params[:date_from].present?
-          from_date = Date.parse(params[:date_from])
+          from_date = parse_iso_date(params[:date_from])
           scope = scope.where(column.gteq(from_date.beginning_of_day))
         end
 
         if params[:date_to].present?
-          to_date = Date.parse(params[:date_to])
+          to_date = parse_iso_date(params[:date_to])
           scope = scope.where(column.lteq(to_date.end_of_day))
         end
 
         scope
-      rescue Date::Error
+      end
+
+      def parse_iso_date(value)
+        Date.strptime(value, "%Y-%m-%d")
+      rescue Date::Error, ArgumentError
         raise InvalidDateParam, "Invalid date format. Use YYYY-MM-DD."
       end
 
