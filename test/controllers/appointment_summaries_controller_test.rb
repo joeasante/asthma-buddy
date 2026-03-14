@@ -47,6 +47,45 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Salbutamol", response.body  # bob_reliever fixture name
   end
 
+  test "GET /appointment-summary renders individual peak flow readings table" do
+    reading = @user.peak_flow_readings.create!(
+      value: 420, time_of_day: :morning,
+      recorded_at: 5.days.ago.change(hour: 8)
+    )
+    get appointment_summary_path
+    assert_response :success
+    assert_match "Individual Readings", response.body
+    assert_match "420", response.body
+    assert_match "Morning", response.body
+    reading.destroy
+  end
+
+  test "GET /appointment-summary renders individual symptom records" do
+    log = @user.symptom_logs.create!(
+      symptom_type: :wheezing, severity: :moderate,
+      recorded_at: 3.days.ago
+    )
+    get appointment_summary_path
+    assert_response :success
+    assert_match "Individual Records", response.body
+    assert_match "Wheezing", response.body
+    log.destroy
+  end
+
+  test "GET /appointment-summary renders dose log details" do
+    reliever = @user.medications.find_by(medication_type: :reliever, course: false)
+    skip "No reliever medication fixture" unless reliever
+    dose = @user.dose_logs.create!(
+      medication: reliever, puffs: 2,
+      recorded_at: 2.days.ago.change(hour: 14)
+    )
+    get appointment_summary_path
+    assert_response :success
+    assert_match "Dose Log", response.body
+    assert_match reliever.name, response.body
+    dose.destroy
+  end
+
   test "GET /appointment-summary shows empty states when no data in period" do
     # Destroy any readings/symptoms in the last 30 days for the verified user
     @user.peak_flow_readings.where(recorded_at: 30.days.ago..).destroy_all
