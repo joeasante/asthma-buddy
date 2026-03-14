@@ -79,4 +79,33 @@ class UserApiKeyTest < ActiveSupport::TestCase
     @user.revoke_api_key!
     assert_not @user.api_key_active?
   end
+
+  test "authenticate_by_api_key rejects expired keys" do
+    token = @user.generate_api_key!
+    @user.update_column(:api_key_created_at, 181.days.ago)
+    assert_nil User.authenticate_by_api_key(token)
+  end
+
+  test "authenticate_by_api_key accepts keys within TTL" do
+    token = @user.generate_api_key!
+    @user.update_column(:api_key_created_at, 179.days.ago)
+    assert_equal @user, User.authenticate_by_api_key(token)
+  end
+
+  test "api_key_expired? returns true for old keys" do
+    @user.generate_api_key!
+    @user.update_column(:api_key_created_at, 181.days.ago)
+    assert @user.api_key_expired?
+  end
+
+  test "api_key_expired? returns false for fresh keys" do
+    @user.generate_api_key!
+    assert_not @user.api_key_expired?
+  end
+
+  test "api_key_expires_at returns correct date" do
+    @user.generate_api_key!
+    expected = @user.api_key_created_at + ApiAuthenticatable::API_KEY_TTL
+    assert_equal expected.to_i, @user.api_key_expires_at.to_i
+  end
 end

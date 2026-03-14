@@ -50,7 +50,11 @@
       <span class="badge badge--enabled">Active</span>
     </div>
     <div class="section-card-body">
-      <p>Your API key was created on <strong><%= @key_created_at.strftime("%B %-d, %Y at %-I:%M %p") %></strong>. Use it in the <code>Authorization</code> header as a Bearer token for programmatic access to your data.</p>
+      <p>Your API key was created on <strong><%= @key_created_at&.strftime("%B %-d, %Y at %-I:%M %p") %></strong>
+        <% if @key_expires_at %>
+          and expires on <strong><%= @key_expires_at.strftime("%B %-d, %Y") %></strong>.
+        <% end %>
+        Use it in the <code>Authorization</code> header as a Bearer token for programmatic access to your data.</p>
 
       <div class="mfa-actions">
         <%= button_to "Revoke API Key", settings_api_key_path, method: :delete, class: "btn-delete", data: { turbo_confirm: "Are you sure you want to revoke your API key? Any integrations using this key will stop working." } %>
@@ -67,7 +71,8 @@
       <p>Generate an API key to access your Asthma Buddy data programmatically. The key will be shown once upon creation — store it somewhere safe.</p>
 
       <div class="mfa-actions">
-        <%= button_to "Generate API Key", settings_api_key_path, method: :post, class: "btn-primary" %>
+        <%= button_to "Generate API Key", settings_api_key_path, method: :post, class: "btn-primary",
+              data: @has_key ? { turbo_confirm: "This will replace your existing API key. Any integrations using the current key will stop working. Continue?" } : {} %>
       </div>
     </div>
   </div>

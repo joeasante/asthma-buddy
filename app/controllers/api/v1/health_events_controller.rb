@@ -15,6 +15,8 @@ module Api
             {
               id: event.id,
               event_type: event.event_type,
+              ended_at: event.ended_at,
+              ongoing: event.ended_at.nil?,
               recorded_at: event.recorded_at,
               created_at: event.created_at
             }
