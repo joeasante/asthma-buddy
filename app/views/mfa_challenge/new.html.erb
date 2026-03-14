@@ -1,0 +1,33 @@
+<% content_for :title, "Two-Factor Authentication — Asthma Buddy" %>
+
+<div class="auth-card">
+  <%= link_to "Asthma Buddy", root_path, class: "auth-brand" %>
+
+  <% if flash[:alert].present? %>
+    <p role="alert" class="flash flash--alert"><%= flash[:alert] %></p>
+  <% end %>
+
+  <h1>Two-Factor Authentication</h1>
+  <p class="auth-subtitle">Enter the 6-digit code from your authenticator app</p>
+
+  <%= form_with url: mfa_challenge_path do |form| %>
+    <div class="field">
+      <%= form.label :otp_code, "Verification code" %>
+      <%= form.text_field :otp_code,
+            required: true,
+            autofocus: true,
+            autocomplete: "one-time-code",
+            inputmode: "numeric",
+            maxlength: 6,
+            pattern: "[0-9a-zA-Z]*",
+            placeholder: "000000" %>
+    </div>
+
+    <%= form.submit "Verify" %>
+  <% end %>
+
+  <div class="auth-links">
+    <p>Lost your device? Enter one of your recovery codes above instead.</p>
+    <p><%= link_to "Back to login", new_session_path %></p>
+  </div>
+</div>

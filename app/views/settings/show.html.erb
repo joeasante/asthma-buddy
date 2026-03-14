@@ -54,6 +54,18 @@
     </div>
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
+  <a href="<%= settings_security_path %>" class="section-card section-card--nav" aria-label="Security settings">
+    <div class="settings-nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="settings-nav-body">
+      <p class="settings-nav-title">Security<%= ' <span class="badge badge--enabled">MFA Enabled</span>'.html_safe if Current.user.otp_required_for_login? %></p>
+      <p class="settings-nav-description">Manage two-factor authentication and recovery codes.</p>
+    </div>
+    <span class="settings-nav-chevron" aria-hidden="true"></span>
+  </a>
   <% if Current.user.admin? %>
     <a href="/jobs" class="section-card section-card--nav" aria-label="Mission Control">
       <div class="settings-nav-icon">
