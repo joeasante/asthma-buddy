@@ -66,6 +66,18 @@
     </div>
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
+  <a href="<%= settings_api_key_path %>" class="section-card section-card--nav" aria-label="API Key settings">
+    <div class="settings-nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="settings-nav-body">
+      <p class="settings-nav-title">API Key<%= ' <span class="badge badge--enabled">Active</span>'.html_safe if Current.user.api_key_active? %></p>
+      <p class="settings-nav-description">Generate and manage your API key for programmatic access.</p>
+    </div>
+    <span class="settings-nav-chevron" aria-hidden="true"></span>
+  </a>
   <% if Current.user.admin? %>
     <a href="/jobs" class="section-card section-card--nav" aria-label="Mission Control">
       <div class="settings-nav-icon">

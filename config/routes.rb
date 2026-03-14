@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       end
       resources :dose_logs, only: %i[index create destroy]
     end
+    resource :api_key, only: %i[show create destroy]
     resource :security, only: [ :show ], controller: "security" do
       get :setup
       post :confirm_setup
