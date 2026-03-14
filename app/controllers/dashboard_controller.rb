@@ -6,6 +6,7 @@ class DashboardController < ApplicationController
   before_action :check_onboarding
 
   def index
+    authorize :dashboard, :index?
     user = Current.user
 
     @personal_best = PersonalBestRecord.current_for(user)

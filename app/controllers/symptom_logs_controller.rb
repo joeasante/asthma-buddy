@@ -19,6 +19,7 @@ class SymptomLogsController < ApplicationController
   before_action :set_symptom_log, only: %i[ show edit update destroy ]
 
   def show
+    authorize @symptom_log
     respond_to do |format|
       format.html
       format.json { render json: symptom_log_json(@symptom_log) }
@@ -44,6 +45,7 @@ class SymptomLogsController < ApplicationController
       end
     end
 
+    authorize SymptomLog
     base_relation = Current.user.symptom_logs
                            .chronological
                            .in_date_range(@start_date, @end_date)
@@ -87,10 +89,12 @@ class SymptomLogsController < ApplicationController
 
   def new
     @symptom_log = Current.user.symptom_logs.new(recorded_at: Time.current.change(sec: 0))
+    authorize @symptom_log
   end
 
   def create
     @symptom_log = Current.user.symptom_logs.new(symptom_log_params)
+    authorize @symptom_log
 
     if @symptom_log.save
       @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
@@ -114,10 +118,11 @@ class SymptomLogsController < ApplicationController
   end
 
   def edit
-    # @symptom_log set by before_action
+    authorize @symptom_log
   end
 
   def update
+    authorize @symptom_log
     if @symptom_log.update(symptom_log_params)
       @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
         Current.user.symptom_logs.severity_counts
@@ -140,6 +145,7 @@ class SymptomLogsController < ApplicationController
   end
 
   def destroy
+    authorize @symptom_log
     @symptom_log.destroy
     @severity_counts = { mild: 0, moderate: 0, severe: 0 }.merge(
       Current.user.symptom_logs.severity_counts

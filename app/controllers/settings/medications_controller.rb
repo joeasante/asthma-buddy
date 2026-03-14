@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Settings::MedicationsController < Settings::BaseController
+  self._skip_pundit = false
   before_action :set_medication, only: %i[edit update destroy refill]
   before_action :ensure_course_not_archived, only: %i[edit update]
 
   def index
+    authorize Medication
     # Load all at once (single query + eager-load). Partition in Ruby to avoid
     # firing two separate queries with includes. The partition logic mirrors the
     # Medication.active_courses / archived_courses scopes on the model.
@@ -29,10 +31,12 @@ class Settings::MedicationsController < Settings::BaseController
 
   def new
     @medication = Current.user.medications.new
+    authorize @medication
   end
 
   def create
     @medication = Current.user.medications.new(medication_params)
+    authorize @medication
     if @medication.save
       set_header_eyebrow_vars
       respond_to do |format|
@@ -50,10 +54,11 @@ class Settings::MedicationsController < Settings::BaseController
   end
 
   def edit
-    # @medication set by before_action; renders edit.html.erb into the turbo_frame_tag dom_id(@medication)
+    authorize @medication
   end
 
   def update
+    authorize @medication
     if @medication.update(medication_params)
       set_header_eyebrow_vars
       respond_to do |format|
@@ -71,6 +76,7 @@ class Settings::MedicationsController < Settings::BaseController
   end
 
   def destroy
+    authorize @medication
     @medication.destroy
     set_header_eyebrow_vars
     respond_to do |format|
@@ -81,6 +87,7 @@ class Settings::MedicationsController < Settings::BaseController
   end
 
   def refill
+    authorize @medication
     new_count = refill_params[:starting_dose_count].to_i
     if new_count >= 0 && @medication.update(starting_dose_count: new_count, refilled_at: Time.current)
       flash.now[:notice] = "#{@medication.name} refilled. #{new_count} doses recorded."

@@ -40,7 +40,7 @@
           <th>Joined</th>
           <th>Last sign in</th>
           <th>Sign-ins</th>
-          <th>Admin</th>
+          <th>Role</th>
           <th></th>
         </tr>
       </thead>
@@ -62,24 +62,24 @@
               <% if user.admin? %>
                 <span class="badge badge--admin">Admin</span>
               <% else %>
-                —
+                <span class="badge">Member</span>
               <% end %>
             </td>
             <td>
               <% if user == Current.user %>
-                <button class="btn-secondary" disabled title="Cannot change your own admin status">
-                  <%= user.admin? ? "Remove admin" : "Make admin" %>
+                <button class="btn-secondary" disabled title="Cannot change your own role">
+                  <%= user.admin? ? "Change to Member" : "Change to Admin" %>
                 </button>
               <% else %>
                 <%= button_to(
-                      user.admin? ? "Remove admin" : "Make admin",
+                      user.admin? ? "Change to Member" : "Change to Admin",
                       toggle_admin_admin_user_path(user),
                       method: :patch,
                       class: "btn-secondary",
                       data: {
                         turbo_confirm: user.admin? ?
-                          "Remove admin from #{user.email_address}? They will lose access to this page." :
-                          "Grant admin to #{user.email_address}? They will have full admin access."
+                          "Change #{user.email_address} to Member? They will lose access to this page." :
+                          "Change #{user.email_address} to Admin? They will have full admin access."
                       }
                     ) %>
               <% end %>

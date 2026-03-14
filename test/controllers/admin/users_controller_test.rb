@@ -34,7 +34,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "PATCH toggle_admin revokes admin from admin user when others exist" do
-    @other_user.update_columns(admin: true)
+    @other_user.update_columns(role: 1)
     sign_in_as(@admin)
     patch toggle_admin_admin_user_path(@other_user)
     assert_not @other_user.reload.admin?
@@ -46,7 +46,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin)
     patch toggle_admin_admin_user_path(@admin)
     assert @admin.reload.admin?
-    assert_match "cannot change your own", flash[:alert].downcase
+    assert_match(/not authorized/i, flash[:alert])
   end
 
   test "PATCH toggle_admin unauthenticated redirects to login" do

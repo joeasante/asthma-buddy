@@ -13,6 +13,7 @@ class NotificationsController < ApplicationController
   before_action :set_notification, only: %i[mark_read]
 
   def index
+    authorize Notification
     @notifications              = Current.user.notifications.newest_first
     @unread_count               = Current.user.notifications.unread.count
     @unread_notification_count  = @unread_count
@@ -30,6 +31,7 @@ class NotificationsController < ApplicationController
   end
 
   def mark_read
+    authorize @notification
     destination = resolve_notification_path(@notification)
     @notification.update!(read: true)
     @unread_count              = Current.user.notifications.unread.count
@@ -44,6 +46,7 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_read
+    authorize Notification
     @notifications             = Current.user.notifications.unread.newest_first.to_a
     @notifications.each { |n| n.read = true }
     Current.user.notifications.unread.update_all(read: true)

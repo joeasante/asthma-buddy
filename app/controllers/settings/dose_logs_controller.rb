@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 class Settings::DoseLogsController < Settings::BaseController
+  self._skip_pundit = false
   before_action :set_medication
   before_action :set_dose_log, only: :destroy
 
   def index
+    authorize @medication, :show?
     dose_logs = @medication.dose_logs.chronological
     if params[:since].present?
       since_date = begin
@@ -28,6 +30,7 @@ class Settings::DoseLogsController < Settings::BaseController
   def create
     @dose_log = @medication.dose_logs.new(dose_log_params)
     @dose_log.user = Current.user
+    authorize @dose_log
     if @dose_log.save
       flash.now[:notice] = "Dose logged."
       set_header_eyebrow_vars
@@ -47,6 +50,7 @@ class Settings::DoseLogsController < Settings::BaseController
   end
 
   def destroy
+    authorize @dose_log
     @dose_log.destroy
     flash.now[:notice] = "Dose removed."
     set_header_eyebrow_vars

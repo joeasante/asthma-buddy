@@ -22,6 +22,7 @@ class PeakFlowReadingsController < ApplicationController
   before_action :set_peak_flow_reading, only: %i[show edit update destroy]
 
   def show
+    authorize @peak_flow_reading
     @personal_best = PersonalBestRecord.current_for(Current.user)
     pb_value = @personal_best&.value
     @zone_percentage = pb_value && @peak_flow_reading.zone ? ((@peak_flow_reading.value.to_f / pb_value) * 100).round : nil
@@ -32,6 +33,7 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def new
+    authorize PeakFlowReading
     @peak_flow_reading = Current.user.peak_flow_readings.new(
       recorded_at: Time.current.change(sec: 0),
       time_of_day: Time.current.hour < 13 ? :morning : :evening
@@ -39,6 +41,7 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def index
+    authorize PeakFlowReading
     @active_preset = ALLOWED_PRESETS.include?(params[:preset]) ? params[:preset] : "30"
 
     if params[:start_date].present? || params[:end_date].present?
@@ -128,6 +131,7 @@ class PeakFlowReadingsController < ApplicationController
 
   def create
     @peak_flow_reading = Current.user.peak_flow_readings.new(peak_flow_reading_params)
+    authorize @peak_flow_reading
 
     if @peak_flow_reading.save
       respond_to do |format|
@@ -152,10 +156,11 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def edit
-    # @peak_flow_reading and @has_personal_best set by before_actions
+    authorize @peak_flow_reading
   end
 
   def update
+    authorize @peak_flow_reading
     if @peak_flow_reading.update(peak_flow_reading_params)
       respond_to do |format|
         format.turbo_stream
@@ -179,6 +184,7 @@ class PeakFlowReadingsController < ApplicationController
   end
 
   def destroy
+    authorize @peak_flow_reading
     @peak_flow_reading.destroy
     respond_to do |format|
       format.turbo_stream do

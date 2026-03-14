@@ -89,12 +89,18 @@ class ApplicationController < ActionController::Base
     self._skip_pundit = true
   end
 
+  def pundit_user
+    Current.user
+  end
+
   def skip_authorization?
     self.class._skip_pundit
   end
 
   def verify_policy_scoped_for_index
-    verify_policy_scoped if action_name == "index"
+    # Skip if authorize was already called (controllers that scope via Current.user
+    # use authorize instead of policy_scope for index actions).
+    verify_policy_scoped if action_name == "index" && !pundit_policy_authorized?
   end
 
   def user_not_authorized

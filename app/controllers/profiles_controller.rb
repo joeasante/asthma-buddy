@@ -11,6 +11,7 @@ class ProfilesController < ApplicationController
   before_action :set_profile_data, only: %i[show update update_personal_best]
 
   def show
+    authorize :profile, :show?
     respond_to do |format|
       format.html
       format.json { render json: profile_json }
@@ -18,6 +19,7 @@ class ProfilesController < ApplicationController
   end
 
   def update
+    authorize :profile, :update?
     @form_section = params[:_profile_section].presence || detect_form_section
     update_attrs = profile_params
 
@@ -53,6 +55,7 @@ class ProfilesController < ApplicationController
   end
 
   def update_personal_best
+    authorize :profile, :update_personal_best?
     @personal_best_record = Current.user.personal_best_records.new(personal_best_params)
 
     respond_to do |format|
@@ -70,6 +73,7 @@ class ProfilesController < ApplicationController
   end
 
   def remove_avatar
+    authorize :profile, :remove_avatar?
     Current.user.avatar.purge
     respond_to do |format|
       format.turbo_stream
