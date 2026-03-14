@@ -45,4 +45,11 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     # Fixture users appear in one of the tables
     assert_select "td", text: users(:verified_user).email_address
   end
+
+  test "GET /admin shows registration toggle section" do
+    sign_in_as(@admin)
+    get admin_root_path
+    assert_response :success
+    assert_select "h2.section-card-title", text: "Site Settings"
+  end
 end

@@ -79,4 +79,47 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert response.parsed_body["errors"].any?
   end
+
+  # --- Registration toggle ---
+
+  test "GET /registration/new shows form when registration is open" do
+    assert SiteSetting.registration_open?
+    get new_registration_path
+    assert_response :success
+    assert_select "form"
+    assert_select "h1", "Create your account"
+  end
+
+  test "GET /registration/new shows closed message when registration is closed" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    get new_registration_path
+    assert_redirected_to new_session_path
+    assert_match "closed", flash[:alert]
+  end
+
+  test "POST /registration blocked when registration is closed" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    assert_no_difference "User.count" do
+      post registration_path, params: {
+        user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" }
+      }
+    end
+    assert_redirected_to new_session_path
+  end
+
+  test "POST /registration blocked when registration is closed (JSON)" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    assert_no_difference "User.count" do
+      post registration_path,
+        params: { user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" } },
+        as: :json
+    end
+    assert_response :forbidden
+  end
 end

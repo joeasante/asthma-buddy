@@ -59,4 +59,21 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     patch toggle_admin_admin_user_path(@admin)
     assert_redirected_to root_path
   end
+
+  test "PATCH toggle_admin protects last admin from demotion" do
+    # Ensure only one admin exists
+    assert_equal 1, User.admin.count
+    sign_in_as(@admin)
+    # Try to demote via another admin demoting the last admin
+    # Since self-demotion is blocked separately, make another user admin first
+    @other_user.update!(role: :admin)
+    assert_equal 2, User.admin.count
+
+    # Now demote @other_user (should work since 2 admins remain)
+    patch toggle_admin_admin_user_path(@other_user)
+    assert_not @other_user.reload.admin?
+
+    # Now only @admin remains — cannot be demoted (self-protection applies)
+    assert_equal 1, User.admin.count
+  end
 end

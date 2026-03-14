@@ -73,6 +73,29 @@ class UserTest < ActiveSupport::TestCase
     assert users(:verified_user).onboarding_complete?
   end
 
+  # -- role enum --
+
+  test "new user defaults to member role" do
+    user = User.new(email_address: "roletest@example.com", password: "password123")
+    assert_equal "member", user.role
+    assert user.member?
+  end
+
+  test "admin? returns true for admin role" do
+    assert users(:admin_user).admin?
+  end
+
+  test "member? returns true for member role" do
+    assert users(:verified_user).member?
+  end
+
+  test "role can be changed to admin" do
+    user = users(:verified_user)
+    assert user.member?
+    user.admin!
+    assert user.admin?
+  end
+
   # -- sign_in_count --
 
   test "sign_in_count defaults to 0 on a new user record" do
