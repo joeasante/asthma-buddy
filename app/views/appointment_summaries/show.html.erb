@@ -163,11 +163,10 @@
         <dd><%= @reliever_doses_per_week %></dd>
       </div>
       <div class="appt-stat">
-        <dt>Guideline limit</dt>
-        <dd><%= @reliever_doses_per_week > 2 ? "Above range (>2 uses/week)" : "Within range (<=2 uses/week)" %></dd>
+        <dt>Status</dt>
+        <dd><%= @reliever_doses_per_week > 2 ? "Above range (>2/week)" : "Within range (<=2/week)" %></dd>
       </div>
     </dl>
-    <p class="appt-guideline-note">Using a reliever more than twice a week may indicate poorly controlled asthma.</p>
     <% if @dose_logs_with_meds.any? %>
       <h3 class="appt-detail-heading">Dose Log</h3>
       <table class="appt-detail-table">
@@ -197,7 +196,7 @@
       <% if @active_medications.any? %>
         <table class="appt-table">
           <thead>
-            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Sick day dose</th></tr>
+            <tr><th>Name</th><th>Type</th><th>Dose</th></tr>
           </thead>
           <tbody>
             <% @active_medications.each do |med| %>
@@ -205,7 +204,6 @@
                 <td><%= med.name %></td>
                 <td><%= med.medication_type.humanize.capitalize %></td>
                 <td><%= med.standard_dose_puffs %> puff<%= "s" if med.standard_dose_puffs != 1 %></td>
-                <td><%= med.sick_day_dose_puffs.present? ? "#{med.sick_day_dose_puffs} puff#{"s" if med.sick_day_dose_puffs != 1}" : "\u2014" %></td>
               </tr>
             <% end %>
           </tbody>
@@ -215,7 +213,7 @@
         <h3 class="appt-detail-heading">Courses during period</h3>
         <table class="appt-table">
           <thead>
-            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Sick day dose</th><th>Dates</th></tr>
+            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Dates</th></tr>
           </thead>
           <tbody>
             <% @period_courses.each do |course| %>
@@ -223,7 +221,6 @@
                 <td><%= course.name %></td>
                 <td>Course</td>
                 <td><%= course.standard_dose_puffs %> puff<%= "s" if course.standard_dose_puffs != 1 %></td>
-                <td><%= course.sick_day_dose_puffs.present? ? "#{course.sick_day_dose_puffs} puff#{"s" if course.sick_day_dose_puffs != 1}" : "\u2014" %></td>
                 <td><%= course.starts_on.strftime("%-d %b") %> &ndash; <%= course.ends_on.strftime("%-d %b %Y") %></td>
               </tr>
             <% end %>

@@ -1140,6 +1140,12 @@ a.dash-health-event-row:focus-visible {
    Responsive
    -------------------------------------------------------------------------- */
 
+@media (max-width: 768px) {
+  .page-header-action-link {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .dash-stats {
     grid-template-columns: 1fr 1fr;

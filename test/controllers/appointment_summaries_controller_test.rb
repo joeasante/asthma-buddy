@@ -108,10 +108,11 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
     assert_match "30-Day Health Report", response.body
   end
 
-  test "GET /health-report displays Guideline limit not GINA" do
+  test "GET /health-report displays plain Status label not GINA or Guideline limit" do
     get health_report_path
     assert_response :success
-    assert_match "Guideline limit", response.body
+    assert_match "Status", response.body
     assert_no_match "GINA", response.body
+    assert_no_match "Guideline limit", response.body
   end
 end

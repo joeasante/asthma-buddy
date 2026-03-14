@@ -5,7 +5,7 @@
 .appt-summary {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .appt-section-title {
@@ -98,7 +98,10 @@
 .appt-zone-legend {
   font-size: 0.75rem;
   color: var(--text-3);
-  margin: var(--space-sm) 0 0;
+  margin: var(--space-md) 0 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
   line-height: 1.6;
 }
 .appt-zone-sep {
@@ -172,6 +175,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .appt-notes-full,
+  .appt-notes-cell {
+    word-break: break-word;
+    min-width: 80px;
+    white-space: normal;
+    max-width: none;
+  }
+
+  .appt-detail-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide print button on mobile */
+  .page-header-actions .btn-secondary {
+    display: none;
+  }
 }
 
 /* --------------------------------------------------------------------------
