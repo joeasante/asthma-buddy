@@ -55,7 +55,7 @@
     <span class="settings-nav-chevron" aria-hidden="true"></span>
   </a>
   <% if Current.user.admin? %>
-    <div class="section-card section-card--admin-links">
+    <a href="/jobs" class="section-card section-card--nav" aria-label="Mission Control">
       <div class="settings-nav-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
           <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.75"/>
@@ -65,12 +65,23 @@
       <div class="settings-nav-body">
         <p class="settings-nav-title">Mission Control <span class="badge badge--admin">Admin</span></p>
         <p class="settings-nav-description">Monitor background jobs and queue health.</p>
-        <div class="admin-nav-links">
-          <%= link_to "Jobs", "/jobs", class: "admin-nav-link" %>
-          <%= link_to "Users", admin_users_path, class: "admin-nav-link" %>
-          <%= link_to "Stats", admin_root_path, class: "admin-nav-link" %>
-        </div>
       </div>
-    </div>
+      <span class="settings-nav-chevron" aria-hidden="true"></span>
+    </a>
+    <a href="<%= admin_users_path %>" class="section-card section-card--nav" aria-label="Admin">
+      <div class="settings-nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.75"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="settings-nav-body">
+        <p class="settings-nav-title">Admin <span class="badge badge--admin">Admin</span></p>
+        <p class="settings-nav-description">Manage users and view platform stats.</p>
+      </div>
+      <span class="settings-nav-chevron" aria-hidden="true"></span>
+    </a>
   <% end %>
 </div>

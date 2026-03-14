@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Admin — shared styles for /admin/* pages
+   ========================================================================== */
+
+/* Table used on /admin/users and within /admin/stats data tables */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 2px solid var(--border);
+  color: var(--text-3);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover td {
+  background: var(--surface-alt);
+}
+
+/* Disabled toggle button — current user cannot change own admin status */
+.admin-table button[disabled],
+.admin-table button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Stat grid — used on /admin/stats */
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .admin-stat-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.admin-stat-card {
+  text-align: center;
+  padding: var(--space-md);
+}
+
+.admin-stat-label {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 var(--space-xs);
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+  line-height: 1;
+  font-family: var(--font-heading);
+}
+
+.admin-stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  margin: var(--space-xs) 0 0;
+}
+
+/* Data tables section — two-column grid on wide screens */
+.admin-tables {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 1024px) {
+  .admin-tables { grid-template-columns: 1fr 1fr; }
+}
+
+.section-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-heading);
+}
+
+.empty-state-text {
+  color: var(--text-3);
+  font-size: 0.875rem;
+  margin: 0;
+}
