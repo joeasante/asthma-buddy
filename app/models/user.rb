@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :notifications,        dependent: :delete_all    # no destroy callbacks — bulk DELETE is safe
   has_one_attached :avatar
   before_destroy :purge_avatar_attachment
+  after_create_commit :notify_admin_of_signup
 
   validates :avatar,
     content_type: { in: %w[image/jpeg image/png image/webp image/gif],
@@ -41,5 +42,11 @@ class User < ApplicationRecord
 
   def purge_avatar_attachment
     avatar.purge if avatar.attached?
+  end
+
+  def notify_admin_of_signup
+    return unless Rails.application.credentials.admin_email.present?
+
+    AdminMailer.new_signup(self).deliver_later
   end
 end

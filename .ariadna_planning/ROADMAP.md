@@ -211,7 +211,7 @@ Plans:
   4. Each step has a visible skip link; skipping advances to the next step (or to the dashboard if skipping Step 2); a skipped step does not re-appear on subsequent logins once either step has been completed or explicitly skipped in that session.
   5. A returning user who already has a personal best and at least one medication is never shown the onboarding wizard.
 
-**Plans:** 2 plans
+\*\*Plans:\*\* 4 plans
 - [ ] 17-01-PLAN.md — Migration (onboarding_personal_best_done + onboarding_medication_done boolean flags on users); OnboardingController refactor (flag persistence on complete/skip, 2-step wizard guard); DashboardController before_action :check_onboarding
 - [ ] 17-02-PLAN.md — Update onboarding views (2-step progress indicator); controller tests and system tests (full wizard, skip step 1, skip step 2, skip both, returning user bypass)
 
@@ -234,13 +234,17 @@ Phases execute in numeric order: 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 ->
 | 13. Dose Tracking & Low Stock | 3/3 | Complete ✓ | 2026-03-08 |
 | 14. Adherence Dashboard | 3/3 | Complete ✓ | 2026-03-10 |
 | 15. Health Events | 3/3 | Complete ✓ | 2026-03-09 |
-| 15.1. Reliever Usage History | 0/2 | Not started | - |
-| 16. Account Management & Legal | 0/3 | Not started | - |
-| 17. Onboarding Flow | 0/2 | Not started | - |
-| 18. Temporary Medication Courses | 0/3 | Not started | - |
-| 19. Notifications | 0/3 | Not started | - |
+| 15.1. Reliever Usage History | 3/3 | Complete ✓ | 2026-03-10 |
+| 16. Account Management & Legal | 3/3 | Complete ✓ | 2026-03-10 |
+| 17. Onboarding Flow | 3/3 | Complete ✓ | 2026-03-10 |
+| 18. Temporary Medication Courses | 3/3 | Complete ✓ | 2026-03-10 |
+| 19. Notifications | 3/3 | Complete ✓ | 2026-03-11 |
 | 20. Legal Pages & Cookie Banner | 3/3 | Complete ✓ | 2026-03-12 |
-| 21. SEO & Meta Tags | 0/3 | Not started | - |
+| 21. SEO & Meta Tags | 4/4 | Complete ✓ | 2026-03-12 |
+| 22. Request-Path Caching | 3/3 | Complete ✓ | 2026-03-12 |
+| 23. Compliance, Security & Accessibility | 2/2 | Complete ✓ | 2026-03-13 |
+| 24. Admin & Observability | 4/4 | Complete ✓ | 2026-03-14 |
+| 25. Clinical Intelligence | 8/8 | Complete ✓ | 2026-03-14 |
 
 ---
 
@@ -406,3 +410,36 @@ Plans:
 - [x] 22-03-PLAN.md — Gap closure: explicit `Rails.cache.delete` in `mark_all_read` after `update_all` (bulk SQL bypasses AR callbacks)
 
 ---
+
+---
+
+### Phase 24: Admin & Observability
+
+**Goal**: You are running a live app with real users and have zero visibility into who has registered, when they last used the app, or whether the app is providing value. This phase delivers: user activity tracking (last_sign_in_at + sign_in_count recorded on every login, admin email notification on new signup); an admin Users page (in-app user list with admin toggle, self/last-admin protection, audit logging); and an admin Stats dashboard (total users, WAU, MAU, new signups, never-returned count).
+**Why this matters**: Operational visibility is a prerequisite for a solo developer running a live health app. Without it, issues go unnoticed, engagement is a black box, and admin actions require server access.
+**Depends on**: Phase 23
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — User activity tracking: migration (last_sign_in_at, sign_in_count), SessionsController#create update_columns, AdminMailer#new_signup, User after_create_commit callback, tests
+- [ ] 24-02-PLAN.md — Admin Users page: admin namespace routes, Admin::UsersController (index + toggle_admin), users index view, Settings Mission Control card links, controller tests
+- [ ] 24-03-PLAN.md — Admin Stats dashboard: Admin::DashboardController#index (6 metrics + 2 tables), stats view, controller tests
+
+### Phase 25: Clinical Intelligence
+
+**Goal**: Turn raw tracking data into interpreted insight — a one-sentence dashboard interpretation, GINA 2×/week reliever threshold warning, personal best aging alert, and a printable 30-day GP consultation summary.
+**Why this matters**: A person with asthma sees numbers but has no context for whether they are good or bad. This phase adds the interpretation layer — the single highest-value UX addition possible without changing the data model.
+**Depends on**: Phase 24
+
+**Plans:** 8 plans
+
+Plans:
+- [ ] 25-01-PLAN.md — Dashboard Intelligence: week interpretation sentence, GINA reliever warning callout, personal best aging alert on Peak Flow page
+- [ ] 25-02-PLAN.md — Appointment Summary view: /appointment-summary route, AppointmentSummariesController#show, print-optimised view, appointment_summary.css, dashboard link, controller tests
+- [ ] 25-03-PLAN.md — Gap closure: appointment summary individual-level detail tables + print layout fix
+- [ ] 25-04-PLAN.md — Gap closure: dashboard appointment link to header, zone-coloured insight card, PB aging 12-month threshold
+- [ ] 25-05-PLAN.md — Gap closure: rename to 30-Day Health Report, route change, dashboard link restyle, zone legend, full notes, GINA jargon removal, sick-day dose column, period-overlapping courses, print tightening
+- [ ] 25-06-PLAN.md — Gap closure: UAT fixes — screen spacing, courses table, reliever label, mobile hides
+- [ ] 25-07-PLAN.md — Gap closure: detail table card layout, dose log type, stats mobile, print button, mobile Health Report link
+- [ ] 25-08-PLAN.md — Gap closure: dose_unit data model (migration + form + display) for tablet-based courses

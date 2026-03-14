@@ -75,15 +75,6 @@ class DashboardController < ApplicationController
       .order(recorded_at: :asc)
       .map(&:to_chart_marker)
 
-    # Duration events that started before this week and are still ongoing.
-    # These have no valid x-axis position so they can't be chart markers,
-    # but they're clinically relevant context shown as an "Active" strip below the chart.
-    @ongoing_health_events = user.health_events
-      .where(recorded_at: ...week_start.beginning_of_day)
-      .where(ended_at: nil)
-      .where.not(event_type: HealthEvent::POINT_IN_TIME_TYPES)
-      .order(recorded_at: :asc)
-
     # Low-stock medications — loaded with dose_logs to avoid N+1 in low_stock?
     # Exclude course medications at query level (low_stock? also returns false for course_active?,
     # but excluding at the DB level avoids loading unnecessary course records).
@@ -109,6 +100,23 @@ class DashboardController < ApplicationController
     # shared with Settings::BaseController via the DashboardVariables concern.
     set_dashboard_vars
 
+    # Week interpretation sentence — one-liner summarising the week's readings
+    @week_interpretation = build_week_interpretation(
+      avg: @week_avg,
+      avg_zone: @week_avg_zone,
+      personal_best: @personal_best&.value,
+      reading_count: @week_reading_count,
+      symptom_count: @week_symptom_count
+    )
+
+    # GINA reliever threshold — count doses logged against reliever medications this week
+    reliever_ids = @reliever_medications.map { |m| m[:id] }
+    @week_reliever_doses = reliever_ids.any? ?
+      Current.user.dose_logs
+        .where(medication_id: reliever_ids)
+        .where(recorded_at: week_start.beginning_of_day..Date.current.end_of_day)
+        .count : 0
+
     respond_to do |format|
       format.html
       format.json { render json: dashboard_json }
@@ -116,6 +124,24 @@ class DashboardController < ApplicationController
   end
 
   private
+
+    def build_week_interpretation(avg:, avg_zone:, personal_best:, reading_count:, symptom_count:)
+      return nil if reading_count == 0
+      if personal_best.nil?
+        plural = reading_count == 1 ? "reading" : "readings"
+        "#{reading_count} #{plural} this week — set your personal best to see zone classifications."
+      elsif avg_zone == "green" && symptom_count == 0
+        "Your readings are all in the Green zone and no symptoms logged this week."
+      elsif avg_zone == "green" && symptom_count > 0
+        plural = symptom_count == 1 ? "symptom" : "symptoms"
+        "Your readings are in the Green zone, but you logged #{symptom_count} #{plural} this week."
+      elsif avg_zone == "yellow"
+        pct = ((avg.to_f / personal_best) * 100).round
+        "Your average this week (#{avg} L/min) is in the Yellow zone — #{pct}% of your personal best."
+      elsif avg_zone == "red"
+        "Your average this week (#{avg} L/min) is in the Red zone. Consider reviewing your action plan with your GP."
+      end
+    end
 
     def dashboard_json
       {

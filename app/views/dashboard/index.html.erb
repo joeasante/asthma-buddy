@@ -39,6 +39,17 @@
         <p class="page-header-subtitle">Your health at a glance</p>
       </div>
     </div>
+    <div class="page-header-actions">
+      <%= link_to health_report_path, class: "page-header-action-link" do %>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Health Report
+      <% end %>
+    </div>
   </div>
 </div>
 
@@ -70,6 +81,20 @@
       </svg>
       <span class="dash-illness-banner-text">Active illness &middot; since <%= @active_illness[:recorded_at].strftime("%-d %b") %></span>
       <%= link_to "View &rarr;".html_safe, health_event_path(@active_illness[:id]), class: "dash-illness-banner-link" %>
+    </div>
+  <% end %>
+
+  <%# ── GINA reliever threshold warning ────────────────────────── %>
+  <% if @week_reliever_doses && @week_reliever_doses > 2 %>
+    <div class="dash-gina-warning" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dash-gina-warning-body">
+        <strong>Reliever used <%= @week_reliever_doses %> times this week</strong>
+        <p>Using your reliever more than twice a week may indicate your asthma isn't fully controlled. Worth discussing with your GP.</p>
+      </div>
+      <%= link_to "View usage \u2192", reliever_usage_path, class: "dash-gina-warning-link" %>
     </div>
   <% end %>
 
@@ -167,6 +192,15 @@
       </svg>
       <span>Log symptom</span>
     <% end %>
+    <%= link_to health_report_path, class: "dash-quick-btn dash-quick-btn--report", id: "dash-health-report-link" do %>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <span>Health Report</span>
+    <% end %>
   </div>
 
   <%# ── This Week — summary stats + chart ───────────────────────── %>
@@ -179,6 +213,23 @@
           <%= link_to "Symptoms", symptom_logs_path(anchor: "symptoms-graph"), class: "dash-section-link" %>
         </div>
       </div>
+
+      <% if @week_interpretation %>
+        <div class="dash-insight-card dash-insight-card--<%= @week_avg_zone || "none" %>" role="status">
+          <div class="dash-insight-icon" aria-hidden="true">
+            <% if @week_avg_zone == "green" %>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <% elsif @week_avg_zone == "yellow" %>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <% elsif @week_avg_zone == "red" %>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <% else %>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <% end %>
+          </div>
+          <p class="dash-insight-text"><%= @week_interpretation %></p>
+        </div>
+      <% end %>
 
       <%# Summary stats row — readings count, average, symptom count %>
       <div class="dash-stats">
@@ -228,18 +279,7 @@
 
       <%# Peak flow chart %>
       <% if @chart_data.any? %>
-        <% if @ongoing_health_events.any? %>
-          <div class="chart-ongoing-strip" aria-label="Currently active health events">
-            <span class="chart-ongoing-label">Currently active</span>
-            <% @ongoing_health_events.each do |e| %>
-              <span class="chart-ongoing-event">
-                <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
-                <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
-              </span>
-            <% end %>
-          </div>
-        <% end %>
-
+        <hr class="dash-divider">
         <div class="chart-section"
              data-controller="chart"
              data-chart-type-value="peakflow-bands"
@@ -282,6 +322,7 @@
           </div>
         <% end %>
       <% end %>
+
     </section>
   <% end %>
 

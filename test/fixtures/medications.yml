@@ -8,6 +8,7 @@ alice_reliever:
   starting_dose_count: 200
   sick_day_dose_puffs:
   doses_per_day:
+  dose_unit: puffs
   created_at: <%= 90.days.ago %>
   updated_at: <%= 90.days.ago %>
 
@@ -19,6 +20,7 @@ alice_preventer:
   starting_dose_count: 120
   sick_day_dose_puffs:
   doses_per_day: 2
+  dose_unit: puffs
   created_at: <%= 90.days.ago %>
   updated_at: <%= 90.days.ago %>
 
@@ -30,6 +32,7 @@ alice_combination:
   starting_dose_count: 120
   sick_day_dose_puffs:
   doses_per_day:
+  dose_unit: puffs
   created_at: <%= 90.days.ago %>
   updated_at: <%= 90.days.ago %>
 
@@ -42,6 +45,7 @@ bob_reliever:
   starting_dose_count: 200
   sick_day_dose_puffs:
   doses_per_day:
+  dose_unit: puffs
   created_at: <%= 90.days.ago %>
   updated_at: <%= 90.days.ago %>
 
@@ -54,6 +58,7 @@ alice_active_course:
   starting_dose_count: 40
   sick_day_dose_puffs:
   doses_per_day:
+  dose_unit: tablets
   course: true
   starts_on: <%= Date.today.to_s %>
   ends_on: <%= 7.days.from_now.to_date.to_s %>
@@ -69,6 +74,7 @@ alice_archived_course:
   starting_dose_count: 40
   sick_day_dose_puffs:
   doses_per_day:
+  dose_unit: tablets
   course: true
   starts_on: <%= 14.days.ago.to_date.to_s %>
   ends_on: <%= 1.day.ago.to_date.to_s %>

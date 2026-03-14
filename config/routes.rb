@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   get "adherence", to: redirect("/preventer_history")
   get "preventer_history", to: "preventer_history#index", as: :preventer_history
   get "reliever-usage",  to: "reliever_usage#index",   as: :reliever_usage
+  get "health-report", to: "appointment_summaries#show", as: :health_report
+  get "appointment-summary", to: redirect("/health-report")
   get "dashboard", to: "dashboard#index", as: :dashboard
 
   scope :onboarding, as: :onboarding do
@@ -71,6 +73,15 @@ Rails.application.routes.draw do
   # Only mounted in the test environment — never available in production.
   if Rails.env.test?
     get "test/sign_in/:session_id", to: "test/sessions#create", as: :test_sign_in
+  end
+
+  namespace :admin do
+    root "dashboard#index"
+    resources :users, only: [ :index ] do
+      member do
+        patch :toggle_admin
+      end
+    end
   end
 
   # Job monitoring UI — protected by HTTP Basic Auth (credentials: mission_control.http_basic_auth_*)

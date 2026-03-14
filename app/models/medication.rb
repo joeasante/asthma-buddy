@@ -14,6 +14,8 @@ class Medication < ApplicationRecord
     tablet:      4
   }, validate: true
 
+  enum :dose_unit, { puffs: "puffs", tablets: "tablets", ml: "ml" }, default: :puffs, validate: true
+
   validates :name,               presence: true, length: { maximum: 100 }
   validates :standard_dose_puffs, presence: true,
             numericality: { only_integer: true, greater_than: 0 },
@@ -89,6 +91,23 @@ class Medication < ApplicationRecord
     return nil if sick_day_dose_puffs.blank? || doses_per_day.blank? || doses_per_day == 0
     total_sick_puffs_per_day = doses_per_day * sick_day_dose_puffs
     (remaining_doses.to_f / total_sick_puffs_per_day).round(1)
+  end
+
+  # Returns human-readable unit label, pluralized based on count.
+  # dose_unit_label(1) => "puff", dose_unit_label(2) => "puffs"
+  # dose_unit_label(1) => "tablet", dose_unit_label(2) => "tablets"
+  # dose_unit_label(1) => "ml", dose_unit_label(2) => "ml"
+  def dose_unit_label(count = 2)
+    case dose_unit
+    when "puffs"
+      count == 1 ? "puff" : "puffs"
+    when "tablets"
+      count == 1 ? "tablet" : "tablets"
+    when "ml"
+      "ml"
+    else
+      dose_unit
+    end
   end
 
   # Returns true when a days-of-supply estimate is available AND fewer than

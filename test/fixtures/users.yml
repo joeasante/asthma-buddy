@@ -4,11 +4,14 @@ verified_user:
   email_verified_at: <%= 1.day.ago %>
   onboarding_personal_best_done: true
   onboarding_medication_done: true
+  sign_in_count: 5
+  last_sign_in_at: <%= 2.days.ago %>
 
 unverified_user:
   email_address: bob@example.com
   password_digest: <%= BCrypt::Password.create("password123") %>
   email_verified_at:
+  sign_in_count: 0
 
 new_user:
   email_address: charlie@example.com
@@ -16,3 +19,5 @@ new_user:
   email_verified_at: <%= 1.day.ago %>
   onboarding_personal_best_done: false
   onboarding_medication_done: false
+  sign_in_count: 1
+  last_sign_in_at: <%= 1.hour.ago %>

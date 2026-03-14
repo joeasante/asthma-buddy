@@ -44,6 +44,14 @@
   </div>
 <% end %>
 
+<% if @current_personal_best && @current_personal_best.recorded_at < 12.months.ago %>
+  <% months_ago = ((Date.current - @current_personal_best.recorded_at.to_date) / 30).round %>
+  <div class="pf-pb-age-notice" role="note">
+    Your personal best was set <%= months_ago %> months ago.
+    If your lung function has changed, <%= link_to "updating it", profile_path %> will keep your zone readings accurate.
+  </div>
+<% end %>
+
 <%# Everything below lives inside the Turbo Frame so filters, stats, and chart
     all update together on every filter/page change. %>
 <section id="peak-flow-graph" aria-label="Peak flow reading history" data-controller="hash-scroll">

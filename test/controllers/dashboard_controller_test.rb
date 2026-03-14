@@ -103,6 +103,51 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "GET /dashboard renders interpretation sentence when readings exist this week" do
+    reading = PeakFlowReading.create!(
+      user: @user,
+      value: 400,
+      time_of_day: :morning,
+      recorded_at: Date.current.beginning_of_week(:monday).to_datetime + 9.hours
+    )
+    get dashboard_path
+    assert_response :success
+    assert_select ".dash-insight-card"
+    reading.destroy
+  end
+
+  test "GET /dashboard does not render interpretation sentence when no readings this week" do
+    @user.peak_flow_readings.where(recorded_at: Date.current.beginning_of_week(:monday)..).destroy_all
+    get dashboard_path
+    assert_response :success
+    assert_select ".dash-insight-card", count: 0
+  end
+
+  test "GET /dashboard renders GINA warning when reliever used more than twice this week" do
+    reliever = @user.medications.find_by(medication_type: 0, course: false)
+    skip "No reliever medication fixture found for this user" unless reliever
+    3.times do |i|
+      DoseLog.create!(
+        user: @user,
+        medication: reliever,
+        puffs: 2,
+        recorded_at: Date.current.beginning_of_week(:monday) + i.days
+      )
+    end
+    get dashboard_path
+    assert_response :success
+    assert_match "Reliever used", response.body
+    DoseLog.where(user: @user, medication: reliever,
+      recorded_at: Date.current.beginning_of_week(:monday)..).destroy_all
+  end
+
+  test "GET /dashboard does not render GINA warning when reliever used twice or less this week" do
+    @user.dose_logs.where(recorded_at: Date.current.beginning_of_week(:monday)..).destroy_all
+    get dashboard_path
+    assert_response :success
+    assert_select ".dash-gina-warning", count: 0
+  end
+
   test "reliever medications excludes course medications" do
     # Verify the dashboard loads correctly — courses should not appear in reliever section
     get dashboard_path

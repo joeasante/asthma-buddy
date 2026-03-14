@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 22 (Request-Path Caching) — COMPLETE
-Plan: Plan 03 (mark_all_read cache invalidation) complete. Phase complete.
-Status: Phase 22 Plan 03 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 22-03 complete: Explicit Rails.cache.delete after update_all in mark_all_read closes UAT gap (badge reappearing). 516 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — Plan 08 complete
+Plan: Plan 08 (Dose Unit for Medications) complete. dose_unit enum (puffs/tablets/ml), form dropdown, course dose fields, dynamic Health Report units.
+Status: Phase 25 plan 08 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-08 complete: dose_unit string-backed enum, dose_unit_label helper, form dropdown, course dose fields, dynamic unit display in Health Report, 576 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -31,9 +31,36 @@ All 9 phases delivered:
 
 ## Performance Metrics
 
+**Phase 25 Velocity:**
+- Phase 25 Plan 05 completed: 2026-03-14 (~3 min, 2 tasks, 7 files modified, 3 new tests -- health report gap closure: rename, zone legend, full notes, guideline labels, sick-day dose, period courses, print tightening)
+- Tests at Phase 25-05 close: 567 passing (no regressions)
+- Phase 25 Plan 04 completed: 2026-03-14 (~2 min, 1 task, 4 files modified -- dashboard UX polish: zone insight card, header button, PB threshold)
+- Phase 25 Plan 03 completed: 2026-03-14 (~4 min, 2 tasks, 4 files modified, 3 new tests -- appointment summary detail tables + print layout fix)
+- Tests at Phase 25-03 close: 564 passing (no regressions)
+- Phase 25 Plan 02 completed: 2026-03-14 (~3 min, 2 tasks, 4 files created, 3 files modified, 7 new tests -- appointment summary page)
+- Tests at Phase 25-02 close: 561 passing (no regressions)
+- Phase 25 Plan 01 completed: 2026-03-14 (~5 min, 2 tasks -- interpreted insights)
+- Tests at Phase 25-01 close: 554 passing (no regressions)
+
+**Phase 24 Velocity:**
+- Phase 24 Plan 01 completed: 2026-03-13 (~12 min, 2 tasks, 6 files created, 6 files modified, 7 new tests — activity tracking + admin signup mailer)
+- Tests at Phase 24-01 close: 538 passing (no regressions)
+- Phase 24 Plan 02 completed: 2026-03-13 (~8 min, 2 tasks, 4 files created, 3 files modified, 8 new controller tests — admin users panel)
+- Tests at Phase 24-02 close: 546 passing (no regressions)
+- Phase 24 Plan 04 completed: 2026-03-14 (~2 min, 2 tasks, 1 file created, 4 files modified, 0 new tests — admin UI polish, design system tokens)
+- Tests at Phase 24-04 close: 550 passing (no regressions)
+- Phase 24 Plan 03 completed: 2026-03-13 (~15 min, 2 tasks, 2 files created, 1 file modified, 4 new controller tests — admin stats dashboard)
+- Tests at Phase 24-03 close: 550 passing (no regressions)
+
 **Milestone 1 Velocity:**
 - Total plans completed: ~25+
 - Tests at close: 195 passing
+
+**Phase 23 Velocity:**
+- Phase 23 Plan 02 completed: 2026-03-13 (~1 min, 1 task, 0 files created, 1 file modified, 0 new tests — throttle message gap closure)
+- Tests at Phase 23-02 close: 531 passing (no regressions)
+- Phase 23 Plan 01 completed: 2026-03-13 (~18 min, 3 tasks, 5 files created, 10 files modified, 7 new tests — rack-attack rate limiting + idle session timeout)
+- Tests at Phase 23-01 close: 531 passing (no regressions)
 
 **Phase 22 Velocity:**
 - Phase 22 Plan 03 completed: 2026-03-13 (~5 min, 2 tasks, 0 files created, 2 files modified, 1 new test — mark_all_read explicit cache delete)
@@ -132,6 +159,36 @@ All Milestone 1 decisions from previous STATE.md apply. Key carry-forwards:
 - **Pagination**: Manual `.paginate` class method returning `[records, total_pages, page]` — no kaminari/pagy
 - **Defense-in-depth**: `update_all` always includes `user_id: user.id` guard even when IDs are pre-filtered by user scope
 - **CSS**: Propshaft pipeline; CSS custom properties on `:root` in `application.css`; zone colours in `--severity-*` and `ZONE_COLORS` JS constant
+
+### Phase 24 Plan 02 Decisions (2026-03-13)
+
+- **Admin::DashboardController stub**: Route `root 'dashboard#index'` inside admin namespace requires controller to exist at load time. Created stub with stats queries; route ready for Plan 24-03 view implementation.
+- **NameError rescue removed from AdminMailer**: Forward-reference rescue (Plan 24-01 workaround) removed once `admin_users_url` route became available in Plan 24-02.
+- **button_to with turbo_confirm for admin toggles**: Browser native confirm dialog sufficient at this scale — no custom Stimulus controller needed.
+- **user == Current.user for self-demotion guard**: AR overrides `==` to compare record ids. `equal?` would compare object identity and fail across request cycles.
+- **Settings Mission Control redesigned to multi-link card**: Changed from single `section-card--nav` anchor to `section-card--admin-links` div with Jobs/Users/Stats sub-links.
+
+### Phase 24 Plan 01 Decisions (2026-03-13)
+
+- **update_columns for login metadata**: `update_columns` bypasses validations and callbacks — correct approach for tracking metadata. Single SQL UPDATE for last_sign_in_at and sign_in_count.
+- **Local user variable in SessionsController#create**: `Current.user` is not yet populated immediately after `start_new_session_for`; session cookie hasn't been re-read. Local `user` variable is safe.
+- **NameError rescue in AdminMailer#new_signup**: `admin_users_url` route doesn't exist until Plan 24-02. Rescued `NameError`, set `@admin_users_url` ivar with `/admin/users` fallback. Views use ivar. Route resolves correctly post-24-02.
+- **assert_enqueued_emails 2 in RegistrationsControllerTest**: New signup now enqueues both email verification AND admin notification. Updated from 1 to 2.
+- **include ActiveJob::TestHelper in UserTest**: Required to gain access to `assert_enqueued_with` — not available in `ActiveSupport::TestCase` by default.
+
+### Phase 23 Plan 02 Decisions (2026-03-13)
+
+- **throttled_responder uses req not _env**: rack-attack 6.x throttled_responder receives a `Rack::Attack::Request` object. The throttle name that fired is at `req.env["rack.attack.matched"]`. Using `_env` (raw Rack env hash) would require `_env["rack.attack.matched"]` but the idiom should use the `req` accessor pattern.
+- **catch-all else in throttled_responder**: A generic fallback branch ensures any future throttle names produce a sensible message without requiring another file edit.
+
+### Phase 23 Plan 01 Decisions (2026-03-13)
+
+- **Rack::Attack dedicated MemoryStore**: Rails.cache uses NullStore in the test environment — throttle counters never accumulate. Set `Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new` in the initializer so the store is independent of Rails.cache in all environments.
+- **Rack::Attack disabled by default in test env**: `Rack::Attack.enabled = false` in initializer for test env; `RateLimitingTest` brackets with `enabled = true` in setup and `false` in teardown. Middleware stays in the test stack.
+- **Session timeout tests use travel() not manual session key manipulation**: Integration test `session` modifications between requests don't persist via cookie. `travel N.minutes` advances `Time.current` so `check_session_freshness` computes correct elapsed time.
+- **sign_in_via_post needs two follow_redirect! calls**: `POST /session` redirects to `root_url` (via after_authentication_url), which redirects to `dashboard_path` for authenticated users.
+- **skip_before_action :check_session_freshness required on all unauthenticated controllers**: Any future unauthenticated controller must add this skip to avoid false timeout redirects.
+- **CspReportsController inherits ActionController::Base, not ApplicationController**: check_session_freshness never registered there; no skip needed.
 
 ### Phase 22 Plan 03 Decisions (2026-03-13)
 
@@ -433,6 +490,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13
-Stopped at: Completed Phase 22 Plan 03 — mark_all_read cache invalidation gap closure. 516 tests passing. Phase 22 complete.
+Last session: 2026-03-14
+Stopped at: Completed Phase 25 Plan 02 — print-optimised /appointment-summary page with 5-section 30-day GP consultation summary. Phase 25 (Clinical Intelligence) fully complete. 561 tests passing.
 Resume file: None
+- **Replace GINA dashboard banner with notification** — Remove the persistent amber "Reliever used X times this week" callout from dashboard. Replace with a one-time notification (type: :reliever_threshold) triggered when weekly count crosses 2. Keep GINA threshold info in Health Report for GP context. (`2026-03-14-reliever-threshold-notification.md`)

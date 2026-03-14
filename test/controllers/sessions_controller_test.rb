@@ -116,4 +116,25 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
     assert_equal "Authentication required", response.parsed_body["error"]
   end
+
+  # -- Activity tracking --
+
+  test "POST /session with valid credentials updates last_sign_in_at" do
+    freeze_time do
+      post session_path, params: { email_address: @user.email_address, password: "password123" }
+      assert_in_delta Time.current, @user.reload.last_sign_in_at, 1.second
+    end
+  end
+
+  test "POST /session with valid credentials increments sign_in_count" do
+    initial_count = @user.sign_in_count
+    post session_path, params: { email_address: @user.email_address, password: "password123" }
+    assert_equal initial_count + 1, @user.reload.sign_in_count
+  end
+
+  test "POST /session with invalid credentials does not update last_sign_in_at" do
+    original_ts = @user.last_sign_in_at
+    post session_path, params: { email_address: @user.email_address, password: "wrongpassword" }
+    assert_equal original_ts, @user.reload.last_sign_in_at
+  end
 end

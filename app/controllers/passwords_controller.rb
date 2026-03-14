@@ -2,6 +2,7 @@
 
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
+  skip_before_action :check_session_freshness
   before_action :set_user_by_token, only: %i[ edit update ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
     respond_to do |format|

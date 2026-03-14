@@ -1,0 +1,114 @@
+<% content_for :title, "Stats — Admin — Asthma Buddy" %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Admin</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Stats</h1>
+        <p class="page-header-subtitle">User growth and engagement</p>
+      </div>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "Users", admin_users_path, class: "btn-secondary" %>
+    </div>
+  </div>
+</div>
+
+<div class="admin-stat-grid">
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">Total Users</p>
+    <p class="admin-stat-value"><%= @total_users %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">New This Week</p>
+    <p class="admin-stat-value"><%= @new_this_week %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">New This Month</p>
+    <p class="admin-stat-value"><%= @new_this_month %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">WAU (7 days)</p>
+    <p class="admin-stat-value"><%= @wau %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">MAU (30 days)</p>
+    <p class="admin-stat-value"><%= @mau %></p>
+  </div>
+  <div class="section-card admin-stat-card">
+    <p class="admin-stat-label">Never Returned</p>
+    <p class="admin-stat-value"><%= @never_returned %></p>
+    <p class="admin-stat-sub">Signed up, logged in once</p>
+  </div>
+</div>
+
+<div class="admin-tables">
+  <div class="section-card">
+    <h2 class="section-card-title">Recent Signups</h2>
+    <% if @recent_signups.empty? %>
+      <p class="empty-state-text">No signups yet.</p>
+    <% else %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_signups.each do |user| %>
+            <tr>
+              <td><%= user.email_address %></td>
+              <td><%= user.full_name.presence || "—" %></td>
+              <td><%= user.created_at.strftime("%d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+
+  <div class="section-card">
+    <h2 class="section-card-title">Most Active</h2>
+    <% if @most_active.empty? %>
+      <p class="empty-state-text">No activity yet.</p>
+    <% else %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Sign-ins</th>
+            <th>Last sign in</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @most_active.each do |user| %>
+            <tr>
+              <td><%= user.email_address %></td>
+              <td><%= user.sign_in_count %></td>
+              <td>
+                <% if user.last_sign_in_at? %>
+                  <%= user.last_sign_in_at.strftime("%d %b %Y") %>
+                <% else %>
+                  Never
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>

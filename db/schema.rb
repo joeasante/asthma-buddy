@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_13_184514) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -77,6 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_184514) do
   create_table "medications", force: :cascade do |t|
     t.boolean "course", default: false, null: false
     t.datetime "created_at", null: false
+    t.string "dose_unit"
     t.integer "doses_per_day"
     t.date "ends_on"
     t.integer "medication_type", null: false
@@ -164,9 +165,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_184514) do
     t.string "email_address", null: false
     t.datetime "email_verified_at"
     t.string "full_name"
+    t.datetime "last_sign_in_at"
     t.boolean "onboarding_medication_done", default: false, null: false
     t.boolean "onboarding_personal_best_done", default: false, null: false
     t.string "password_digest", null: false
+    t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end

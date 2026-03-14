@@ -1,0 +1,296 @@
+<% content_for :title, "30-Day Health Report — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="30-day asthma summary for your GP consultation — peak flow, symptoms, reliever use, and medications."><% end %>
+
+<div class="page-header">
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <div>
+        <h1>30-Day Health Report</h1>
+        <p class="page-header-subtitle">Last 30 days: <%= @period_start.strftime("%-d %b") %> &ndash; <%= Date.current.strftime("%-d %b %Y") %></p>
+      </div>
+    </div>
+    <div class="page-header-actions no-print">
+      <button onclick="window.print()" class="page-header-action-link appt-print-btn" aria-label="Print or save as PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        <span class="appt-print-label">Print</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="appt-summary">
+
+  <%# -- 1. Peak Flow -------------------------------------------------------- %>
+  <section class="section-card appt-section">
+    <h2 class="appt-section-title">Peak Flow</h2>
+    <% if @reading_count == 0 %>
+      <p class="appt-empty">No peak flow readings in this period.</p>
+    <% else %>
+      <dl class="appt-stats-grid">
+        <div class="appt-stat">
+          <dt>Readings</dt>
+          <dd><%= @reading_count %></dd>
+        </div>
+        <div class="appt-stat">
+          <dt>Period average</dt>
+          <dd><%= @avg ? "#{@avg} L/min" : "\u2014" %></dd>
+        </div>
+        <div class="appt-stat">
+          <dt>Best in period</dt>
+          <dd><%= @best_in_period ? "#{@best_in_period} L/min" : "\u2014" %></dd>
+        </div>
+        <div class="appt-stat">
+          <dt>Worst in period</dt>
+          <dd><%= @worst_in_period ? "#{@worst_in_period} L/min" : "\u2014" %></dd>
+        </div>
+        <% if @personal_best %>
+          <div class="appt-stat">
+            <dt>Personal best</dt>
+            <dd><%= @personal_best.value %> L/min</dd>
+          </div>
+        <% end %>
+      </dl>
+      <% if @zone_counts.any? %>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Zone</th><th>Readings</th></tr>
+          </thead>
+          <tbody>
+            <% [["green", "Green"], ["yellow", "Yellow"], ["red", "Red"]].each do |zone_key, zone_label| %>
+              <% count = @zone_counts[zone_key] || 0 %>
+              <tr>
+                <td><span class="zone-dot zone-dot--<%= zone_key %>"></span> <%= zone_label %></td>
+                <td><%= count %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <p class="appt-zone-legend">
+          <span class="zone-dot zone-dot--green"></span> Green = &ge;80% of personal best
+          <span class="appt-zone-sep">&middot;</span>
+          <span class="zone-dot zone-dot--yellow"></span> Yellow = 50&ndash;79%
+          <span class="appt-zone-sep">&middot;</span>
+          <span class="zone-dot zone-dot--red"></span> Red = &lt;50%
+        </p>
+      <% end %>
+      <% if @individual_readings.any? %>
+        <h3 class="appt-detail-heading">Individual Readings</h3>
+        <table class="appt-detail-table">
+          <thead>
+            <tr><th>Date</th><th>Time</th><th>Value</th><th>Zone</th></tr>
+          </thead>
+          <tbody>
+            <% @individual_readings.each do |reading| %>
+              <tr>
+                <td data-label="Date"><time datetime="<%= reading.recorded_at.iso8601 %>"><%= reading.recorded_at.strftime("%-d %b %Y") %></time></td>
+                <td data-label="Time"><%= reading.recorded_at.strftime("%H:%M") %></td>
+                <td data-label="Value"><%= reading.value %> L/min</td>
+                <td data-label="Zone"><% if reading.zone %><span class="zone-dot zone-dot--<%= reading.zone %>"></span> <%= reading.zone.capitalize %><% else %><%= "\u2014" %><% end %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%# -- 2. Symptoms --------------------------------------------------------- %>
+  <section class="section-card appt-section">
+    <h2 class="appt-section-title">Symptoms</h2>
+    <% if @symptom_count == 0 %>
+      <p class="appt-empty">No symptoms logged in this period.</p>
+    <% else %>
+      <dl class="appt-stats-grid">
+        <div class="appt-stat">
+          <dt>Total symptoms</dt>
+          <dd><%= @symptom_count %></dd>
+        </div>
+      </dl>
+      <% if @severity_breakdown.any? %>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Severity</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            <% [["mild", "Mild"], ["moderate", "Moderate"], ["severe", "Severe"]].each do |sev_key, sev_label| %>
+              <% count = @severity_breakdown[sev_key] || 0 %>
+              <tr>
+                <td><span class="severity-badge severity-badge--<%= sev_key %>"><%= sev_label %></span></td>
+                <td><%= count %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+      <% if @symptom_logs.any? %>
+        <h3 class="appt-detail-heading">Individual Records</h3>
+        <table class="appt-detail-table">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Severity</th><th>Triggers</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <% @symptom_logs.each do |log| %>
+              <tr>
+                <td data-label="Date"><time datetime="<%= log.recorded_at.iso8601 %>"><%= log.recorded_at.strftime("%-d %b %Y") %></time></td>
+                <td data-label="Type"><%= log.symptom_type.humanize %></td>
+                <td data-label="Severity"><span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span></td>
+                <td data-label="Triggers"><%= log.triggers.any? ? log.triggers.map { |t| t.humanize }.join(", ") : "\u2014" %></td>
+                <td data-label="Notes" class="appt-notes-full"><%= log.notes.present? ? log.notes.to_plain_text : "\u2014" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%# -- 3. Reliever Use ------------------------------------------------------ %>
+  <section class="section-card appt-section">
+    <h2 class="appt-section-title">Reliever Use</h2>
+    <dl class="appt-stats-grid">
+      <div class="appt-stat">
+        <dt>Total doses (30 days)</dt>
+        <dd><%= @reliever_doses_total %></dd>
+      </div>
+      <div class="appt-stat">
+        <dt>Avg per week</dt>
+        <dd><%= @reliever_doses_per_week %></dd>
+      </div>
+      <div class="appt-stat">
+        <dt>Status</dt>
+        <dd><%= @reliever_doses_per_week > 2 ? "Above range (>2/week)" : "Within range (<=2/week)" %></dd>
+      </div>
+    </dl>
+    <% if @dose_logs_with_meds.any? %>
+      <h3 class="appt-detail-heading">Dose Log</h3>
+      <table class="appt-detail-table">
+        <thead>
+          <tr><th>Date</th><th>Time</th><th>Type</th><th>Puffs</th></tr>
+        </thead>
+        <tbody>
+          <% @dose_logs_with_meds.each do |log| %>
+            <tr>
+              <td data-label="Date"><time datetime="<%= log.recorded_at.iso8601 %>"><%= log.recorded_at.strftime("%-d %b %Y") %></time></td>
+              <td data-label="Time"><%= log.recorded_at.strftime("%H:%M") %></td>
+              <td data-label="Type"><%= Medication.medication_types.key(log.med_type)&.humanize&.capitalize || "\u2014" %></td>
+              <td data-label="Puffs"><%= log.puffs %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </section>
+
+  <%# -- 4. Medications ------------------------------------------------------- %>
+  <section class="section-card appt-section">
+    <h2 class="appt-section-title">Medications</h2>
+    <% if @active_medications.none? && @period_courses.none? %>
+      <p class="appt-empty">No medications recorded.</p>
+    <% else %>
+      <% if @active_medications.any? %>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Dose</th></tr>
+          </thead>
+          <tbody>
+            <% @active_medications.each do |med| %>
+              <tr>
+                <td><%= med.name %></td>
+                <td><%= med.medication_type.humanize.capitalize %></td>
+                <td><%= med.standard_dose_puffs %> <%= med.dose_unit_label(med.standard_dose_puffs) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+      <% if @period_courses.any? %>
+        <h3 class="appt-detail-heading">Courses during period</h3>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Dates</th></tr>
+          </thead>
+          <tbody>
+            <% @period_courses.each do |course| %>
+              <tr>
+                <td><%= course.name %></td>
+                <td>Course</td>
+                <td>
+                  <% if course.standard_dose_puffs.present? %>
+                    <%= course.standard_dose_puffs %> <%= course.dose_unit_label(course.standard_dose_puffs) %><%= " x#{course.doses_per_day}/day" if course.doses_per_day.present? %>
+                  <% else %>
+                    &mdash;
+                  <% end %>
+                </td>
+                <td><%= course.starts_on.strftime("%-d %b") %> &ndash; <%= course.ends_on.strftime("%-d %b %Y") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%# -- 5. Health Events ----------------------------------------------------- %>
+  <section class="section-card appt-section">
+    <h2 class="appt-section-title">Health Events</h2>
+    <% if @health_events.none? %>
+      <p class="appt-empty">No health events in this period.</p>
+    <% else %>
+      <table class="appt-detail-table">
+        <thead>
+          <tr><th>Type</th><th>Date</th><th>Duration</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <% @health_events.each do |event| %>
+            <tr>
+              <td data-label="Type"><%= event.event_type_label %></td>
+              <td data-label="Date"><time datetime="<%= event.recorded_at.iso8601 %>"><%= event.recorded_at.strftime("%-d %b %Y") %></time></td>
+              <td data-label="Duration">
+                <% if event.ongoing? %>
+                  Ongoing (since <%= event.recorded_at.strftime("%-d %b") %>)
+                <% elsif event.ended_at %>
+                  <%= event.formatted_duration %> (ended <%= event.ended_at.strftime("%-d %b") %>)
+                <% else %>
+                  <%= "\u2014" %>
+                <% end %>
+              </td>
+              <td data-label="Notes" class="appt-notes-full"><%= event.notes.present? ? event.notes.to_plain_text : "\u2014" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </section>
+
+  <div class="appt-mobile-print no-print">
+    <button onclick="window.print()" class="appt-print-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 6 2 18 2 18 9"/>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+        <rect x="6" y="14" width="12" height="8"/>
+      </svg>
+      <span>Print / Save as PDF</span>
+    </button>
+  </div>
+
+  <footer class="appt-footer no-print">
+    <p>Generated by Asthma Buddy on <%= Date.current.strftime("%-d %B %Y") %>. For reference only — not a medical document.</p>
+  </footer>
+  <footer class="appt-footer appt-footer--print">
+    <p>Generated by Asthma Buddy on <%= Date.current.strftime("%-d %B %Y") %>. Not a medical document &mdash; for reference only.</p>
+  </footer>
+
+</div>
