@@ -9,12 +9,12 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 27 of 30 (Multi-Factor Authentication)
-Plan: 03 complete (phase complete)
-Status: Phase 27 complete
-Last activity: 2026-03-14 — Phase 27 verified and complete (TOTP MFA, 661 tests)
+Phase: 28 of 30 (REST API)
+Plan: 01 complete
+Status: Phase 28 in progress
+Last activity: 2026-03-14 — Plan 28-01 complete (API key infrastructure, 681 tests)
 
-Progress: ####░░░░░░ 40% (Milestone 3 — SaaS Foundation)
+Progress: #####░░░░░ 50% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5 (Milestone 3)
-- Average duration: 6 min
-- Total execution time: 30 min
+- Total plans completed: 6 (Milestone 3)
+- Average duration: 5 min
+- Total execution time: 32 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -57,6 +57,7 @@ Tests at close: 195
 | 27    | 01   | 4 min    | 2     | 8     |
 | 27    | 02   | 6 min    | 2     | 15    |
 | 27    | 03   | 3 min    | 2     | 4     |
+| 28    | 01   | 2 min    | 2     | 9     |
 
 ## Accumulated Context
 
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - 27-02: Pending MFA session uses session[:pending_mfa_user_id] + session[:pending_mfa_at] with 5-min TTL
 - 27-03: MFA enabled programmatically in test setup via enable_mfa! (AR Encryption fixture incompatibility)
 - 27-03: Fixed mfa_challenge route controller resolution (singular resource needed controller: option)
+- 28-01: One API key per user stored as SHA-256 digest on users table (no separate model)
+- 28-01: Plaintext key passed via flash[:api_key] for one-time display after redirect
+- 28-01: Reused SettingsPolicy :show? for API key controller authorization
 
 ### Pending Todos
 
@@ -97,5 +101,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 27-03-PLAN.md
+Stopped at: Completed 28-01-PLAN.md
 Resume file: None
