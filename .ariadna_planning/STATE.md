@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 26 of 30 (Role-Based Access Control)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-03-14 — Milestone 3 roadmap created (5 phases, 22 requirements mapped)
+Plan: 01 complete
+Status: Plan 01 complete
+Last activity: 2026-03-14 — Phase 26 Plan 01 executed (RBAC foundation, Pundit policies, role enum)
 
-Progress: ░░░░░░░░░░ 0% (Milestone 3 — SaaS Foundation)
+Progress: ##░░░░░░░░ 20% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,9 +46,13 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (Milestone 3)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1 (Milestone 3)
+- Average duration: 13 min
+- Total execution time: 13 min
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 26    | 01   | 13 min   | 3     | 52    |
 
 ## Accumulated Context
 
@@ -62,6 +66,10 @@ Recent decisions affecting current work:
 - Research: Pay gem needs `alias_attribute :email, :email_address` before `pay_customer`
 - Research: MFA must use "pending" session state — don't authenticate before TOTP verification
 - Research: Stripe webhooks must be async (SQLite single-writer constraint)
+- 26-01: Used class_attribute :_skip_pundit for skip mechanism (cleaner than skip_after_action)
+- 26-01: Kept require_admin in Admin::BaseController as defense-in-depth alongside Pundit
+- 26-01: Used headless policies for non-model controllers (authorize :symbol, :action?)
+- 26-01: Defined pundit_user mapping to Current.user (app uses Current.user, not current_user)
 
 ### Pending Todos
 
@@ -74,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Milestone 3 roadmap created; ready to plan Phase 26
+Stopped at: Completed 26-01-PLAN.md
 Resume file: None
