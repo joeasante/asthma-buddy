@@ -12,6 +12,7 @@ proxy:
   healthcheck:
     path: /up
     interval: 3
+    timeout: 90
   run:
     http_port: 3000       # kamal-proxy listens on :3000 — CloudPanel proxies here
     https_port: 4430      # move away from 443 — CloudPanel Nginx owns that port
