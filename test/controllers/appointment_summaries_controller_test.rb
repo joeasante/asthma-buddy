@@ -31,7 +31,7 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
 
   test "GET /health-report renders print button" do
     get health_report_path
-    assert_match "window.print()", response.body
+    assert_match 'data-action="click->print#print"', response.body
   end
 
   test "GET /health-report shows correct period date range" do

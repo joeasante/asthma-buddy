@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
-# Use a dedicated MemoryStore so throttle counters persist across requests.
-# Rack::Attack defaults to Rails.cache, which is NullStore in the test environment.
-# The MemoryStore is reset between test runs via Rack::Attack.reset! in test setup/teardown.
-Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+# Use Rails.cache (Solid Cache / SQLite-backed in production) so throttle counters
+# are shared across Puma workers. Falls back to MemoryStore in test (where Rails.cache
+# is NullStore). Rack::Attack.reset! in test setup/teardown clears the MemoryStore.
+Rack::Attack.cache.store = if Rails.env.test?
+  ActiveSupport::Cache::MemoryStore.new
+else
+  Rails.cache
+end
 
 class Rack::Attack
   # Throttle login attempts: 5 per IP per 20 seconds
@@ -16,17 +20,29 @@ class Rack::Attack
     req.ip if req.path == "/registration" && req.post?
   end
 
-  # Custom response for throttled requests — message varies by which throttle fired
+  # Throttle login attempts per email: 10 per 5 minutes (distributed brute-force protection)
+  throttle("logins/email", limit: 10, period: 5.minutes) do |req|
+    if req.path == "/session" && req.post?
+      req.params.dig("email_address")&.downcase&.strip
+    end
+  end
+
+  # Custom response for throttled requests — format-aware (JSON or plain text)
   self.throttled_responder = lambda do |req|
     message = case req.env["rack.attack.matched"]
-    when "logins/ip"
-                "Too many sign-in attempts. Please wait 20 seconds before trying again."
+    when "logins/ip", "logins/email"
+                "Too many sign-in attempts. Please wait before trying again."
     when "signups/ip"
                 "Too many sign-up attempts from this IP address. Please try again later."
     else
                 "Too many requests. Please try again later."
     end
-    [ 429, { "Content-Type" => "text/plain" }, [ message ] ]
+
+    if req.env["HTTP_ACCEPT"]&.include?("application/json") || req.content_type&.include?("application/json")
+      [ 429, { "Content-Type" => "application/json" }, [ { error: message }.to_json ] ]
+    else
+      [ 429, { "Content-Type" => "text/plain" }, [ message ] ]
+    end
   end
 end
 

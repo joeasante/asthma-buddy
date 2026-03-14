@@ -168,6 +168,11 @@ class DashboardController < ApplicationController
         totals: {
           readings: @total_reading_count,
           symptoms: @total_symptom_count
+        },
+        week_interpretation: @week_interpretation,
+        reliever: {
+          week_doses: @week_reliever_doses,
+          above_threshold: @week_reliever_doses > 2
         }
       }
     end

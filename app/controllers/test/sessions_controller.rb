@@ -6,7 +6,6 @@ raise "Test::SessionsController must not run outside test environment" unless Ra
 
 class Test::SessionsController < ApplicationController
   allow_unauthenticated_access
-  skip_before_action :check_session_freshness
 
   def create
     session_record = Session.find(params[:session_id])
