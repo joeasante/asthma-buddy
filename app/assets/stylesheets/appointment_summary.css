@@ -164,6 +164,10 @@
   white-space: nowrap;
 }
 
+.appt-detail-table tbody tr:nth-child(even) {
+  background: var(--surface-alt);
+}
+
 .appt-detail-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -178,27 +182,102 @@
 }
 
 /* --------------------------------------------------------------------------
+   Print button — icon-styled, always visible
+   -------------------------------------------------------------------------- */
+
+.appt-print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-2);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.appt-print-btn:hover {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+/* --------------------------------------------------------------------------
    Mobile responsive
    -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
-  .appt-notes-full,
-  .appt-notes-cell {
-    word-break: break-word;
-    min-width: 80px;
-    white-space: normal;
-    max-width: none;
-  }
-
-  .appt-detail-table {
+  .appt-detail-table,
+  .appt-detail-table thead,
+  .appt-detail-table tbody,
+  .appt-detail-table tr,
+  .appt-detail-table th,
+  .appt-detail-table td {
     display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
-  /* Hide print button on mobile */
-  .page-header-actions .btn-secondary {
+  .appt-detail-table thead {
     display: none;
+  }
+
+  .appt-detail-table tbody tr {
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .appt-detail-table td {
+    padding: 0.125rem 0;
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.8125rem;
+  }
+
+  .appt-detail-table td::before {
+    content: attr(data-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+    flex-shrink: 0;
+    margin-right: var(--space-sm);
+  }
+
+  /* Notes cells span full width and stack below */
+  .appt-detail-table td.appt-notes-full {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: var(--space-xs);
+    padding-top: var(--space-xs);
+    border-top: 1px dashed var(--border);
+  }
+
+  .appt-detail-table td.appt-notes-full::before {
+    margin-bottom: 0.125rem;
+  }
+
+  .appt-stats-grid {
+    gap: var(--space-sm);
+  }
+
+  .appt-stat dd {
+    font-size: 1rem;
+  }
+
+  .appt-print-label {
+    display: none;
+  }
+
+  .appt-print-btn {
+    padding: 0.375rem;
   }
 }
 
