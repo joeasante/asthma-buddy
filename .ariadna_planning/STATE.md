@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 27 of 30 (Multi-Factor Authentication)
-Plan: 02 complete
+Plan: 03 complete
 Status: Executing Phase 27
-Last activity: 2026-03-14 — Phase 27 Plan 02 executed (MFA controllers, views, security settings)
+Last activity: 2026-03-14 — Phase 27 Plan 03 executed (MFA controller tests, 27 new tests)
 
 Progress: ####░░░░░░ 40% (Milestone 3 — SaaS Foundation)
 
@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (Milestone 3)
-- Average duration: 7 min
-- Total execution time: 27 min
+- Total plans completed: 5 (Milestone 3)
+- Average duration: 6 min
+- Total execution time: 30 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -56,6 +56,7 @@ Tests at close: 195
 | 26    | 02   | 4 min    | 2     | 20    |
 | 27    | 01   | 4 min    | 2     | 8     |
 | 27    | 02   | 6 min    | 2     | 15    |
+| 27    | 03   | 3 min    | 2     | 4     |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - 27-02: Used controller: "security" in routes to fix Rails inflection of resource :security
 - 27-02: Reused SettingsPolicy :show? for all security controller actions
 - 27-02: Pending MFA session uses session[:pending_mfa_user_id] + session[:pending_mfa_at] with 5-min TTL
+- 27-03: MFA enabled programmatically in test setup via enable_mfa! (AR Encryption fixture incompatibility)
+- 27-03: Fixed mfa_challenge route controller resolution (singular resource needed controller: option)
 
 ### Pending Todos
 
@@ -94,5 +97,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 27-02-PLAN.md
+Stopped at: Completed 27-03-PLAN.md
 Resume file: None
