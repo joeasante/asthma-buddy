@@ -79,4 +79,68 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert response.parsed_body["errors"].any?
   end
+
+  # --- Security: role mass-assignment ---
+
+  test "POST /registration with role param does not create an admin user" do
+    assert_difference "User.count", 1 do
+      post registration_path, params: {
+        user: { email_address: "sneaky@example.com", password: "password123", password_confirmation: "password123", role: "admin" }
+      }
+    end
+    assert_equal "member", User.find_by(email_address: "sneaky@example.com").role
+  end
+
+  test "POST /registration with role param does not create an admin user (JSON)" do
+    assert_difference "User.count", 1 do
+      post registration_path,
+        params: { user: { email_address: "sneaky-json@example.com", password: "password123", password_confirmation: "password123", role: "admin" } },
+        as: :json
+    end
+    assert_response :created
+    assert_equal "member", User.find_by(email_address: "sneaky-json@example.com").role
+  end
+
+  # --- Registration toggle ---
+
+  test "GET /registration/new shows form when registration is open" do
+    assert SiteSetting.registration_open?
+    get new_registration_path
+    assert_response :success
+    assert_select "form"
+    assert_select "h1", "Create your account"
+  end
+
+  test "GET /registration/new shows closed message when registration is closed" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    get new_registration_path
+    assert_redirected_to new_session_path
+    assert_match "closed", flash[:alert]
+  end
+
+  test "POST /registration blocked when registration is closed" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    assert_no_difference "User.count" do
+      post registration_path, params: {
+        user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" }
+      }
+    end
+    assert_redirected_to new_session_path
+  end
+
+  test "POST /registration blocked when registration is closed (JSON)" do
+    site_settings(:registration_open).update!(value: "false")
+    Rails.cache.delete("site_setting:registration_open")
+
+    assert_no_difference "User.count" do
+      post registration_path,
+        params: { user: { email_address: "newuser@example.com", password: "password123", password_confirmation: "password123" } },
+        as: :json
+    end
+    assert_response :forbidden
+  end
 end

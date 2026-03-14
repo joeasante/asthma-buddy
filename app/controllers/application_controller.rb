@@ -2,7 +2,12 @@
 
 class ApplicationController < ActionController::Base
   include Authentication
+  include Pundit::Authorization
   include ActionView::RecordIdentifier
+
+  after_action :verify_authorized, unless: :skip_authorization?
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   # Scope modern browser check to HTML requests only.
   # Non-browser clients (agents, API callers, curl) request JSON and must not be rejected.
   before_action do
@@ -38,7 +43,7 @@ class ApplicationController < ActionController::Base
     if Time.current - session[:last_seen_at].to_time > IDLE_TIMEOUT
       reset_session
       respond_to do |format|
-        format.html { redirect_to new_session_path, alert: "Your session expired due to inactivity. Please sign in again." }
+        format.html { redirect_to main_app.new_session_path, alert: "Your session expired due to inactivity. Please sign in again." }
         format.json { render json: { error: "Session expired" }, status: :unauthorized }
       end
     else
@@ -57,8 +62,9 @@ class ApplicationController < ActionController::Base
 
   # --- Access control via ALLOWED_EMAILS env var ---
   # Set ALLOWED_EMAILS="joe@example.com,alice@example.com" in production
-  # to restrict login and disable registration for everyone else.
-  # Unset or blank = open to all (default).
+  # to restrict which email addresses can log in.
+  # Registration is separately controlled by SiteSetting.registration_open?.
+  # Unset or blank = any email can log in (default).
 
   def allowed_emails
     @allowed_emails ||= ENV["ALLOWED_EMAILS"]&.split(",")&.map(&:strip)&.map(&:downcase)
@@ -69,8 +75,32 @@ class ApplicationController < ActionController::Base
   end
 
   def registration_open?
-    allowed_emails.blank?
+    SiteSetting.registration_open?
   end
 
   helper_method :registration_open?
+
+  # --- Pundit skip mechanism ---
+  # Controllers that handle unauthenticated access or have no actions
+  # to authorize call `skip_pundit` at the class level.
+  class_attribute :_skip_pundit, default: false
+
+  def self.skip_pundit
+    self._skip_pundit = true
+  end
+
+  def pundit_user
+    Current.user
+  end
+
+  def skip_authorization?
+    self.class._skip_pundit
+  end
+
+  def user_not_authorized
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: main_app.root_path, alert: "You are not authorized to perform this action.") }
+      format.json { render json: { error: "Forbidden" }, status: :forbidden }
+    end
+  end
 end

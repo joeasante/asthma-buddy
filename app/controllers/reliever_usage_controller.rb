@@ -17,6 +17,7 @@ class RelieverUsageController < ApplicationController
              }
 
   def index
+    authorize :reliever_usage, :index?
     @weeks       = params[:weeks].to_i.in?([ 8, 12 ]) ? params[:weeks].to_i : 8
     period_start = @weeks.weeks.ago.to_date
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ErrorsController < ApplicationController
+  skip_pundit
   allow_unauthenticated_access
   skip_before_action :set_notification_badge_count
 

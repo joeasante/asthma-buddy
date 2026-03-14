@@ -25,6 +25,24 @@
   </div>
 </div>
 
+<div class="section-card" style="margin-bottom: var(--spacing-md);">
+  <h2 class="section-card-title">Site Settings</h2>
+  <div style="display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;">
+    <span>Registration:</span>
+    <% if @registration_open %>
+      <span class="badge badge--success">Open</span>
+    <% else %>
+      <span class="badge badge--danger">Closed</span>
+    <% end %>
+    <%= button_to admin_toggle_registration_path,
+          method: :post,
+          class: "btn-secondary",
+          data: { turbo_confirm: "Are you sure you want to #{@registration_open ? 'close' : 'open'} registration?" } do %>
+      <%= @registration_open ? "Close Registration" : "Open Registration" %>
+    <% end %>
+  </div>
+</div>
+
 <div class="admin-stat-grid">
   <div class="section-card admin-stat-card">
     <p class="admin-stat-label">Total Users</p>

@@ -2,6 +2,8 @@
 
 class User < ApplicationRecord
   has_secure_password
+
+  enum :role, { member: 0, admin: 1 }, default: :member
   # :delete_all skips callbacks — sessions have none, and bulk DELETE is more efficient than per-record :destroy
   has_many :sessions,             dependent: :delete_all
   has_many :symptom_logs,         dependent: :destroy       # has_rich_text :notes — needs callbacks for ActionText cleanup

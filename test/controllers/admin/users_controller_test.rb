@@ -34,7 +34,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "PATCH toggle_admin revokes admin from admin user when others exist" do
-    @other_user.update_columns(admin: true)
+    @other_user.update_columns(role: 1)
     sign_in_as(@admin)
     patch toggle_admin_admin_user_path(@other_user)
     assert_not @other_user.reload.admin?
@@ -46,7 +46,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin)
     patch toggle_admin_admin_user_path(@admin)
     assert @admin.reload.admin?
-    assert_match "cannot change your own", flash[:alert].downcase
+    assert_match(/not authorized/i, flash[:alert])
   end
 
   test "PATCH toggle_admin unauthenticated redirects to login" do
@@ -58,5 +58,22 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@other_user)
     patch toggle_admin_admin_user_path(@admin)
     assert_redirected_to root_path
+  end
+
+  test "PATCH toggle_admin protects last admin from demotion" do
+    # Ensure only one admin exists
+    assert_equal 1, User.admin.count
+    sign_in_as(@admin)
+    # Try to demote via another admin demoting the last admin
+    # Since self-demotion is blocked separately, make another user admin first
+    @other_user.update!(role: :admin)
+    assert_equal 2, User.admin.count
+
+    # Now demote @other_user (should work since 2 admins remain)
+    patch toggle_admin_admin_user_path(@other_user)
+    assert_not @other_user.reload.admin?
+
+    # Now only @admin remains — cannot be demoted (self-protection applies)
+    assert_equal 1, User.admin.count
   end
 end

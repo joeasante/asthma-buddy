@@ -2,6 +2,7 @@
 
 class AppointmentSummariesController < ApplicationController
   def show
+    authorize :appointment_summary, :show?
     user = Current.user
     period_start = 30.days.ago.to_date
 

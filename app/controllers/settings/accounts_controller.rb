@@ -10,6 +10,7 @@ module Settings
     }
 
     def destroy
+      authorize :account, :destroy?
       if params[:confirmation] == "DELETE"
         user = Current.user
         terminate_session

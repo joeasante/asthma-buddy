@@ -18,6 +18,7 @@ class OnboardingController < ApplicationController
   before_action :redirect_if_step1_done, only: :show
 
   def show
+    authorize :onboarding, :show?
     @step = current_step
     if @step == 2
       @medication = Medication.new(
@@ -32,6 +33,7 @@ class OnboardingController < ApplicationController
   end
 
   def submit_1
+    authorize :onboarding, :submit?
     value = params.dig(:personal_best_record, :value).to_i
     unless value.between?(100, 900)
       @step = 1
@@ -58,6 +60,7 @@ class OnboardingController < ApplicationController
   end
 
   def submit_2
+    authorize :onboarding, :submit?
     @medication = Medication.new(medication_params.merge(user: Current.user))
     if @medication.valid?
       ApplicationRecord.transaction do
@@ -78,6 +81,7 @@ class OnboardingController < ApplicationController
   end
 
   def skip
+    authorize :onboarding, :skip?
     step = params[:step].to_i
     case step
     when 1

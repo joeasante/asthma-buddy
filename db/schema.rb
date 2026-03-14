@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_175309) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -143,6 +143,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "site_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.string "value"
+    t.index ["key"], name: "index_site_settings_on_key", unique: true
+  end
+
 # Could not dump table "sqlite_stat1" because of following StandardError
 #   Unknown type '' for column 'idx'
 
@@ -160,7 +168,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email_address", null: false
@@ -170,6 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
     t.boolean "onboarding_medication_done", default: false, null: false
     t.boolean "onboarding_personal_best_done", default: false, null: false
     t.string "password_digest", null: false
+    t.integer "role", default: 0, null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_users_on_created_at"

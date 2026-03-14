@@ -4,50 +4,58 @@
 <div class="auth-card">
   <%= link_to "Asthma Buddy", root_path, class: "auth-brand" %>
 
-  <% if @user.errors.any? %>
-    <div role="alert" class="flash flash--alert">
-      <ul>
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <% unless registration_open? %>
+    <h1>Registration Closed</h1>
+    <p style="text-align: center; margin-bottom: var(--spacing-md);">Registration is currently closed.</p>
+    <div class="auth-links">
+      <p><%= link_to "Back to sign in", new_session_path %></p>
+    </div>
+  <% else %>
+    <% if @user.errors.any? %>
+      <div role="alert" class="flash flash--alert">
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <h1>Create your account</h1>
+
+    <%= form_with model: @user, url: registration_path do |form| %>
+      <div class="field">
+        <%= form.label :full_name, "Full name" %>
+        <%= form.text_field :full_name,
+              autofocus: true,
+              autocomplete: "name",
+              placeholder: "Optional" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :email_address, "Email address" %>
+        <%= form.email_field :email_address,
+              required: true,
+              autocomplete: "email" %>
+      </div>
+
+      <%= render "shared/password_field",
+            form: form,
+            field: :password,
+            label_text: "Password",
+            autocomplete: "new-password" %>
+
+      <%= render "shared/password_field",
+            form: form,
+            field: :password_confirmation,
+            label_text: "Confirm password",
+            autocomplete: "new-password" %>
+
+      <%= form.submit "Create account" %>
+    <% end %>
+
+    <div class="auth-links">
+      <p>Already have an account? <%= link_to "Sign in", new_session_path %></p>
     </div>
   <% end %>
-
-  <h1>Create your account</h1>
-
-  <%= form_with model: @user, url: registration_path do |form| %>
-    <div class="field">
-      <%= form.label :full_name, "Full name" %>
-      <%= form.text_field :full_name,
-            autofocus: true,
-            autocomplete: "name",
-            placeholder: "Optional" %>
-    </div>
-
-    <div class="field">
-      <%= form.label :email_address, "Email address" %>
-      <%= form.email_field :email_address,
-            required: true,
-            autocomplete: "email" %>
-    </div>
-
-    <%= render "shared/password_field",
-          form: form,
-          field: :password,
-          label_text: "Password",
-          autocomplete: "new-password" %>
-
-    <%= render "shared/password_field",
-          form: form,
-          field: :password_confirmation,
-          label_text: "Confirm password",
-          autocomplete: "new-password" %>
-
-    <%= form.submit "Create account" %>
-  <% end %>
-
-  <div class="auth-links">
-    <p>Already have an account? <%= link_to "Sign in", new_session_path %></p>
-  </div>
 </div>

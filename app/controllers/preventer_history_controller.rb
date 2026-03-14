@@ -2,6 +2,7 @@
 
 class PreventerHistoryController < ApplicationController
   def index
+    authorize :preventer_history, :index?
     user = Current.user
     @period = params[:period].to_i.in?([ 7, 30 ]) ? params[:period].to_i : 7
 

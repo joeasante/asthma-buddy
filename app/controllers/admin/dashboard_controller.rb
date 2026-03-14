@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class Admin::DashboardController < Admin::BaseController
+  after_action :verify_authorized
+
   def index
+    authorize :admin_dashboard, :index?
+    @registration_open = SiteSetting.registration_open?
     @total_users    = User.count
     @new_this_week  = User.where(created_at: 1.week.ago..).count
     @new_this_month = User.where(created_at: 1.month.ago..).count

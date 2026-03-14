@@ -2,6 +2,7 @@
 
 class SettingsController < ApplicationController
   def show
+    authorize :settings, :show?
     respond_to do |format|
       format.html
       format.json do

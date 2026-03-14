@@ -81,5 +81,5 @@
     <p>If you believe we have not handled your personal data correctly, you have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong>, the UK's independent supervisory authority for data protection. You can contact the ICO at <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a> or by calling their helpline on 0303 123 1113. We would always appreciate the opportunity to address your concerns directly before you approach the ICO, but you are entitled to contact them at any time.</p>
   </div>
 
-  <%= link_to "← Back", url_from(request.referer) || root_path, class: "legal-back-link" %>
+  <%= link_to "← Back", safe_back_url, class: "legal-back-link" %>
 </div>

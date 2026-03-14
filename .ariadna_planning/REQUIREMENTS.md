@@ -95,7 +95,51 @@
 
 ---
 
-## v2 Requirements (Milestone 3)
+## v3 Requirements (Milestone 3 — SaaS Foundation)
+
+### RBAC (Role-Based Access Control)
+
+- [ ] **RBAC-01**: Admin can assign roles (admin/member) to users via the admin panel — *replaces boolean flag with extensible role system*
+- [ ] **RBAC-02**: All resource access is authorized via Pundit policies, with `verify_authorized` safety net on every controller — *prevents forgotten authorization checks*
+- [ ] **RBAC-03**: Existing admin functionality continues working after migration from boolean to role enum — *zero-downtime migration*
+- [ ] **RBAC-04**: Admin can toggle registration open/closed; closed registration shows a "registration closed" page to visitors — *controls who can access the health app*
+
+### MFA (Multi-Factor Authentication)
+
+- [ ] **MFA-01**: User can enable TOTP-based MFA by scanning a QR code with an authenticator app — *protects health data with second factor*
+- [ ] **MFA-02**: After password verification, MFA-enabled users must enter a TOTP code before gaining access — *prevents unauthorized access even with stolen password*
+- [ ] **MFA-03**: User receives 10 one-time recovery codes when enabling MFA, downloadable as text — *prevents permanent lockout if phone is lost*
+- [ ] **MFA-04**: User can disable MFA from their settings after re-authenticating — *user controls their own security settings*
+- [ ] **MFA-05**: TOTP secrets are encrypted at rest using Rails Active Record Encryption — *UK GDPR security measure for authentication secrets*
+
+### REST API
+
+- [ ] **API-01**: User can generate an API key from settings; the key is shown once and stored as a SHA-256 hash — *enables programmatic access without exposing credentials*
+- [ ] **API-02**: API requests authenticate via Bearer token in Authorization header — *standard API authentication pattern*
+- [ ] **API-03**: Versioned JSON endpoints at `/api/v1/` expose symptom logs, peak flow readings, medications, dose logs, and health events — *GDPR data portability and integration support*
+- [ ] **API-04**: API responses follow a consistent JSON format with pagination, filtering, and error handling — *usable API for third-party consumers*
+- [ ] **API-05**: API requests are rate-limited separately from web requests via Rack::Attack — *prevents API abuse without affecting web users*
+- [ ] **API-06**: User can revoke an API key from settings — *user controls their API access*
+
+### Stripe Billing
+
+- [ ] **BILL-01**: App offers free and premium subscription plans; free users have feature limits — *monetization foundation*
+- [ ] **BILL-02**: User can subscribe to a premium plan via Stripe Checkout (hosted payment page) — *PCI compliance without handling card data*
+- [ ] **BILL-03**: User can manage their subscription (cancel, update payment method) via Stripe Customer Portal — *self-service billing management*
+- [ ] **BILL-04**: Stripe webhooks are processed asynchronously via Solid Queue with idempotency — *reliable billing state sync with SQLite write safety*
+- [ ] **BILL-05**: Feature access is gated by subscription plan using Pundit policies — *premium features only for paying users*
+- [ ] **BILL-06**: Billing UI shows current plan, next billing date, and subscription status — *transparency for the user*
+
+### Cross-Feature Integration Tests
+
+- [ ] **TEST-01**: Integration tests verify MFA + API key interaction (API keys bypass MFA by design) — *confirms dual auth paths work correctly*
+- [ ] **TEST-02**: Integration tests verify billing + feature gating across plan changes — *confirms upgrade/downgrade triggers correct access changes*
+- [ ] **TEST-03**: Integration tests verify RBAC policies apply identically to web and API controllers — *confirms no authorization bypass via API*
+- [ ] **TEST-04**: Stripe webhook processing is tested with WebMock/VCR fixtures — *reliable CI without hitting Stripe API*
+
+---
+
+## Future Requirements (Milestone 4+)
 
 ### Environmental Monitoring
 
@@ -108,10 +152,6 @@
 - **RPT-02**: User can generate a report of peak flow trends
 - **RPT-03**: User can export a report as PDF
 - **RPT-04**: User can export a report as CSV
-
----
-
-## v2 Requirements (Milestone 4)
 
 ### Caregiver Access
 
@@ -130,13 +170,15 @@
 
 | Feature | Reason |
 |---------|--------|
-| OAuth login (Google, GitHub) | Email/password sufficient for v1; can add later |
+| OAuth login (Google, GitHub) | Email/password sufficient; MFA provides stronger security |
 | Native mobile app | PWA covers mobile install; native is a separate project |
 | Smart inhaler integration | Future enhancement; requires hardware partnership |
 | Telehealth integrations | Future; out of scope for personal tracking tool |
 | Community / social features | Not aligned with core value of individual tracking |
 | AI/ML predictive analytics | Future; needs sufficient data first |
-| Billing / subscriptions | Not monetising in v1 |
+| SMS-based MFA | SIM-swap vulnerability; TOTP is more secure and free |
+| JWT/OAuth2 for API auth | Over-engineering for current scale; API keys are simpler and sufficient |
+| Custom roles beyond admin/member | YAGNI; two roles cover all current needs |
 
 ---
 
@@ -146,59 +188,90 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-02 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-03 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-04 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-05 | Phase 2 — Authentication | ✅ Complete |
-| SYMP-01 | Phase 3 — Symptom Recording | ✅ Complete |
-| SYMP-02 | Phase 3 — Symptom Recording | ✅ Complete |
-| SYMP-03 | Phase 5 — Symptom Timeline | ✅ Complete |
-| SYMP-04 | Phase 5 — Symptom Timeline | ✅ Complete |
-| SYMP-05 | Phase 4 — Symptom Management | ✅ Complete |
-| SYMP-06 | Phase 4 — Symptom Management | ✅ Complete |
-| SYMP-07 | Phase 5 — Symptom Timeline | ✅ Complete |
-| PEAK-01 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-02 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-03 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-04 | Phase 7 — Peak Flow Display | ✅ Complete |
-| PEAK-05 | Phase 8 — Peak Flow Trends | ✅ Complete |
-| PEAK-06 | Phase 7 — Peak Flow Display | ✅ Complete |
-| PEAK-07 | Phase 7 — Peak Flow Display | ✅ Complete |
+| AUTH-01 | Phase 2 — Authentication | Complete |
+| AUTH-02 | Phase 2 — Authentication | Complete |
+| AUTH-03 | Phase 2 — Authentication | Complete |
+| AUTH-04 | Phase 2 — Authentication | Complete |
+| AUTH-05 | Phase 2 — Authentication | Complete |
+| SYMP-01 | Phase 3 — Symptom Recording | Complete |
+| SYMP-02 | Phase 3 — Symptom Recording | Complete |
+| SYMP-03 | Phase 5 — Symptom Timeline | Complete |
+| SYMP-04 | Phase 5 — Symptom Timeline | Complete |
+| SYMP-05 | Phase 4 — Symptom Management | Complete |
+| SYMP-06 | Phase 4 — Symptom Management | Complete |
+| SYMP-07 | Phase 5 — Symptom Timeline | Complete |
+| PEAK-01 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-02 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-03 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-04 | Phase 7 — Peak Flow Display | Complete |
+| PEAK-05 | Phase 8 — Peak Flow Trends | Complete |
+| PEAK-06 | Phase 7 — Peak Flow Display | Complete |
+| PEAK-07 | Phase 7 — Peak Flow Display | Complete |
 
-### Milestone 2 (v2.0 — In Progress)
+### Milestone 2 (v2.0 — Complete 2026-03-14)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MED-01 | Phase 10 — Medication Data Layer | Pending |
-| MED-02 | Phase 10 — Medication Data Layer | Pending |
-| MED-03 | Phase 11 — Medication Management UI | Pending |
-| DOSE-01 | Phase 12 — Dose Logging | Pending |
-| DOSE-02 | Phase 12 — Dose Logging | Pending |
-| TRACK-01 | Phase 13 — Dose Tracking | Pending |
-| TRACK-02 | Phase 13 — Dose Tracking | Pending |
-| TRACK-03 | Phase 13 — Dose Tracking | Pending |
-| ADH-01 | Phase 14 — Adherence Dashboard | Pending |
-| ADH-02 | Phase 14 — Adherence Dashboard | Pending |
-| EVT-01 | Phase 15 — Health Events | Pending |
-| EVT-02 | Phase 15 — Health Events | Pending |
-| EVT-03 | Phase 15 — Health Events | Pending |
-| REL-01 | Phase 15.1 — Reliever Usage History | Pending |
-| REL-02 | Phase 15.1 — Reliever Usage History | Pending |
-| ACC-01 | Phase 16 — Account Management | Pending |
-| ACC-02 | Phase 16 — Account Management | Pending |
-| ONBD-01 | Phase 17 — Onboarding | Pending |
-| ONBD-02 | Phase 17 — Onboarding | Pending |
-| LEGAL-01 | Phase 16 — Account Management | Pending |
-| LEGAL-02 | Phase 16 — Account Management | Pending |
-| LEGAL-03 | Phase 16 — Account Management | Pending |
-| ERR-01 | Phase 20 — Legal Pages, Cookie Banner & Error Pages | Pending |
-| ERR-02 | Phase 20 — Legal Pages, Cookie Banner & Error Pages | Pending |
+| MED-01 | Phase 10 — Medication Data Layer | Complete |
+| MED-02 | Phase 10 — Medication Data Layer | Complete |
+| MED-03 | Phase 11 — Medication Management UI | Complete |
+| DOSE-01 | Phase 12 — Dose Logging | Complete |
+| DOSE-02 | Phase 12 — Dose Logging | Complete |
+| TRACK-01 | Phase 13 — Dose Tracking | Complete |
+| TRACK-02 | Phase 13 — Dose Tracking | Complete |
+| TRACK-03 | Phase 13 — Dose Tracking | Complete |
+| ADH-01 | Phase 14 — Adherence Dashboard | Complete |
+| ADH-02 | Phase 14 — Adherence Dashboard | Complete |
+| EVT-01 | Phase 15 — Health Events | Complete |
+| EVT-02 | Phase 15 — Health Events | Complete |
+| EVT-03 | Phase 15 — Health Events | Complete |
+| REL-01 | Phase 15.1 — Reliever Usage History | Complete |
+| REL-02 | Phase 15.1 — Reliever Usage History | Complete |
+| ACC-01 | Phase 16 — Account Management | Complete |
+| ACC-02 | Phase 16 — Account Management | Complete |
+| ONBD-01 | Phase 17 — Onboarding | Complete |
+| ONBD-02 | Phase 17 — Onboarding | Complete |
+| LEGAL-01 | Phase 16 — Account Management | Complete |
+| LEGAL-02 | Phase 16 — Account Management | Complete |
+| LEGAL-03 | Phase 16 — Account Management | Complete |
+| ERR-01 | Phase 20 — Legal Pages & Error Pages | Complete |
+| ERR-02 | Phase 20 — Legal Pages & Error Pages | Complete |
+
+### Milestone 3 (v3.0 — In Progress)
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| RBAC-01 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-02 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-03 | Phase 26 — Role-Based Access Control | Complete |
+| RBAC-04 | Phase 26 — Role-Based Access Control | Complete |
+| MFA-01 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-02 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-03 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-04 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-05 | Phase 27 — Multi-Factor Authentication | Pending |
+| API-01 | Phase 28 — REST API | Pending |
+| API-02 | Phase 28 — REST API | Pending |
+| API-03 | Phase 28 — REST API | Pending |
+| API-04 | Phase 28 — REST API | Pending |
+| API-05 | Phase 28 — REST API | Pending |
+| API-06 | Phase 28 — REST API | Pending |
+| BILL-01 | Phase 29 — Stripe Billing | Pending |
+| BILL-02 | Phase 29 — Stripe Billing | Pending |
+| BILL-03 | Phase 29 — Stripe Billing | Pending |
+| BILL-04 | Phase 29 — Stripe Billing | Pending |
+| BILL-05 | Phase 29 — Stripe Billing | Pending |
+| BILL-06 | Phase 29 — Stripe Billing | Pending |
+| TEST-01 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-02 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-03 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-04 | Phase 30 — Cross-Feature Integration Tests | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total — 19 mapped, 0 unmapped ✓
-- v2 requirements: 22 total — 22 mapped, 0 unmapped ✓
+- v1 requirements: 19 total — 19 mapped, 19 complete
+- v2 requirements: 22 total — 22 mapped, 22 complete (+ 2 REL requirements)
+- v3 requirements: 22 total — 22 mapped, 4 complete
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-12 — ERR-01 and ERR-02 added (Phase 20 error pages)*
+*Last updated: 2026-03-14 — Phase 26 complete; RBAC-01 through RBAC-04 verified*

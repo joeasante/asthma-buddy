@@ -21,7 +21,7 @@ Built initially for personal use (self or family), then opened to others — mul
 
 - **Success means:** Users log consistently enough that patterns emerge — reducing asthma attacks and improving medication adherence
 - **Bigger picture:** Start personal, grow into a public product for anyone managing asthma
-- **Not optimising for:** Complex AI/ML, real-time collaboration, social features, monetisation (v1)
+- **Not optimising for:** Complex AI/ML, real-time collaboration, social features
 
 ## Requirements
 
@@ -37,24 +37,23 @@ Built initially for personal use (self or family), then opened to others — mul
 
 ### Active
 
-<!-- Milestone 2 scope — v2.0 Medication & Compliance -->
+<!-- Milestone 3 scope — v3.0 SaaS Foundation -->
 
-- [ ] User can manage their medication profile (reliever, preventer, combination inhaler)
-- [ ] User can log dose events (which medication, puffs, timestamp)
-- [ ] System tracks remaining doses and warns when stock is low (14-day threshold)
-- [ ] Dashboard shows preventer adherence indicator for today (taken / missed)
-- [ ] User can log health events (illness, GP appointment, prescription course) with chart markers
-- [ ] User can delete their account (GDPR right to erasure, full cascade)
-- [ ] New users are guided through an onboarding flow
-- [ ] App has Terms of Service and Privacy Policy pages
+- [ ] Comprehensive integration and system test coverage as a safety net
+- [ ] Auth hardening: MFA (TOTP), password strength policies, session management improvements
+- [ ] Role-based access control (RBAC) with granular permissions beyond basic admin flag
+- [ ] Admin dashboard enhancements: analytics, audit logs, user management tools
+- [ ] Notifications & event tracking: webhook-style event system, notification preferences
+- [ ] REST API foundations: versioned JSON API, API key authentication, rate limiting
+- [ ] Subscription billing via Stripe: plans, checkout, billing portal, webhook handling
 
 ### Out of Scope
 
-- Trigger correlation analysis — Milestone 3
-- Environmental API integrations (pollen, AQI) — Milestone 3
-- Reports (PDF/CSV export) — Milestone 3
-- Caregiver accounts and shared monitoring — Milestone 4
-- Analytics and advanced insights — Milestone 4
+- Trigger correlation analysis — Milestone 4
+- Environmental API integrations (pollen, AQI) — Milestone 4
+- Reports (PDF/CSV export) — Milestone 4
+- Caregiver accounts and shared monitoring — Milestone 5
+- Analytics and advanced insights — Milestone 5
 - Smart inhaler integration — Future
 - Telehealth integration — Future
 - Community features — Future
@@ -93,7 +92,8 @@ Built initially for personal use (self or family), then opened to others — mul
 | Milestone | Version | Theme | Status | Completed |
 |-----------|---------|-------|--------|-----------|
 | Milestone 1 | v1.0 | Foundation & Core Tracking | Complete | 2026-03-08 |
-| Milestone 2 | v2.0 | Medication & Compliance | In Progress | — |
+| Milestone 2 | v2.0 | Medication & Compliance | Complete | 2026-03-14 |
+| Milestone 3 | v3.0 | SaaS Foundation | In Progress | — |
 
 ---
-*Last updated: 2026-03-08 — Milestone 2 started*
+*Last updated: 2026-03-14 — Milestone 3 started*
