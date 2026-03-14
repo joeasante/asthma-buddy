@@ -84,12 +84,14 @@ class UserTest < ActiveSupport::TestCase
   # -- after_create_commit :notify_admin_of_signup --
 
   test "creating a user enqueues AdminMailer.new_signup via deliver_later" do
-    assert_enqueued_with(job: ActionMailer::MailDeliveryJob) do
-      User.create!(
-        email_address: "trackme@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+    Rails.application.credentials.stub(:admin_email, "admin@test.com") do
+      assert_enqueued_with(job: ActionMailer::MailDeliveryJob) do
+        User.create!(
+          email_address: "trackme@example.com",
+          password: "password123",
+          password_confirmation: "password123"
+        )
+      end
     end
   end
 end

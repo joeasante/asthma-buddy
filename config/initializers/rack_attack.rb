@@ -19,14 +19,14 @@ class Rack::Attack
   # Custom response for throttled requests — message varies by which throttle fired
   self.throttled_responder = lambda do |req|
     message = case req.env["rack.attack.matched"]
-              when "logins/ip"
+    when "logins/ip"
                 "Too many sign-in attempts. Please wait 20 seconds before trying again."
-              when "signups/ip"
+    when "signups/ip"
                 "Too many sign-up attempts from this IP address. Please try again later."
-              else
+    else
                 "Too many requests. Please try again later."
-              end
-    [429, { "Content-Type" => "text/plain" }, [message]]
+    end
+    [ 429, { "Content-Type" => "text/plain" }, [ message ] ]
   end
 end
 

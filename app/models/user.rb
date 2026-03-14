@@ -45,6 +45,8 @@ class User < ApplicationRecord
   end
 
   def notify_admin_of_signup
+    return unless Rails.application.credentials.admin_email.present?
+
     AdminMailer.new_signup(self).deliver_later
   end
 end
