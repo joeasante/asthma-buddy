@@ -33,6 +33,8 @@ All 9 phases delivered:
 
 **Phase 25 Velocity:**
 - Phase 25 Plan 04 completed: 2026-03-14 (~2 min, 1 task, 4 files modified -- dashboard UX polish: zone insight card, header button, PB threshold)
+- Phase 25 Plan 03 completed: 2026-03-14 (~4 min, 2 tasks, 4 files modified, 3 new tests -- appointment summary detail tables + print layout fix)
+- Tests at Phase 25-03 close: 564 passing (no regressions)
 - Phase 25 Plan 02 completed: 2026-03-14 (~3 min, 2 tasks, 4 files created, 3 files modified, 7 new tests -- appointment summary page)
 - Tests at Phase 25-02 close: 561 passing (no regressions)
 - Phase 25 Plan 01 completed: 2026-03-14 (~5 min, 2 tasks -- interpreted insights)
