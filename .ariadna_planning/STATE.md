@@ -10,11 +10,11 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 27 of 30 (Multi-Factor Authentication)
-Plan: 01 complete
+Plan: 02 complete
 Status: Executing Phase 27
-Last activity: 2026-03-14 — Phase 27 Plan 01 executed (MFA data layer, model methods, unit tests)
+Last activity: 2026-03-14 — Phase 27 Plan 02 executed (MFA controllers, views, security settings)
 
-Progress: ###░░░░░░░ 30% (Milestone 3 — SaaS Foundation)
+Progress: ####░░░░░░ 40% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,15 +46,16 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3 (Milestone 3)
+- Total plans completed: 4 (Milestone 3)
 - Average duration: 7 min
-- Total execution time: 21 min
+- Total execution time: 27 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 26    | 01   | 13 min   | 3     | 52    |
 | 26    | 02   | 4 min    | 2     | 20    |
 | 27    | 01   | 4 min    | 2     | 8     |
+| 27    | 02   | 6 min    | 2     | 15    |
 
 ## Accumulated Context
 
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - 27-01: Used AR Encryption (encrypts :otp_secret) for at-rest encryption of MFA secrets
 - 27-01: Fixtures with AR Encryption fields must not store plaintext in YAML; enable MFA programmatically in tests
 - 27-01: Recovery codes stored as comma-separated encrypted text, normalized on verification
+- 27-02: Used controller: "security" in routes to fix Rails inflection of resource :security
+- 27-02: Reused SettingsPolicy :show? for all security controller actions
+- 27-02: Pending MFA session uses session[:pending_mfa_user_id] + session[:pending_mfa_at] with 5-min TTL
 
 ### Pending Todos
 
@@ -90,5 +94,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 27-01-PLAN.md
+Stopped at: Completed 27-02-PLAN.md
 Resume file: None
