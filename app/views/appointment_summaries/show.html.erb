@@ -1,4 +1,4 @@
-<% content_for :title, "Appointment Summary — Asthma Buddy" %>
+<% content_for :title, "30-Day Health Report — Asthma Buddy" %>
 <% content_for :meta_description do %><meta name="description" content="30-day asthma summary for your GP consultation — peak flow, symptoms, reliever use, and medications."><% end %>
 
 <div class="page-header">
@@ -14,7 +14,7 @@
         </svg>
       </div>
       <div>
-        <h1>Appointment Summary</h1>
+        <h1>30-Day Health Report</h1>
         <p class="page-header-subtitle">Last 30 days: <%= @period_start.strftime("%-d %b") %> &ndash; <%= Date.current.strftime("%-d %b %Y") %></p>
       </div>
     </div>
@@ -71,6 +71,13 @@
             <% end %>
           </tbody>
         </table>
+        <p class="appt-zone-legend">
+          <span class="zone-dot zone-dot--green"></span> Green = &ge;80% of personal best
+          <span class="appt-zone-sep">&middot;</span>
+          <span class="zone-dot zone-dot--yellow"></span> Yellow = 50&ndash;79%
+          <span class="appt-zone-sep">&middot;</span>
+          <span class="zone-dot zone-dot--red"></span> Red = &lt;50%
+        </p>
       <% end %>
       <% if @individual_readings.any? %>
         <h3 class="appt-detail-heading">Individual Readings</h3>
@@ -134,7 +141,7 @@
                 <td><%= log.symptom_type.humanize %></td>
                 <td><span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span></td>
                 <td><%= log.triggers.any? ? log.triggers.map { |t| t.humanize }.join(", ") : "\u2014" %></td>
-                <td class="appt-notes-cell"><%= log.notes.present? ? log.notes.to_plain_text.truncate(80) : "\u2014" %></td>
+                <td class="appt-notes-full"><%= log.notes.present? ? log.notes.to_plain_text : "\u2014" %></td>
               </tr>
             <% end %>
           </tbody>
@@ -156,10 +163,11 @@
         <dd><%= @reliever_doses_per_week %></dd>
       </div>
       <div class="appt-stat">
-        <dt>GINA threshold</dt>
-        <dd><%= @reliever_doses_per_week > 2 ? "Exceeded (>2/week)" : "Within range (\u22642/week)" %></dd>
+        <dt>Guideline limit</dt>
+        <dd><%= @reliever_doses_per_week > 2 ? "Above range (>2 uses/week)" : "Within range (<=2 uses/week)" %></dd>
       </div>
     </dl>
+    <p class="appt-guideline-note">Using a reliever more than twice a week may indicate poorly controlled asthma.</p>
     <% if @dose_logs_with_meds.any? %>
       <h3 class="appt-detail-heading">Dose Log</h3>
       <table class="appt-detail-table">
@@ -183,30 +191,45 @@
   <%# -- 4. Medications ------------------------------------------------------- %>
   <section class="section-card appt-section">
     <h2 class="appt-section-title">Medications</h2>
-    <% if @active_medications.none? && @active_courses.none? %>
+    <% if @active_medications.none? && @period_courses.none? %>
       <p class="appt-empty">No medications recorded.</p>
     <% else %>
-      <table class="appt-table">
-        <thead>
-          <tr><th>Name</th><th>Type</th><th>Dose</th></tr>
-        </thead>
-        <tbody>
-          <% @active_medications.each do |med| %>
-            <tr>
-              <td><%= med.name %></td>
-              <td><%= med.medication_type.humanize.capitalize %></td>
-              <td><%= med.standard_dose_puffs %> puff<%= "s" if med.standard_dose_puffs != 1 %></td>
-            </tr>
-          <% end %>
-          <% @active_courses.each do |course| %>
-            <tr>
-              <td><%= course.name %></td>
-              <td>Course (ends <%= course.ends_on.strftime("%-d %b") %>)</td>
-              <td><%= course.standard_dose_puffs %> puff<%= "s" if course.standard_dose_puffs != 1 %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+      <% if @active_medications.any? %>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Sick day dose</th></tr>
+          </thead>
+          <tbody>
+            <% @active_medications.each do |med| %>
+              <tr>
+                <td><%= med.name %></td>
+                <td><%= med.medication_type.humanize.capitalize %></td>
+                <td><%= med.standard_dose_puffs %> puff<%= "s" if med.standard_dose_puffs != 1 %></td>
+                <td><%= med.sick_day_dose_puffs.present? ? "#{med.sick_day_dose_puffs} puff#{"s" if med.sick_day_dose_puffs != 1}" : "\u2014" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+      <% if @period_courses.any? %>
+        <h3 class="appt-detail-heading">Courses during period</h3>
+        <table class="appt-table">
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Dose</th><th>Sick day dose</th><th>Dates</th></tr>
+          </thead>
+          <tbody>
+            <% @period_courses.each do |course| %>
+              <tr>
+                <td><%= course.name %></td>
+                <td>Course</td>
+                <td><%= course.standard_dose_puffs %> puff<%= "s" if course.standard_dose_puffs != 1 %></td>
+                <td><%= course.sick_day_dose_puffs.present? ? "#{course.sick_day_dose_puffs} puff#{"s" if course.sick_day_dose_puffs != 1}" : "\u2014" %></td>
+                <td><%= course.starts_on.strftime("%-d %b") %> &ndash; <%= course.ends_on.strftime("%-d %b %Y") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
     <% end %>
   </section>
 
@@ -234,7 +257,7 @@
                   <%= "\u2014" %>
                 <% end %>
               </td>
-              <td class="appt-notes-cell"><%= event.notes.present? ? event.notes.to_plain_text.truncate(80) : "\u2014" %></td>
+              <td class="appt-notes-full"><%= event.notes.present? ? event.notes.to_plain_text : "\u2014" %></td>
             </tr>
           <% end %>
         </tbody>

@@ -38,7 +38,9 @@ class AppointmentSummariesController < ApplicationController
       .order(recorded_at: :desc)
 
     @active_medications = user.medications.where(course: false).order(:name)
-    @active_courses     = user.medications.active_courses.order(:ends_on)
+    @period_courses = user.medications.where(course: true)
+      .where("starts_on <= ? AND ends_on >= ?", Date.current, period_start)
+      .order(:starts_on)
 
     @health_events = user.health_events
       .where("recorded_at >= ? OR ended_at IS NULL", period_start)
