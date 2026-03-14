@@ -2,12 +2,15 @@
 
 module Api
   module V1
+    class InvalidDateParam < StandardError; end
+
     class BaseController < ActionController::API
       include Pundit::Authorization
 
       after_action :verify_authorized
 
       before_action :authenticate_api_key!
+      before_action :set_cache_headers
 
       rescue_from Pundit::NotAuthorizedError do |_exception|
         render_error(status: 403, message: "Forbidden")
@@ -15,6 +18,10 @@ module Api
 
       rescue_from ActiveRecord::RecordNotFound do |_exception|
         render_error(status: 404, message: "Not found")
+      end
+
+      rescue_from InvalidDateParam do |exception|
+        render_error(status: 400, message: exception.message)
       end
 
       private
@@ -43,7 +50,7 @@ module Api
         header = request.headers["Authorization"]
         return nil unless header.present?
 
-        match = header.match(/\ABearer\s+(.+)\z/)
+        match = header.match(/\ABearer\s+([a-f0-9]{64})\z/)
         match&.captures&.first
       end
 
@@ -60,20 +67,26 @@ module Api
       end
 
       def date_filter(scope, date_column: :recorded_at)
+        column = scope.arel_table[date_column]
+
         if params[:date_from].present?
           from_date = Date.parse(params[:date_from])
-          scope = scope.where("#{date_column} >= ?", from_date.beginning_of_day)
+          scope = scope.where(column.gteq(from_date.beginning_of_day))
         end
 
         if params[:date_to].present?
           to_date = Date.parse(params[:date_to])
-          scope = scope.where("#{date_column} <= ?", to_date.end_of_day)
+          scope = scope.where(column.lteq(to_date.end_of_day))
         end
 
         scope
       rescue Date::Error
-        render_error(status: 400, message: "Invalid date format. Use YYYY-MM-DD.")
-        nil
+        raise InvalidDateParam, "Invalid date format. Use YYYY-MM-DD."
+      end
+
+      def set_cache_headers
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+        response.headers["Pragma"] = "no-cache"
       end
 
       def render_error(status:, message:, details: nil)

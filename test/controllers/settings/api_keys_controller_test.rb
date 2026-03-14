@@ -36,12 +36,11 @@ class Settings::ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
   # -- create --
 
-  test "create generates a key and shows flash with api_key" do
+  test "create generates a key and renders it inline" do
     sign_in_as @user
     post settings_api_key_path
-    assert_redirected_to settings_api_key_path
-    assert flash[:api_key].present?
-    assert_match(/\A[0-9a-f]{64}\z/, flash[:api_key])
+    assert_response :success
+    assert_select "#api-key-value", /\A[0-9a-f]{64}\z/
     assert_equal "API key generated. Copy it now — it won't be shown again.", flash[:notice]
   end
 
@@ -51,7 +50,7 @@ class Settings::ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     sign_in_as @user
     post settings_api_key_path
-    assert_redirected_to settings_api_key_path
+    assert_response :success
 
     @user.reload
     assert_not_equal old_digest, @user.api_key_digest

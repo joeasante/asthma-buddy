@@ -18,7 +18,7 @@ class Api::V1::RateLimitingTest < ActionDispatch::IntegrationTest
 
   test "API requests within limit succeed" do
     3.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     # Requests should not be throttled (all under limit of 60)
     # Last response should NOT be 429
@@ -27,14 +27,14 @@ class Api::V1::RateLimitingTest < ActionDispatch::IntegrationTest
 
   test "API requests exceeding limit get 429" do
     61.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     assert_response 429
   end
 
   test "429 response includes Retry-After header" do
     61.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     assert_response 429
     assert response.headers["Retry-After"].present?, "Expected Retry-After header"
@@ -43,7 +43,7 @@ class Api::V1::RateLimitingTest < ActionDispatch::IntegrationTest
 
   test "429 response body is consistent JSON error format" do
     61.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     assert_response 429
 
@@ -56,7 +56,7 @@ class Api::V1::RateLimitingTest < ActionDispatch::IntegrationTest
   test "web requests are not affected by API rate limit" do
     # Exhaust API rate limit
     61.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     assert_response 429
 
@@ -72,12 +72,12 @@ class Api::V1::RateLimitingTest < ActionDispatch::IntegrationTest
 
     # Exhaust User A's rate limit
     61.times do
-      get "/api/v1/health", headers: auth_headers(@api_key)
+      get "/api/v1/symptom_logs", headers: auth_headers(@api_key)
     end
     assert_response 429
 
     # User B should still be able to make requests
-    get "/api/v1/health", headers: auth_headers(api_key_b)
+    get "/api/v1/symptom_logs", headers: auth_headers(api_key_b)
     assert_not_equal 429, response.status
   end
 

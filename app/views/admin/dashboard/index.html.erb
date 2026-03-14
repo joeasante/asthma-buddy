@@ -2,6 +2,8 @@
 
 <div class="page-header">
   <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Settings</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.4; margin: 0 0.25rem;"><polyline points="9 18 15 12 9 6"/></svg>
     <span class="eyebrow-section">Admin</span>
     <div class="eyebrow-rule" aria-hidden="true"></div>
   </div>
@@ -25,21 +27,27 @@
   </div>
 </div>
 
-<div class="section-card" style="margin-bottom: var(--spacing-md);">
-  <h2 class="section-card-title">Site Settings</h2>
-  <div style="display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap;">
-    <span>Registration:</span>
-    <% if @registration_open %>
-      <span class="badge badge--success">Open</span>
-    <% else %>
-      <span class="badge badge--danger">Closed</span>
-    <% end %>
-    <%= button_to admin_toggle_registration_path,
-          method: :post,
-          class: "btn-secondary",
-          data: { turbo_confirm: "Are you sure you want to #{@registration_open ? 'close' : 'open'} registration?" } do %>
-      <%= @registration_open ? "Close Registration" : "Open Registration" %>
-    <% end %>
+<div class="section-card">
+  <div class="section-card-header">
+    <h2 class="section-card-title">Site Settings</h2>
+  </div>
+  <div class="section-card-body">
+    <div class="admin-site-setting">
+      <div class="admin-site-setting-info">
+        <span class="admin-site-setting-label">Registration</span>
+        <% if @registration_open %>
+          <span class="badge badge--success">Open</span>
+        <% else %>
+          <span class="badge badge--danger">Closed</span>
+        <% end %>
+      </div>
+      <%= button_to admin_toggle_registration_path,
+            method: :post,
+            class: "btn-secondary",
+            data: { turbo_confirm: "Are you sure you want to #{@registration_open ? 'close' : 'open'} registration?" } do %>
+        <%= @registration_open ? "Close Registration" : "Open Registration" %>
+      <% end %>
+    </div>
   </div>
 </div>
 
@@ -73,60 +81,76 @@
 
 <div class="admin-tables">
   <div class="section-card">
-    <h2 class="section-card-title">Recent Signups</h2>
-    <% if @recent_signups.empty? %>
-      <p class="empty-state-text">No signups yet.</p>
-    <% else %>
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Joined</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @recent_signups.each do |user| %>
-            <tr>
-              <td><%= user.email_address %></td>
-              <td><%= user.full_name.presence || "—" %></td>
-              <td><%= user.created_at.strftime("%d %b %Y") %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% end %>
+    <div class="section-card-header">
+      <h2 class="section-card-title">Recent Signups</h2>
+    </div>
+    <div class="section-card-body">
+      <% if @recent_signups.empty? %>
+        <p class="empty-state-text">No signups yet.</p>
+      <% else %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @recent_signups.each do |user| %>
+                <tr>
+                  <td><%= user.email_address %></td>
+                  <td><%= user.full_name.presence || "—" %></td>
+                  <td><%= user.created_at.strftime("%d %b %Y") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
   </div>
 
   <div class="section-card">
-    <h2 class="section-card-title">Most Active</h2>
-    <% if @most_active.empty? %>
-      <p class="empty-state-text">No activity yet.</p>
-    <% else %>
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Sign-ins</th>
-            <th>Last sign in</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @most_active.each do |user| %>
-            <tr>
-              <td><%= user.email_address %></td>
-              <td><%= user.sign_in_count %></td>
-              <td>
-                <% if user.last_sign_in_at? %>
-                  <%= user.last_sign_in_at.strftime("%d %b %Y") %>
-                <% else %>
-                  Never
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    <% end %>
+    <div class="section-card-header">
+      <h2 class="section-card-title">Most Active</h2>
+    </div>
+    <div class="section-card-body">
+      <% if @most_active.empty? %>
+        <p class="empty-state-text">No activity yet.</p>
+      <% else %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Sign-ins</th>
+                <th>Last sign in</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @most_active.each do |user| %>
+                <tr>
+                  <td><%= user.email_address %></td>
+                  <td><%= user.sign_in_count %></td>
+                  <td>
+                    <% if user.last_sign_in_at? %>
+                      <%= user.last_sign_in_at.strftime("%d %b %Y") %>
+                    <% else %>
+                      Never
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
   </div>
+</div>
+
+<div class="form-actions">
+  <%= link_to "Back to Settings", settings_path, class: "btn-cancel" %>
 </div>

@@ -9,9 +9,11 @@ class Settings::ApiKeysController < Settings::BaseController
   end
 
   def create
-    plaintext_key = Current.user.generate_api_key!
-    flash[:api_key] = plaintext_key
-    redirect_to settings_api_key_path, notice: "API key generated. Copy it now — it won't be shown again."
+    @plaintext_key = Current.user.generate_api_key!
+    @has_key = true
+    @key_created_at = Current.user.api_key_created_at
+    flash.now[:notice] = "API key generated. Copy it now — it won't be shown again."
+    render :show
   end
 
   def destroy

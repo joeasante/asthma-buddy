@@ -27,7 +27,7 @@
   <p role="status" class="flash flash--notice"><%= flash[:notice] %></p>
 <% end %>
 
-<% if flash[:api_key].present? %>
+<% if @plaintext_key.present? %>
   <div class="section-card section-card--highlight">
     <div class="section-card-header">
       <h2 class="section-card-title">Your New API Key</h2>
@@ -36,8 +36,8 @@
     <div class="section-card-body">
       <p><strong>Copy this key now. It will not be shown again.</strong></p>
       <div class="api-key-display">
-        <code class="api-key-value" id="api-key-value"><%= flash[:api_key] %></code>
-        <button type="button" class="btn-secondary btn-small" onclick="navigator.clipboard.writeText(document.getElementById('api-key-value').textContent).then(function() { this.textContent = 'Copied!'; setTimeout(function() { this.textContent = 'Copy'; }.bind(this), 2000); }.bind(this))">Copy</button>
+        <code class="api-key-value" id="api-key-value"><%= @plaintext_key %></code>
+        <button type="button" class="btn-secondary btn-small" data-controller="clipboard" data-clipboard-target-value="api-key-value" data-action="clipboard#copy">Copy</button>
       </div>
     </div>
   </div>
@@ -57,7 +57,7 @@
       </div>
     </div>
   </div>
-<% elsif flash[:api_key].blank? %>
+<% elsif @plaintext_key.blank? %>
   <div class="section-card">
     <div class="section-card-header">
       <h2 class="section-card-title">API Key</h2>

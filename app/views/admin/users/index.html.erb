@@ -2,7 +2,11 @@
 
 <div class="page-header">
   <div class="page-header-eyebrow">
-    <span class="eyebrow-section"><%= pluralize(@total_user_count, "user") %></span>
+    <span class="eyebrow-section">Settings</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.4; margin: 0 0.25rem;"><polyline points="9 18 15 12 9 6"/></svg>
+    <span class="eyebrow-section">Admin</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.4; margin: 0 0.25rem;"><polyline points="9 18 15 12 9 6"/></svg>
+    <span class="eyebrow-section">Users</span>
     <div class="eyebrow-rule" aria-hidden="true"></div>
   </div>
   <div class="page-header-main">
@@ -17,7 +21,7 @@
       </div>
       <div>
         <h1>Users</h1>
-        <p class="page-header-subtitle">All registered accounts</p>
+        <p class="page-header-subtitle"><%= pluralize(@total_user_count, "registered account") %></p>
       </div>
     </div>
     <div class="page-header-actions">
@@ -27,66 +31,74 @@
 </div>
 
 <% if @users.empty? %>
-  <div class="empty-state">
-    <p>No users yet.</p>
+  <div class="section-card">
+    <div class="section-card-body">
+      <p class="empty-state-text">No users yet.</p>
+    </div>
   </div>
 <% else %>
   <div class="section-card">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Name</th>
-          <th>Joined</th>
-          <th>Last sign in</th>
-          <th>Sign-ins</th>
-          <th>Role</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @users.each do |user| %>
-          <tr id="<%= dom_id(user) %>">
-            <td><%= user.email_address %></td>
-            <td><%= user.full_name.presence || "—" %></td>
-            <td><%= user.created_at.strftime("%d %b %Y") %></td>
-            <td>
-              <% if user.last_sign_in_at? %>
-                <%= time_ago_in_words(user.last_sign_in_at) %> ago
-              <% else %>
-                Never
-              <% end %>
-            </td>
-            <td><%= user.sign_in_count %></td>
-            <td>
-              <% if user.admin? %>
-                <span class="badge badge--admin">Admin</span>
-              <% else %>
-                <span class="badge">Member</span>
-              <% end %>
-            </td>
-            <td>
-              <% if user == Current.user %>
-                <button class="btn-secondary" disabled title="Cannot change your own role">
-                  <%= user.admin? ? "Change to Member" : "Change to Admin" %>
-                </button>
-              <% else %>
-                <%= button_to(
-                      user.admin? ? "Change to Member" : "Change to Admin",
-                      toggle_admin_admin_user_path(user),
-                      method: :patch,
-                      class: "btn-secondary",
-                      data: {
-                        turbo_confirm: user.admin? ?
-                          "Change #{user.email_address} to Member? They will lose access to this page." :
-                          "Change #{user.email_address} to Admin? They will have full admin access."
-                      }
-                    ) %>
-              <% end %>
-            </td>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Joined</th>
+            <th>Last sign in</th>
+            <th>Sign-ins</th>
+            <th>Role</th>
+            <th></th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @users.each do |user| %>
+            <tr id="<%= dom_id(user) %>">
+              <td><%= user.email_address %></td>
+              <td><%= user.full_name.presence || "—" %></td>
+              <td class="admin-table-nowrap"><%= user.created_at.strftime("%d %b %Y") %></td>
+              <td class="admin-table-nowrap">
+                <% if user.last_sign_in_at? %>
+                  <%= time_ago_in_words(user.last_sign_in_at) %> ago
+                <% else %>
+                  <span class="admin-table-muted">Never</span>
+                <% end %>
+              </td>
+              <td><%= user.sign_in_count %></td>
+              <td>
+                <% if user.admin? %>
+                  <span class="badge badge--admin">Admin</span>
+                <% else %>
+                  <span class="badge badge--member">Member</span>
+                <% end %>
+              </td>
+              <td class="admin-table-action">
+                <% if user == Current.user %>
+                  <button class="btn-secondary btn-small" disabled title="Cannot change your own role">
+                    <%= user.admin? ? "Demote" : "Promote" %>
+                  </button>
+                <% else %>
+                  <%= button_to(
+                        user.admin? ? "Demote" : "Promote",
+                        toggle_admin_admin_user_path(user),
+                        method: :patch,
+                        class: "btn-secondary btn-small",
+                        data: {
+                          turbo_confirm: user.admin? ?
+                            "Change #{user.email_address} to Member? They will lose access to this page." :
+                            "Change #{user.email_address} to Admin? They will have full admin access."
+                        }
+                      ) %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 <% end %>
+
+<div class="form-actions">
+  <%= link_to "Back to Admin", admin_root_path, class: "btn-cancel" %>
+</div>

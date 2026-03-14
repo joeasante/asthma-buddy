@@ -8,8 +8,6 @@ module Api
 
         scope = policy_scope(PeakFlowReading).order(recorded_at: :desc)
         scope = date_filter(scope, date_column: :recorded_at)
-        return unless scope
-
         result = paginate(scope)
 
         render json: {

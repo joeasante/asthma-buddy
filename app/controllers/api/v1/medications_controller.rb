@@ -6,7 +6,7 @@ module Api
       def index
         authorize Medication
 
-        scope = policy_scope(Medication).includes(:dose_logs).order(created_at: :desc)
+        scope = policy_scope(Medication).order(created_at: :desc)
         result = paginate(scope)
 
         render json: {

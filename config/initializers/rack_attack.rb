@@ -31,8 +31,16 @@ class Rack::Attack
   throttle("api/v1/requests", limit: 60, period: 1.minute) do |req|
     if req.path.start_with?("/api/v1/")
       # Throttle by API key digest (extracted from Bearer token)
-      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer (.+)\z/)&.[](1)
+      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
       Digest::SHA256.hexdigest(token) if token.present?
+    end
+  end
+
+  # Throttle unauthenticated API requests by IP (stricter limit)
+  throttle("api/v1/unauthenticated", limit: 10, period: 1.minute) do |req|
+    if req.path.start_with?("/api/v1/")
+      token = req.env["HTTP_AUTHORIZATION"]&.match(/\ABearer\s+([a-f0-9]{64})\z/)&.[](1)
+      req.ip unless token.present?
     end
   end
 

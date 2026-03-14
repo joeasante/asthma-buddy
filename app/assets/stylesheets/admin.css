@@ -2,53 +2,51 @@
    Admin — shared styles for /admin/* pages
    ========================================================================== */
 
-/* Table used on /admin/users and within /admin/stats data tables */
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
+/* ── Site Settings row ──────────────────────────────────────────────────── */
+
+.admin-site-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
 }
 
-.admin-table th {
-  text-align: left;
-  padding: var(--space-xs) var(--space-sm);
-  border-bottom: 2px solid var(--border);
-  color: var(--text-3);
+.admin-site-setting-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.admin-site-setting-label {
   font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  color: var(--text-2);
+  font-size: 0.9375rem;
 }
 
-.admin-table td {
-  padding: var(--space-xs) var(--space-sm);
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  vertical-align: middle;
+/* ── Badge variants ─────────────────────────────────────────────────────── */
+
+.badge--success {
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #16a34a;
 }
 
-.admin-table tbody tr:last-child td {
-  border-bottom: none;
+.badge--danger {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #dc2626;
 }
 
-.admin-table tbody tr:hover td {
+.badge--member {
   background: var(--surface-alt);
+  color: var(--text-3);
 }
 
-/* Disabled toggle button — current user cannot change own admin status */
-.admin-table button[disabled],
-.admin-table button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* ── Stat grid ──────────────────────────────────────────────────────────── */
 
-/* Stat grid — used on /admin/stats */
 .admin-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-sm);
+  gap: var(--space-md);
   margin-bottom: var(--space-lg);
 }
 
@@ -58,7 +56,7 @@
 
 .admin-stat-card {
   text-align: center;
-  padding: var(--space-md);
+  padding: var(--space-lg) var(--space-md);
 }
 
 .admin-stat-label {
@@ -67,7 +65,7 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  margin: 0 0 var(--space-xs);
+  margin: 0 0 var(--space-sm);
 }
 
 .admin-stat-value {
@@ -81,11 +79,12 @@
 
 .admin-stat-sub {
   font-size: 0.75rem;
-  color: var(--text-3);
+  color: var(--text-4);
   margin: var(--space-xs) 0 0;
 }
 
-/* Data tables section — two-column grid on wide screens */
+/* ── Data tables ────────────────────────────────────────────────────────── */
+
 .admin-tables {
   display: grid;
   gap: var(--space-lg);
@@ -95,16 +94,86 @@
   .admin-tables { grid-template-columns: 1fr 1fr; }
 }
 
-.section-card-title {
-  font-size: 1rem;
-  font-weight: 700;
+/* Scrollable wrapper for wide tables on mobile */
+.admin-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: var(--space-sm) var(--space-sm);
+  border-bottom: 2px solid var(--border);
+  color: var(--text-3);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: var(--space-sm) var(--space-sm);
+  border-bottom: 1px solid var(--border);
   color: var(--text);
-  margin: 0 0 var(--space-md);
-  font-family: var(--font-heading);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover td {
+  background: var(--surface-alt);
+}
+
+.admin-table-nowrap {
+  white-space: nowrap;
+}
+
+.admin-table-muted {
+  color: var(--text-4);
+}
+
+.admin-table-action {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Disabled toggle button — current user cannot change own role */
+.admin-table button[disabled],
+.admin-table button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .empty-state-text {
   color: var(--text-3);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   margin: 0;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .admin-site-setting {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .admin-stat-card {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  .admin-stat-value {
+    font-size: 1.5rem;
+  }
 }

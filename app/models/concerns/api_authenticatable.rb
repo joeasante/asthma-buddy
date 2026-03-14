@@ -3,9 +3,8 @@
 module ApiAuthenticatable
   extend ActiveSupport::Concern
 
-  included do
-    # Class method for authenticating by API key token
-    def self.authenticate_by_api_key(token)
+  class_methods do
+    def authenticate_by_api_key(token)
       return nil if token.blank?
 
       digest = Digest::SHA256.hexdigest(token)
