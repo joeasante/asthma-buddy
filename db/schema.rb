@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_165604) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -160,7 +160,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email_address", null: false
@@ -170,11 +169,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
     t.boolean "onboarding_medication_done", default: false, null: false
     t.boolean "onboarding_personal_best_done", default: false, null: false
     t.string "password_digest", null: false
+    t.integer "role", default: 0, null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["last_sign_in_at"], name: "index_users_on_last_sign_in_at"
+    t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

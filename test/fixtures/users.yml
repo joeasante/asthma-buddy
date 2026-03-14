@@ -30,4 +30,4 @@ admin_user:
   onboarding_medication_done: true
   sign_in_count: 10
   last_sign_in_at: <%= 1.hour.ago %>
-  admin: true
+  role: 1
