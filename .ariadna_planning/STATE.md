@@ -5,14 +5,14 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 3 — SaaS Foundation (Phase 27: Multi-Factor Authentication)
+**Current focus:** Milestone 3 — SaaS Foundation (Phase 28: REST API)
 
 ## Current Position
 
 Phase: 27 of 30 (Multi-Factor Authentication)
-Plan: 03 complete
-Status: Executing Phase 27
-Last activity: 2026-03-14 — Phase 27 Plan 03 executed (MFA controller tests, 27 new tests)
+Plan: 03 complete (phase complete)
+Status: Phase 27 complete
+Last activity: 2026-03-14 — Phase 27 verified and complete (TOTP MFA, 661 tests)
 
 Progress: ####░░░░░░ 40% (Milestone 3 — SaaS Foundation)
 
