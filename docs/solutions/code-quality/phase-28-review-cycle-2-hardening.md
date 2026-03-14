@@ -156,3 +156,30 @@ All 750 tests pass.
 5. **Enforce strict date parsing** with `Date.strptime` — never use `Date.parse` for user input.
 6. **Add `.catch()` to all clipboard operations** — not all browsers/contexts support it.
 7. **Audit log all security-sensitive actions** — key generation, revocation, API access.
+
+### CI Checks to Consider
+
+| Check | What it catches |
+|---|---|
+| `grep -rn 'Date\.parse' app/` returns 0 | Ambiguous date parsing (#422) |
+| `grep -rn 'Bearer' app/ config/ \| grep -v BEARER_PATTERN` | Duplicated regex (#423) |
+| `grep -rn 'method: :delete' app/views/ \| grep -v turbo_confirm` | Missing confirmation (#418) |
+| `grep -rn '\.then(' app/javascript/ \| grep -v '\.catch('` | Unhandled promise rejections (#425) |
+| Every Rack::Attack throttle rule has 2+ tests | Missing rate limit coverage (#424) |
+
+## Cross-References
+
+### Prior Findings in Same Areas
+
+- **Rate limiting:** #408 (added unauthenticated throttle), #413 (test route fix), #372 (response format), #355 (MemoryStore), #079 (JSON handler)
+- **API key security:** #414 (key from flash cookie), #415 (tighten bearer regex), #409 (cache headers on API), #083 (cache-control on health data)
+- **Date parsing:** #407 (SQL injection in date filter), #411 (nil return convention), #050 (unvalidated Date.parse), #094 (rescue nil widens query)
+- **DRY violations:** #153 (Ruby/JS constant duplication), #194 (GINA thresholds), #339 (cache key literals)
+- **API response gaps:** #130 (triggers missing from symptom logs), #139 (profile missing avatar), #296 (dose puffs missing)
+- **Admin tests:** #374 (admin fixture missing), #293 (dashboard feature tests missing)
+
+### Related Documentation
+
+- [Phase 28 Review Cycle 1](phase-28-rest-api-code-review-fixes.md) — 10 fixes from initial review
+- [MFA Code Review Hardening](../security-issues/mfa-code-review-hardening.md) — re-authentication patterns
+- [PR #17 Comprehensive Review](pr17-comprehensive-code-review-28-fixes.md) — earlier review methodology
