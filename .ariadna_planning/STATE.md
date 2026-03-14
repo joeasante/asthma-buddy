@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 25 (Clinical Intelligence) — COMPLETE
-Plan: Plan 02 (Appointment Summary) complete. All plans in phase 25 done.
+Plan: Plan 04 (Dashboard UX Polish) complete. All plans in phase 25 done.
 Status: Phase 25 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-02 complete: print-optimised /appointment-summary page with 5 data sections (peak flow, symptoms, reliever use, medications, health events), 7 new tests, 561 total passing.
+Last activity: 2026-03-14 — Phase 25-04 complete: zone-coloured insight card for interpretation, GP Summary button in header, 12-month PB threshold, 561 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -32,6 +32,7 @@ All 9 phases delivered:
 ## Performance Metrics
 
 **Phase 25 Velocity:**
+- Phase 25 Plan 04 completed: 2026-03-14 (~2 min, 1 task, 4 files modified -- dashboard UX polish: zone insight card, header button, PB threshold)
 - Phase 25 Plan 02 completed: 2026-03-14 (~3 min, 2 tasks, 4 files created, 3 files modified, 7 new tests -- appointment summary page)
 - Tests at Phase 25-02 close: 561 passing (no regressions)
 - Phase 25 Plan 01 completed: 2026-03-14 (~5 min, 2 tasks -- interpreted insights)
