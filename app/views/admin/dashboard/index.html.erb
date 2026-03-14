@@ -1,33 +1,5 @@
 <% content_for :title, "Stats — Admin — Asthma Buddy" %>
 
-<% content_for :head do %>
-  <style>
-    .admin-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-sm);
-      margin-bottom: var(--space-lg);
-    }
-    @media (min-width: 768px) {
-      .admin-stat-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .admin-stat-card { text-align: center; padding: var(--space-md); }
-    .admin-stat-label { font-size: 0.8125rem; color: var(--text-3); margin: 0 0 var(--space-xs); }
-    .admin-stat-value { font-size: 2rem; font-weight: 700; color: var(--text); margin: 0; line-height: 1; }
-    .admin-stat-sub { font-size: 0.75rem; color: var(--text-3); margin: var(--space-xs) 0 0; }
-    .admin-tables { display: grid; gap: var(--space-lg); }
-    @media (min-width: 1024px) {
-      .admin-tables { grid-template-columns: 1fr 1fr; }
-    }
-    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .admin-table th { text-align: left; padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--border); color: var(--text-3); font-weight: 600; }
-    .admin-table td { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--border); color: var(--text); }
-    .admin-table tbody tr:last-child td { border-bottom: none; }
-    .section-card-title { font-size: 1rem; font-weight: 600; margin: 0 0 var(--space-md); color: var(--text); }
-    .empty-state-text { color: var(--text-3); font-size: 0.875rem; }
-  </style>
-<% end %>
-
 <div class="page-header">
   <div class="page-header-eyebrow">
     <span class="eyebrow-section">Admin</span>
@@ -35,6 +7,13 @@
   </div>
   <div class="page-header-main">
     <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
       <div>
         <h1>Stats</h1>
         <p class="page-header-subtitle">User growth and engagement</p>
