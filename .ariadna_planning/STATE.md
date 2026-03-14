@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: Phase 24 (Admin Observability) — COMPLETE
-Plan: Plan 03 (Admin stats dashboard) complete. Phase 24 done.
-Status: Phase 24 Plan 03 complete. 2026-03-13.
-Last activity: 2026-03-13 — Phase 24-03 complete: Admin::DashboardController with 8 queries (total users, new this week/month, WAU, MAU, never returned, recent signups, most active), stats view with 6 metric cards and 2 data tables, 4 controller tests. 550 tests passing.
+Plan: Plan 04 (Admin UI polish) complete. Phase 24 fully done.
+Status: Phase 24 Plan 04 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 24-04 complete: admin.css created with design-system tokens, settings hub split into two section-card--nav anchors (Mission Control + Admin), page-header icons added to /admin/users and /admin/stats, inline styles removed from stats view. 550 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
@@ -36,6 +36,8 @@ All 9 phases delivered:
 - Tests at Phase 24-01 close: 538 passing (no regressions)
 - Phase 24 Plan 02 completed: 2026-03-13 (~8 min, 2 tasks, 4 files created, 3 files modified, 8 new controller tests — admin users panel)
 - Tests at Phase 24-02 close: 546 passing (no regressions)
+- Phase 24 Plan 04 completed: 2026-03-14 (~2 min, 2 tasks, 1 file created, 4 files modified, 0 new tests — admin UI polish, design system tokens)
+- Tests at Phase 24-04 close: 550 passing (no regressions)
 - Phase 24 Plan 03 completed: 2026-03-13 (~15 min, 2 tasks, 2 files created, 1 file modified, 4 new controller tests — admin stats dashboard)
 - Tests at Phase 24-03 close: 550 passing (no regressions)
 
