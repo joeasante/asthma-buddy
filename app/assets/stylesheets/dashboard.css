@@ -243,6 +243,12 @@
 .dash-severity-card--moderate .dash-severity-label { color: var(--severity-moderate-text); }
 .dash-severity-card--severe   .dash-severity-label { color: var(--severity-severe); }
 
+.dash-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--space-md) 0 0;
+}
+
 /* --------------------------------------------------------------------------
    Summary stat cards
    -------------------------------------------------------------------------- */
@@ -441,6 +447,71 @@
 }
 
 .dash-illness-banner-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   This Week — interpretation sentence
+   -------------------------------------------------------------------------- */
+
+.dash-interpretation {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  margin-top: var(--space-sm);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   GINA reliever threshold warning — shown when >2 reliever uses this week
+   -------------------------------------------------------------------------- */
+
+.dash-gina-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--severity-moderate-bg);
+  border-left: 4px solid var(--severity-moderate);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.875rem;
+  color: var(--severity-moderate-text);
+}
+
+.dash-gina-warning svg {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--severity-moderate);
+}
+
+.dash-gina-warning-body {
+  flex: 1;
+}
+
+.dash-gina-warning-body strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.dash-gina-warning-body p {
+  font-size: 0.8125rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.dash-gina-warning-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--severity-moderate-text);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+  opacity: 0.8;
+}
+
+.dash-gina-warning-link:hover {
   opacity: 1;
   text-decoration: underline;
 }
@@ -1040,36 +1111,3 @@ a.dash-health-event-row:focus-visible {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Chart ongoing events strip — shown below the 7-day chart when duration
-   events started before this week are still active.
-   -------------------------------------------------------------------------- */
-
-.chart-ongoing-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.chart-ongoing-label {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-right: 0.25rem;
-}
-
-.chart-ongoing-event {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.chart-ongoing-since {
-  font-size: 0.8rem;
-  color: var(--text-3);
-}

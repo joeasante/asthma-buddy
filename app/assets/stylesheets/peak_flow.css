@@ -148,6 +148,27 @@
 }
 
 /* --------------------------------------------------------------------------
+   Personal best aging notice — shown when PB is >18 months old
+   -------------------------------------------------------------------------- */
+
+.pf-pb-age-notice {
+  font-size: 0.8125rem;
+  color: var(--text-3);
+  margin-top: calc(-0.75rem);  /* tuck up beneath the hero card margin */
+  margin-bottom: 1.25rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.pf-pb-age-notice a {
+  color: var(--text-2);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
    Period stat strip — compact inline summary between filter bar and chart.
    Intentionally frameless: context, not content.
    -------------------------------------------------------------------------- */

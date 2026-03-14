@@ -73,6 +73,20 @@
     </div>
   <% end %>
 
+  <%# ── GINA reliever threshold warning ────────────────────────── %>
+  <% if @week_reliever_doses && @week_reliever_doses > 2 %>
+    <div class="dash-gina-warning" role="alert">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dash-gina-warning-body">
+        <strong>Reliever used <%= @week_reliever_doses %> times this week</strong>
+        <p>Using your reliever more than twice a week may indicate your asthma isn't fully controlled. Worth discussing with your GP.</p>
+      </div>
+      <%= link_to "View usage \u2192", reliever_usage_path, class: "dash-gina-warning-link" %>
+    </div>
+  <% end %>
+
   <%# ── Personal best missing — callout ────────────────────────── %>
   <% if @personal_best.nil? && @last_reading %>
     <div class="dash-pb-banner" role="alert">
@@ -208,6 +222,10 @@
         </div>
       </div>
 
+      <% if @week_interpretation %>
+        <p class="dash-interpretation"><%= @week_interpretation %></p>
+      <% end %>
+
       <%# Symptom severity breakdown — only shown when there are symptoms this week %>
       <% if @week_symptom_count > 0 %>
       <div class="dash-severity-cards">
@@ -228,18 +246,7 @@
 
       <%# Peak flow chart %>
       <% if @chart_data.any? %>
-        <% if @ongoing_health_events.any? %>
-          <div class="chart-ongoing-strip" aria-label="Currently active health events">
-            <span class="chart-ongoing-label">Currently active</span>
-            <% @ongoing_health_events.each do |e| %>
-              <span class="chart-ongoing-event">
-                <span class="event-badge event-badge--<%= e.event_type_css_modifier %>"><%= e.event_type_label %></span>
-                <span class="chart-ongoing-since">since <%= e.recorded_at.strftime("%-d %b") %></span>
-              </span>
-            <% end %>
-          </div>
-        <% end %>
-
+        <hr class="dash-divider">
         <div class="chart-section"
              data-controller="chart"
              data-chart-type-value="peakflow-bands"
