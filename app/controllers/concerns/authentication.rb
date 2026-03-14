@@ -39,15 +39,16 @@ module Authentication
       respond_to do |format|
         format.html do
           # url_from validates same-origin to prevent open redirect; falls back to root_url for external URLs.
-          session[:return_to_after_authenticating] = url_from(request.url) || root_url
-          redirect_to new_session_path
+          # main_app prefix ensures route resolution uses the app's routes, not a mounted engine's.
+          session[:return_to_after_authenticating] = url_from(request.url) || main_app.root_url
+          redirect_to main_app.new_session_path
         end
         format.json { render json: { error: "Authentication required" }, status: :unauthorized }
       end
     end
 
     def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
+      session.delete(:return_to_after_authenticating) || main_app.root_url
     end
 
     def start_new_session_for(user)
