@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (Milestone 3)
+- Total plans completed: 8 (Milestone 3)
 - Average duration: 5 min
-- Total execution time: 33 min
+- Total execution time: 37 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -58,6 +58,7 @@ Tests at close: 195
 | 27    | 02   | 6 min    | 2     | 15    |
 | 27    | 03   | 3 min    | 2     | 4     |
 | 28    | 01   | 2 min    | 2     | 9     |
+| 28    | 02   | 4 min    | 2     | 14    |
 | 28    | 03   | 1 min    | 1     | 2     |
 
 ## Accumulated Context
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - 28-01: One API key per user stored as SHA-256 digest on users table (no separate model)
 - 28-01: Plaintext key passed via flash[:api_key] for one-time display after redirect
 - 28-01: Reused SettingsPolicy :show? for API key controller authorization
+- 28-02: Inherited from ActionController::API (not ApplicationController) for lightweight stateless API
+- 28-02: Added user attribute to Current model with session fallback for API auth flow
+- 28-02: Used recorded_at for HealthEvent API (plan had occurred_on which doesn't exist)
 - 28-03: Throttle key is SHA-256 digest of Bearer token (matches stored digest)
 - 28-03: Retry-After computed from throttle window reset time
 - 28-03: API throttle response uses consistent JSON error format matching API controllers
@@ -105,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 28-03-PLAN.md
+Stopped at: Completed 28-02-PLAN.md (after 28-03)
 Resume file: None
