@@ -12,7 +12,6 @@ proxy:
   healthcheck:
     path: /up
     interval: 3
-    timeout: 90
   run:
     http_port: 3000       # kamal-proxy listens on :3000 — CloudPanel proxies here
     https_port: 4430      # move away from 443 — CloudPanel Nginx owns that port
@@ -39,6 +38,8 @@ builder:
 # Use a persistent storage volume for SQLite databases and Active Storage files.
 volumes:
   - "asthma_buddy_storage:/rails/storage"
+
+deploy_timeout: 120
 
 asset_path: /rails/public/assets
 
