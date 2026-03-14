@@ -137,4 +137,60 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     post session_path, params: { email_address: @user.email_address, password: "wrongpassword" }
     assert_equal original_ts, @user.reload.last_sign_in_at
   end
+
+  # -- MFA --
+
+  test "POST /session with MFA-enabled user redirects to MFA challenge" do
+    mfa_user = users(:mfa_user)
+    mfa_user.enable_mfa!(ROTP::Base32.random)
+
+    assert_no_difference "Session.count" do
+      post session_path, params: { email_address: mfa_user.email_address, password: "password123" }
+    end
+    assert_redirected_to new_mfa_challenge_path
+  end
+
+  test "POST /session with MFA-enabled user sets pending MFA session state" do
+    mfa_user = users(:mfa_user)
+    mfa_user.enable_mfa!(ROTP::Base32.random)
+
+    post session_path, params: { email_address: mfa_user.email_address, password: "password123" }
+    assert_equal mfa_user.id, session[:pending_mfa_user_id]
+    assert_not_nil session[:pending_mfa_at]
+  end
+
+  test "POST /session with MFA-enabled user does not set session cookie" do
+    mfa_user = users(:mfa_user)
+    mfa_user.enable_mfa!(ROTP::Base32.random)
+
+    post session_path, params: { email_address: mfa_user.email_address, password: "password123" }
+    assert_redirected_to new_mfa_challenge_path
+
+    # Follow redirect to MFA challenge page, then try a protected page
+    follow_redirect!
+    get dashboard_path
+    assert_redirected_to new_session_path
+  end
+
+  test "POST /session with non-MFA user works normally" do
+    assert_difference "Session.count", 1 do
+      post session_path, params: { email_address: @user.email_address, password: "password123" }
+    end
+    assert_redirected_to root_path
+  end
+
+  test "GET /session/new clears stale pending MFA state" do
+    mfa_user = users(:mfa_user)
+    mfa_user.enable_mfa!(ROTP::Base32.random)
+
+    # Enter pending MFA state
+    post session_path, params: { email_address: mfa_user.email_address, password: "password123" }
+    assert_equal mfa_user.id, session[:pending_mfa_user_id]
+
+    # Visiting login page clears pending state
+    get new_session_path
+    assert_response :success
+    assert_nil session[:pending_mfa_user_id]
+    assert_nil session[:pending_mfa_at]
+  end
 end

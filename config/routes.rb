@@ -2,7 +2,7 @@
 
 Rails.application.routes.draw do
   resource :session
-  resource :mfa_challenge, only: %i[ new create ], path: "mfa-challenge"
+  resource :mfa_challenge, only: %i[ new create ], path: "mfa-challenge", controller: "mfa_challenge"
   resource :registration, only: %i[ new create ]
   get "email_verification/new", to: "email_verifications#new", as: :new_email_verification
   post "email_verification", to: "email_verifications#create", as: :email_verification_resend
