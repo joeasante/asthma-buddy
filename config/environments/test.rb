@@ -56,4 +56,10 @@ Rails.application.configure do
   # Keep Rack::Attack in the middleware stack so integration tests can enable it
   # selectively, but start with it disabled so it does not affect unrelated tests.
   # RateLimitingTest re-enables it in setup and disables it in teardown.
+
+  # Deterministic AR Encryption keys for tests so MFA tests work without
+  # requiring credentials to contain encryption keys (CI compatibility).
+  config.active_record.encryption.primary_key = "test-primary-key-that-is-at-least-12-bytes"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key-at-least-12-bytes"
+  config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt-at-least-20-bytes"
 end
