@@ -1,16 +1,24 @@
 # frozen_string_literal: true
 
-class NotificationPolicy < ApplicationPolicy
+class OwnerCrudPolicy < ApplicationPolicy
   def index?
     true
   end
 
-  def mark_read?
+  def show?
     owner?
   end
 
-  def mark_all_read?
+  def create?
     true
+  end
+
+  def update?
+    owner?
+  end
+
+  def destroy?
+    owner?
   end
 
   class Scope < ApplicationPolicy::Scope

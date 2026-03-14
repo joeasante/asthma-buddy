@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class MedicationPolicy < ApplicationPolicy
-  include OwnerCrudPolicy
-
+class MedicationPolicy < OwnerCrudPolicy
   def refill?
     owner?
   end

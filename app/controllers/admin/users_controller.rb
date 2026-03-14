@@ -3,7 +3,7 @@
 class Admin::UsersController < Admin::BaseController
   def index
     authorize User
-    @users = User.all.order(created_at: :desc).limit(100)
+    @users = User.order(created_at: :desc).limit(100)
     @total_user_count = User.count
 
     respond_to do |format|
@@ -37,9 +37,11 @@ class Admin::UsersController < Admin::BaseController
     # Policy still enforces as a safety net
     authorize @user
 
-    new_role = @user.admin? ? :member : :admin
-
+    new_role = nil
     User.transaction do
+      @user.lock!
+      new_role = @user.admin? ? :member : :admin
+
       # Re-check with row-level lock to prevent TOCTOU race condition
       if new_role == :member && User.where(role: :admin).lock.count <= 1
         respond_to do |format|

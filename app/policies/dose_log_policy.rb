@@ -12,4 +12,10 @@ class DoseLogPolicy < ApplicationPolicy
   def destroy?
     owner?
   end
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      scope.joins(:medication).where(medications: { user_id: user.id })
+    end
+  end
 end

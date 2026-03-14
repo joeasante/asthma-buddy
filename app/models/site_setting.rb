@@ -11,11 +11,9 @@ class SiteSetting < ApplicationRecord
   end
 
   def self.toggle_registration!
-    transaction do
-      setting = find_or_create_by!(key: "registration_open") { |s| s.value = "true" }
-      setting.with_lock do
-        setting.update!(value: setting.value == "true" ? "false" : "true")
-      end
+    setting = find_or_create_by!(key: "registration_open") { |s| s.value = "true" }
+    setting.with_lock do
+      setting.update!(value: setting.value == "true" ? "false" : "true")
     end
     Rails.cache.delete("site_setting:registration_open")
     registration_open?
