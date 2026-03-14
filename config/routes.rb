@@ -82,6 +82,7 @@ Rails.application.routes.draw do
         patch :toggle_admin
       end
     end
+    post "site_settings/toggle_registration", to: "site_settings#toggle_registration", as: :toggle_registration
   end
 
   # Job monitoring UI — protected by HTTP Basic Auth (credentials: mission_control.http_basic_auth_*)

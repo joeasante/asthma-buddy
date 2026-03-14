@@ -75,7 +75,7 @@ class ApplicationController < ActionController::Base
   end
 
   def registration_open?
-    allowed_emails.blank?
+    SiteSetting.registration_open?
   end
 
   helper_method :registration_open?
