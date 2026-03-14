@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 3 — SaaS Foundation (Phase 26: Role-Based Access Control)
+**Current focus:** Milestone 3 — SaaS Foundation (Phase 28: REST API)
 
 ## Current Position
 
-Phase: 26 of 30 (Role-Based Access Control)
-Plan: 02 complete (phase complete)
-Status: Phase 26 complete
-Last activity: 2026-03-14 — Phase 26 Plan 02 executed (registration toggle, RBAC test suite)
+Phase: 27 of 30 (Multi-Factor Authentication)
+Plan: 03 complete (phase complete)
+Status: Phase 27 complete
+Last activity: 2026-03-14 — Phase 27 verified and complete (TOTP MFA, 661 tests)
 
-Progress: ##░░░░░░░░ 20% (Milestone 3 — SaaS Foundation)
+Progress: ####░░░░░░ 40% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,14 +46,17 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2 (Milestone 3)
-- Average duration: 9 min
-- Total execution time: 17 min
+- Total plans completed: 5 (Milestone 3)
+- Average duration: 6 min
+- Total execution time: 30 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 26    | 01   | 13 min   | 3     | 52    |
 | 26    | 02   | 4 min    | 2     | 20    |
+| 27    | 01   | 4 min    | 2     | 8     |
+| 27    | 02   | 6 min    | 2     | 15    |
+| 27    | 03   | 3 min    | 2     | 4     |
 
 ## Accumulated Context
 
@@ -74,6 +77,14 @@ Recent decisions affecting current work:
 - 26-02: Kept ALLOWED_EMAILS for login restriction, SiteSetting only controls registration toggle
 - 26-02: Used Rails.cache.fetch with 5-min TTL for registration_open? to avoid per-request DB queries
 - 26-02: Used find_or_create_by! in toggle_registration! for resilience
+- 27-01: Used AR Encryption (encrypts :otp_secret) for at-rest encryption of MFA secrets
+- 27-01: Fixtures with AR Encryption fields must not store plaintext in YAML; enable MFA programmatically in tests
+- 27-01: Recovery codes stored as comma-separated encrypted text, normalized on verification
+- 27-02: Used controller: "security" in routes to fix Rails inflection of resource :security
+- 27-02: Reused SettingsPolicy :show? for all security controller actions
+- 27-02: Pending MFA session uses session[:pending_mfa_user_id] + session[:pending_mfa_at] with 5-min TTL
+- 27-03: MFA enabled programmatically in test setup via enable_mfa! (AR Encryption fixture incompatibility)
+- 27-03: Fixed mfa_challenge route controller resolution (singular resource needed controller: option)
 
 ### Pending Todos
 
@@ -86,5 +97,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 26-02-PLAN.md (Phase 26 complete)
+Stopped at: Completed 27-03-PLAN.md
 Resume file: None

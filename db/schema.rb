@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_175309) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_201031) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -173,9 +173,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_175309) do
     t.string "email_address", null: false
     t.datetime "email_verified_at"
     t.string "full_name"
+    t.datetime "last_otp_at"
     t.datetime "last_sign_in_at"
     t.boolean "onboarding_medication_done", default: false, null: false
     t.boolean "onboarding_personal_best_done", default: false, null: false
+    t.text "otp_recovery_codes"
+    t.boolean "otp_required_for_login", default: false, null: false
+    t.text "otp_secret"
     t.string "password_digest", null: false
     t.integer "role", default: 0, null: false
     t.integer "sign_in_count", default: 0, null: false

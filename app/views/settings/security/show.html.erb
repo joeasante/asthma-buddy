@@ -1,0 +1,64 @@
+<% content_for :title, "Security — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="Manage two-factor authentication and recovery codes."><% end %>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">
+    <span class="eyebrow-section">Settings</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.4; margin: 0 0.25rem;"><polyline points="9 18 15 12 9 6"/></svg>
+    <span class="eyebrow-section">Security</span>
+    <div class="eyebrow-rule" aria-hidden="true"></div>
+  </div>
+  <div class="page-header-main">
+    <div class="page-header-left">
+      <div class="page-header-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Security</h1>
+        <p class="page-header-subtitle">Manage two-factor authentication</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if flash[:notice].present? %>
+  <p role="status" class="flash flash--notice"><%= flash[:notice] %></p>
+<% end %>
+
+<% if Current.user.otp_required_for_login? %>
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2 class="section-card-title">Two-Factor Authentication</h2>
+      <span class="badge badge--enabled">Enabled</span>
+    </div>
+    <div class="section-card-body">
+      <p>Your account is protected with two-factor authentication. You will need to enter a code from your authenticator app each time you sign in.</p>
+
+      <div class="mfa-actions">
+        <%= link_to "View Recovery Codes", recovery_codes_settings_security_path, class: "btn-secondary" %>
+        <%= link_to "Regenerate Recovery Codes", regenerate_recovery_codes_settings_security_path, class: "btn-secondary" %>
+        <%= link_to "Disable", disable_settings_security_path, class: "btn-delete" %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2 class="section-card-title">Two-Factor Authentication</h2>
+      <span class="badge badge--disabled">Disabled</span>
+    </div>
+    <div class="section-card-body">
+      <p>Add an extra layer of security to your account. When enabled, you will need to enter a code from your authenticator app (such as Google Authenticator or Authy) each time you sign in.</p>
+
+      <div class="mfa-actions">
+        <%= link_to "Enable Two-Factor Authentication", setup_settings_security_path, class: "btn-primary" %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="form-actions">
+  <%= link_to "Back to Settings", settings_path, class: "btn-cancel" %>
+</div>

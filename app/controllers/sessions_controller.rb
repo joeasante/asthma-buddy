@@ -11,9 +11,14 @@ class SessionsController < ApplicationController
   }
 
   def new
+    session.delete(:pending_mfa_user_id)
+    session.delete(:pending_mfa_at)
   end
 
   def create
+    session.delete(:pending_mfa_user_id)
+    session.delete(:pending_mfa_at)
+
     user = User.authenticate_by(params.permit(:email_address, :password))
 
     unless user
@@ -37,10 +42,16 @@ class SessionsController < ApplicationController
       end
     end
 
-    start_new_session_for user
-    session[:last_seen_at] = Time.current
-    user.update_columns(last_sign_in_at: Time.current)
-    User.where(id: user.id).update_all("sign_in_count = sign_in_count + 1")
+    if user.otp_required_for_login?
+      session[:pending_mfa_user_id] = user.id
+      session[:pending_mfa_at] = Time.current.to_i
+      return respond_to do |format|
+        format.html { redirect_to new_mfa_challenge_path }
+        format.json { render json: { error: "MFA required", mfa_required: true }, status: :forbidden }
+      end
+    end
+
+    complete_sign_in(user)
     # NOTE: JSON clients must preserve the Set-Cookie response header (session_id cookie)
     # and replay it on all subsequent authenticated requests. There is no bearer token yet.
     respond_to do |format|
