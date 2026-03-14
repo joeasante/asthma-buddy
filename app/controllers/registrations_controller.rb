@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class RegistrationsController < ApplicationController
+  skip_pundit
   allow_unauthenticated_access only: %i[ new create ]
   before_action :require_registration_open, only: %i[ new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CookieNoticesController < ApplicationController
+  skip_pundit
   allow_unauthenticated_access
 
   # Persistent dismissal: sets a cookie lasting 365 days so the notice never

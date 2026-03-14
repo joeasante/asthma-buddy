@@ -2,7 +2,13 @@
 
 class ApplicationController < ActionController::Base
   include Authentication
+  include Pundit::Authorization
   include ActionView::RecordIdentifier
+
+  after_action :verify_authorized, unless: :skip_authorization?
+  after_action :verify_policy_scoped_for_index, unless: :skip_authorization?
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   # Scope modern browser check to HTML requests only.
   # Non-browser clients (agents, API callers, curl) request JSON and must not be rejected.
   before_action do
@@ -73,4 +79,28 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :registration_open?
+
+  # --- Pundit skip mechanism ---
+  # Controllers that handle unauthenticated access or have no actions
+  # to authorize call `skip_pundit` at the class level.
+  class_attribute :_skip_pundit, default: false
+
+  def self.skip_pundit
+    self._skip_pundit = true
+  end
+
+  def skip_authorization?
+    self.class._skip_pundit
+  end
+
+  def verify_policy_scoped_for_index
+    verify_policy_scoped if action_name == "index"
+  end
+
+  def user_not_authorized
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: root_path, alert: "You are not authorized to perform this action.") }
+      format.json { render json: { error: "Forbidden" }, status: :forbidden }
+    end
+  end
 end

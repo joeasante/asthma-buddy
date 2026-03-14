@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class EmailVerificationsController < ApplicationController
+  skip_pundit
   allow_unauthenticated_access only: %i[ show new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
     respond_to do |format|

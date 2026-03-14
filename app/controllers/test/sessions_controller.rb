@@ -6,6 +6,7 @@
 # eager-loads all files under app/controllers/ in production — a top-level raise
 # would crash the boot process.
 class Test::SessionsController < ApplicationController
+  skip_pundit
   allow_unauthenticated_access
 
   def create
