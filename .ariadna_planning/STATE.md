@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — COMPLETE (all UAT gaps closed)
-Plan: Plan 06 (UAT Gap Closure) complete. All plans + UAT fixes in phase 25 done.
-Status: Phase 25 fully complete with all UAT gaps closed. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-06 complete: fixed screen spacing, mobile responsive hides, simplified reliever label, removed sick-day dose columns, 567 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — Plan 07 complete
+Plan: Plan 07 (UAT Gap Closure - Health Report & Dashboard) complete. Mobile card layout, icon print button, med type in dose log, mobile Health Report access.
+Status: Phase 25 plan 07 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-07 complete: mobile card layout for detail tables, icon print button, dose log shows medication type, Health Report accessible from mobile dashboard, 567 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
