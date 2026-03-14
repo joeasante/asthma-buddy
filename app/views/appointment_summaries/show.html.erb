@@ -72,6 +72,24 @@
           </tbody>
         </table>
       <% end %>
+      <% if @individual_readings.any? %>
+        <h3 class="appt-detail-heading">Individual Readings</h3>
+        <table class="appt-detail-table">
+          <thead>
+            <tr><th>Date</th><th>Time</th><th>Value</th><th>Zone</th></tr>
+          </thead>
+          <tbody>
+            <% @individual_readings.each do |reading| %>
+              <tr>
+                <td><time datetime="<%= reading.recorded_at.iso8601 %>"><%= reading.recorded_at.strftime("%-d %b %Y") %></time></td>
+                <td><%= reading.time_of_day&.capitalize || "\u2014" %></td>
+                <td><%= reading.value %> L/min</td>
+                <td><% if reading.zone %><span class="zone-dot zone-dot--<%= reading.zone %>"></span> <%= reading.zone.capitalize %><% else %><%= "\u2014" %><% end %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
     <% end %>
   </section>
 
@@ -103,6 +121,25 @@
           </tbody>
         </table>
       <% end %>
+      <% if @symptom_logs.any? %>
+        <h3 class="appt-detail-heading">Individual Records</h3>
+        <table class="appt-detail-table">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Severity</th><th>Triggers</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <% @symptom_logs.each do |log| %>
+              <tr>
+                <td><time datetime="<%= log.recorded_at.iso8601 %>"><%= log.recorded_at.strftime("%-d %b %Y") %></time></td>
+                <td><%= log.symptom_type.humanize %></td>
+                <td><span class="severity-badge severity-badge--<%= log.severity %>"><%= log.severity.capitalize %></span></td>
+                <td><%= log.triggers.any? ? log.triggers.map { |t| t.humanize }.join(", ") : "\u2014" %></td>
+                <td class="appt-notes-cell"><%= log.notes.present? ? log.notes.to_plain_text.truncate(80) : "\u2014" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
     <% end %>
   </section>
 
@@ -123,6 +160,24 @@
         <dd><%= @reliever_doses_per_week > 2 ? "Exceeded (>2/week)" : "Within range (\u22642/week)" %></dd>
       </div>
     </dl>
+    <% if @dose_logs_with_meds.any? %>
+      <h3 class="appt-detail-heading">Dose Log</h3>
+      <table class="appt-detail-table">
+        <thead>
+          <tr><th>Date</th><th>Time</th><th>Medication</th><th>Puffs</th></tr>
+        </thead>
+        <tbody>
+          <% @dose_logs_with_meds.each do |log| %>
+            <tr>
+              <td><time datetime="<%= log.recorded_at.iso8601 %>"><%= log.recorded_at.strftime("%-d %b %Y") %></time></td>
+              <td><%= log.recorded_at.strftime("%H:%M") %></td>
+              <td><%= log.medication_name %></td>
+              <td><%= log.puffs %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   </section>
 
   <%# -- 4. Medications ------------------------------------------------------- %>
@@ -161,16 +216,25 @@
     <% if @health_events.none? %>
       <p class="appt-empty">No health events in this period.</p>
     <% else %>
-      <table class="appt-table">
+      <table class="appt-detail-table">
         <thead>
-          <tr><th>Type</th><th>Date</th><th>Status</th></tr>
+          <tr><th>Type</th><th>Date</th><th>Duration</th><th>Notes</th></tr>
         </thead>
         <tbody>
           <% @health_events.each do |event| %>
             <tr>
               <td><%= event.event_type_label %></td>
               <td><time datetime="<%= event.recorded_at.iso8601 %>"><%= event.recorded_at.strftime("%-d %b %Y") %></time></td>
-              <td><%= event.ongoing? ? "Ongoing" : (event.ended_at ? "Ended #{event.ended_at.strftime("%-d %b")}" : "Resolved") %></td>
+              <td>
+                <% if event.ongoing? %>
+                  Ongoing (since <%= event.recorded_at.strftime("%-d %b") %>)
+                <% elsif event.ended_at %>
+                  <%= event.formatted_duration %> (ended <%= event.ended_at.strftime("%-d %b") %>)
+                <% else %>
+                  <%= "\u2014" %>
+                <% end %>
+              </td>
+              <td class="appt-notes-cell"><%= event.notes.present? ? event.notes.to_plain_text.truncate(80) : "\u2014" %></td>
             </tr>
           <% end %>
         </tbody>
