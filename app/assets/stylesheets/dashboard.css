@@ -391,6 +391,32 @@
   transform: scale(0.98);
 }
 
+.dash-quick-btn--report {
+  border-color: var(--border);
+  color: var(--text-2);
+}
+
+.dash-quick-btn--report:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.dash-quick-btn--report svg {
+  color: var(--text-3);
+}
+
+.dash-quick-btn--report:hover svg {
+  color: var(--brand);
+}
+
+/* On desktop the page header already has the Health Report link */
+@media (min-width: 769px) {
+  .dash-quick-btn--report {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dash-quick-btn { transition: background var(--dur), color var(--dur); }
   .dash-quick-btn:active { transform: none; }
