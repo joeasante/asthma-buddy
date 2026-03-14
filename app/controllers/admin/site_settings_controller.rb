@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admin::SiteSettingsController < Admin::BaseController
+  after_action :verify_authorized
+
   def toggle_registration
     authorize :site_setting, :toggle_registration?
     is_open = SiteSetting.toggle_registration!

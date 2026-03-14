@@ -46,7 +46,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin)
     patch toggle_admin_admin_user_path(@admin)
     assert @admin.reload.admin?
-    assert_match(/cannot change your own admin status/i, flash[:alert])
+    assert_match(/not authorized/i, flash[:alert])
   end
 
   test "PATCH toggle_admin unauthenticated redirects to login" do

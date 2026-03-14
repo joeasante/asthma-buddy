@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
     if Time.current - session[:last_seen_at].to_time > IDLE_TIMEOUT
       reset_session
       respond_to do |format|
-        format.html { redirect_to new_session_path, alert: "Your session expired due to inactivity. Please sign in again." }
+        format.html { redirect_to main_app.new_session_path, alert: "Your session expired due to inactivity. Please sign in again." }
         format.json { render json: { error: "Session expired" }, status: :unauthorized }
       end
     else
@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
 
   def user_not_authorized
     respond_to do |format|
-      format.html { redirect_back(fallback_location: root_path, alert: "You are not authorized to perform this action.") }
+      format.html { redirect_back(fallback_location: main_app.root_path, alert: "You are not authorized to perform this action.") }
       format.json { render json: { error: "Forbidden" }, status: :forbidden }
     end
   end

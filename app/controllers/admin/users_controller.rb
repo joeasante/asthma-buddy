@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admin::UsersController < Admin::BaseController
+  after_action :verify_authorized
+
   def index
     authorize User
     @users = User.order(created_at: :desc).limit(100)
@@ -14,35 +16,13 @@ class Admin::UsersController < Admin::BaseController
 
   def toggle_admin
     @user = User.find(params[:id])
-
-    # Explicit guard clauses with user-friendly messages (before Pundit)
-    if @user == Current.user
-      skip_authorization
-      respond_to do |format|
-        format.html { redirect_to admin_users_path, alert: "You cannot change your own admin status." }
-        format.json { render json: { error: "You cannot change your own admin status." }, status: :forbidden }
-      end
-      return
-    end
-
-    if @user.admin? && User.admin.count <= 1
-      skip_authorization
-      respond_to do |format|
-        format.html { redirect_to admin_users_path, alert: "Cannot remove the last admin." }
-        format.json { render json: { error: "Cannot remove the last admin." }, status: :forbidden }
-      end
-      return
-    end
-
-    # Policy still enforces as a safety net
-    authorize @user
+    authorize @user # Policy blocks self-demotion and last-admin demotion
 
     new_role = nil
     User.transaction do
       @user.lock!
       new_role = @user.admin? ? :member : :admin
 
-      # Re-check with row-level lock to prevent TOCTOU race condition
       if new_role == :member && User.where(role: :admin).lock.count <= 1
         respond_to do |format|
           format.html { redirect_to admin_users_path, alert: "Cannot remove the last admin." }

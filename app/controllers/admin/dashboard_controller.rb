@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Admin::DashboardController < Admin::BaseController
+  after_action :verify_authorized
+
   def index
     authorize :admin_dashboard, :index?
     @registration_open = SiteSetting.registration_open?
