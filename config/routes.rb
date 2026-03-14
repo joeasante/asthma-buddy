@@ -3,11 +3,11 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
-      resources :symptom_logs, only: [:index]
-      resources :peak_flow_readings, only: [:index]
-      resources :medications, only: [:index]
-      resources :dose_logs, only: [:index]
-      resources :health_events, only: [:index]
+      resources :symptom_logs, only: [ :index ]
+      resources :peak_flow_readings, only: [ :index ]
+      resources :medications, only: [ :index ]
+      resources :dose_logs, only: [ :index ]
+      resources :health_events, only: [ :index ]
     end
   end
 
