@@ -131,8 +131,8 @@
    -------------------------------------------------------------------------- */
 
 .appt-section.section-card {
-  padding: 0.625rem 1rem;
-  margin-bottom: 0;  /* flex gap handles inter-section spacing, don't double up */
+  padding: 0.25rem 1rem 0.625rem;
+  margin-bottom: 0;
 }
 
 .appt-detail-heading {
