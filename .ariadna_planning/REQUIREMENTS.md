@@ -188,90 +188,90 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-02 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-03 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-04 | Phase 2 — Authentication | ✅ Complete |
-| AUTH-05 | Phase 2 — Authentication | ✅ Complete |
-| SYMP-01 | Phase 3 — Symptom Recording | ✅ Complete |
-| SYMP-02 | Phase 3 — Symptom Recording | ✅ Complete |
-| SYMP-03 | Phase 5 — Symptom Timeline | ✅ Complete |
-| SYMP-04 | Phase 5 — Symptom Timeline | ✅ Complete |
-| SYMP-05 | Phase 4 — Symptom Management | ✅ Complete |
-| SYMP-06 | Phase 4 — Symptom Management | ✅ Complete |
-| SYMP-07 | Phase 5 — Symptom Timeline | ✅ Complete |
-| PEAK-01 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-02 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-03 | Phase 6 — Peak Flow Recording | ✅ Complete |
-| PEAK-04 | Phase 7 — Peak Flow Display | ✅ Complete |
-| PEAK-05 | Phase 8 — Peak Flow Trends | ✅ Complete |
-| PEAK-06 | Phase 7 — Peak Flow Display | ✅ Complete |
-| PEAK-07 | Phase 7 — Peak Flow Display | ✅ Complete |
+| AUTH-01 | Phase 2 — Authentication | Complete |
+| AUTH-02 | Phase 2 — Authentication | Complete |
+| AUTH-03 | Phase 2 — Authentication | Complete |
+| AUTH-04 | Phase 2 — Authentication | Complete |
+| AUTH-05 | Phase 2 — Authentication | Complete |
+| SYMP-01 | Phase 3 — Symptom Recording | Complete |
+| SYMP-02 | Phase 3 — Symptom Recording | Complete |
+| SYMP-03 | Phase 5 — Symptom Timeline | Complete |
+| SYMP-04 | Phase 5 — Symptom Timeline | Complete |
+| SYMP-05 | Phase 4 — Symptom Management | Complete |
+| SYMP-06 | Phase 4 — Symptom Management | Complete |
+| SYMP-07 | Phase 5 — Symptom Timeline | Complete |
+| PEAK-01 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-02 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-03 | Phase 6 — Peak Flow Recording | Complete |
+| PEAK-04 | Phase 7 — Peak Flow Display | Complete |
+| PEAK-05 | Phase 8 — Peak Flow Trends | Complete |
+| PEAK-06 | Phase 7 — Peak Flow Display | Complete |
+| PEAK-07 | Phase 7 — Peak Flow Display | Complete |
 
 ### Milestone 2 (v2.0 — Complete 2026-03-14)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MED-01 | Phase 10 — Medication Data Layer | ✅ Complete |
-| MED-02 | Phase 10 — Medication Data Layer | ✅ Complete |
-| MED-03 | Phase 11 — Medication Management UI | ✅ Complete |
-| DOSE-01 | Phase 12 — Dose Logging | ✅ Complete |
-| DOSE-02 | Phase 12 — Dose Logging | ✅ Complete |
-| TRACK-01 | Phase 13 — Dose Tracking | ✅ Complete |
-| TRACK-02 | Phase 13 — Dose Tracking | ✅ Complete |
-| TRACK-03 | Phase 13 — Dose Tracking | ✅ Complete |
-| ADH-01 | Phase 14 — Adherence Dashboard | ✅ Complete |
-| ADH-02 | Phase 14 — Adherence Dashboard | ✅ Complete |
-| EVT-01 | Phase 15 — Health Events | ✅ Complete |
-| EVT-02 | Phase 15 — Health Events | ✅ Complete |
-| EVT-03 | Phase 15 — Health Events | ✅ Complete |
-| REL-01 | Phase 15.1 — Reliever Usage History | ✅ Complete |
-| REL-02 | Phase 15.1 — Reliever Usage History | ✅ Complete |
-| ACC-01 | Phase 16 — Account Management | ✅ Complete |
-| ACC-02 | Phase 16 — Account Management | ✅ Complete |
-| ONBD-01 | Phase 17 — Onboarding | ✅ Complete |
-| ONBD-02 | Phase 17 — Onboarding | ✅ Complete |
-| LEGAL-01 | Phase 16 — Account Management | ✅ Complete |
-| LEGAL-02 | Phase 16 — Account Management | ✅ Complete |
-| LEGAL-03 | Phase 16 — Account Management | ✅ Complete |
-| ERR-01 | Phase 20 — Legal Pages & Error Pages | ✅ Complete |
-| ERR-02 | Phase 20 — Legal Pages & Error Pages | ✅ Complete |
+| MED-01 | Phase 10 — Medication Data Layer | Complete |
+| MED-02 | Phase 10 — Medication Data Layer | Complete |
+| MED-03 | Phase 11 — Medication Management UI | Complete |
+| DOSE-01 | Phase 12 — Dose Logging | Complete |
+| DOSE-02 | Phase 12 — Dose Logging | Complete |
+| TRACK-01 | Phase 13 — Dose Tracking | Complete |
+| TRACK-02 | Phase 13 — Dose Tracking | Complete |
+| TRACK-03 | Phase 13 — Dose Tracking | Complete |
+| ADH-01 | Phase 14 — Adherence Dashboard | Complete |
+| ADH-02 | Phase 14 — Adherence Dashboard | Complete |
+| EVT-01 | Phase 15 — Health Events | Complete |
+| EVT-02 | Phase 15 — Health Events | Complete |
+| EVT-03 | Phase 15 — Health Events | Complete |
+| REL-01 | Phase 15.1 — Reliever Usage History | Complete |
+| REL-02 | Phase 15.1 — Reliever Usage History | Complete |
+| ACC-01 | Phase 16 — Account Management | Complete |
+| ACC-02 | Phase 16 — Account Management | Complete |
+| ONBD-01 | Phase 17 — Onboarding | Complete |
+| ONBD-02 | Phase 17 — Onboarding | Complete |
+| LEGAL-01 | Phase 16 — Account Management | Complete |
+| LEGAL-02 | Phase 16 — Account Management | Complete |
+| LEGAL-03 | Phase 16 — Account Management | Complete |
+| ERR-01 | Phase 20 — Legal Pages & Error Pages | Complete |
+| ERR-02 | Phase 20 — Legal Pages & Error Pages | Complete |
 
 ### Milestone 3 (v3.0 — In Progress)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RBAC-01 | Pending | Pending |
-| RBAC-02 | Pending | Pending |
-| RBAC-03 | Pending | Pending |
-| RBAC-04 | Pending | Pending |
-| MFA-01 | Pending | Pending |
-| MFA-02 | Pending | Pending |
-| MFA-03 | Pending | Pending |
-| MFA-04 | Pending | Pending |
-| MFA-05 | Pending | Pending |
-| API-01 | Pending | Pending |
-| API-02 | Pending | Pending |
-| API-03 | Pending | Pending |
-| API-04 | Pending | Pending |
-| API-05 | Pending | Pending |
-| API-06 | Pending | Pending |
-| BILL-01 | Pending | Pending |
-| BILL-02 | Pending | Pending |
-| BILL-03 | Pending | Pending |
-| BILL-04 | Pending | Pending |
-| BILL-05 | Pending | Pending |
-| BILL-06 | Pending | Pending |
-| TEST-01 | Pending | Pending |
-| TEST-02 | Pending | Pending |
-| TEST-03 | Pending | Pending |
-| TEST-04 | Pending | Pending |
+| RBAC-01 | Phase 26 — Role-Based Access Control | Pending |
+| RBAC-02 | Phase 26 — Role-Based Access Control | Pending |
+| RBAC-03 | Phase 26 — Role-Based Access Control | Pending |
+| RBAC-04 | Phase 26 — Role-Based Access Control | Pending |
+| MFA-01 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-02 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-03 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-04 | Phase 27 — Multi-Factor Authentication | Pending |
+| MFA-05 | Phase 27 — Multi-Factor Authentication | Pending |
+| API-01 | Phase 28 — REST API | Pending |
+| API-02 | Phase 28 — REST API | Pending |
+| API-03 | Phase 28 — REST API | Pending |
+| API-04 | Phase 28 — REST API | Pending |
+| API-05 | Phase 28 — REST API | Pending |
+| API-06 | Phase 28 — REST API | Pending |
+| BILL-01 | Phase 29 — Stripe Billing | Pending |
+| BILL-02 | Phase 29 — Stripe Billing | Pending |
+| BILL-03 | Phase 29 — Stripe Billing | Pending |
+| BILL-04 | Phase 29 — Stripe Billing | Pending |
+| BILL-05 | Phase 29 — Stripe Billing | Pending |
+| BILL-06 | Phase 29 — Stripe Billing | Pending |
+| TEST-01 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-02 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-03 | Phase 30 — Cross-Feature Integration Tests | Pending |
+| TEST-04 | Phase 30 — Cross-Feature Integration Tests | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total — 19 mapped, 19 complete ✓
-- v2 requirements: 22 total — 22 mapped, 22 complete ✓
-- v3 requirements: 22 total — 0 mapped (roadmap pending)
+- v1 requirements: 19 total — 19 mapped, 19 complete
+- v2 requirements: 22 total — 22 mapped, 22 complete (+ 2 REL requirements)
+- v3 requirements: 22 total — 22 mapped, 0 complete
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-14 — Milestone 3 requirements added; Milestone 2 marked complete*
+*Last updated: 2026-03-14 — Milestone 3 roadmap created; all 22 v3 requirements mapped to phases 26-30*
