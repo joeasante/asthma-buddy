@@ -9,10 +9,10 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: Phase 25 (Clinical Intelligence) — Plan 07 complete
-Plan: Plan 07 (UAT Gap Closure - Health Report & Dashboard) complete. Mobile card layout, icon print button, med type in dose log, mobile Health Report access.
-Status: Phase 25 plan 07 complete. 2026-03-14.
-Last activity: 2026-03-14 — Phase 25-07 complete: mobile card layout for detail tables, icon print button, dose log shows medication type, Health Report accessible from mobile dashboard, 567 tests passing.
+Phase: Phase 25 (Clinical Intelligence) — Plan 08 complete
+Plan: Plan 08 (Dose Unit for Medications) complete. dose_unit enum (puffs/tablets/ml), form dropdown, course dose fields, dynamic Health Report units.
+Status: Phase 25 plan 08 complete. 2026-03-14.
+Last activity: 2026-03-14 — Phase 25-08 complete: dose_unit string-backed enum, dose_unit_label helper, form dropdown, course dose fields, dynamic unit display in Health Report, 576 tests passing.
 
 Progress: [██████████] Phase 15 in progress (Milestone 3 — Health Events)
 
