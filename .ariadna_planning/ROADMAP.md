@@ -111,7 +111,12 @@ Plans:
   5. Premium-only features are gated by subscription plan using Pundit policies; a user who downgrades or cancels loses access to premium features gracefully (with a clear upgrade prompt, not an error).
   6. The billing settings page shows the user's current plan name, subscription status (active, cancelled, past due), and next billing date.
 
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 29-01-PLAN.md — Pay gem setup, migrations, User model integration, PlanLimits concern
+- [ ] 29-02-PLAN.md — Billing settings controller, views, policy, settings navigation
+- [ ] 29-03-PLAN.md — Feature gating (API keys, history limits) with upgrade prompts
 
 ---
 
@@ -142,7 +147,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 | 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
 | 27. Multi-Factor Authentication | 3/3 | ✓ Complete | 2026-03-14 |
 | 28. REST API | 3/3 | ✓ Complete | 2026-03-14 |
-| 29. Stripe Billing | 0/TBD | Not started | - |
+| 29. Stripe Billing | 0/3 | Not started | - |
 | 30. Cross-Feature Integration Tests | 0/TBD | Not started | - |
 
 ---
