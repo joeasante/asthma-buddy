@@ -23,6 +23,13 @@ class SessionsController < ApplicationController
       end
     end
 
+    unless allowed_email?(user.email_address)
+      return respond_to do |format|
+        format.html { redirect_to new_session_path, alert: "Try another email address or password." }
+        format.json { render json: { error: "Invalid email address or password" }, status: :unauthorized }
+      end
+    end
+
     unless user.email_verified_at?
       return respond_to do |format|
         format.html { redirect_to new_session_path, alert: "Please verify your email address before signing in. Check your inbox for a verification link." }

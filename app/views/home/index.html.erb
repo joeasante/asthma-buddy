@@ -16,7 +16,11 @@
     </h1>
     <p class="home-hero-subtitle">Log symptoms, track your peak flow, and manage your inhalers &mdash; all in one place built for people with asthma.</p>
     <div class="home-hero-actions">
-      <%= link_to "Get started", new_registration_path, class: "btn-primary btn-primary--hero" %>
+      <% if registration_open? %>
+        <%= link_to "Get started", new_registration_path, class: "btn-primary btn-primary--hero" %>
+      <% else %>
+        <%= link_to "Sign in", new_session_path, class: "btn-primary btn-primary--hero" %>
+      <% end %>
     </div>
     <p class="home-hero-signin">Already have an account? <%= link_to "Sign in &rarr;".html_safe, new_session_path %></p>
     <ul class="home-hero-trust" role="list" aria-label="Why it's safe to sign up">

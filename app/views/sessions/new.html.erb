@@ -34,7 +34,7 @@
   <% end %>
 
   <div class="auth-links">
-    <p>Don't have an account? <%= link_to "Create one", new_registration_path %></p>
+    <% if registration_open? %><p>Don't have an account? <%= link_to "Create one", new_registration_path %></p><% end %>
     <p>Need a verification email? <%= link_to "Resend it", new_email_verification_path %></p>
   </div>
 </div>

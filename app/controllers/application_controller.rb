@@ -51,4 +51,27 @@ class ApplicationController < ActionController::Base
       Current.user.notifications.unread.count
     end
   end
+
+  # --- Access control via ALLOWED_EMAILS env var ---
+  # Set ALLOWED_EMAILS="joe@example.com,alice@example.com" in production
+  # to restrict login and disable registration for everyone else.
+  # Unset or blank = open to all (default).
+
+  def allowed_emails
+    @allowed_emails ||= ENV["ALLOWED_EMAILS"]&.split(",")&.map(&:strip)&.map(&:downcase)
+  end
+
+  def access_restricted?
+    allowed_emails.present?
+  end
+
+  def allowed_email?(email)
+    !access_restricted? || allowed_emails.include?(email.to_s.downcase)
+  end
+
+  def registration_open?
+    !access_restricted?
+  end
+
+  helper_method :registration_open?
 end

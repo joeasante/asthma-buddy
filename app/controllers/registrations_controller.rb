@@ -3,6 +3,7 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create ]
   skip_before_action :check_session_freshness, only: %i[ new create ]
+  before_action :require_registration_open, only: %i[ new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
     respond_to do |format|
       format.html { redirect_to new_registration_path, alert: "Try again later." }
@@ -34,5 +35,14 @@ class RegistrationsController < ApplicationController
 
     def registration_params
       params.require(:user).permit(:email_address, :password, :password_confirmation)
+    end
+
+    def require_registration_open
+      return if registration_open?
+
+      respond_to do |format|
+        format.html { redirect_to new_session_path, alert: "Registration is currently closed." }
+        format.json { render json: { error: "Registration is currently closed." }, status: :forbidden }
+      end
     end
 end
