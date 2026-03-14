@@ -43,6 +43,7 @@ Rails.application.routes.draw do
   get "adherence", to: redirect("/preventer_history")
   get "preventer_history", to: "preventer_history#index", as: :preventer_history
   get "reliever-usage",  to: "reliever_usage#index",   as: :reliever_usage
+  get "appointment-summary", to: "appointment_summaries#show", as: :appointment_summary
   get "dashboard", to: "dashboard#index", as: :dashboard
 
   scope :onboarding, as: :onboarding do
