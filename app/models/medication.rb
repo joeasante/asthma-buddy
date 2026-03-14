@@ -98,16 +98,8 @@ class Medication < ApplicationRecord
   # dose_unit_label(1) => "tablet", dose_unit_label(2) => "tablets"
   # dose_unit_label(1) => "ml", dose_unit_label(2) => "ml"
   def dose_unit_label(count = 2)
-    case dose_unit
-    when "puffs"
-      count == 1 ? "puff" : "puffs"
-    when "tablets"
-      count == 1 ? "tablet" : "tablets"
-    when "ml"
-      "ml"
-    else
-      dose_unit
-    end
+    return dose_unit if dose_unit == "ml"
+    count == 1 ? dose_unit.singularize : dose_unit
   end
 
   # Returns true when a days-of-supply estimate is available AND fewer than

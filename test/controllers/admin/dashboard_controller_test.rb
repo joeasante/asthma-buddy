@@ -4,10 +4,8 @@ require "test_helper"
 
 class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @admin      = users(:verified_user)
+    @admin      = users(:admin_user)
     @non_admin  = users(:new_user)
-    @admin.update_columns(admin: true)
-    @non_admin.update_columns(admin: false)
   end
 
   test "GET /admin returns 200 for admin" do

@@ -10,6 +10,12 @@ class Admin::BaseController < ApplicationController
   private
 
     def require_admin
-      redirect_to root_path unless Current.user&.admin?
+      unless Current.user&.admin?
+        Rails.logger.warn "[security] Non-admin access attempt to #{request.path} by user #{Current.user&.id || 'anonymous'}"
+        respond_to do |format|
+          format.html { redirect_to root_path, alert: "You do not have access to that page." }
+          format.json { render json: { error: "Forbidden" }, status: :forbidden }
+        end
+      end
     end
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PersonalBestRecord < ApplicationRecord
+  STALE_THRESHOLD = 12.months
+
   belongs_to :user
 
   validates :value, presence: true,

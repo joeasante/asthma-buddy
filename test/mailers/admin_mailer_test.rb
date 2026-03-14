@@ -13,8 +13,7 @@ class AdminMailerTest < ActionMailer::TestCase
     Rails.application.credentials.stub(:admin_email, STUB_ADMIN_EMAIL) do
       mail = AdminMailer.new_signup(@user)
       assert_equal [ STUB_ADMIN_EMAIL ], mail.to
-      assert_match "New signup", mail.subject
-      assert_match @user.email_address, mail.subject
+      assert_equal "New signup on Asthma Buddy", mail.subject
     end
   end
 

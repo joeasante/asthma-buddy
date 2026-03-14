@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_140300) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -77,7 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
   create_table "medications", force: :cascade do |t|
     t.boolean "course", default: false, null: false
     t.datetime "created_at", null: false
-    t.string "dose_unit"
+    t.string "dose_unit", default: "puffs", null: false
     t.integer "doses_per_day"
     t.date "ends_on"
     t.integer "medication_type", null: false
@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
     t.integer "user_id", null: false
     t.index ["medication_type"], name: "index_medications_on_medication_type"
     t.index ["user_id", "course", "ends_on"], name: "index_medications_covering_course_queries"
+    t.check_constraint "dose_unit IN ('puffs', 'tablets', 'ml')", name: "medications_dose_unit_check"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -159,7 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.boolean "admin"
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email_address", null: false
@@ -171,7 +172,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_121711) do
     t.string "password_digest", null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["last_sign_in_at"], name: "index_users_on_last_sign_in_at"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

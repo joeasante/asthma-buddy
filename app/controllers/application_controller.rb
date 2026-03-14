@@ -23,9 +23,9 @@ class ApplicationController < ActionController::Base
   before_action :set_notification_badge_count, if: :authenticated?
 
   # Terminate idle authenticated sessions after 60 minutes of inactivity.
-  # Skipped by all controllers that handle unauthenticated access.
+  # Only runs for authenticated users.
   IDLE_TIMEOUT = 60.minutes
-  before_action :check_session_freshness
+  before_action :check_session_freshness, if: :authenticated?
 
   private
 
@@ -37,7 +37,10 @@ class ApplicationController < ActionController::Base
     return unless session[:last_seen_at]
     if Time.current - session[:last_seen_at].to_time > IDLE_TIMEOUT
       reset_session
-      redirect_to new_session_path, alert: "Your session expired due to inactivity. Please sign in again."
+      respond_to do |format|
+        format.html { redirect_to new_session_path, alert: "Your session expired due to inactivity. Please sign in again." }
+        format.json { render json: { error: "Session expired" }, status: :unauthorized }
+      end
     else
       session[:last_seen_at] = Time.current
     end
@@ -61,16 +64,12 @@ class ApplicationController < ActionController::Base
     @allowed_emails ||= ENV["ALLOWED_EMAILS"]&.split(",")&.map(&:strip)&.map(&:downcase)
   end
 
-  def access_restricted?
-    allowed_emails.present?
-  end
-
   def allowed_email?(email)
-    !access_restricted? || allowed_emails.include?(email.to_s.downcase)
+    allowed_emails.blank? || allowed_emails.include?(email.to_s.downcase)
   end
 
   def registration_open?
-    !access_restricted?
+    allowed_emails.blank?
   end
 
   helper_method :registration_open?

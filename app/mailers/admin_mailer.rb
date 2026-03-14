@@ -5,6 +5,6 @@ class AdminMailer < ApplicationMailer
     @user = user
     @admin_email = Rails.application.credentials.admin_email
     @admin_users_url = admin_users_url
-    mail(to: @admin_email, subject: "New signup: #{user.email_address}")
+    mail(to: @admin_email, subject: "New signup on Asthma Buddy")
   end
 end

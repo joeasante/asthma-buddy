@@ -44,7 +44,7 @@
   </div>
 <% end %>
 
-<% if @current_personal_best && @current_personal_best.recorded_at < 12.months.ago %>
+<% if @current_personal_best && @current_personal_best.recorded_at < PersonalBestRecord::STALE_THRESHOLD.ago %>
   <% months_ago = ((Date.current - @current_personal_best.recorded_at.to_date) / 30).round %>
   <div class="pf-pb-age-notice" role="note">
     Your personal best was set <%= months_ago %> months ago.
