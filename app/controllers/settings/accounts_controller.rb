@@ -2,7 +2,6 @@
 
 module Settings
   class AccountsController < Settings::BaseController
-    self._skip_pundit = false
     rate_limit to: 3, within: 10.minutes, only: :destroy, with: -> {
       respond_to do |format|
         format.html { redirect_to settings_path, alert: "Too many deletion attempts. Please try again later." }

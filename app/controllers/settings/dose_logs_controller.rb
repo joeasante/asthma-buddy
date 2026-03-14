@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Settings::DoseLogsController < Settings::BaseController
-  self._skip_pundit = false
   before_action :set_medication
   before_action :set_dose_log, only: :destroy
 

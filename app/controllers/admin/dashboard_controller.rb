@@ -3,6 +3,7 @@
 class Admin::DashboardController < Admin::BaseController
   def index
     authorize :admin_dashboard, :index?
+    @registration_open = SiteSetting.registration_open?
     @total_users    = User.count
     @new_this_week  = User.where(created_at: 1.week.ago..).count
     @new_this_month = User.where(created_at: 1.month.ago..).count

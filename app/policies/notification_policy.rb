@@ -12,10 +12,4 @@ class NotificationPolicy < ApplicationPolicy
   def mark_all_read?
     true
   end
-
-  class Scope < ApplicationPolicy::Scope
-    def resolve
-      scope.where(user: user)
-    end
-  end
 end

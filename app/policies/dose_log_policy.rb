@@ -10,12 +10,6 @@ class DoseLogPolicy < ApplicationPolicy
   end
 
   def destroy?
-    record.medication.user == user
-  end
-
-  class Scope < ApplicationPolicy::Scope
-    def resolve
-      scope.joins(:medication).where(medications: { user_id: user.id })
-    end
+    owner?
   end
 end

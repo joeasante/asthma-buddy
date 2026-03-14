@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_14_171218) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_175309) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -145,9 +145,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_171218) do
 
   create_table "site_settings", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "key"
+    t.string "key", null: false
     t.datetime "updated_at", null: false
     t.string "value"
+    t.index ["key"], name: "index_site_settings_on_key", unique: true
   end
 
 # Could not dump table "sqlite_stat1" because of following StandardError
@@ -182,7 +183,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_171218) do
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["last_sign_in_at"], name: "index_users_on_last_sign_in_at"
-    t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

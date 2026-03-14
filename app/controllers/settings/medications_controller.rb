@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Settings::MedicationsController < Settings::BaseController
-  self._skip_pundit = false
   before_action :set_medication, only: %i[edit update destroy refill]
   before_action :ensure_course_not_archived, only: %i[edit update]
 

@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
   include ActionView::RecordIdentifier
 
   after_action :verify_authorized, unless: :skip_authorization?
-  after_action :verify_policy_scoped_for_index, unless: :skip_authorization?
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   # Scope modern browser check to HTML requests only.
@@ -63,8 +62,9 @@ class ApplicationController < ActionController::Base
 
   # --- Access control via ALLOWED_EMAILS env var ---
   # Set ALLOWED_EMAILS="joe@example.com,alice@example.com" in production
-  # to restrict login and disable registration for everyone else.
-  # Unset or blank = open to all (default).
+  # to restrict which email addresses can log in.
+  # Registration is separately controlled by SiteSetting.registration_open?.
+  # Unset or blank = any email can log in (default).
 
   def allowed_emails
     @allowed_emails ||= ENV["ALLOWED_EMAILS"]&.split(",")&.map(&:strip)&.map(&:downcase)
@@ -95,12 +95,6 @@ class ApplicationController < ActionController::Base
 
   def skip_authorization?
     self.class._skip_pundit
-  end
-
-  def verify_policy_scoped_for_index
-    # Skip if authorize was already called (controllers that scope via Current.user
-    # use authorize instead of policy_scope for index actions).
-    verify_policy_scoped if action_name == "index" && !pundit_policy_authorized?
   end
 
   def user_not_authorized

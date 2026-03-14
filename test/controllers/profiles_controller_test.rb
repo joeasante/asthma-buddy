@@ -185,4 +185,22 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal original_email, @user.email_address
   end
+
+  # ---------------------------------------------------------------------------
+  # Security: role must not be updatable via profile_params
+  # ---------------------------------------------------------------------------
+
+  test "PATCH /profile does not permit changing role to admin" do
+    assert_equal "member", @user.role
+    patch profile_path, params: { user: { role: "admin", full_name: "Sneaky" } }
+    @user.reload
+    assert_equal "member", @user.role
+  end
+
+  test "PATCH /profile does not permit changing role to admin (JSON)" do
+    assert_equal "member", @user.role
+    patch profile_path(format: :json), params: { user: { role: "admin", full_name: "Sneaky JSON" } }
+    @user.reload
+    assert_equal "member", @user.role
+  end
 end

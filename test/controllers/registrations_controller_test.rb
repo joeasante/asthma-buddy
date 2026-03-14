@@ -80,6 +80,27 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert response.parsed_body["errors"].any?
   end
 
+  # --- Security: role mass-assignment ---
+
+  test "POST /registration with role param does not create an admin user" do
+    assert_difference "User.count", 1 do
+      post registration_path, params: {
+        user: { email_address: "sneaky@example.com", password: "password123", password_confirmation: "password123", role: "admin" }
+      }
+    end
+    assert_equal "member", User.find_by(email_address: "sneaky@example.com").role
+  end
+
+  test "POST /registration with role param does not create an admin user (JSON)" do
+    assert_difference "User.count", 1 do
+      post registration_path,
+        params: { user: { email_address: "sneaky-json@example.com", password: "password123", password_confirmation: "password123", role: "admin" } },
+        as: :json
+    end
+    assert_response :created
+    assert_equal "member", User.find_by(email_address: "sneaky-json@example.com").role
+  end
+
   # --- Registration toggle ---
 
   test "GET /registration/new shows form when registration is open" do

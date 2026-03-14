@@ -5,6 +5,8 @@
 # user is the configured admin. Works over any URL (Tailscale, localhost, etc.)
 # without requiring HTTPS for HTTP Basic Auth browser prompts.
 class Admin::BaseController < ApplicationController
+  # Belt-and-suspenders: require_admin provides immediate redirect with friendly message;
+  # Pundit authorize is the policy safety net that catches any bypass.
   before_action :require_admin
 
   private

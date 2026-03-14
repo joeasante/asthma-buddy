@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Settings::BaseController < ApplicationController
-  skip_pundit
   include DashboardVariables
 
   private
