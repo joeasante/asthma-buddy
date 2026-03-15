@@ -59,9 +59,14 @@ class PeakFlowReadingsController < ApplicationController
 
     @active_zone = %w[green yellow red].include?(params[:zone]) ? params[:zone] : nil
 
+    # Apply plan-based history limit for free users
+    cutoff = Current.user.history_cutoff_date(:peak_flow_history_days)
+    @history_limited = cutoff.present?
+    effective_start = [ @start_date, cutoff&.to_date ].compact.max
+
     base_relation = Current.user.peak_flow_readings
                            .chronological
-                           .in_date_range(@start_date, @end_date)
+                           .in_date_range(effective_start, @end_date)
     base_relation = base_relation.where(zone: @active_zone) if @active_zone.present?
     @current_personal_best = PersonalBestRecord.current_for(Current.user)
 

@@ -3,6 +3,15 @@
 
 <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
 
+<% if @history_limited %>
+  <div class="section-card" style="border-left: 3px solid var(--brand); margin-bottom: 1.5rem;">
+    <p style="margin: 0;">
+      <strong>Free plan:</strong> Showing the last 30 days.
+      <%= link_to "Upgrade to Premium", settings_billing_path %> for unlimited history.
+    </p>
+  </div>
+<% end %>
+
 <div id="symptoms-graph" class="section-card" data-controller="hash-scroll">
   <div class="section-card-header">
     <h2 class="section-card-title">History</h2>

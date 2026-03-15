@@ -34,4 +34,11 @@ module PlanLimits
   def next_billing_date
     payment_processor&.subscription&.current_period_end
   end
+
+  def history_cutoff_date(feature_key)
+    days = plan_features[feature_key]
+    return nil if days.nil? # nil means unlimited
+
+    days.days.ago.beginning_of_day
+  end
 end
