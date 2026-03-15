@@ -10,6 +10,6 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def portal?
-    user.premium? && !user.admin? # Only paying premium users can access portal
+    (user.premium? || user.paused?) && !user.admin?
   end
 end

@@ -101,13 +101,7 @@
       <p><%= link_to "See full plan comparison", pricing_path %></p>
     <% end %>
 
-    <% if @user.paused? %>
-      <div class="billing-actions">
-        <%= button_to "Manage Subscription", portal_settings_billing_path, class: "btn-secondary", data: { turbo: false } %>
-      </div>
-    <% end %>
-
-    <% if @user.premium? && !@user.admin? %>
+    <% if (@user.paused? || (@user.premium? && !@user.admin?)) %>
       <div class="billing-actions">
         <%= button_to "Manage Subscription", portal_settings_billing_path, class: "btn-secondary", data: { turbo: false } %>
       </div>

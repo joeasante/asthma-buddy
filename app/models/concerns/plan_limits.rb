@@ -3,9 +3,11 @@
 module PlanLimits
   extend ActiveSupport::Concern
 
+  # Trial users ARE premium — explicit check avoids implicit dependency on Pay's active? behavior
   def premium?
-    return @_premium if defined?(@_premium)
-    @_premium = admin? || (current_subscription&.active? && !paused?) || false
+    return true if admin?
+    sub = current_subscription
+    sub.present? && (sub.active? || sub.on_trial?) && sub.status != "paused"
   end
 
   def free?
@@ -62,7 +64,6 @@ module PlanLimits
   private
 
   def current_subscription
-    return @_current_subscription if defined?(@_current_subscription)
-    @_current_subscription = payment_processor&.subscription
+    payment_processor&.subscription
   end
 end

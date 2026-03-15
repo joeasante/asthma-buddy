@@ -22,27 +22,27 @@
     </div>
     <ul class="pricing-features" role="list">
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Symptom logging
       </li>
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Peak flow tracking
       </li>
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Medication management
       </li>
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Notifications & reminders
       </li>
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Dashboard & insights
       </li>
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         <%= PLANS[:free][:features][:symptom_log_history_days] %> days of history
       </li>
     </ul>
@@ -72,23 +72,23 @@
     </div>
     <ul class="pricing-features" role="list">
       <li>
-        <svg class="pricing-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon %>
         Everything in Free
       </li>
       <li>
-        <svg class="pricing-check pricing-check--premium" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon(premium: true) %>
         Unlimited history
       </li>
       <li>
-        <svg class="pricing-check pricing-check--premium" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon(premium: true) %>
         Health report export
       </li>
       <li>
-        <svg class="pricing-check pricing-check--premium" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon(premium: true) %>
         API access
       </li>
       <li>
-        <svg class="pricing-check pricing-check--premium" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8l3.5 3.5 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= pricing_check_icon(premium: true) %>
         Priority support
       </li>
     </ul>
@@ -98,7 +98,8 @@
           <span class="pricing-current">You're on Premium</span>
           <p class="pricing-cta-sub"><%= link_to "Manage your subscription", settings_billing_path %></p>
         <% else %>
-          <%= button_to "Start Free Trial", checkout_settings_billing_path(plan: "monthly"), class: "btn-primary pricing-btn", data: { turbo: false } %>
+          <%= button_to "Start Free Trial — Monthly", checkout_settings_billing_path(plan: "monthly"), class: "btn-primary pricing-btn", data: { turbo: false } %>
+          <%= button_to "Start Free Trial — Annual (save #{PLANS[:premium][:pricing][:annual][:savings]})", checkout_settings_billing_path(plan: "annual"), class: "btn-secondary pricing-btn", data: { turbo: false } %>
           <p class="pricing-cta-sub">No charge for <%= PLANS[:premium][:trial_days] %> days. Cancel anytime.</p>
         <% end %>
       <% else %>

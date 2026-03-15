@@ -16,12 +16,12 @@ class PricingControllerTest < ActionDispatch::IntegrationTest
 
   test "pricing page contains monthly price" do
     get pricing_path
-    assert_match "7.99", response.body
+    assert_match PLANS[:premium][:pricing][:monthly][:display], response.body
   end
 
   test "pricing page contains annual price" do
     get pricing_path
-    assert_match "59.99", response.body
+    assert_match PLANS[:premium][:pricing][:annual][:display], response.body
   end
 
   test "pricing page contains free trial messaging" do
@@ -37,7 +37,7 @@ class PricingControllerTest < ActionDispatch::IntegrationTest
   test "pricing page shows Start Free Trial for free authenticated users" do
     sign_in_as users(:verified_user)
     get pricing_path
-    assert_select "button", text: "Start Free Trial"
+    assert_select "button", /Start Free Trial/
   end
 
   test "pricing page shows You're on Premium for premium users" do

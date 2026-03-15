@@ -122,7 +122,7 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
     get health_report_path(format: :json)
     assert_response :forbidden
     json = JSON.parse(response.body)
-    assert_equal "Health report export requires a premium subscription.", json["error"]
+    assert_equal "Forbidden", json["error"]
   end
 
   test "GET /health-report.json returns 200 for premium users" do

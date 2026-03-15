@@ -11,16 +11,27 @@ class Settings::BillingController < Settings::BaseController
     authorize :billing, :checkout?
     Current.user.set_payment_processor :stripe
 
-    price_id = if params[:plan] == "annual"
-                  Rails.application.credentials.dig(:stripe, :annual_price_id)
-    else
-                  Rails.application.credentials.dig(:stripe, :monthly_price_id)
+    plan = params[:plan]
+    unless %w[monthly annual].include?(plan)
+      plan = "monthly"
     end
+
+    price_id = if plan == "annual"
+                 Rails.application.credentials.dig(:stripe, :annual_price_id)
+               else
+                 Rails.application.credentials.dig(:stripe, :monthly_price_id)
+               end
+
+    # Only grant trial to first-time subscribers
+    has_had_subscription = Pay::Subscription.joins(:customer)
+      .where(pay_customers: { owner_type: "User", owner_id: Current.user.id })
+      .exists?
+    subscription_data = has_had_subscription ? {} : { trial_period_days: PLANS[:premium][:trial_days] }
 
     checkout_session = Current.user.payment_processor.checkout(
       mode: "subscription",
       line_items: price_id,
-      subscription_data: { trial_period_days: PLANS[:premium][:trial_days] },
+      subscription_data: subscription_data,
       success_url: settings_billing_url,
       cancel_url: settings_billing_url
     )

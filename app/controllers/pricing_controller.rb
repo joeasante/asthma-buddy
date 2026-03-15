@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class PricingController < ApplicationController
-  allow_unauthenticated_access
   skip_pundit
+  allow_unauthenticated_access
 
   def show
   end
