@@ -91,6 +91,8 @@ Rails.application.routes.draw do
 
   post "cookie-notice/dismiss", to: "cookie_notices#dismiss", as: :cookie_notice_dismiss
 
+  resource :pricing, only: [ :show ], controller: "pricing"
+
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms
   get "cookies", to: "pages#cookie_policy", as: :cookie_policy
