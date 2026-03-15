@@ -50,7 +50,13 @@ class AppointmentSummariesController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: health_report_json }
+      format.json do
+        if Current.user.premium?
+          render json: health_report_json
+        else
+          render json: { error: "Health report export requires a premium subscription." }, status: :forbidden
+        end
+      end
     end
   end
 
