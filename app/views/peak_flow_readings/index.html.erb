@@ -12,6 +12,10 @@
 
 <%= render "page_header", last_reading: @header_last_reading, month_count: @header_month_count %>
 
+<% if @history_limited %>
+  <%= render "shared/upgrade_banner", feature_key: :peak_flow_history_days %>
+<% end %>
+
 <%# Personal best hero card — shown only when PB is set %>
 <% if @current_personal_best %>
   <% pb = @current_personal_best.value %>

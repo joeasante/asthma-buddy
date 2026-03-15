@@ -104,6 +104,7 @@
               </div>
             </div>
           <% else %>
+            <%= link_to "Pricing", pricing_path, class: "nav-link" %>
             <%= link_to "Sign in", new_session_path, class: "nav-link" %>
             <% if registration_open? %><%= link_to "Get started", new_registration_path, class: "nav-link nav-link--cta" %><% end %>
           <% end %>
@@ -130,6 +131,7 @@
       <%# App footer — just legal links, no marketing copy inside the product %>
       <footer class="footer-app">
         <nav class="footer-nav" aria-label="Footer">
+          <%= link_to "Pricing", pricing_path %>
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
           <%= link_to "Cookies", cookie_policy_path %>
@@ -139,6 +141,7 @@
       <footer>
         <p class="footer-copy">Asthma Buddy &mdash; track your breathing, understand your patterns</p>
         <nav class="footer-nav" aria-label="Footer">
+          <%= link_to "Pricing", pricing_path %>
           <%= link_to "Privacy", privacy_path %>
           <%= link_to "Terms", terms_path %>
           <%= link_to "Cookies", cookie_policy_path %>

@@ -34,6 +34,17 @@ class Api::V1::SymptomLogsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
+  test "returns 403 when user is not premium" do
+    free_user = users(:admin_user) # use a different user
+    free_user.update!(role: :member) # ensure not admin
+    token = free_user.generate_api_key!
+    # No subscription = free user
+    get api_v1_symptom_logs_url, headers: api_headers(token)
+    assert_response :forbidden
+    error = parsed_response["error"]
+    assert_match(/premium/, error["message"])
+  end
+
   # --- Data scoping ---
 
   test "returns only current user records" do
@@ -51,6 +62,7 @@ class Api::V1::SymptomLogsControllerTest < ActionDispatch::IntegrationTest
     # new_user has no symptom logs
     new_user = users(:new_user)
     token = new_user.generate_api_key!
+    make_premium(new_user)
     get api_v1_symptom_logs_url, headers: api_headers(token)
     assert_response :ok
     assert_equal [], parsed_response["data"]

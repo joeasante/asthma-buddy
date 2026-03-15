@@ -227,4 +227,90 @@ class UserTest < ActiveSupport::TestCase
       end
     end
   end
+
+  # -- PlanLimits --
+
+  test "email alias returns same value as email_address" do
+    user = users(:verified_user)
+    assert_equal user.email_address, user.email
+  end
+
+  test "premium? returns false for regular user with no subscription" do
+    user = users(:verified_user)
+    assert_not user.premium?
+  end
+
+  test "premium? returns true for admin regardless of subscription" do
+    user = users(:admin_user)
+    assert user.premium?
+  end
+
+  test "free? is inverse of premium?" do
+    user = users(:verified_user)
+    assert user.free?
+    assert_not user.premium?
+  end
+
+  test "plan_name returns Free for free users" do
+    user = users(:verified_user)
+    assert_equal "Free", user.plan_name
+  end
+
+  test "plan_name returns Premium for admin users" do
+    user = users(:admin_user)
+    assert_equal "Premium", user.plan_name
+  end
+
+  test "plan_features returns free plan features for free users" do
+    user = users(:verified_user)
+    assert_equal PLANS[:free][:features], user.plan_features
+  end
+
+  test "plan_features returns premium plan features for premium users" do
+    user = users(:admin_user)
+    assert_equal PLANS[:premium][:features], user.plan_features
+  end
+
+  test "subscription_status returns none for users without subscriptions" do
+    user = users(:verified_user)
+    assert_equal "none", user.subscription_status
+  end
+
+  test "premium? returns true when user has active subscription" do
+    user = users(:verified_user)
+    user.set_payment_processor :stripe
+    Pay::Subscription.create!(
+      customer: user.payment_processor,
+      processor_id: "sub_test_123",
+      processor_plan: "price_test",
+      name: "default",
+      status: "active",
+      type: "Pay::Stripe::Subscription"
+    )
+    user.payment_processor.reload
+    assert user.premium?
+    assert_equal "Premium", user.plan_name
+    assert_equal "active", user.subscription_status
+  end
+
+  test "subscription_status returns cancelling when active with ends_at" do
+    user = users(:verified_user)
+    user.set_payment_processor :stripe
+    Pay::Subscription.create!(
+      customer: user.payment_processor,
+      processor_id: "sub_test_456",
+      processor_plan: "price_test",
+      name: "default",
+      status: "active",
+      ends_at: 30.days.from_now,
+      type: "Pay::Stripe::Subscription"
+    )
+    user.payment_processor.reload
+    assert_equal "cancelling", user.subscription_status
+  end
+
+  test "next_billing_date returns nil for users without subscriptions" do
+    user = users(:verified_user)
+    assert_nil user.next_billing_date
+  end
 end

@@ -3,6 +3,10 @@
 
 <%= render "page_header", last_log: @header_last_log, month_count: @header_month_count %>
 
+<% if @history_limited %>
+  <%= render "shared/upgrade_banner", feature_key: :symptom_log_history_days %>
+<% end %>
+
 <div id="symptoms-graph" class="section-card" data-controller="hash-scroll">
   <div class="section-card-header">
     <h2 class="section-card-title">History</h2>

@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 3 — SaaS Foundation (Phase 28: REST API)
+**Current focus:** Milestone 3 — SaaS Foundation (Phase 29 complete, Phase 30 next)
 
 ## Current Position
 
-Phase: 28 of 30 (REST API)
-Plan: 03 complete (phase complete)
-Status: Phase 28 complete
-Last activity: 2026-03-14 — Phase 28 verified and complete (REST API, 743 tests)
+Phase: 29 of 30 (Stripe Billing — COMPLETE)
+Plan: All 4/4 complete
+Status: Phase 29 verified and complete
+Last activity: 2026-03-15 — Phase 29 complete (16/16 must-haves verified, 818 tests)
 
-Progress: ######░░░░ 60% (Milestone 3 — SaaS Foundation)
+Progress: #########░ 90% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (Milestone 3)
-- Average duration: 5 min
-- Total execution time: 37 min
+- Total plans completed: 12 (Milestone 3)
+- Average duration: 4 min
+- Total execution time: 54 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -60,6 +60,10 @@ Tests at close: 195
 | 28    | 01   | 2 min    | 2     | 9     |
 | 28    | 02   | 4 min    | 2     | 14    |
 | 28    | 03   | 1 min    | 1     | 2     |
+| 29    | 01   | 4 min    | 2     | 11    |
+| 29    | 02   | 4 min    | 2     | 6     |
+| 29    | 03   | 1 min    | 2     | 0     |
+| 29    | 04   | 8 min    | 8     | 22    |
 
 ## Accumulated Context
 
@@ -97,6 +101,19 @@ Recent decisions affecting current work:
 - 28-03: Throttle key is SHA-256 digest of Bearer token (matches stored digest)
 - 28-03: Retry-After computed from throttle window reset time
 - 28-03: API throttle response uses consistent JSON error format matching API controllers
+- 29-01: Pay emails disabled for MVP (config.send_emails = false)
+- 29-01: alias_attribute :email, :email_address before pay_customer for Pay gem compatibility
+- 29-01: Admins always treated as premium regardless of subscription status
+- 29-01: Pay::Stripe::Subscription STI type required when creating test records directly
+- 29-02: button_to data-turbo=false goes on <button> element, not <form> — test selectors must match
+- 29-02: Admins see "Premium (Admin)" but no manage subscription button (no Stripe subscription)
+- 29-02: Policy gates: checkout for free only, portal for premium non-admin only
+- 29-03: All feature gating code delivered by 29-01/29-02; plan 03 was verification-only pass
+- 29-04: Paused subscriptions do NOT grant premium access (explicit !paused? check)
+- 29-04: Health report JSON gated via premium?; HTML remains accessible to all
+- 29-04: Trial reminder targets via Pay::Subscription query (status: trialing, 3-day window)
+- 29-04: Pricing page uses allow_unauthenticated_access + skip_pundit for public access
+- 29-04: Monthly price is default when no plan param provided to checkout
 
 ### Pending Todos
 
@@ -108,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Completed Phase 28 (REST API)
+Last session: 2026-03-15
+Stopped at: Completed 29-04-PLAN.md (Trial, Pricing & Lifecycle)
 Resume file: None

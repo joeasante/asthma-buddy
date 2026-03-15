@@ -44,6 +44,12 @@ module Api
         end
 
         Current.user = user
+
+        unless user.premium?
+          render_error(status: 403, message: "API access requires an active premium subscription")
+          return
+        end
+
         Rails.logger.info("[API] user=#{user.id} endpoint=#{request.path} ip=#{request.remote_ip}")
       end
 

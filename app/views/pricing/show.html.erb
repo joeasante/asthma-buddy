@@ -1,0 +1,130 @@
+<% content_for :title, "Pricing — Asthma Buddy" %>
+<% content_for :meta_description do %><meta name="description" content="Simple, transparent pricing for Asthma Buddy. Free forever or Premium with unlimited history and health report export."><% end %>
+
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pricing", "data-turbo-track": "reload" %>
+<% end %>
+
+<div class="pricing-hero">
+  <h1>Simple, transparent pricing</h1>
+  <p class="pricing-subtitle">Everything you need to track your asthma. Start free, upgrade when you're ready.</p>
+</div>
+
+<div class="pricing-cards">
+  <%# -- Free Plan -- %>
+  <div class="pricing-card">
+    <div class="pricing-card-header">
+      <h2 class="pricing-plan-name">Free</h2>
+      <div class="pricing-amount">
+        <span class="pricing-price">$0</span>
+      </div>
+      <p class="pricing-period">Forever</p>
+    </div>
+    <ul class="pricing-features" role="list">
+      <li>
+        <%= pricing_check_icon %>
+        Symptom logging
+      </li>
+      <li>
+        <%= pricing_check_icon %>
+        Peak flow tracking
+      </li>
+      <li>
+        <%= pricing_check_icon %>
+        Medication management
+      </li>
+      <li>
+        <%= pricing_check_icon %>
+        Notifications & reminders
+      </li>
+      <li>
+        <%= pricing_check_icon %>
+        Dashboard & insights
+      </li>
+      <li>
+        <%= pricing_check_icon %>
+        <%= PLANS[:free][:features][:symptom_log_history_days] %> days of history
+      </li>
+    </ul>
+    <div class="pricing-cta">
+      <% if authenticated? %>
+        <% if Current.user.free? %>
+          <span class="pricing-current">Your current plan</span>
+        <% else %>
+          <span class="pricing-current">Included in Premium</span>
+        <% end %>
+      <% else %>
+        <%= link_to "Get Started", new_registration_path, class: "btn-secondary pricing-btn" %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# -- Premium Plan -- %>
+  <div class="pricing-card pricing-card--featured">
+    <div class="pricing-card-badge">Most popular</div>
+    <div class="pricing-card-header">
+      <h2 class="pricing-plan-name">Premium</h2>
+      <div class="pricing-amount">
+        <span class="pricing-price"><%= PLANS[:premium][:pricing][:monthly][:display] %></span>
+      </div>
+      <p class="pricing-period">or <%= PLANS[:premium][:pricing][:annual][:display] %> (save <%= PLANS[:premium][:pricing][:annual][:savings] %>)</p>
+      <p class="pricing-trial"><%= PLANS[:premium][:trial_days] %>-day free trial</p>
+    </div>
+    <ul class="pricing-features" role="list">
+      <li>
+        <%= pricing_check_icon %>
+        Everything in Free
+      </li>
+      <li>
+        <%= pricing_check_icon(premium: true) %>
+        Unlimited history
+      </li>
+      <li>
+        <%= pricing_check_icon(premium: true) %>
+        Health report export
+      </li>
+      <li>
+        <%= pricing_check_icon(premium: true) %>
+        API access
+      </li>
+      <li>
+        <%= pricing_check_icon(premium: true) %>
+        Priority support
+      </li>
+    </ul>
+    <div class="pricing-cta">
+      <% if authenticated? %>
+        <% if Current.user.premium? %>
+          <span class="pricing-current">You're on Premium</span>
+          <p class="pricing-cta-sub"><%= link_to "Manage your subscription", settings_billing_path %></p>
+        <% else %>
+          <%= button_to "Start Free Trial — Monthly", checkout_settings_billing_path(plan: "monthly"), class: "btn-primary pricing-btn", data: { turbo: false } %>
+          <%= button_to "Start Free Trial — Annual (save #{PLANS[:premium][:pricing][:annual][:savings]})", checkout_settings_billing_path(plan: "annual"), class: "btn-secondary pricing-btn", data: { turbo: false } %>
+          <p class="pricing-cta-sub">No charge for <%= PLANS[:premium][:trial_days] %> days. Cancel anytime.</p>
+        <% end %>
+      <% else %>
+        <%= link_to "Start Free Trial", new_registration_path, class: "btn-primary pricing-btn" %>
+        <p class="pricing-cta-sub">No charge for <%= PLANS[:premium][:trial_days] %> days. Cancel anytime.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# -- FAQ Section -- %>
+<div class="pricing-faq">
+  <h2>Frequently asked questions</h2>
+  <dl class="pricing-faq-list">
+    <div class="pricing-faq-item">
+      <dt>Can I cancel anytime?</dt>
+      <dd>Yes. Cancel or pause your subscription from your billing settings. No questions asked.</dd>
+    </div>
+    <div class="pricing-faq-item">
+      <dt>When will I be charged?</dt>
+      <dd>After your <%= PLANS[:premium][:trial_days] %>-day free trial ends. Cancel before then and you won't be charged a penny.</dd>
+    </div>
+    <div class="pricing-faq-item">
+      <dt>Can I switch between monthly and annual?</dt>
+      <dd>Yes. You can switch plans anytime from the Stripe customer portal in your billing settings.</dd>
+    </div>
+  </dl>
+</div>

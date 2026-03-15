@@ -46,9 +46,15 @@ class SymptomLogsController < ApplicationController
     end
 
     authorize SymptomLog
+
+    # Apply plan-based history limit for free users
+    cutoff = Current.user.history_cutoff_date(:symptom_log_history_days)
+    @history_limited = cutoff.present?
+    effective_start = [ @start_date, cutoff&.to_date ].compact.max
+
     base_relation = Current.user.symptom_logs
                            .chronological
-                           .in_date_range(@start_date, @end_date)
+                           .in_date_range(effective_start, @end_date)
                            .includes(:rich_text_notes)
 
     base_relation = base_relation.where(symptom_type: @active_symptom_type) if @active_symptom_type.present?

@@ -1141,6 +1141,14 @@ button {
   margin-bottom: 1.5rem;
 }
 
+.section-card--upsell {
+  border-left: 3px solid var(--brand);
+}
+
+.section-card--upsell p {
+  margin: 0;
+}
+
 .section-card-header {
   display: flex;
   align-items: center;

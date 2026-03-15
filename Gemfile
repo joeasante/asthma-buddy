@@ -25,6 +25,8 @@ gem "rack-attack"
 gem "pundit"
 gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 3.2"
+gem "pay", "~> 11.4"
+gem "stripe", "~> 18.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

@@ -50,7 +50,10 @@ class AppointmentSummariesController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: health_report_json }
+      format.json do
+        authorize :appointment_summary, :export?
+        render json: health_report_json
+      end
     end
   end
 

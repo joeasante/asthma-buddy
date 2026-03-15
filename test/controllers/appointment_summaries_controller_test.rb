@@ -115,4 +115,42 @@ class AppointmentSummariesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "GINA", response.body
     assert_no_match "Guideline limit", response.body
   end
+
+  # -- JSON export gating --
+
+  test "GET /health-report.json returns 403 for free users" do
+    get health_report_path(format: :json)
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "Forbidden", json["error"]
+  end
+
+  test "GET /health-report.json returns 200 for premium users" do
+    @user.set_payment_processor :stripe
+    @user.payment_processor.subscriptions.create!(
+      name: "default",
+      processor_id: "sub_json_export",
+      processor_plan: "price_test",
+      status: "active",
+      type: "Pay::Stripe::Subscription"
+    )
+    @user.payment_processor.reload
+
+    get health_report_path(format: :json)
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert json.key?("period_start"), "JSON should contain period_start"
+    assert json.key?("peak_flow"), "JSON should contain peak_flow"
+  end
+
+  test "GET /health-report.json returns 200 for admin users" do
+    sign_in_as users(:admin_user)
+    get health_report_path(format: :json)
+    assert_response :success
+  end
+
+  test "GET /health-report HTML returns 200 for free users" do
+    get health_report_path
+    assert_response :success
+  end
 end

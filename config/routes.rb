@@ -3,6 +3,7 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      resource :account, only: [ :show ]
       resources :symptom_logs, only: [ :index ]
       resources :peak_flow_readings, only: [ :index ]
       resources :medications, only: [ :index ]
@@ -37,6 +38,10 @@ Rails.application.routes.draw do
       resources :dose_logs, only: %i[index create destroy]
     end
     resource :api_key, only: %i[show create destroy]
+    resource :billing, only: [ :show ], controller: "billing" do
+      post :checkout
+      post :portal
+    end
     resource :security, only: [ :show ], controller: "security" do
       get :setup
       post :confirm_setup
@@ -86,6 +91,8 @@ Rails.application.routes.draw do
   end
 
   post "cookie-notice/dismiss", to: "cookie_notices#dismiss", as: :cookie_notice_dismiss
+
+  resource :pricing, only: [ :show ], controller: "pricing"
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms

@@ -40,6 +40,13 @@ class Rack::Attack
     end
   end
 
+  # Throttle billing checkout/portal: 5 per IP per 10 minutes
+  throttle("billing/ip", limit: 5, period: 10.minutes) do |req|
+    if req.path.start_with?("/settings/billing") && req.post?
+      req.ip
+    end
+  end
+
   # Throttle unauthenticated API requests by IP (stricter limit)
   throttle("api/v1/unauthenticated", limit: 10, period: 1.minute) do |req|
     if req.path.start_with?("/api/v1/")
