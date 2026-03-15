@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 3 — SaaS Foundation (Phase 28: REST API)
+**Current focus:** Milestone 3 — SaaS Foundation (Phase 29: Stripe Billing)
 
 ## Current Position
 
-Phase: 28 of 30 (REST API)
-Plan: 03 complete (phase complete)
-Status: Phase 28 complete
-Last activity: 2026-03-14 — Phase 28 verified and complete (REST API, 743 tests)
+Phase: 29 of 30 (Stripe Billing)
+Plan: 01 complete
+Status: Executing Phase 29
+Last activity: 2026-03-15 — Plan 29-01 complete (Pay gem, plan constants, PlanLimits concern, 762 tests)
 
-Progress: ######░░░░ 60% (Milestone 3 — SaaS Foundation)
+Progress: #######░░░ 70% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (Milestone 3)
+- Total plans completed: 9 (Milestone 3)
 - Average duration: 5 min
-- Total execution time: 37 min
+- Total execution time: 41 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -60,6 +60,7 @@ Tests at close: 195
 | 28    | 01   | 2 min    | 2     | 9     |
 | 28    | 02   | 4 min    | 2     | 14    |
 | 28    | 03   | 1 min    | 1     | 2     |
+| 29    | 01   | 4 min    | 2     | 11    |
 
 ## Accumulated Context
 
@@ -97,6 +98,10 @@ Recent decisions affecting current work:
 - 28-03: Throttle key is SHA-256 digest of Bearer token (matches stored digest)
 - 28-03: Retry-After computed from throttle window reset time
 - 28-03: API throttle response uses consistent JSON error format matching API controllers
+- 29-01: Pay emails disabled for MVP (config.send_emails = false)
+- 29-01: alias_attribute :email, :email_address before pay_customer for Pay gem compatibility
+- 29-01: Admins always treated as premium regardless of subscription status
+- 29-01: Pay::Stripe::Subscription STI type required when creating test records directly
 
 ### Pending Todos
 
@@ -108,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Completed Phase 28 (REST API)
+Last session: 2026-03-15
+Stopped at: Completed 29-01-PLAN.md (Stripe Billing Foundation)
 Resume file: None
