@@ -5,7 +5,7 @@ module PlanLimits
 
   def premium?
     return @_premium if defined?(@_premium)
-    @_premium = admin? || current_subscription&.active? || false
+    @_premium = admin? || (current_subscription&.active? && !paused?) || false
   end
 
   def free?
@@ -23,13 +23,29 @@ module PlanLimits
   def subscription_status
     sub = current_subscription
     return "none" unless sub
-    if sub.active? && sub.ends_at.present?
+    if sub.status == "paused"
+      "paused"
+    elsif sub.on_trial?
+      "trialing"
+    elsif sub.active? && sub.ends_at.present?
       "cancelling"
     elsif sub.active?
       "active"
     else
       sub.status
     end
+  end
+
+  def on_trial?
+    current_subscription&.on_trial? || false
+  end
+
+  def trial_ends_at
+    current_subscription&.trial_ends_at
+  end
+
+  def paused?
+    current_subscription&.status == "paused"
   end
 
   def next_billing_date
