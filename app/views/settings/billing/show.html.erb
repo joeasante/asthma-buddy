@@ -58,7 +58,7 @@
       </p>
     <% end %>
 
-    <% if @subscription&.active? && @user.next_billing_date.present? && @user.subscription_status != "cancelling" %>
+    <% if @user.subscription_status == "active" && @user.next_billing_date.present? %>
       <p>Next billing date: <strong><%= @user.next_billing_date.strftime("%B %-d, %Y") %></strong></p>
     <% end %>
 
@@ -66,10 +66,9 @@
       <div class="billing-limits">
         <h3>Free Plan Limits</h3>
         <ul>
-          <li>30 days symptom log history</li>
-          <li>30 days peak flow history</li>
+          <li><%= PLANS[:free][:features][:symptom_log_history_days] %> days symptom log history</li>
+          <li><%= PLANS[:free][:features][:peak_flow_history_days] %> days peak flow history</li>
           <li>No API access</li>
-          <li>No data export</li>
         </ul>
       </div>
     <% end %>

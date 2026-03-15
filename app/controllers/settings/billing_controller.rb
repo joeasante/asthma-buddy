@@ -9,10 +9,9 @@ class Settings::BillingController < Settings::BaseController
 
   def checkout
     authorize :billing, :checkout?
-    user = Current.user
-    user.set_payment_processor :stripe
+    Current.user.set_payment_processor :stripe
 
-    checkout_session = user.payment_processor.checkout(
+    checkout_session = Current.user.payment_processor.checkout(
       mode: "subscription",
       line_items: Rails.application.credentials.dig(:stripe, :premium_price_id),
       success_url: settings_billing_url,
@@ -20,6 +19,9 @@ class Settings::BillingController < Settings::BaseController
     )
 
     redirect_to checkout_session.url, allow_other_host: true
+  rescue Pay::Error, Stripe::StripeError => e
+    Rails.logger.error("[Billing] Checkout failed: #{e.message}")
+    redirect_to settings_billing_path, alert: "Unable to start checkout. Please try again."
   end
 
   def portal
@@ -28,5 +30,8 @@ class Settings::BillingController < Settings::BaseController
       return_url: settings_billing_url
     )
     redirect_to portal_session.url, allow_other_host: true
+  rescue Pay::Error, Stripe::StripeError => e
+    Rails.logger.error("[Billing] Portal failed: #{e.message}")
+    redirect_to settings_billing_path, alert: "Unable to open billing portal. Please try again."
   end
 end

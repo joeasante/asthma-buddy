@@ -36,6 +36,7 @@ class Api::V1::DoseLogsControllerTest < ActionDispatch::IntegrationTest
   test "returns empty array when user has no records" do
     new_user = users(:new_user)
     token = new_user.generate_api_key!
+    make_premium(new_user)
     get api_v1_dose_logs_url, headers: api_headers(token)
     assert_response :ok
     assert_equal [], parsed_response["data"]

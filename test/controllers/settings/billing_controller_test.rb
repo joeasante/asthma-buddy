@@ -33,7 +33,7 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     sign_in_as @user
     get settings_billing_path
     assert_select ".billing-limits" do
-      assert_select "li", text: /30 days symptom log history/
+      assert_select "li", text: /#{PLANS[:free][:features][:symptom_log_history_days]} days symptom log history/
       assert_select "li", text: /No API access/
     end
   end

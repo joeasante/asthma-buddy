@@ -4,7 +4,8 @@ module PlanLimits
   extend ActiveSupport::Concern
 
   def premium?
-    admin? || payment_processor&.subscription&.active?
+    return @_premium if defined?(@_premium)
+    @_premium = admin? || current_subscription&.active? || false
   end
 
   def free?
@@ -20,7 +21,7 @@ module PlanLimits
   end
 
   def subscription_status
-    sub = payment_processor&.subscription
+    sub = current_subscription
     return "none" unless sub
     if sub.active? && sub.ends_at.present?
       "cancelling"
@@ -32,13 +33,20 @@ module PlanLimits
   end
 
   def next_billing_date
-    payment_processor&.subscription&.current_period_end
+    current_subscription&.current_period_end
   end
 
   def history_cutoff_date(feature_key)
     days = plan_features[feature_key]
-    return nil if days.nil? # nil means unlimited
+    return nil if days.nil?
 
     days.days.ago.beginning_of_day
+  end
+
+  private
+
+  def current_subscription
+    return @_current_subscription if defined?(@_current_subscription)
+    @_current_subscription = payment_processor&.subscription
   end
 end
