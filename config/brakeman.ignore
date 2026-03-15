@@ -1,0 +1,14 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "c79d9a973f80f3845d0518278fca3ff684fc7d72c37da110482e1d50e2b39e7c",
+      "note": "Intentional redirect to Stripe Checkout session URL (allow_other_host required)"
+    },
+    {
+      "fingerprint": "61f55e8cea9b5c3522f0a8a74a4746ea77ee30ab14e8755c4bb2d3f266386c78",
+      "note": "Intentional redirect to Stripe Billing Portal URL (allow_other_host required)"
+    }
+  ],
+  "updated": "2026-03-15",
+  "brakeman_version": "8.0.4"
+}

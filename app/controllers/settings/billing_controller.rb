@@ -16,11 +16,9 @@ class Settings::BillingController < Settings::BaseController
       plan = "monthly"
     end
 
-    price_id = if plan == "annual"
-                 Rails.application.credentials.dig(:stripe, :annual_price_id)
-               else
-                 Rails.application.credentials.dig(:stripe, :monthly_price_id)
-               end
+    price_id = plan == "annual" ?
+      Rails.application.credentials.dig(:stripe, :annual_price_id) :
+      Rails.application.credentials.dig(:stripe, :monthly_price_id)
 
     # Only grant trial to first-time subscribers
     has_had_subscription = Pay::Subscription.joins(:customer)
