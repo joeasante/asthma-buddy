@@ -34,8 +34,12 @@
     <% case @user.subscription_status %>
     <% when "active" %>
       <span class="badge badge--enabled">Active</span>
+    <% when "trialing" %>
+      <span class="badge badge--enabled">Trial</span>
     <% when "cancelling" %>
       <span class="badge badge--warning">Cancelling</span>
+    <% when "paused" %>
+      <span class="badge badge--warning">Paused</span>
     <% when "past_due" %>
       <span class="badge badge--danger">Past Due</span>
     <% else %>
@@ -50,6 +54,17 @@
         <strong><%= @user.plan_name %></strong>
       <% end %>
     </div>
+
+    <% if @user.on_trial? && @user.trial_ends_at.present? %>
+      <p>Your free trial ends on <strong><%= @user.trial_ends_at.strftime("%B %-d, %Y") %></strong>.
+      You won't be charged until then.</p>
+    <% end %>
+
+    <% if @user.paused? %>
+      <p class="billing-notice">
+        Your subscription is paused. Resume anytime from the subscription portal.
+      </p>
+    <% end %>
 
     <% if @user.subscription_status == "cancelling" && @subscription&.ends_at.present? %>
       <p class="billing-notice">
@@ -69,17 +84,34 @@
           <li><%= PLANS[:free][:features][:symptom_log_history_days] %> days symptom log history</li>
           <li><%= PLANS[:free][:features][:peak_flow_history_days] %> days peak flow history</li>
           <li>No API access</li>
+          <li>No health report export</li>
         </ul>
+      </div>
+
+      <div class="billing-pricing">
+        <p><strong>Premium:</strong> <%= PLANS[:premium][:pricing][:monthly][:display] %> or <%= PLANS[:premium][:pricing][:annual][:display] %> (save <%= PLANS[:premium][:pricing][:annual][:savings] %>)</p>
+        <p>Start with a <%= PLANS[:premium][:trial_days] %>-day free trial — no charge until the trial ends.</p>
+      </div>
+
+      <div class="billing-actions">
+        <%= button_to "Start Free Trial (Monthly)", checkout_settings_billing_path(plan: "monthly"), class: "btn-primary", data: { turbo: false } %>
+        <%= button_to "Start Free Trial (Annual)", checkout_settings_billing_path(plan: "annual"), class: "btn-secondary", data: { turbo: false } %>
+      </div>
+
+      <p><%= link_to "See full plan comparison", pricing_path %></p>
+    <% end %>
+
+    <% if @user.paused? %>
+      <div class="billing-actions">
+        <%= button_to "Manage Subscription", portal_settings_billing_path, class: "btn-secondary", data: { turbo: false } %>
       </div>
     <% end %>
 
-    <div class="billing-actions">
-      <% if @user.free? %>
-        <%= button_to "Upgrade to Premium", checkout_settings_billing_path, class: "btn-primary", data: { turbo: false } %>
-      <% elsif @user.premium? && !@user.admin? %>
+    <% if @user.premium? && !@user.admin? %>
+      <div class="billing-actions">
         <%= button_to "Manage Subscription", portal_settings_billing_path, class: "btn-secondary", data: { turbo: false } %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   </div>
 </div>
 
