@@ -8,7 +8,7 @@ alice_coughing_old:
   user: verified_user
   symptom_type: 1      # coughing
   severity: 0          # mild
-  recorded_at: <%= 40.days.ago %>
+  recorded_at: <%= 25.days.ago %>
 
 alice_severe_recent:
   user: verified_user

@@ -220,7 +220,7 @@ class SymptomLoggingTest < ApplicationSystemTestCase
 
     within("[role='group'][aria-label='Time period']") { click_on "All" }
 
-    # alice_coughing_old (40 days ago) should now appear
+    # alice_coughing_old (25 days ago) should now appear
     assert_selector ".timeline-card", text: /Coughing/i
   end
 
