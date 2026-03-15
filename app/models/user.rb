@@ -2,6 +2,10 @@
 
 class User < ApplicationRecord
   include ApiAuthenticatable
+  include PlanLimits
+
+  alias_attribute :email, :email_address
+  pay_customer default_payment_processor: :stripe
 
   has_secure_password
 
