@@ -3,8 +3,10 @@
 module Api
   module V1
     class AccountsController < BaseController
+      skip_before_action :require_premium_subscription
+
       def show
-        authorize :account, :destroy? # reuse existing policy — any authenticated user can view their own account
+        authorize :account, :show?
 
         user = Current.user
         render json: {
@@ -15,7 +17,8 @@ module Api
             subscription_status: user.subscription_status,
             on_trial: user.on_trial?,
             trial_ends_at: user.trial_ends_at,
-            next_billing_date: user.next_billing_date
+            next_billing_date: user.next_billing_date,
+            features: user.plan_features
           }
         }
       end
