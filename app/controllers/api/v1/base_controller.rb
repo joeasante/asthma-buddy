@@ -10,6 +10,7 @@ module Api
       after_action :verify_authorized
 
       before_action :authenticate_api_key!
+      before_action :require_premium_subscription
       before_action :set_cache_headers
 
       rescue_from Pundit::NotAuthorizedError do |_exception|
@@ -44,13 +45,12 @@ module Api
         end
 
         Current.user = user
-
-        unless user.premium?
-          render_error(status: 403, message: "API access requires an active premium subscription")
-          return
-        end
-
         Rails.logger.info("[API] user=#{user.id} endpoint=#{request.path} ip=#{request.remote_ip}")
+      end
+
+      def require_premium_subscription
+        return if Current.user&.premium?
+        render_error(status: 403, message: "API access requires an active premium subscription")
       end
 
       def extract_bearer_token

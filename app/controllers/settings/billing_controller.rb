@@ -20,11 +20,7 @@ class Settings::BillingController < Settings::BaseController
       Rails.application.credentials.dig(:stripe, :annual_price_id) :
       Rails.application.credentials.dig(:stripe, :monthly_price_id)
 
-    # Only grant trial to first-time subscribers
-    has_had_subscription = Pay::Subscription.joins(:customer)
-      .where(pay_customers: { owner_type: "User", owner_id: Current.user.id })
-      .exists?
-    subscription_data = has_had_subscription ? {} : { trial_period_days: PLANS[:premium][:trial_days] }
+    subscription_data = Current.user.has_had_subscription? ? {} : { trial_period_days: PLANS[:premium][:trial_days] }
 
     checkout_session = Current.user.payment_processor.checkout(
       mode: "subscription",

@@ -11,18 +11,6 @@ module ApiTestHelper
     make_premium(@api_user)
   end
 
-  def make_premium(user)
-    user.set_payment_processor :stripe
-    user.payment_processor.subscriptions.create!(
-      name: "default",
-      processor_id: "sub_test_#{user.id}",
-      processor_plan: "price_test",
-      status: "active",
-      type: "Pay::Stripe::Subscription"
-    )
-    user.payment_processor.reload
-  end
-
   def setup_other_user
     @other_user = users(:unverified_user)
   end

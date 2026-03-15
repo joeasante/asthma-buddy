@@ -16,5 +16,17 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    def make_premium(user, status: "active", **overrides)
+      user.set_payment_processor :stripe
+      user.payment_processor.subscriptions.create!({
+        name: "default",
+        processor_id: "sub_test_#{user.id}",
+        processor_plan: "price_test",
+        status: status,
+        type: "Pay::Stripe::Subscription"
+      }.merge(overrides))
+      user.payment_processor.reload
+    end
   end
 end

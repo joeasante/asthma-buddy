@@ -24,6 +24,7 @@ module PlanLimits
 
   def subscription_status
     sub = current_subscription
+    return "admin" if admin? && sub.nil?
     return "none" unless sub
     if sub.status == "paused"
       "paused"
@@ -54,6 +55,12 @@ module PlanLimits
     current_subscription&.current_period_end
   end
 
+  def has_had_subscription?
+    Pay::Subscription.joins(:customer)
+      .where(pay_customers: { owner_type: "User", owner_id: id })
+      .exists?
+  end
+
   def history_cutoff_date(feature_key)
     days = plan_features[feature_key]
     return nil if days.nil?
@@ -61,9 +68,17 @@ module PlanLimits
     days.days.ago.beginning_of_day
   end
 
+  # Returns [effective_start_date, history_limited?] after applying plan-based history limits
+  def apply_history_limit(feature_key, start_date)
+    cutoff = history_cutoff_date(feature_key)
+    effective_start = [ start_date, cutoff&.to_date ].compact.max
+    [ effective_start, cutoff.present? ]
+  end
+
   private
 
   def current_subscription
-    payment_processor&.subscription
+    return @_current_subscription if defined?(@_current_subscription)
+    @_current_subscription = payment_processor&.subscription
   end
 end

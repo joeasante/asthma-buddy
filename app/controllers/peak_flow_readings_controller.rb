@@ -59,10 +59,7 @@ class PeakFlowReadingsController < ApplicationController
 
     @active_zone = %w[green yellow red].include?(params[:zone]) ? params[:zone] : nil
 
-    # Apply plan-based history limit for free users
-    cutoff = Current.user.history_cutoff_date(:peak_flow_history_days)
-    @history_limited = cutoff.present?
-    effective_start = [ @start_date, cutoff&.to_date ].compact.max
+    effective_start, @history_limited = Current.user.apply_history_limit(:peak_flow_history_days, @start_date)
 
     base_relation = Current.user.peak_flow_readings
                            .chronological

@@ -199,6 +199,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_173006) do
     t.index ["customer_id", "processor_id"], name: "index_pay_subscriptions_on_customer_id_and_processor_id", unique: true
     t.index ["metered"], name: "index_pay_subscriptions_on_metered"
     t.index ["pause_starts_at"], name: "index_pay_subscriptions_on_pause_starts_at"
+    t.index ["status", "trial_ends_at"], name: "index_pay_subscriptions_on_status_and_trial_ends_at"
   end
 
   create_table "pay_webhooks", force: :cascade do |t|
