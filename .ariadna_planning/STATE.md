@@ -10,9 +10,9 @@ See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 29 of 30 (Stripe Billing)
-Plan: 01 complete
+Plan: 02 complete
 Status: Executing Phase 29
-Last activity: 2026-03-15 — Plan 29-01 complete (Pay gem, plan constants, PlanLimits concern, 762 tests)
+Last activity: 2026-03-15 — Plan 29-02 complete (Billing settings UI, Stripe Checkout/Portal, Pundit policy, 776 tests)
 
 Progress: #######░░░ 70% (Milestone 3 — SaaS Foundation)
 
@@ -46,9 +46,9 @@ Tests at close: 195
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9 (Milestone 3)
+- Total plans completed: 10 (Milestone 3)
 - Average duration: 5 min
-- Total execution time: 41 min
+- Total execution time: 45 min
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -61,6 +61,7 @@ Tests at close: 195
 | 28    | 02   | 4 min    | 2     | 14    |
 | 28    | 03   | 1 min    | 1     | 2     |
 | 29    | 01   | 4 min    | 2     | 11    |
+| 29    | 02   | 4 min    | 2     | 6     |
 
 ## Accumulated Context
 
@@ -102,6 +103,9 @@ Recent decisions affecting current work:
 - 29-01: alias_attribute :email, :email_address before pay_customer for Pay gem compatibility
 - 29-01: Admins always treated as premium regardless of subscription status
 - 29-01: Pay::Stripe::Subscription STI type required when creating test records directly
+- 29-02: button_to data-turbo=false goes on <button> element, not <form> — test selectors must match
+- 29-02: Admins see "Premium (Admin)" but no manage subscription button (no Stripe subscription)
+- 29-02: Policy gates: checkout for free only, portal for premium non-admin only
 
 ### Pending Todos
 
@@ -114,5 +118,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 29-01-PLAN.md (Stripe Billing Foundation)
+Stopped at: Completed 29-02-PLAN.md (Billing Settings UI)
 Resume file: None
