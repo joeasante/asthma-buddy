@@ -33,3 +33,8 @@ production:
     class: DatabaseMaintenanceJob
     queue: default
     schedule: every day at 4am
+
+  trial_reminders:
+    class: TrialReminderJob
+    queue: default
+    schedule: every day at 9am

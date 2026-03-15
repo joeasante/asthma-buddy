@@ -1,0 +1,13 @@
+Your trial is ending soon
+
+Hi<%= @user.full_name.present? ? " #{@user.full_name}" : "" %>,
+
+Your Asthma Buddy free trial ends on <%= @trial_ends_at.strftime("%B %-d, %Y") %>.
+
+After that, you'll be charged <%= @plan_display %> to continue with Premium features like unlimited history and health report export.
+
+If you'd rather not continue, you can cancel anytime from your billing settings before the trial ends — you won't be charged.
+
+Manage your subscription: <%= settings_billing_url %>
+
+Thanks for trying Asthma Buddy Premium.
