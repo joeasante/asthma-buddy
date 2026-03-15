@@ -37,6 +37,10 @@ Rails.application.routes.draw do
       resources :dose_logs, only: %i[index create destroy]
     end
     resource :api_key, only: %i[show create destroy]
+    resource :billing, only: [ :show ], controller: "billing" do
+      post :checkout
+      post :portal
+    end
     resource :security, only: [ :show ], controller: "security" do
       get :setup
       post :confirm_setup
