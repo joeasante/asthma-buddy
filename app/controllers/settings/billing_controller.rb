@@ -11,9 +11,16 @@ class Settings::BillingController < Settings::BaseController
     authorize :billing, :checkout?
     Current.user.set_payment_processor :stripe
 
+    price_id = if params[:plan] == "annual"
+                  Rails.application.credentials.dig(:stripe, :annual_price_id)
+    else
+                  Rails.application.credentials.dig(:stripe, :monthly_price_id)
+    end
+
     checkout_session = Current.user.payment_processor.checkout(
       mode: "subscription",
-      line_items: Rails.application.credentials.dig(:stripe, :premium_price_id),
+      line_items: price_id,
+      subscription_data: { trial_period_days: PLANS[:premium][:trial_days] },
       success_url: settings_billing_url,
       cancel_url: settings_billing_url
     )

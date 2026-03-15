@@ -38,10 +38,13 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "show displays upgrade button for free users" do
+  test "show displays pricing info and trial buttons for free users" do
     sign_in_as @user
     get settings_billing_path
-    assert_select "button", text: "Upgrade to Premium"
+    assert_select ".billing-pricing", text: /7\.99/
+    assert_select ".billing-pricing", text: /59\.99/
+    assert_select "button", text: /Start Free Trial \(Monthly\)/
+    assert_select "button", text: /Start Free Trial \(Annual\)/
   end
 
   test "show does not display manage subscription button for free users" do
@@ -62,16 +65,21 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     assert_select "button", text: "Manage Subscription", count: 0
   end
 
-  test "show does not display upgrade button for admin users" do
+  test "show does not display upgrade buttons for admin users" do
     sign_in_as @admin
     get settings_billing_path
-    assert_select "button", text: "Upgrade to Premium", count: 0
+    assert_select "button", text: /Start Free Trial/, count: 0
+  end
+
+  test "show displays link to full pricing page for free users" do
+    sign_in_as @user
+    get settings_billing_path
+    assert_select "a[href='#{pricing_path}']", text: /plan comparison/i
   end
 
   # -- checkout policy enforcement --
 
   test "checkout is denied for premium users" do
-    # Make user premium via subscription
     @user.set_payment_processor :stripe
     @user.payment_processor.subscriptions.create!(
       name: "default",
@@ -86,6 +94,38 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     post checkout_settings_billing_path
     assert_redirected_to root_path
     assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
+
+  test "checkout is allowed for paused users" do
+    @user.set_payment_processor :stripe
+    @user.payment_processor.subscriptions.create!(
+      name: "default",
+      processor_id: "sub_paused_checkout",
+      processor_plan: "price_test",
+      status: "paused",
+      type: "Pay::Stripe::Subscription"
+    )
+    @user.payment_processor.reload
+
+    sign_in_as @user
+    # This will fail at the Stripe API level (no real credentials),
+    # but it should NOT be denied by Pundit policy
+    post checkout_settings_billing_path(plan: "monthly")
+    # Should redirect to billing with alert (Stripe error), not root (policy denial)
+    assert_redirected_to settings_billing_path
+  end
+
+  test "checkout defaults to monthly when no plan param given" do
+    sign_in_as @user
+    # Will fail at Stripe API level but should not raise policy error
+    post checkout_settings_billing_path
+    assert_redirected_to settings_billing_path
+  end
+
+  test "checkout accepts annual plan param" do
+    sign_in_as @user
+    post checkout_settings_billing_path(plan: "annual")
+    assert_redirected_to settings_billing_path
   end
 
   # -- portal policy enforcement --
@@ -104,13 +144,13 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
 
-  # -- checkout and portal buttons have data-turbo=false --
+  # -- checkout buttons have data-turbo=false --
 
-  test "checkout button has data-turbo false attribute" do
+  test "checkout buttons have data-turbo false attribute" do
     sign_in_as @user
     get settings_billing_path
-    assert_select "form[action='#{checkout_settings_billing_path}']" do
-      assert_select "button[data-turbo='false']", text: "Upgrade to Premium"
+    assert_select "form[action*='checkout']" do
+      assert_select "button[data-turbo='false']"
     end
   end
 

@@ -6,7 +6,7 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def checkout?
-    user.free? # Only free users can initiate checkout
+    user.free? || user.paused?
   end
 
   def portal?
