@@ -21,8 +21,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 26: Role-Based Access Control** — Replace admin boolean with role enum; authorize every action via Pundit policies
 - [x] **Phase 27: Multi-Factor Authentication** — TOTP-based MFA with QR setup, recovery codes, and encrypted secrets
 - [x] **Phase 28: REST API** — Versioned JSON API with key-based auth, pagination, filtering, and rate limiting
-- [ ] **Phase 29: Stripe Billing** — Subscription plans, Stripe Checkout, Customer Portal, webhook processing, feature gating
-- [ ] **Phase 30: Cross-Feature Integration Tests** — Verify interactions between MFA, API, billing, and RBAC
+- [x] **Phase 29: Stripe Billing** — Subscription plans, Stripe Checkout, Customer Portal, webhook processing, feature gating, 30-day trial with auto-convert, pause-subscription option
+- [ ] **Phase 30: Cross-Feature Integration Tests & Launch Prep** — Verify interactions between MFA, API, billing, and RBAC; FDA-safe copy review pass
 
 ---
 
@@ -98,32 +98,36 @@ Plans:
 
 ### Phase 29: Stripe Billing
 
-**Goal**: The app offers free and premium subscription plans with feature limits, users can subscribe via Stripe Checkout, manage their subscription via Stripe Customer Portal, and billing state is kept in sync through asynchronous webhook processing.
+**Goal**: The app offers free and premium subscription plans with feature limits, users can subscribe via Stripe Checkout with a 30-day free trial (auto-converts to paid), manage their subscription via Stripe Customer Portal (including pause option), and billing state is kept in sync through asynchronous webhook processing.
 **Why this matters**: Billing is the monetization foundation that turns Asthma Buddy from a personal project into a sustainable product — without revenue, the app cannot grow or fund ongoing development and hosting.
 **Depends on**: Phase 26 (Pundit policies for feature gating), Phase 28 (API patterns inform webhook controller design)
 **Requirements**: BILL-01, BILL-02, BILL-03, BILL-04, BILL-05, BILL-06
 
-**Success Criteria** (what must be TRUE):
-  1. The app defines free and premium plans; free users have visible feature limits (e.g. restricted API access, limited history) while premium users have full access.
-  2. A free user can initiate a subscription upgrade, be redirected to Stripe Checkout (hosted payment page), complete payment, and return to the app as a premium subscriber — without the app handling card data directly.
-  3. A subscribed user can access the Stripe Customer Portal from their billing settings to cancel their subscription, update their payment method, or view invoices.
-  4. Stripe webhook events (subscription created, updated, cancelled, payment failed) are processed asynchronously via Solid Queue with idempotency — duplicate webhook deliveries do not create duplicate state changes.
-  5. Premium-only features are gated by subscription plan using Pundit policies; a user who downgrades or cancels loses access to premium features gracefully (with a clear upgrade prompt, not an error).
-  6. The billing settings page shows the user's current plan name, subscription status (active, cancelled, past due), and next billing date.
+**Pricing**: $7.99/month or $59.99/year (37% annual savings). 30-day free trial for new users (collects payment info upfront, auto-converts).
 
-**Plans:** 3 plans
+**Success Criteria** (what must be TRUE):
+  1. The app defines free and premium plans; free users have visible feature limits (e.g. restricted API access, limited history, no PDF export) while premium users have full access.
+  2. A free user can initiate a subscription upgrade, be redirected to Stripe Checkout (hosted payment page) with a 30-day free trial, complete signup, and return to the app as a premium subscriber — without the app handling card data directly.
+  3. A subscribed user can access the Stripe Customer Portal from their billing settings to cancel, pause (1 or 3 months), update their payment method, or view invoices.
+  4. Stripe webhook events (subscription created, updated, cancelled, paused, resumed, payment failed) are processed asynchronously via Solid Queue with idempotency — duplicate webhook deliveries do not create duplicate state changes.
+  5. Premium-only features are gated by subscription plan using Pundit policies; a user who downgrades or cancels loses access to premium features gracefully (with a clear upgrade prompt, not an error).
+  6. The billing settings page shows the user's current plan name, subscription status (active, trialing, paused, cancelled, past due), next billing date, and trial end date if applicable.
+  7. Trial reminder email is sent 3 days before the trial ends, clearly stating the charge amount and how to cancel.
+
+**Plans:** 4 plans
 
 Plans:
-- [ ] 29-01-PLAN.md — Pay gem setup, migrations, User model integration, PlanLimits concern
-- [ ] 29-02-PLAN.md — Billing settings controller, views, policy, settings navigation
-- [ ] 29-03-PLAN.md — Feature gating (API keys, history limits) with upgrade prompts
+- [x] 29-01-PLAN.md — Pay gem setup, migrations, User model integration, PlanLimits concern
+- [x] 29-02-PLAN.md — Billing settings controller, views, policy, settings navigation
+- [x] 29-03-PLAN.md — Feature gating (API keys, history limits) with upgrade prompts
+- [x] 29-04-PLAN.md — 30-day trial, monthly/annual pricing, public pricing page, paused state, trial reminder emails
 
 ---
 
-### Phase 30: Cross-Feature Integration Tests
+### Phase 30: Cross-Feature Integration Tests & Launch Prep
 
-**Goal**: Integration tests verify the correct interactions between all Milestone 3 features — MFA with API keys, billing with feature gating, RBAC parity across web and API, and Stripe webhook processing with test fixtures.
-**Why this matters**: Each phase includes its own unit and controller tests, but the cross-cutting interactions (Does MFA block API access? Does downgrading revoke API-gated features? Do API endpoints enforce the same Pundit policies as web?) are where bugs hide. This phase is the safety net.
+**Goal**: Integration tests verify the correct interactions between all Milestone 3 features — MFA with API keys, billing with feature gating, RBAC parity across web and API, and Stripe webhook processing with test fixtures. Additionally, a copy review pass ensures all user-facing text avoids FDA medical device classification.
+**Why this matters**: Each phase includes its own unit and controller tests, but the cross-cutting interactions (Does MFA block API access? Does downgrading revoke API-gated features? Do API endpoints enforce the same Pundit policies as web?) are where bugs hide. The copy review prevents regulatory risk before launch.
 **Depends on**: Phase 26, Phase 27, Phase 28, Phase 29 (all features must exist before integration testing)
 **Requirements**: TEST-01, TEST-02, TEST-03, TEST-04
 
@@ -131,7 +135,8 @@ Plans:
   1. Tests confirm that API key authentication bypasses MFA (by design) — a user with MFA enabled can use their API key without entering a TOTP code, while web login still requires MFA.
   2. Tests confirm that upgrading from free to premium grants access to gated features, and downgrading or cancelling removes access — across both web and API.
   3. Tests confirm that Pundit policies produce identical authorization decisions for the same user/resource whether accessed via web controller or API controller.
-  4. Stripe webhook test fixtures (via WebMock/VCR) verify that subscription lifecycle events (created, updated, cancelled, payment_failed) are processed correctly without hitting the Stripe API.
+  4. Stripe webhook test fixtures (via WebMock/VCR) verify that subscription lifecycle events (created, updated, cancelled, paused, resumed, payment_failed) are processed correctly without hitting the Stripe API.
+  5. All user-facing text has been reviewed to avoid medical device classification language — no "diagnose," "treat," "prescribe," or "medical advice." Only "track," "monitor," "understand," "informational."
 
 **Plans**: TBD
 
@@ -147,7 +152,7 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 | 26. Role-Based Access Control | 2/2 | ✓ Complete | 2026-03-14 |
 | 27. Multi-Factor Authentication | 3/3 | ✓ Complete | 2026-03-14 |
 | 28. REST API | 3/3 | ✓ Complete | 2026-03-14 |
-| 29. Stripe Billing | 0/3 | Not started | - |
+| 29. Stripe Billing | 4/4 | ✓ Complete | 2026-03-15 |
 | 30. Cross-Feature Integration Tests | 0/TBD | Not started | - |
 
 ---
@@ -188,3 +193,34 @@ Phases execute in numeric order: 26 -> 27 -> 28 -> 29 -> 30
 
 *Roadmap created: 2026-03-14 — Milestone 3 (SaaS Foundation)*
 *Milestones 1-2 (Phases 1-25) archived — all 26 phases complete (including 15.1)*
+
+---
+
+## Milestone 4 — Feature Expansion & Accessibility (Planned)
+
+**Theme:** Close competitive gaps, ensure accessibility, and add polish.
+
+**Pricing context:** $7.99/mo or $59.99/yr. Freemium with 30-day trial. Free tier: core tracking with 30-day history. Premium: unlimited history, API, PDF export.
+
+### Planned Phases (to be detailed when Milestone 3 completes)
+
+| Priority | Phase | Feature | Notes |
+|----------|-------|---------|-------|
+| High | 31 | Air Quality / Pollen / Weather Integration | Real-time environmental data with trigger alerts. #1 missing feature vs competitors. |
+| High | 32 | Asthma Action Plan | Digital green/yellow/red zone plans — clinical standard |
+| High | 33 | PDF/CSV Health Report Export | Doctors want PDF, not JSON. Email share included. Premium feature. |
+| High | 34 | Apple HealthKit Integration | Table stakes for health apps. Critical as Apple expands asthma features. |
+| Medium | 35 | Trigger Correlation Analysis | Track triggers, correlate with symptom episodes over time |
+| Medium | 36 | Multi-User / Family Support | Parents managing children's asthma |
+| Medium | 37 | Gamification | Streaks, challenges, rewards for engagement. Helps with 7.5% monthly churn. |
+| Medium | 38 | Dark Mode | Full dark mode support across all views |
+| Medium | 39 | WCAG 2.2 Compliance | Full accessibility audit and remediation |
+| Medium | 40 | Inhaler Technique Training Videos | Educational content — last medium priority item |
+| Low | 41 | AI Chat (optional) | Conversational asthma assistant. Only if demand warrants. Requires disclaimers. |
+
+### Backlog (post-launch, demand-driven)
+- HSA/FSA eligibility (LMN templates, Truemed integration)
+- Regional/PPP-adjusted pricing
+- Clinician portal (only if B2B2C demand emerges)
+
+*Milestone 4 planned: 2026-03-15 — informed by competitive research and pricing strategy*

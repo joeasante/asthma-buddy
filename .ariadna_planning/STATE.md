@@ -5,16 +5,16 @@
 See: .ariadna_planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** A reliable daily tracking companion that surfaces patterns — so users and their doctors actually understand what's happening with their asthma.
-**Current focus:** Milestone 3 — SaaS Foundation (Phase 29: Stripe Billing)
+**Current focus:** Milestone 3 — SaaS Foundation (Phase 29 complete, Phase 30 next)
 
 ## Current Position
 
-Phase: 29 of 30 (Stripe Billing)
-Plan: 04 complete
-Status: Executing Phase 29
-Last activity: 2026-03-15 — Plan 29-04 complete (Trial, pricing, lifecycle states, 818 tests)
+Phase: 29 of 30 (Stripe Billing — COMPLETE)
+Plan: All 4/4 complete
+Status: Phase 29 verified and complete
+Last activity: 2026-03-15 — Phase 29 complete (16/16 must-haves verified, 818 tests)
 
-Progress: ########░░ 80% (Milestone 3 — SaaS Foundation)
+Progress: #########░ 90% (Milestone 3 — SaaS Foundation)
 
 ## Milestone 2 Summary (v2.0 — Complete 2026-03-14)
 
